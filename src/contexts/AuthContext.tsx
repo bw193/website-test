@@ -26,10 +26,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      handleUser(session?.user ?? null);
-    });
+    // Get initial session with a timeout to prevent infinite loading if URL is invalid
+    const fetchSession = async () => {
+      try {
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error("Supabase getSession timeout")), 10000)
+        );
+        const sessionPromise = supabase.auth.getSession();
+        
+        const { data: { session } } = await Promise.race([sessionPromise, timeoutPromise]) as any;
+        handleUser(session?.user ?? null);
+      } catch (error) {
+        console.error("Error getting initial session:", error);
+        handleUser(null); // Fallback to unauthenticated state
+      }
+    };
+
+    fetchSession();
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -103,26 +116,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const loginWithEmail = async (email: string, pass: string) => {
-    // Hardcoded Master Admin Bypass
-    const isMaster = (email === 'wubanglun@gmail.com' || email === 'wubanglun@163.com') && pass === '12345678';
-    
-    if (isMaster) {
-      console.log("Master Admin Bypass Activated for:", email);
-      setUser({ 
-        id: '00000000-0000-0000-0000-000000000000', // Dummy UUID
-        email: email,
-        app_metadata: {},
-        user_metadata: {},
-        aud: 'authenticated',
-        created_at: new Date().toISOString()
-      } as User);
-      setIsAdmin(true);
-      setIsMasterAdmin(true);
-      setIsPending(false);
-      setLoading(false);
-      return;
-    }
-
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password: pass });
       if (error) throw error;
@@ -133,26 +126,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const registerWithEmail = async (email: string, pass: string) => {
-    // Hardcoded Master Admin Bypass for Registration
-    const isMaster = (email === 'wubanglun@gmail.com' || email === 'wubanglun@163.com') && pass === '12345678';
-    
-    if (isMaster) {
-      console.log("Master Admin Registration Bypass Activated for:", email);
-      setUser({ 
-        id: '00000000-0000-0000-0000-000000000000', 
-        email: email,
-        app_metadata: {},
-        user_metadata: {},
-        aud: 'authenticated',
-        created_at: new Date().toISOString()
-      } as User);
-      setIsAdmin(true);
-      setIsMasterAdmin(true);
-      setIsPending(false);
-      setLoading(false);
-      return;
-    }
-
     try {
       const { data, error } = await supabase.auth.signUp({ 
         email, 
@@ -167,7 +140,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           email: data.user.email,
           role: 'pending'
         });
-        if (profileError) throw profileError;
+        // Ignore duplicate key error (23505) in case a Postgres trigger already created the profile
+        if (profileError && profileError.code !== '23505') {
+          console.error("Profile creation error:", profileError);
+        }
       }
     } catch (error: any) {
       console.error("Registration failed", error);
