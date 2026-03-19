@@ -2,10 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Sparkles, LogIn, UserPlus } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function AdminLogin() {
   const { user, isAdmin, isPending, login, loginWithEmail, registerWithEmail, loading } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [error, setError] = useState<string | null>(null);
   const [isRegistering, setIsRegistering] = useState(false);
   const [email, setEmail] = useState('');
@@ -26,7 +28,7 @@ export default function AdminLogin() {
       if (err.code === 'auth/popup-closed-by-user') {
         console.log('Login popup closed by user');
       } else {
-        setError(err.message || 'An error occurred during login.');
+        setError(err.message || t('admin.login.errors.loginFailed'));
       }
     }
   };
@@ -42,7 +44,7 @@ export default function AdminLogin() {
         await loginWithEmail(email, password);
       }
     } catch (err: any) {
-      setError(err.message || 'An error occurred.');
+      setError(err.message || t('admin.login.errors.generalError'));
     } finally {
       setIsLoading(false);
     }
@@ -55,7 +57,7 @@ export default function AdminLogin() {
     try {
       await loginWithEmail('wubanglun@gmail.com', '12345678');
     } catch (err: any) {
-      setError(err.message || 'An error occurred.');
+      setError(err.message || t('admin.login.errors.generalError'));
     } finally {
       setIsLoading(false);
     }
@@ -68,10 +70,10 @@ export default function AdminLogin() {
           <Sparkles className="h-12 w-12 text-amber-600" />
         </div>
         <h2 className="mt-6 text-center text-3xl font-extrabold text-stone-900">
-          Employee Portal
+          {t('admin.login.title')}
         </h2>
         <p className="mt-2 text-center text-sm text-stone-600">
-          {isRegistering ? 'Create an employee account to request access.' : 'Sign in to manage the product catalog and view RFQs.'}
+          {isRegistering ? t('admin.login.subtitleRegister') : t('admin.login.subtitleLogin')}
         </p>
       </div>
 
@@ -84,19 +86,19 @@ export default function AdminLogin() {
           )}
           {user && isPending ? (
             <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded relative mb-4" role="alert">
-              <strong className="font-bold">Pending Approval! </strong>
-              <span className="block sm:inline">Your account ({user.email}) is waiting for master admin approval.</span>
+              <strong className="font-bold">{t('admin.login.pendingTitle')} </strong>
+              <span className="block sm:inline">{t('admin.login.pendingDesc', { email: user.email })}</span>
             </div>
           ) : user && !isAdmin ? (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-              <strong className="font-bold">Access Denied! </strong>
-              <span className="block sm:inline">Your account ({user.email}) does not have admin privileges.</span>
+              <strong className="font-bold">{t('admin.login.deniedTitle')} </strong>
+              <span className="block sm:inline">{t('admin.login.deniedDesc', { email: user.email })}</span>
             </div>
           ) : null}
           
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-stone-700">Email address</label>
+              <label className="block text-sm font-medium text-stone-700">{t('admin.login.email')}</label>
               <div className="mt-1">
                 <input
                   type="email"
@@ -109,7 +111,7 @@ export default function AdminLogin() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-stone-700">Password</label>
+              <label className="block text-sm font-medium text-stone-700">{t('admin.login.password')}</label>
               <div className="mt-1">
                 <input
                   type="password"
@@ -127,7 +129,7 @@ export default function AdminLogin() {
               className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 disabled:opacity-50"
             >
               {isRegistering ? <UserPlus className="w-5 h-5 mr-2" /> : <LogIn className="w-5 h-5 mr-2" />}
-              {isRegistering ? 'Register Account' : 'Sign In'}
+              {isRegistering ? t('admin.login.registerBtn') : t('admin.login.signInBtn')}
             </button>
 
             {!isRegistering && (
@@ -137,7 +139,7 @@ export default function AdminLogin() {
                 disabled={loading || isLoading}
                 className="w-full flex justify-center py-2 px-4 border border-amber-600 rounded-md shadow-sm text-sm font-medium text-amber-600 bg-white hover:bg-amber-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 disabled:opacity-50 mt-2"
               >
-                Quick Login (Master Admin)
+                {t('admin.login.quickLogin')}
               </button>
             )}
           </form>
@@ -148,7 +150,7 @@ export default function AdminLogin() {
                 <div className="w-full border-t border-stone-300" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-stone-500">Or continue with</span>
+                <span className="px-2 bg-white text-stone-500">{t('admin.login.orContinueWith')}</span>
               </div>
             </div>
 
@@ -160,7 +162,7 @@ export default function AdminLogin() {
                 className="w-full flex justify-center py-2 px-4 border border-stone-300 rounded-md shadow-sm bg-white text-sm font-medium text-stone-700 hover:bg-stone-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 disabled:opacity-50"
               >
                 <img className="h-5 w-5 mr-2" src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google logo" />
-                Google (Master Admin)
+                {t('admin.login.googleLogin')}
               </button>
             </div>
           </div>
@@ -171,7 +173,7 @@ export default function AdminLogin() {
               onClick={() => setIsRegistering(!isRegistering)}
               className="text-sm text-amber-600 hover:text-amber-500 font-medium"
             >
-              {isRegistering ? 'Already have an account? Sign in' : 'Need an employee account? Register'}
+              {isRegistering ? t('admin.login.alreadyHaveAccount') : t('admin.login.needAccount')}
             </button>
           </div>
         </div>

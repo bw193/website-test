@@ -107,6 +107,96 @@ export const en = {
       submitting: "Submitting...",
       rfqSuccess: "RFQ submitted successfully! We will contact you soon.",
       rfqError: "Failed to submit RFQ. Please try again."
+    },
+    admin: {
+      dashboard: {
+        title: "Admin Dashboard",
+        addProduct: "Add Product",
+        tabs: {
+          products: "Products",
+          rfqs: "RFQs",
+          employees: "Employees"
+        },
+        products: {
+          uncategorized: "Uncategorized",
+          noProducts: "No products found.",
+          deleteConfirm: "Are you sure you want to delete this product?",
+          deleteError: "Failed to delete product."
+        },
+        rfqs: {
+          new: "New",
+          replyEmail: "Reply via Email",
+          noRfqs: "No RFQs received yet."
+        },
+        employees: {
+          status: "Status:",
+          approve: "Approve",
+          reject: "Reject",
+          noEmployees: "No employee accounts found.",
+          updateError: "Failed to update employee status.",
+          roles: {
+            admin: "ADMIN",
+            pending: "PENDING",
+            rejected: "REJECTED"
+          }
+        }
+      },
+      login: {
+        title: "Employee Portal",
+        subtitleRegister: "Create an employee account to request access.",
+        subtitleLogin: "Sign in to manage the product catalog and view RFQs.",
+        pendingTitle: "Pending Approval!",
+        pendingDesc: "Your account ({{email}}) is waiting for master admin approval.",
+        deniedTitle: "Access Denied!",
+        deniedDesc: "Your account ({{email}}) does not have admin privileges.",
+        email: "Email address",
+        password: "Password",
+        registerBtn: "Register Account",
+        signInBtn: "Sign In",
+        quickLogin: "Quick Login (Master Admin)",
+        orContinueWith: "Or continue with",
+        googleLogin: "Google (Master Admin)",
+        alreadyHaveAccount: "Already have an account? Sign in",
+        needAccount: "Need an employee account? Register",
+        errors: {
+          loginFailed: "An error occurred during login.",
+          generalError: "An error occurred."
+        }
+      },
+      productForm: {
+        backToDashboard: "Back to Dashboard",
+        supabaseSetupTitle: "Supabase Setup Required",
+        supabaseSetupDesc: "To enable image uploads, please add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to your AI Studio Secrets.",
+        editProduct: "Edit Product",
+        addProduct: "Add New Product",
+        productTitle: "Product Title",
+        category: "Category",
+        shortDesc: "Short Description",
+        longDetails: "Long Details (Rich Text / HTML allowed)",
+        images: "Images",
+        uploading: "Uploading...",
+        uploadImages: "Upload Images",
+        addUrl: "Add URL",
+        specifications: "Specifications",
+        addSpec: "Add Spec",
+        cancel: "Cancel",
+        saveProduct: "Save Product",
+        errors: {
+          titleRequired: "Title is required",
+          descRequired: "Description is required",
+          urlRequired: "URL is required"
+        },
+        placeholders: {
+          specKey: "e.g., Dimensions",
+          specValue: "e.g., 24x36 inches"
+        },
+        alerts: {
+          supabaseNotConfigured: "Supabase is not configured. Please add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to AI Studio Secrets.",
+          bucketNotFound: "Storage bucket \"product-images\" not found. Please create it in your Supabase dashboard and set it to Public.",
+          uploadFailed: "Failed to upload images: {{message}}",
+          saveFailed: "Failed to save product. Check console for details."
+        }
+      }
     }
   }
 };

@@ -107,6 +107,96 @@ export const zh = {
       submitting: "提交中...",
       rfqSuccess: "RFQ 提交成功！我们将尽快与您联系。",
       rfqError: "提交 RFQ 失败。请重试。"
+    },
+    admin: {
+      dashboard: {
+        title: "管理后台",
+        addProduct: "添加产品",
+        tabs: {
+          products: "产品",
+          rfqs: "询价单",
+          employees: "员工"
+        },
+        products: {
+          uncategorized: "未分类",
+          noProducts: "未找到产品。",
+          deleteConfirm: "您确定要删除此产品吗？",
+          deleteError: "删除产品失败。"
+        },
+        rfqs: {
+          new: "新",
+          replyEmail: "通过邮件回复",
+          noRfqs: "暂未收到询价单。"
+        },
+        employees: {
+          status: "状态：",
+          approve: "批准",
+          reject: "拒绝",
+          noEmployees: "未找到员工账号。",
+          updateError: "更新员工状态失败。",
+          roles: {
+            admin: "管理员",
+            pending: "待批准",
+            rejected: "已拒绝"
+          }
+        }
+      },
+      login: {
+        title: "员工门户",
+        subtitleRegister: "创建员工账号以申请访问权限。",
+        subtitleLogin: "登录以管理产品目录和查看询价单。",
+        pendingTitle: "等待批准！",
+        pendingDesc: "您的账号 ({{email}}) 正在等待超级管理员批准。",
+        deniedTitle: "访问被拒绝！",
+        deniedDesc: "您的账号 ({{email}}) 没有管理员权限。",
+        email: "电子邮件地址",
+        password: "密码",
+        registerBtn: "注册账号",
+        signInBtn: "登录",
+        quickLogin: "快速登录 (超级管理员)",
+        orContinueWith: "或继续使用",
+        googleLogin: "Google (超级管理员)",
+        alreadyHaveAccount: "已有账号？登录",
+        needAccount: "需要员工账号？注册",
+        errors: {
+          loginFailed: "登录过程中发生错误。",
+          generalError: "发生错误。"
+        }
+      },
+      productForm: {
+        backToDashboard: "返回仪表盘",
+        supabaseSetupTitle: "需要设置 Supabase",
+        supabaseSetupDesc: "要启用图片上传，请将 VITE_SUPABASE_URL 和 VITE_SUPABASE_ANON_KEY 添加到您的 AI Studio Secrets 中。",
+        editProduct: "编辑产品",
+        addProduct: "添加新产品",
+        productTitle: "产品标题",
+        category: "类别",
+        shortDesc: "简短描述",
+        longDetails: "详细信息 (允许富文本 / HTML)",
+        images: "图片",
+        uploading: "上传中...",
+        uploadImages: "上传图片",
+        addUrl: "添加 URL",
+        specifications: "规格",
+        addSpec: "添加规格",
+        cancel: "取消",
+        saveProduct: "保存产品",
+        errors: {
+          titleRequired: "标题是必填项",
+          descRequired: "描述是必填项",
+          urlRequired: "URL 是必填项"
+        },
+        placeholders: {
+          specKey: "例如：尺寸",
+          specValue: "例如：24x36 英寸"
+        },
+        alerts: {
+          supabaseNotConfigured: "未配置 Supabase。请将 VITE_SUPABASE_URL 和 VITE_SUPABASE_ANON_KEY 添加到您的 AI Studio Secrets 中。",
+          bucketNotFound: "未找到存储桶 \"product-images\"。请在您的 Supabase 仪表板中创建它并将其设置为公开。",
+          uploadFailed: "上传图片失败：{{message}}",
+          saveFailed: "保存产品失败。请检查控制台以获取详细信息。"
+        }
+      }
     }
   }
 };

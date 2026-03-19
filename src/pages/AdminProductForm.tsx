@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { supabase, hasSupabaseConfig } from '../supabase';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { Loader2, ArrowLeft, Plus, Trash2, Upload } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface ProductForm {
   title: string;
@@ -16,6 +17,7 @@ interface ProductForm {
 export default function AdminProductForm() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(id ? true : false);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -72,7 +74,7 @@ export default function AdminProductForm() {
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!hasSupabaseConfig) {
-      alert('Supabase is not configured. Please add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to AI Studio Secrets.');
+      alert(t('admin.productForm.alerts.supabaseNotConfigured'));
       return;
     }
     const files = e.target.files;
@@ -124,9 +126,9 @@ export default function AdminProductForm() {
       console.error('Error uploading images to Supabase:', error);
       let message = error.message || 'Unknown error';
       if (message.includes('Bucket not found')) {
-        message = 'Storage bucket "product-images" not found. Please create it in your Supabase dashboard and set it to Public.';
+        message = t('admin.productForm.alerts.bucketNotFound');
       }
-      alert(`Failed to upload images: ${message}`);
+      alert(t('admin.productForm.alerts.uploadFailed', { message }));
     } finally {
       setUploading(false);
       if (fileInputRef.current) {
@@ -171,7 +173,7 @@ export default function AdminProductForm() {
       navigate('/admin');
     } catch (error) {
       console.error("Error saving product", error);
-      alert("Failed to save product. Check console for details.");
+      alert(t('admin.productForm.alerts.saveFailed'));
     } finally {
       setSaving(false);
     }
@@ -184,14 +186,14 @@ export default function AdminProductForm() {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <button onClick={() => navigate('/admin')} className="flex items-center text-sm text-stone-500 hover:text-stone-900 mb-6">
-        <ArrowLeft className="h-4 w-4 mr-1" /> Back to Dashboard
+        <ArrowLeft className="h-4 w-4 mr-1" /> {t('admin.productForm.backToDashboard')}
       </button>
 
       {!hasSupabaseConfig && (
         <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-md">
-          <h4 className="text-sm font-medium text-amber-800">Supabase Setup Required</h4>
+          <h4 className="text-sm font-medium text-amber-800">{t('admin.productForm.supabaseSetupTitle')}</h4>
           <p className="mt-1 text-sm text-amber-700">
-            To enable image uploads, please add <strong>VITE_SUPABASE_URL</strong> and <strong>VITE_SUPABASE_ANON_KEY</strong> to your AI Studio Secrets.
+            {t('admin.productForm.supabaseSetupDesc')}
           </p>
         </div>
       )}
@@ -199,37 +201,37 @@ export default function AdminProductForm() {
       <div className="bg-white shadow overflow-hidden sm:rounded-lg">
         <div className="px-4 py-5 sm:px-6 border-b border-stone-200">
           <h3 className="text-lg leading-6 font-medium text-stone-900">
-            {id ? 'Edit Product' : 'Add New Product'}
+            {id ? t('admin.productForm.editProduct') : t('admin.productForm.addProduct')}
           </h3>
         </div>
         
         <form onSubmit={handleSubmit(onSubmit)} className="px-4 py-5 sm:p-6 space-y-6">
           <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
             <div className="sm:col-span-4">
-              <label className="block text-sm font-medium text-stone-700">Product Title</label>
-              <input type="text" {...register('title', { required: 'Title is required' })} className="mt-1 block w-full border border-stone-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm" />
+              <label className="block text-sm font-medium text-stone-700">{t('admin.productForm.productTitle')}</label>
+              <input type="text" {...register('title', { required: t('admin.productForm.errors.titleRequired') })} className="mt-1 block w-full border border-stone-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm" />
               {errors.title && <p className="mt-1 text-sm text-red-600">{errors.title.message}</p>}
             </div>
 
             <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-stone-700">Category</label>
+              <label className="block text-sm font-medium text-stone-700">{t('admin.productForm.category')}</label>
               <input type="text" {...register('category')} className="mt-1 block w-full border border-stone-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm" />
             </div>
 
             <div className="sm:col-span-6">
-              <label className="block text-sm font-medium text-stone-700">Short Description</label>
-              <textarea rows={2} {...register('description', { required: 'Description is required' })} className="mt-1 block w-full border border-stone-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm" />
+              <label className="block text-sm font-medium text-stone-700">{t('admin.productForm.shortDesc')}</label>
+              <textarea rows={2} {...register('description', { required: t('admin.productForm.errors.descRequired') })} className="mt-1 block w-full border border-stone-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm" />
             </div>
 
             <div className="sm:col-span-6">
-              <label className="block text-sm font-medium text-stone-700">Long Details (Rich Text / HTML allowed)</label>
+              <label className="block text-sm font-medium text-stone-700">{t('admin.productForm.longDetails')}</label>
               <textarea rows={6} {...register('details')} className="mt-1 block w-full border border-stone-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm" />
             </div>
           </div>
 
           <div className="pt-6 border-t border-stone-200">
             <div className="flex items-center justify-between mb-4">
-              <h4 className="text-md font-medium text-stone-900">Images</h4>
+              <h4 className="text-md font-medium text-stone-900">{t('admin.productForm.images')}</h4>
               <div className="flex gap-2">
                 <input
                   type="file"
@@ -246,16 +248,16 @@ export default function AdminProductForm() {
                   className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-amber-600 hover:bg-amber-700 disabled:opacity-50"
                 >
                   {uploading ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Upload className="h-4 w-4 mr-1" />}
-                  {uploading ? 'Uploading...' : 'Upload Images'}
+                  {uploading ? t('admin.productForm.uploading') : t('admin.productForm.uploadImages')}
                 </button>
                 <button type="button" onClick={() => appendImage({ url: '' })} className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-amber-700 bg-amber-100 hover:bg-amber-200">
-                  <Plus className="h-4 w-4 mr-1" /> Add URL
+                  <Plus className="h-4 w-4 mr-1" /> {t('admin.productForm.addUrl')}
                 </button>
               </div>
             </div>
             {imageFields.map((field, index) => (
               <div key={field.id} className="flex items-center gap-2 mb-2">
-                <input type="text" {...register(`images.${index}.url` as const, { required: 'URL is required' })} placeholder="https://..." className="flex-1 border border-stone-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm" />
+                <input type="text" {...register(`images.${index}.url` as const, { required: t('admin.productForm.errors.urlRequired') })} placeholder="https://..." className="flex-1 border border-stone-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm" />
                 {control._formValues.images?.[index]?.url && (
                   <img src={control._formValues.images[index].url} alt="" className="h-10 w-10 object-cover rounded border border-stone-200" />
                 )}
@@ -268,15 +270,15 @@ export default function AdminProductForm() {
 
           <div className="pt-6 border-t border-stone-200">
             <div className="flex items-center justify-between mb-4">
-              <h4 className="text-md font-medium text-stone-900">Specifications</h4>
+              <h4 className="text-md font-medium text-stone-900">{t('admin.productForm.specifications')}</h4>
               <button type="button" onClick={() => appendSpec({ key: '', value: '' })} className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-amber-700 bg-amber-100 hover:bg-amber-200">
-                <Plus className="h-4 w-4 mr-1" /> Add Spec
+                <Plus className="h-4 w-4 mr-1" /> {t('admin.productForm.addSpec')}
               </button>
             </div>
             {specFields.map((field, index) => (
               <div key={field.id} className="flex items-center gap-2 mb-2">
-                <input type="text" {...register(`specifications.${index}.key` as const)} placeholder="e.g., Dimensions" className="w-1/3 border border-stone-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm" />
-                <input type="text" {...register(`specifications.${index}.value` as const)} placeholder="e.g., 24x36 inches" className="flex-1 border border-stone-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm" />
+                <input type="text" {...register(`specifications.${index}.key` as const)} placeholder={t('admin.productForm.placeholders.specKey')} className="w-1/3 border border-stone-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm" />
+                <input type="text" {...register(`specifications.${index}.value` as const)} placeholder={t('admin.productForm.placeholders.specValue')} className="flex-1 border border-stone-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm" />
                 <button type="button" onClick={() => removeSpec(index)} className="p-2 text-red-600 hover:bg-red-50 rounded-md">
                   <Trash2 className="h-5 w-5" />
                 </button>
@@ -286,10 +288,10 @@ export default function AdminProductForm() {
 
           <div className="pt-6 border-t border-stone-200 flex justify-end">
             <button type="button" onClick={() => navigate('/admin')} className="bg-white py-2 px-4 border border-stone-300 rounded-md shadow-sm text-sm font-medium text-stone-700 hover:bg-stone-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 mr-3">
-              Cancel
+              {t('admin.productForm.cancel')}
             </button>
             <button type="submit" disabled={saving || uploading} className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 disabled:opacity-50">
-              {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Save Product'}
+              {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : t('admin.productForm.saveProduct')}
             </button>
           </div>
         </form>
