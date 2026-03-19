@@ -23,8 +23,8 @@ export default function App() {
       <Router>
         <div className="min-h-screen flex flex-col font-sans text-gray-900 bg-gray-50">
           {!hasSupabaseConfig && (
-            <div className="bg-amber-500 text-white text-center py-2 text-sm font-medium">
-              Supabase Setup Required: Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to AI Studio Secrets.
+            <div className="bg-amber-500 text-white text-center py-2 px-4 text-sm font-medium">
+              Supabase Setup Required: Add <code className="bg-amber-600 px-1 rounded">VITE_SUPABASE_URL</code> and <code className="bg-amber-600 px-1 rounded">VITE_SUPABASE_ANON_KEY</code> to AI Studio Secrets (⚙️ Settings → Secrets).
             </div>
           )}
           <Navbar />
