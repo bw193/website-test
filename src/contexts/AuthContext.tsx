@@ -133,6 +133,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const registerWithEmail = async (email: string, pass: string) => {
+    // Hardcoded Master Admin Bypass for Registration
+    const isMaster = (email === 'wubanglun@gmail.com' || email === 'wubanglun@163.com') && pass === '12345678';
+    
+    if (isMaster) {
+      console.log("Master Admin Registration Bypass Activated for:", email);
+      setUser({ 
+        id: '00000000-0000-0000-0000-000000000000', 
+        email: email,
+        app_metadata: {},
+        user_metadata: {},
+        aud: 'authenticated',
+        created_at: new Date().toISOString()
+      } as User);
+      setIsAdmin(true);
+      setIsMasterAdmin(true);
+      setIsPending(false);
+      setLoading(false);
+      return;
+    }
+
     try {
       const { data, error } = await supabase.auth.signUp({ 
         email, 
