@@ -1,0 +1,71 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isMasterAdmin() {
+      return isAuthenticated() && request.auth.token.email == "wubanglun@gmail.com";
+    }
+
+    function isApprovedEmployee() {
+      return isAuthenticated() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.status == 'approved';
+    }
+
+    function isAdmin() {
+      return isMasterAdmin() || isApprovedEmployee();
+    }
+    
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    function isValidUser(data) {
+      return data.email is string && data.email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$") && data.email.size() < 100 &&
+             data.status in ['pending', 'approved', 'rejected'] &&
+             data.role == 'employee' &&
+             data.createdAt is timestamp;
+    }
+    
+    function isValidProduct(data) {
+      return data.title is string && data.title.size() > 0 && data.title.size() < 200 &&
+             data.description is string && data.description.size() < 1000 &&
+             data.images is list && data.images.size() <= 10 &&
+             (!('details' in data) || (data.details is string && data.details.size() < 10000)) &&
+             (!('category' in data) || (data.category is string && data.category.size() < 100)) &&
+             (!('specifications' in data) || (data.specifications is map && data.specifications.size() <= 20));
+    }
+
+    function isValidRFQ(data) {
+      return data.productId is string && data.productId.size() > 0 && data.productId.size() < 100 &&
+             data.productName is string && data.productName.size() > 0 && data.productName.size() < 200 &&
+             data.customerName is string && data.customerName.size() > 0 && data.customerName.size() < 100 &&
+             data.customerEmail is string && data.customerEmail.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$") && data.customerEmail.size() < 100 &&
+             data.message is string && data.message.size() > 0 && data.message.size() < 2000 &&
+             (!('status' in data) || (data.status in ['new', 'read', 'replied']));
+    }
+
+    match /users/{userId} {
+      allow read: if isMasterAdmin() || request.auth.uid == userId;
+      allow create: if isAuthenticated() && request.auth.uid == userId && request.resource.data.status == 'pending' && isValidUser(request.resource.data);
+      allow update: if isMasterAdmin() && isValidUser(request.resource.data);
+      allow delete: if isMasterAdmin();
+    }
+
+    match /products/{productId} {
+      allow read: if true; // Publicly readable catalog
+      allow create: if isAdmin() && hasRequiredFields(['title', 'description', 'images']) && isValidProduct(request.resource.data);
+      allow update: if isAdmin() && isValidProduct(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    match /rfqs/{rfqId} {
+      allow read: if isAdmin(); // Only admins can read RFQs
+      allow create: if hasRequiredFields(['productId', 'productName', 'customerName', 'customerEmail', 'message']) && isValidRFQ(request.resource.data);
+      allow update: if isAdmin() && isValidRFQ(request.resource.data);
+      allow delete: if isAdmin();
+    }
+  }
+}

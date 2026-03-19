@@ -1,0 +1,45 @@
+{
+  "entities": {
+    "Product": {
+      "title": "Product",
+      "description": "An LED mirror product in the catalog.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "description": "Name of the product" },
+        "description": { "type": "string", "description": "Short description" },
+        "details": { "type": "string", "description": "Long rich text details" },
+        "images": { "type": "array", "items": { "type": "string" }, "description": "Array of image URLs" },
+        "category": { "type": "string", "description": "Product category" },
+        "specifications": { "type": "object", "description": "Key-value pairs of specs" },
+        "createdAt": { "type": "timestamp", "description": "Creation time" },
+        "updatedAt": { "type": "timestamp", "description": "Last update time" }
+      },
+      "required": ["title", "description", "images"]
+    },
+    "RFQ": {
+      "title": "Request for Quote",
+      "description": "A customer inquiry for a product.",
+      "type": "object",
+      "properties": {
+        "productId": { "type": "string" },
+        "productName": { "type": "string" },
+        "customerName": { "type": "string" },
+        "customerEmail": { "type": "string" },
+        "message": { "type": "string" },
+        "createdAt": { "type": "timestamp" },
+        "status": { "type": "string", "enum": ["new", "read", "replied"] }
+      },
+      "required": ["productId", "productName", "customerName", "customerEmail", "message"]
+    }
+  },
+  "firestore": {
+    "/products/{productId}": {
+      "schema": { "$ref": "#/entities/Product" },
+      "description": "Collection of all products."
+    },
+    "/rfqs/{rfqId}": {
+      "schema": { "$ref": "#/entities/RFQ" },
+      "description": "Collection of all RFQs."
+    }
+  }
+}
