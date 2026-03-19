@@ -12,11 +12,11 @@ interface Product {
 
 interface RFQ {
   id: string;
-  productName: string;
-  customerName: string;
-  customerEmail: string;
+  product_name: string;
+  customer_name: string;
+  customer_email: string;
   message: string;
-  createdAt: string;
+  created_at: string;
 }
 
 interface Employee {
@@ -51,7 +51,7 @@ export default function AdminDashboard() {
         const { data, error } = await supabase
           .from('rfqs')
           .select('*')
-          .order('createdAt', { ascending: false });
+          .order('created_at', { ascending: false });
         if (error) throw error;
         setRfqs(data || []);
       } else if (activeTab === 'employees' && isMasterAdmin) {
@@ -177,8 +177,8 @@ export default function AdminDashboard() {
               <li key={rfq.id} className="p-6">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h3 className="text-lg font-medium text-stone-900">{rfq.customerName} - {rfq.productName}</h3>
-                    <p className="text-sm text-stone-500 mt-1"><a href={`mailto:${rfq.customerEmail}`} className="text-amber-600 hover:underline">{rfq.customerEmail}</a></p>
+                    <h3 className="text-lg font-medium text-stone-900">{rfq.customer_name} - {rfq.product_name}</h3>
+                    <p className="text-sm text-stone-500 mt-1"><a href={`mailto:${rfq.customer_email}`} className="text-amber-600 hover:underline">{rfq.customer_email}</a></p>
                   </div>
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                     New
@@ -188,7 +188,7 @@ export default function AdminDashboard() {
                   {rfq.message}
                 </div>
                 <div className="mt-4 flex gap-4">
-                  <a href={`mailto:${rfq.customerEmail}?subject=Re: RFQ for ${rfq.productName}`} className="text-sm font-medium text-amber-600 hover:text-amber-500">
+                  <a href={`mailto:${rfq.customer_email}?subject=Re: RFQ for ${rfq.product_name}`} className="text-sm font-medium text-amber-600 hover:text-amber-500">
                     Reply via Email
                   </a>
                 </div>
