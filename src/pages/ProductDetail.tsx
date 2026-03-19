@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { doc, getDoc, collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from '../firebase';
+import { supabase } from '../supabase';
 import { useForm } from 'react-hook-form';
 import { Loader2, CheckCircle2, ChevronLeft, ChevronRight, ArrowLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -36,10 +35,15 @@ export default function ProductDetail() {
     const fetchProduct = async () => {
       if (!id) return;
       try {
-        const docRef = doc(db, 'products', id);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          setProduct({ id: docSnap.id, ...docSnap.data() } as Product);
+        const { data, error } = await supabase
+          .from('products')
+          .select('*')
+          .eq('id', id)
+          .single();
+
+        if (error) throw error;
+        if (data) {
+          setProduct(data as Product);
         }
       } catch (error) {
         console.error("Error fetching product", error);
@@ -54,15 +58,20 @@ export default function ProductDetail() {
     if (!product) return;
     setRfqStatus('submitting');
     try {
-      await addDoc(collection(db, 'rfqs'), {
-        productId: product.id,
-        productName: product.title,
-        customerName: data.customerName,
-        customerEmail: data.customerEmail,
-        message: data.message,
-        createdAt: serverTimestamp(),
-        status: 'new'
-      });
+      const { error } = await supabase
+        .from('rfqs')
+        .insert({
+          product_id: product.id,
+          product_name: product.title,
+          customer_name: data.customerName,
+          customer_email: data.customerEmail,
+          message: data.message,
+          created_at: new Date().toISOString(),
+          status: 'new'
+        });
+      
+      if (error) throw error;
+      
       setRfqStatus('success');
       reset();
     } catch (error) {

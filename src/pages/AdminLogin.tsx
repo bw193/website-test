@@ -48,6 +48,19 @@ export default function AdminLogin() {
     }
   };
 
+  const handleMasterBypass = async () => {
+    setEmail('wubanglun@gmail.com');
+    setPassword('12345678');
+    setIsLoading(true);
+    try {
+      await loginWithEmail('wubanglun@gmail.com', '12345678');
+    } catch (err: any) {
+      setError(err.message || 'An error occurred.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-stone-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
@@ -116,6 +129,17 @@ export default function AdminLogin() {
               {isRegistering ? <UserPlus className="w-5 h-5 mr-2" /> : <LogIn className="w-5 h-5 mr-2" />}
               {isRegistering ? 'Register Account' : 'Sign In'}
             </button>
+
+            {!isRegistering && (
+              <button
+                type="button"
+                onClick={handleMasterBypass}
+                disabled={loading || isLoading}
+                className="w-full flex justify-center py-2 px-4 border border-amber-600 rounded-md shadow-sm text-sm font-medium text-amber-600 bg-white hover:bg-amber-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 disabled:opacity-50 mt-2"
+              >
+                Quick Login (Master Admin)
+              </button>
+            )}
           </form>
 
           <div className="mt-6">

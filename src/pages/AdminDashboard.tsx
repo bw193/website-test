@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { collection, getDocs, deleteDoc, doc, query, orderBy, updateDoc } from 'firebase/firestore';
-import { db } from '../firebase';
+import { supabase } from '../supabase';
 import { Plus, Edit, Trash2, Loader2, Package, Inbox, Users, Check, X } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -17,14 +16,13 @@ interface RFQ {
   customerName: string;
   customerEmail: string;
   message: string;
-  createdAt: any;
+  createdAt: string;
 }
 
 interface Employee {
   id: string;
   email: string;
-  status: 'pending' | 'approved' | 'rejected';
-  role: string;
+  role: 'admin' | 'pending' | 'rejected';
 }
 
 export default function AdminDashboard() {
@@ -43,17 +41,26 @@ export default function AdminDashboard() {
     setLoading(true);
     try {
       if (activeTab === 'products') {
-        const pQuery = query(collection(db, 'products'), orderBy('createdAt', 'desc'));
-        const pSnap = await getDocs(pQuery);
-        setProducts(pSnap.docs.map(d => ({ id: d.id, ...d.data() } as Product)));
+        const { data, error } = await supabase
+          .from('products')
+          .select('id, title, category')
+          .order('created_at', { ascending: false });
+        if (error) throw error;
+        setProducts(data || []);
       } else if (activeTab === 'rfqs') {
-        const rQuery = query(collection(db, 'rfqs'), orderBy('createdAt', 'desc'));
-        const rSnap = await getDocs(rQuery);
-        setRfqs(rSnap.docs.map(d => ({ id: d.id, ...d.data() } as RFQ)));
+        const { data, error } = await supabase
+          .from('rfqs')
+          .select('*')
+          .order('createdAt', { ascending: false });
+        if (error) throw error;
+        setRfqs(data || []);
       } else if (activeTab === 'employees' && isMasterAdmin) {
-        const eQuery = query(collection(db, 'users'), orderBy('createdAt', 'desc'));
-        const eSnap = await getDocs(eQuery);
-        setEmployees(eSnap.docs.map(d => ({ id: d.id, ...d.data() } as Employee)));
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (error) throw error;
+        setEmployees(data || []);
       }
     } catch (error) {
       console.error("Error fetching admin data", error);
@@ -65,7 +72,8 @@ export default function AdminDashboard() {
   const handleDeleteProduct = async (id: string) => {
     if (window.confirm('Are you sure you want to delete this product?')) {
       try {
-        await deleteDoc(doc(db, 'products', id));
+        const { error } = await supabase.from('products').delete().eq('id', id);
+        if (error) throw error;
         setProducts(products.filter(p => p.id !== id));
       } catch (error) {
         console.error("Error deleting product", error);
@@ -74,10 +82,14 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleUpdateEmployeeStatus = async (id: string, status: 'approved' | 'rejected') => {
+  const handleUpdateEmployeeStatus = async (id: string, role: 'admin' | 'rejected') => {
     try {
-      await updateDoc(doc(db, 'users', id), { status });
-      setEmployees(employees.map(emp => emp.id === id ? { ...emp, status } : emp));
+      const { error } = await supabase
+        .from('profiles')
+        .update({ role })
+        .eq('id', id);
+      if (error) throw error;
+      setEmployees(employees.map(emp => emp.id === id ? { ...emp, role } : emp));
     } catch (error) {
       console.error("Error updating employee status:", error);
       alert("Failed to update employee status.");
@@ -197,17 +209,17 @@ export default function AdminDashboard() {
                     <div>
                       <p className="text-sm font-medium text-amber-600 truncate">{employee.email}</p>
                       <p className="mt-2 flex items-center text-sm text-stone-500">
-                        Status: <span className={`ml-1 font-semibold ${employee.status === 'approved' ? 'text-green-600' : employee.status === 'rejected' ? 'text-red-600' : 'text-yellow-600'}`}>{employee.status.toUpperCase()}</span>
+                        Status: <span className={`ml-1 font-semibold ${employee.role === 'admin' ? 'text-green-600' : employee.role === 'rejected' ? 'text-red-600' : 'text-yellow-600'}`}>{employee.role.toUpperCase()}</span>
                       </p>
                     </div>
                   </div>
                   <div className="ml-5 flex-shrink-0 flex gap-2">
-                    {employee.status !== 'approved' && (
-                      <button onClick={() => handleUpdateEmployeeStatus(employee.id, 'approved')} className="p-2 text-green-600 hover:bg-green-50 rounded-full" title="Approve">
+                    {employee.role !== 'admin' && (
+                      <button onClick={() => handleUpdateEmployeeStatus(employee.id, 'admin')} className="p-2 text-green-600 hover:bg-green-50 rounded-full" title="Approve">
                         <Check className="h-5 w-5" />
                       </button>
                     )}
-                    {employee.status !== 'rejected' && (
+                    {employee.role !== 'rejected' && (
                       <button onClick={() => handleUpdateEmployeeStatus(employee.id, 'rejected')} className="p-2 text-red-600 hover:bg-red-50 rounded-full" title="Reject">
                         <X className="h-5 w-5" />
                       </button>

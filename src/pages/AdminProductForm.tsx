@@ -1,7 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { doc, getDoc, collection, addDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from '../firebase';
 import { supabase, hasSupabaseConfig } from '../supabase';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { Loader2, ArrowLeft, Plus, Trash2, Upload } from 'lucide-react';
@@ -44,9 +42,15 @@ export default function AdminProductForm() {
     if (id) {
       const fetchProduct = async () => {
         try {
-          const docSnap = await getDoc(doc(db, 'products', id));
-          if (docSnap.exists()) {
-            const data = docSnap.data();
+          const { data, error } = await supabase
+            .from('products')
+            .select('*')
+            .eq('id', id)
+            .single();
+
+          if (error) throw error;
+
+          if (data) {
             reset({
               title: data.title || '',
               description: data.description || '',
@@ -146,16 +150,23 @@ export default function AdminProductForm() {
           }
           return acc;
         }, {} as Record<string, string>),
-        updatedAt: serverTimestamp()
+        updated_at: new Date().toISOString()
       };
 
       if (id) {
-        await updateDoc(doc(db, 'products', id), productData);
+        const { error } = await supabase
+          .from('products')
+          .update(productData)
+          .eq('id', id);
+        if (error) throw error;
       } else {
-        await addDoc(collection(db, 'products'), {
-          ...productData,
-          createdAt: serverTimestamp()
-        });
+        const { error } = await supabase
+          .from('products')
+          .insert({
+            ...productData,
+            created_at: new Date().toISOString()
+          });
+        if (error) throw error;
       }
       navigate('/admin');
     } catch (error) {
