@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../supabase';
-import { Plus, Edit, Trash2, Loader2, Package, Inbox, Users, Check, X } from 'lucide-react';
+import { Plus, Edit, Trash2, Loader2, Package, Inbox, Users, Check, X, Settings } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 
@@ -33,7 +33,7 @@ export default function AdminDashboard() {
   const [rfqs, setRfqs] = useState<RFQ[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'products' | 'rfqs' | 'employees'>('products');
+  const [activeTab, setActiveTab] = useState<'products' | 'rfqs' | 'employees' | 'settings'>('products');
 
   useEffect(() => {
     fetchData();
@@ -135,6 +135,13 @@ export default function AdminDashboard() {
               {t('admin.dashboard.tabs.employees')}
             </button>
           )}
+          <button
+            onClick={() => setActiveTab('settings')}
+            className={`${activeTab === 'settings' ? 'border-amber-500 text-amber-600' : 'border-transparent text-stone-500 hover:text-stone-700 hover:border-stone-300'} whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm flex items-center`}
+          >
+            <Settings className="h-5 w-5 mr-2" />
+            Settings
+          </button>
         </nav>
       </div>
 
@@ -201,7 +208,7 @@ export default function AdminDashboard() {
             )}
           </ul>
         </div>
-      ) : (
+      ) : activeTab === 'employees' ? (
         <div className="bg-white shadow overflow-hidden sm:rounded-md">
           <ul className="divide-y divide-stone-200">
             {employees.map((employee) => (
@@ -235,7 +242,11 @@ export default function AdminDashboard() {
             )}
           </ul>
         </div>
-      )}
+      ) : activeTab === 'settings' ? (
+        <React.Suspense fallback={<div className="flex justify-center py-12"><Loader2 className="h-8 w-8 text-amber-500 animate-spin" /></div>}>
+          {React.createElement(React.lazy(() => import('./AdminSettings')))}
+        </React.Suspense>
+      ) : null}
     </div>
   );
 }

@@ -3,9 +3,20 @@ export const en = {
     navbar: {
       home: "Home",
       catalog: "Catalog",
+      ourStory: "Our Story",
       adminDashboard: "Admin Dashboard",
       logout: "Logout",
       employeeLogin: "Employee Login"
+    },
+    ourStoryPage: {
+      title: "Our Story",
+      subtitle: "Jiaxing Chengtai Mirror Co., Ltd.",
+      paragraphs: [
+        "With nearly 20 years of dedicated experience in mirror manufacturing, Jiaxing Chengtai Mirror Co., Ltd. has built a reputation that goes far beyond any single sales channel. Our 50,000+ square meter production complex, two independent factories, and a team of over 200 skilled workers give us the capacity and flexibility to handle orders of virtually any scale — from boutique interior design projects to large-scale hotel and real estate developments.",
+        "We own the entire production process in-house. From raw glass processing and LED integration to frame fabrication and smart feature assembly, every stage of manufacturing is handled under one roof and overseen by dedicated QA/QC inspectors. This vertical integration means we control quality at every step, eliminate third-party delays, and keep lead times competitive.",
+        "Our 200+ product styles across 6 core series are not off-the-shelf templates — they represent years of design iteration informed by both European aesthetic trends and real-world buyer feedback. For clients who need something unique, our OEM and ODM capabilities allow full customization of size, shape, lighting, smart features, materials, and branding.",
+        "Backed by international certifications including CE, RoHS, and IP66 waterproofing, our products meet the compliance requirements of markets across Europe, North America, the Middle East, and beyond. We don't just manufacture mirrors — we build long-term partnerships with importers, distributors, interior designers, and developers who demand consistency, precision, and a supplier they can rely on year after year."
+      ]
     },
     home: {
       companyName: "Jiaxing Chengtai Mirror Co., Ltd.",
@@ -66,21 +77,12 @@ export const en = {
       whyUs: {
         title1: "Why Partner With",
         title2: "Chengtai?",
-        desc: "We don't just manufacture mirrors; we build long-term partnerships based on trust, quality, and reliability.",
-        points: [
-          "Complete intellectual property rights and patents",
-          "Average response time under 8 hours",
-          "85.7% on-time delivery rate",
-          "Over $270,000 USD in verified platform orders"
-        ],
-        cert: {
-          title: "Certified Excellence",
-          desc: "All products pass rigorous international safety and quality certifications, including CE, RoHS, and IP66 waterproofing standards."
-        },
-        logistics: {
-          title: "Global Logistics",
-          desc: "End-to-end support from product consultation to after-sales service. Shipping available via express courier, air, sea, and land freight."
-        }
+        paragraphs: [
+          "With nearly 20 years of dedicated experience in mirror manufacturing, Jiaxing Chengtai Mirror Co., Ltd. has built a reputation that goes far beyond any single sales channel. Our 50,000+ square meter production complex, two independent factories, and a team of over 200 skilled workers give us the capacity and flexibility to handle orders of virtually any scale — from boutique interior design projects to large-scale hotel and real estate developments.",
+          "We own the entire production process in-house. From raw glass processing and LED integration to frame fabrication and smart feature assembly, every stage of manufacturing is handled under one roof and overseen by dedicated QA/QC inspectors. This vertical integration means we control quality at every step, eliminate third-party delays, and keep lead times competitive.",
+          "Our 200+ product styles across 6 core series are not off-the-shelf templates — they represent years of design iteration informed by both European aesthetic trends and real-world buyer feedback. For clients who need something unique, our OEM and ODM capabilities allow full customization of size, shape, lighting, smart features, materials, and branding.",
+          "Backed by international certifications including CE, RoHS, and IP66 waterproofing, our products meet the compliance requirements of markets across Europe, North America, the Middle East, and beyond. We don't just manufacture mirrors — we build long-term partnerships with importers, distributors, interior designers, and developers who demand consistency, precision, and a supplier they can rely on year after year."
+        ]
       },
       cta: {
         title: "Ready to Elevate Your Space?",
@@ -93,7 +95,18 @@ export const en = {
       catalog: "Product Catalog",
       desc: "Browse our extensive collection of premium mirrors, featuring smart LED technology, elegant vanity designs, and customizable options.",
       noProducts: "No products found matching your criteria.",
-      viewDetails: "View Details"
+      viewDetails: "View Details",
+      allCategories: "All Categories",
+      categories: {
+        "New Arrival": "New Arrival",
+        "Hot Sale": "Hot Sale",
+        "Led Lighted Mirror": "Led Lighted Mirror",
+        "Bathroom Mirror without led": "Bathroom Mirror without led",
+        "Full Length Dressing Mirror": "Full Length Dressing Mirror",
+        "Irregular Mirror": "Irregular Mirror"
+      },
+      priceRange: "Price Range",
+      msrp: "Suggested Retail Price"
     },
     productDetail: {
       backToCatalog: "Back to Catalog",
@@ -115,7 +128,8 @@ export const en = {
         tabs: {
           products: "Products",
           rfqs: "RFQs",
-          employees: "Employees"
+          employees: "Employees",
+          settings: "Settings"
         },
         products: {
           uncategorized: "Uncategorized",
@@ -139,6 +153,21 @@ export const en = {
             pending: "PENDING",
             rejected: "REJECTED"
           }
+        },
+        settings: {
+          title: "Site Settings",
+          heroBgLabel: "Home Page Promotion Images",
+          heroBgPlaceholder: "https://example.com/image.jpg",
+          heroBgHelp: "Add image URLs or upload images. The first image will be the default if none are provided.",
+          preview: "Preview:",
+          save: "Save Settings",
+          saving: "Saving...",
+          saveSuccess: "Settings saved successfully!",
+          setupRequired: "Database Setup Required",
+          setupDesc: "To enable site settings, please run the following SQL command in your Supabase SQL Editor:",
+          setupBtn: "I have run the SQL command",
+          addImage: "Add Image",
+          removeImage: "Remove"
         }
       },
       login: {
@@ -166,11 +195,13 @@ export const en = {
       productForm: {
         backToDashboard: "Back to Dashboard",
         supabaseSetupTitle: "Supabase Setup Required",
-        supabaseSetupDesc: "To enable image uploads, please add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to your AI Studio Secrets.",
+        supabaseSetupDesc: "To enable image uploads, please add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to your Environment Variables (or AI Studio Secrets) and rebuild the app.",
         editProduct: "Edit Product",
         addProduct: "Add New Product",
         productTitle: "Product Title",
         category: "Category",
+        priceRange: "Price Range",
+        msrp: "MSRP",
         shortDesc: "Short Description",
         longDetails: "Long Details (Rich Text / HTML allowed)",
         images: "Images",
@@ -191,7 +222,7 @@ export const en = {
           specValue: "e.g., 24x36 inches"
         },
         alerts: {
-          supabaseNotConfigured: "Supabase is not configured. Please add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to AI Studio Secrets.",
+          supabaseNotConfigured: "Supabase is not configured. Please add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to your Environment Variables and rebuild.",
           bucketNotFound: "Storage bucket \"product-images\" not found. Please create it in your Supabase dashboard and set it to Public.",
           uploadFailed: "Failed to upload images: {{message}}",
           saveFailed: "Failed to save product. Check console for details."

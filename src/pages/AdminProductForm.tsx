@@ -10,6 +10,8 @@ interface ProductForm {
   description: string;
   details: string;
   category: string;
+  price_range: string;
+  msrp: string;
   images: { url: string }[];
   specifications: { key: string; value: string }[];
 }
@@ -21,6 +23,14 @@ export default function AdminProductForm() {
   const [loading, setLoading] = useState(id ? true : false);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [categories, setCategories] = useState<string[]>([
+    "New Arrival",
+    "Hot Sale",
+    "Led Lighted Mirror",
+    "Bathroom Mirror without led",
+    "Full Length Dressing Mirror",
+    "Irregular Mirror"
+  ]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { register, control, handleSubmit, reset, getValues, setValue, formState: { errors } } = useForm<ProductForm>({
@@ -30,7 +40,7 @@ export default function AdminProductForm() {
     }
   });
 
-  const { fields: imageFields, append: appendImage, remove: removeImage } = useFieldArray({
+  const { fields: imageFields, append: appendImage, remove: removeImage, move: moveImage } = useFieldArray({
     control,
     name: "images"
   });
@@ -40,9 +50,37 @@ export default function AdminProductForm() {
     name: "specifications"
   });
 
+  const normalizeCategory = (cat: string | undefined | null) => {
+    if (!cat) return '';
+    return cat.toLowerCase().replace(/[^a-z0-9]/g, '');
+  };
+
   useEffect(() => {
-    if (id) {
-      const fetchProduct = async () => {
+    const fetchData = async () => {
+      let fetchedCategories = categories;
+      try {
+        const { data, error } = await supabase
+          .from('site_settings')
+          .select('value')
+          .eq('key', 'categories')
+          .single();
+
+        if (!error && data && data.value) {
+          try {
+            const parsed = JSON.parse(data.value);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              setCategories(parsed);
+              fetchedCategories = parsed;
+            }
+          } catch (e) {
+            console.error("Error parsing categories", e);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching categories", error);
+      }
+
+      if (id) {
         try {
           const { data, error } = await supabase
             .from('products')
@@ -53,11 +91,23 @@ export default function AdminProductForm() {
           if (error) throw error;
 
           if (data) {
+            // Try to match the existing category with the loaded categories
+            let matchedCategory = data.category || '';
+            if (matchedCategory) {
+              const normalized = normalizeCategory(matchedCategory);
+              const found = fetchedCategories.find(c => normalizeCategory(c) === normalized);
+              if (found) {
+                matchedCategory = found;
+              }
+            }
+
             reset({
               title: data.title || '',
               description: data.description || '',
               details: data.details || '',
-              category: data.category || '',
+              category: matchedCategory,
+              price_range: data.price_range || '',
+              msrp: data.msrp || '',
               images: data.images ? data.images.map((url: string) => ({ url })) : [{ url: '' }],
               specifications: data.specifications ? Object.entries(data.specifications).map(([key, value]) => ({ key, value: value as string })) : [{ key: '', value: '' }]
             });
@@ -67,9 +117,12 @@ export default function AdminProductForm() {
         } finally {
           setLoading(false);
         }
-      };
-      fetchProduct();
-    }
+      } else {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, [id, reset]);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -145,6 +198,8 @@ export default function AdminProductForm() {
         description: data.description,
         details: data.details,
         category: data.category,
+        price_range: data.price_range,
+        msrp: data.msrp,
         images: data.images.map(img => img.url).filter(url => url.trim() !== ''),
         specifications: data.specifications.reduce((acc, curr) => {
           if (curr.key.trim() && curr.value.trim()) {
@@ -215,7 +270,22 @@ export default function AdminProductForm() {
 
             <div className="sm:col-span-2">
               <label className="block text-sm font-medium text-stone-700">{t('admin.productForm.category')}</label>
-              <input type="text" {...register('category')} className="mt-1 block w-full border border-stone-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm" />
+              <select {...register('category')} className="mt-1 block w-full border border-stone-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm">
+                <option value="">{t('products.allCategories')}</option>
+                {categories.map(cat => (
+                  <option key={cat} value={cat}>{t(`products.categories.${cat}`, cat)}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="sm:col-span-2">
+              <label className="block text-sm font-medium text-stone-700">{t('admin.productForm.priceRange')}</label>
+              <input type="text" {...register('price_range')} placeholder="$20 - $40" className="mt-1 block w-full border border-stone-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm" />
+            </div>
+
+            <div className="sm:col-span-2">
+              <label className="block text-sm font-medium text-stone-700">{t('admin.productForm.msrp')}</label>
+              <input type="text" {...register('msrp')} placeholder="$59.99" className="mt-1 block w-full border border-stone-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm" />
             </div>
 
             <div className="sm:col-span-6">
@@ -260,6 +330,11 @@ export default function AdminProductForm() {
                 <input type="text" {...register(`images.${index}.url` as const, { required: t('admin.productForm.errors.urlRequired') })} placeholder="https://..." className="flex-1 border border-stone-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm" />
                 {control._formValues.images?.[index]?.url && (
                   <img src={control._formValues.images[index].url} alt="" className="h-10 w-10 object-cover rounded border border-stone-200" />
+                )}
+                {index === 0 ? (
+                  <span className="px-2 py-1 bg-amber-100 text-amber-800 text-xs rounded font-medium whitespace-nowrap">Main</span>
+                ) : (
+                  <button type="button" onClick={() => moveImage(index, 0)} className="px-2 py-1 bg-stone-100 hover:bg-stone-200 text-stone-600 text-xs rounded whitespace-nowrap">Set Main</button>
                 )}
                 <button type="button" onClick={() => removeImage(index)} className="p-2 text-red-600 hover:bg-red-50 rounded-md">
                   <Trash2 className="h-5 w-5" />

@@ -9,6 +9,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
+import OurStory from './pages/OurStory';
 import Products from './pages/Products';
 import ProductDetail from './pages/ProductDetail';
 import AdminLogin from './pages/AdminLogin';
@@ -24,13 +25,14 @@ export default function App() {
         <div className="min-h-screen flex flex-col font-sans text-gray-900 bg-gray-50">
           {!hasSupabaseConfig && (
             <div className="bg-amber-500 text-white text-center py-2 px-4 text-sm font-medium">
-              Supabase Setup Required: Add <code className="bg-amber-600 px-1 rounded">VITE_SUPABASE_URL</code> and <code className="bg-amber-600 px-1 rounded">VITE_SUPABASE_ANON_KEY</code> to AI Studio Secrets (⚙️ Settings → Secrets).
+              Supabase Setup Required: Add <code className="bg-amber-600 px-1 rounded">VITE_SUPABASE_URL</code> and <code className="bg-amber-600 px-1 rounded">VITE_SUPABASE_ANON_KEY</code> to your Environment Variables (or AI Studio Secrets) and rebuild the app.
             </div>
           )}
           <Navbar />
           <main className="flex-1">
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/our-story" element={<OurStory />} />
               <Route path="/products" element={<Products />} />
               <Route path="/products/:id" element={<ProductDetail />} />
               

@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabase';
 import ProductCard from '../components/ProductCard';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Search, SlidersHorizontal, PackageX } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { motion, AnimatePresence } from 'motion/react';
 
 interface Product {
   id: string;
@@ -10,64 +11,222 @@ interface Product {
   description: string;
   images: string[];
   category?: string;
+  price_range?: string;
+  msrp?: string;
 }
 
 export default function Products() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<string[]>([
+    "New Arrival",
+    "Hot Sale",
+    "Led Lighted Mirror",
+    "Bathroom Mirror without led",
+    "Full Length Dressing Mirror",
+    "Irregular Mirror"
+  ]);
   const [loading, setLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
   const { t } = useTranslation();
 
+  const normalizeCategory = (cat: string | undefined | null) => {
+    if (!cat) return '';
+    return cat.toLowerCase().replace(/[^a-z0-9]/g, '');
+  };
+
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchData = async () => {
       try {
-        const { data, error } = await supabase
+        // Fetch products
+        const { data: productsData, error: productsError } = await supabase
           .from('products')
           .select('*')
           .order('created_at', { ascending: false });
 
-        if (error) throw error;
-        setProducts(data || []);
+        if (productsError) throw productsError;
+        setProducts(productsData || []);
+
+        // Fetch categories
+        const { data: settingsData, error: settingsError } = await supabase
+          .from('site_settings')
+          .select('value')
+          .eq('key', 'categories')
+          .single();
+
+        if (!settingsError && settingsData && settingsData.value) {
+          try {
+            const parsed = JSON.parse(settingsData.value);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              setCategories(parsed);
+            }
+          } catch (e) {
+            console.error("Error parsing categories", e);
+          }
+        }
       } catch (error) {
-        console.error("Error fetching products", error);
+        console.error("Error fetching data", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchProducts();
+    fetchData();
   }, []);
 
+  const filteredProducts = products.filter(p => {
+    const matchesCategory = selectedCategory ? normalizeCategory(p.category) === normalizeCategory(selectedCategory) : true;
+    const matchesSearch = p.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          (p.description && p.description.toLowerCase().includes(searchQuery.toLowerCase()));
+    return matchesCategory && matchesSearch;
+  });
+
   return (
-    <div className="bg-white min-h-screen py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-extrabold text-stone-900 tracking-tight">{t('products.catalog')}</h1>
-          <p className="mt-4 text-xl text-stone-500 max-w-2xl mx-auto">
+    <div className="bg-stone-50 min-h-screen pb-24">
+      {/* Hero Section */}
+      <div className="bg-stone-900 text-white py-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1600566752355-35792bedcfea?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-center" />
+        <div className="absolute inset-0 bg-gradient-to-b from-stone-900/50 to-stone-900" />
+        
+        <div className="relative max-w-7xl mx-auto text-center">
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-4xl md:text-5xl font-extrabold tracking-tight mb-6"
+          >
+            {t('products.catalog')}
+          </motion.h1>
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="text-lg md:text-xl text-stone-300 max-w-2xl mx-auto font-light"
+          >
             {t('products.desc')}
-          </p>
+          </motion.p>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10">
+        <div className="bg-white rounded-2xl shadow-sm border border-stone-200 p-4 md:p-6 mb-12">
+          <div className="flex flex-col md:flex-row gap-6 items-center justify-between">
+            {/* Search Bar */}
+            <div className="relative w-full md:w-96">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Search className="h-5 w-5 text-stone-400" />
+              </div>
+              <input
+                type="text"
+                placeholder="Search products..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="block w-full pl-10 pr-3 py-3 border border-stone-200 rounded-xl leading-5 bg-stone-50 placeholder-stone-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors sm:text-sm"
+              />
+            </div>
+
+            {/* Categories */}
+            <div className="flex-1 w-full overflow-x-auto pb-2 md:pb-0 hide-scrollbar">
+              <div className="flex md:flex-wrap gap-2 md:justify-end min-w-max md:min-w-0">
+                <button
+                  onClick={() => setSelectedCategory(null)}
+                  className={`px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 whitespace-nowrap ${
+                    selectedCategory === null
+                      ? 'bg-stone-900 text-white shadow-md scale-105'
+                      : 'bg-stone-100 text-stone-600 hover:bg-stone-200 hover:text-stone-900'
+                  }`}
+                >
+                  {t('products.allCategories')}
+                </button>
+                {categories.map(cat => (
+                  <button
+                    key={cat}
+                    onClick={() => setSelectedCategory(cat)}
+                    className={`px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 whitespace-nowrap ${
+                      selectedCategory === cat
+                        ? 'bg-stone-900 text-white shadow-md scale-105'
+                        : 'bg-stone-100 text-stone-600 hover:bg-stone-200 hover:text-stone-900'
+                    }`}
+                  >
+                    {t(`products.categories.${cat}`, cat)}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
 
         {loading ? (
           <div className="flex justify-center items-center h-64">
-            <Loader2 className="h-12 w-12 text-amber-500 animate-spin" />
-          </div>
-        ) : products.length === 0 ? (
-          <div className="text-center text-stone-500 py-12">
-            {t('products.noProducts')}
+            <Loader2 className="h-10 w-10 text-amber-500 animate-spin" />
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            {products.map((product) => (
-              <ProductCard
-                key={product.id}
-                id={product.id}
-                title={product.title}
-                description={product.description}
-                image={product.images?.[0]}
-                category={product.category}
-              />
-            ))}
-          </div>
+          <AnimatePresence mode="wait">
+            {filteredProducts.length === 0 ? (
+              <motion.div 
+                key="empty"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="text-center py-24 bg-white rounded-3xl border border-stone-100 shadow-sm"
+              >
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-stone-100 mb-6">
+                  <PackageX className="h-8 w-8 text-stone-400" />
+                </div>
+                <h3 className="text-xl font-semibold text-stone-900 mb-2">No products found</h3>
+                <p className="text-stone-500 max-w-md mx-auto">
+                  {searchQuery 
+                    ? `We couldn't find anything matching "${searchQuery}". Try adjusting your search or filters.`
+                    : t('products.noProducts')}
+                </p>
+                {(searchQuery || selectedCategory) && (
+                  <button
+                    onClick={() => {
+                      setSearchQuery('');
+                      setSelectedCategory(null);
+                    }}
+                    className="mt-6 px-6 py-2 bg-stone-900 text-white rounded-full text-sm font-medium hover:bg-stone-800 transition-colors"
+                  >
+                    Clear all filters
+                  </button>
+                )}
+              </motion.div>
+            ) : (
+              <motion.div 
+                key="grid"
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-10"
+                initial="hidden"
+                animate="show"
+                variants={{
+                  hidden: { opacity: 0 },
+                  show: {
+                    opacity: 1,
+                    transition: { staggerChildren: 0.1 }
+                  }
+                }}
+              >
+                {filteredProducts.map((product) => (
+                  <motion.div
+                    key={product.id}
+                    variants={{
+                      hidden: { opacity: 0, y: 20 },
+                      show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+                    }}
+                  >
+                    <ProductCard
+                      id={product.id}
+                      title={product.title}
+                      description={product.description}
+                      image={product.images?.[0]}
+                      category={product.category}
+                      priceRange={product.price_range}
+                      msrp={product.msrp}
+                    />
+                  </motion.div>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
         )}
       </div>
     </div>

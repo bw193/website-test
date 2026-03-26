@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { ArrowRight, Globe, ShieldCheck, Truck, Factory, Lightbulb, Users, Clock, CheckCircle2, ChevronRight } from 'lucide-react';
+import { ArrowRight, Globe, ShieldCheck, Truck, Factory, Lightbulb, Users, Clock, CheckCircle2, ChevronRight, ChevronLeft } from 'lucide-react';
 import { useTranslation, Trans } from 'react-i18next';
+import { supabase } from '../supabase';
+import { AnimatePresence } from 'motion/react';
 
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
@@ -21,52 +23,142 @@ const staggerContainer = {
 
 export default function Home() {
   const { t } = useTranslation();
+  const [heroBgs, setHeroBgs] = useState<string[]>(['https://picsum.photos/seed/warm-interior-mirror/1920/1080?blur=2']);
+  const [currentBgIndex, setCurrentBgIndex] = useState(0);
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('site_settings')
+          .select('value')
+          .eq('key', 'hero_bg')
+          .single();
+        
+        if (data && data.value) {
+          try {
+            const parsed = JSON.parse(data.value);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              setHeroBgs(parsed);
+            } else if (typeof data.value === 'string' && data.value.length > 0 && !data.value.startsWith('[')) {
+              setHeroBgs([data.value]);
+            }
+          } catch (e) {
+            if (typeof data.value === 'string' && data.value.length > 0) {
+              setHeroBgs([data.value]);
+            }
+          }
+        }
+      } catch (err) {
+        // Ignore errors if table doesn't exist or setting not found
+        console.error("Could not fetch hero background:", err);
+      }
+    };
+    fetchSettings();
+  }, []);
+
+  useEffect(() => {
+    if (heroBgs.length <= 1) return;
+    
+    const interval = setInterval(() => {
+      setCurrentBgIndex((prev) => (prev + 1) % heroBgs.length);
+    }, 5000); // Change image every 5 seconds
+    
+    return () => clearInterval(interval);
+  }, [heroBgs.length]);
+
+  const nextBg = () => {
+    setCurrentBgIndex((prev) => (prev + 1) % heroBgs.length);
+  };
+
+  const prevBg = () => {
+    setCurrentBgIndex((prev) => (prev - 1 + heroBgs.length) % heroBgs.length);
+  };
+
+  const isDefaultBg = heroBgs.length === 1 && heroBgs[0].includes('picsum.photos');
 
   return (
     <div className="bg-[#FAF9F6] text-stone-800 font-sans overflow-hidden">
       {/* Hero Section */}
-      <div className="relative bg-stone-900 min-h-[90vh] flex items-center">
+      <div className="relative bg-stone-900 min-h-[90vh] flex items-center overflow-hidden">
         <div className="absolute inset-0">
-          <motion.img
-            initial={{ scale: 1.1 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 10, ease: "easeOut" }}
-            className="w-full h-full object-cover opacity-40"
-            src="https://picsum.photos/seed/warm-interior-mirror/1920/1080?blur=2"
-            alt="Premium Mirrors"
-            referrerPolicy="no-referrer"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-stone-900 via-stone-900/80 to-transparent mix-blend-multiply" />
+          <AnimatePresence mode="wait">
+            <motion.img
+              key={currentBgIndex}
+              initial={{ opacity: 0, scale: 1.05 }}
+              animate={{ opacity: isDefaultBg ? 0.4 : 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1.5, ease: "easeInOut" }}
+              className="absolute inset-0 w-full h-full object-cover"
+              src={heroBgs[currentBgIndex]}
+              alt="Premium Mirrors"
+              referrerPolicy="no-referrer"
+            />
+          </AnimatePresence>
+          {isDefaultBg && (
+            <div className="absolute inset-0 bg-gradient-to-r from-stone-900 via-stone-900/80 to-transparent mix-blend-multiply" />
+          )}
         </div>
         
-        <div className="relative max-w-7xl mx-auto py-24 px-4 sm:py-32 sm:px-6 lg:px-8 w-full">
-          <motion.div 
-            variants={staggerContainer}
-            initial="hidden"
-            animate="visible"
-            className="max-w-3xl"
-          >
-            <motion.span variants={fadeIn} className="inline-block text-amber-500 font-semibold tracking-wider uppercase mb-4 tracking-[0.2em] text-sm">
-              {t('home.companyName')}
-            </motion.span>
-            <motion.h1 variants={fadeIn} className="text-5xl font-extrabold tracking-tight text-white sm:text-6xl lg:text-7xl leading-[1.1]">
-              {t('home.heroTitle1')} <br />
-              <span className="text-amber-400 font-serif italic font-light">{t('home.heroTitle2')}</span>
-            </motion.h1>
-            <motion.p variants={fadeIn} className="mt-6 text-xl text-stone-300 max-w-2xl leading-relaxed font-light">
-              <Trans i18nKey="home.heroDesc" components={{ 1: <strong /> }} />
-            </motion.p>
-            <motion.div variants={fadeIn} className="mt-10 flex flex-wrap gap-4">
-              <Link to="/products" className="group inline-flex items-center px-8 py-4 border border-transparent text-base font-medium rounded-full text-stone-900 bg-amber-400 hover:bg-amber-500 transition-all duration-300 shadow-[0_0_20px_rgba(251,191,36,0.3)] hover:shadow-[0_0_30px_rgba(251,191,36,0.5)]">
-                {t('home.exploreBtn')} 
-                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-              </Link>
-              <a href="#about" className="inline-flex items-center px-8 py-4 border border-stone-300/30 text-base font-medium rounded-full text-stone-200 bg-white/5 hover:bg-white/10 backdrop-blur-sm transition-all duration-300">
-                {t('home.ourStoryBtn')}
-              </a>
+        {heroBgs.length > 1 && (
+          <>
+            <button 
+              onClick={prevBg}
+              className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-black/20 text-white/70 hover:bg-black/40 hover:text-white transition-all backdrop-blur-sm"
+              aria-label="Previous image"
+            >
+              <ChevronLeft className="w-8 h-8" />
+            </button>
+            <button 
+              onClick={nextBg}
+              className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-black/20 text-white/70 hover:bg-black/40 hover:text-white transition-all backdrop-blur-sm"
+              aria-label="Next image"
+            >
+              <ChevronRight className="w-8 h-8" />
+            </button>
+            <div className="absolute bottom-24 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+              {heroBgs.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setCurrentBgIndex(idx)}
+                  className={`w-2.5 h-2.5 rounded-full transition-all ${idx === currentBgIndex ? 'bg-amber-400 w-8' : 'bg-white/50 hover:bg-white/80'}`}
+                  aria-label={`Go to image ${idx + 1}`}
+                />
+              ))}
+            </div>
+          </>
+        )}
+        
+        {isDefaultBg && (
+          <div className="relative max-w-7xl mx-auto py-24 px-4 sm:py-32 sm:px-6 lg:px-8 w-full z-10">
+            <motion.div 
+              variants={staggerContainer}
+              initial="hidden"
+              animate="visible"
+              className="max-w-3xl"
+            >
+              <motion.span variants={fadeIn} className="inline-block text-amber-500 font-semibold tracking-wider uppercase mb-4 tracking-[0.2em] text-sm">
+                {t('home.companyName')}
+              </motion.span>
+              <motion.h1 variants={fadeIn} className="text-5xl font-extrabold tracking-tight text-white sm:text-6xl lg:text-7xl leading-[1.1]">
+                {t('home.heroTitle1')} <br />
+                <span className="text-amber-400 font-serif italic font-light">{t('home.heroTitle2')}</span>
+              </motion.h1>
+              <motion.p variants={fadeIn} className="mt-6 text-xl text-stone-300 max-w-2xl leading-relaxed font-light">
+                <Trans i18nKey="home.heroDesc" components={{ 1: <strong /> }} />
+              </motion.p>
+              <motion.div variants={fadeIn} className="mt-10 flex flex-wrap gap-4">
+                <Link to="/products" className="group inline-flex items-center px-8 py-4 border border-transparent text-base font-medium rounded-full text-stone-900 bg-amber-400 hover:bg-amber-500 transition-all duration-300 shadow-[0_0_20px_rgba(251,191,36,0.3)] hover:shadow-[0_0_30px_rgba(251,191,36,0.5)]">
+                  {t('home.exploreBtn')} 
+                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                </Link>
+                <Link to="/our-story" className="inline-flex items-center px-8 py-4 border border-stone-300/30 text-base font-medium rounded-full text-stone-200 bg-white/5 hover:bg-white/10 backdrop-blur-sm transition-all duration-300">
+                  {t('home.ourStoryBtn')}
+                </Link>
+              </motion.div>
             </motion.div>
-          </motion.div>
-        </div>
+          </div>
+        )}
       </div>
 
       {/* Stats Section */}
@@ -129,7 +221,7 @@ export default function Home() {
               className="mt-12 lg:mt-0 relative"
             >
               <div className="aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl relative">
-                <img src="https://picsum.photos/seed/mirror-factory/800/1000" alt="Factory" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                <img src="https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/building.jpg" alt="Factory" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                 <div className="absolute inset-0 bg-gradient-to-t from-stone-900/60 to-transparent" />
                 <div className="absolute bottom-8 left-8 right-8 text-white">
                   <p className="text-2xl font-serif italic mb-2">{t('home.about.quote')}</p>
@@ -283,42 +375,23 @@ export default function Home() {
       {/* Why Choose Us */}
       <div className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="lg:grid lg:grid-cols-12 lg:gap-16 items-center">
+          <div className="lg:grid lg:grid-cols-12 lg:gap-16 items-start">
             <motion.div 
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="lg:col-span-5 mb-12 lg:mb-0"
+              className="lg:col-span-12 mb-12 lg:mb-0"
             >
-              <h2 className="text-4xl font-serif text-stone-900 sm:text-5xl mb-6 leading-tight">{t('home.whyUs.title1')} <br/>{t('home.whyUs.title2')}</h2>
-              <p className="text-lg text-stone-600 font-light mb-8">
-                {t('home.whyUs.desc')}
-              </p>
-              <ul className="space-y-4">
-                {(t('home.whyUs.points', { returnObjects: true }) as string[]).map((text: string, i: number) => (
-                  <li key={i} className="flex items-start">
-                    <CheckCircle2 className="h-6 w-6 text-amber-500 mr-3 flex-shrink-0" />
-                    <span className="text-stone-700">{text}</span>
-                  </li>
-                ))}
-              </ul>
-            </motion.div>
-
-            <motion.div 
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-6"
-            >
-              <div className="bg-stone-50 p-8 rounded-3xl border border-stone-100 hover:shadow-lg transition-shadow duration-300">
-                <ShieldCheck className="h-10 w-10 text-amber-600 mb-6" />
-                <h3 className="text-xl font-bold text-stone-900 mb-3">{t('home.whyUs.cert.title')}</h3>
-                <p className="text-stone-600 font-light text-sm leading-relaxed">{t('home.whyUs.cert.desc')}</p>
-              </div>
-              <div className="bg-stone-50 p-8 rounded-3xl border border-stone-100 hover:shadow-lg transition-shadow duration-300 sm:translate-y-8">
-                <Truck className="h-10 w-10 text-amber-600 mb-6" />
-                <h3 className="text-xl font-bold text-stone-900 mb-3">{t('home.whyUs.logistics.title')}</h3>
-                <p className="text-stone-600 font-light text-sm leading-relaxed">{t('home.whyUs.logistics.desc')}</p>
+              <h2 className="text-4xl font-serif text-stone-900 sm:text-5xl mb-10 leading-tight text-center">{t('home.whyUs.title1')} <span className="italic text-amber-700">{t('home.whyUs.title2')}</span></h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-lg text-stone-600 font-light leading-relaxed">
+                <div className="space-y-6">
+                  <p>{(t('home.whyUs.paragraphs', { returnObjects: true }) as string[])[0]}</p>
+                  <p>{(t('home.whyUs.paragraphs', { returnObjects: true }) as string[])[1]}</p>
+                </div>
+                <div className="space-y-6">
+                  <p>{(t('home.whyUs.paragraphs', { returnObjects: true }) as string[])[2]}</p>
+                  <p>{(t('home.whyUs.paragraphs', { returnObjects: true }) as string[])[3]}</p>
+                </div>
               </div>
             </motion.div>
           </div>

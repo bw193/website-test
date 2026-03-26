@@ -5,7 +5,7 @@ import { Sparkles, LogIn, UserPlus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 export default function AdminLogin() {
-  const { user, isAdmin, isPending, login, loginWithEmail, registerWithEmail, loading } = useAuth();
+  const { user, isAdmin, isPending, loginWithEmail, registerWithEmail, loading } = useAuth();
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [error, setError] = useState<string | null>(null);
@@ -20,19 +20,6 @@ export default function AdminLogin() {
     }
   }, [user, isAdmin, navigate]);
 
-  const handleGoogleLogin = async () => {
-    setError(null);
-    try {
-      await login();
-    } catch (err: any) {
-      if (err.code === 'auth/popup-closed-by-user') {
-        console.log('Login popup closed by user');
-      } else {
-        setError(err.message || t('admin.login.errors.loginFailed'));
-      }
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -43,19 +30,6 @@ export default function AdminLogin() {
       } else {
         await loginWithEmail(email, password);
       }
-    } catch (err: any) {
-      setError(err.message || t('admin.login.errors.generalError'));
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleMasterBypass = async () => {
-    setEmail('wubanglun@gmail.com');
-    setPassword('12345678');
-    setIsLoading(true);
-    try {
-      await loginWithEmail('wubanglun@gmail.com', '12345678');
     } catch (err: any) {
       setError(err.message || t('admin.login.errors.generalError'));
     } finally {
@@ -132,40 +106,10 @@ export default function AdminLogin() {
               {isRegistering ? t('admin.login.registerBtn') : t('admin.login.signInBtn')}
             </button>
 
-            {!isRegistering && (
-              <button
-                type="button"
-                onClick={handleMasterBypass}
-                disabled={loading || isLoading}
-                className="w-full flex justify-center py-2 px-4 border border-amber-600 rounded-md shadow-sm text-sm font-medium text-amber-600 bg-white hover:bg-amber-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 disabled:opacity-50 mt-2"
-              >
-                {t('admin.login.quickLogin')}
-              </button>
-            )}
+
           </form>
 
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-stone-300" />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-stone-500">{t('admin.login.orContinueWith')}</span>
-              </div>
-            </div>
 
-            <div className="mt-6">
-              <button
-                onClick={handleGoogleLogin}
-                type="button"
-                disabled={loading || isLoading}
-                className="w-full flex justify-center py-2 px-4 border border-stone-300 rounded-md shadow-sm bg-white text-sm font-medium text-stone-700 hover:bg-stone-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 disabled:opacity-50"
-              >
-                <img className="h-5 w-5 mr-2" src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google logo" />
-                {t('admin.login.googleLogin')}
-              </button>
-            </div>
-          </div>
 
           <div className="mt-6 text-center">
             <button

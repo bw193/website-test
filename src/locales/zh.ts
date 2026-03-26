@@ -3,9 +3,20 @@ export const zh = {
     navbar: {
       home: "首页",
       catalog: "产品目录",
+      ourStory: "我们的故事",
       adminDashboard: "管理后台",
       logout: "退出登录",
       employeeLogin: "员工登录"
+    },
+    ourStoryPage: {
+      title: "我们的故事",
+      subtitle: "嘉兴诚泰镜业有限公司",
+      paragraphs: [
+        "凭借在镜子制造领域近20年的专注经验，嘉兴诚泰镜业有限公司建立了超越任何单一销售渠道的声誉。我们拥有50,000多平方米的生产综合体、两家独立工厂以及一支由200多名熟练工人组成的团队，这赋予了我们处理几乎任何规模订单的能力和灵活性——从精品室内设计项目到大型酒店和房地产开发。",
+        "我们将整个生产过程掌握在自己手中。从原玻璃加工和LED集成到框架制造和智能功能组装，制造的每个阶段都在同一屋檐下进行，并由专门的QA/QC检查员监督。这种垂直整合意味着我们在每个步骤都控制质量，消除第三方延迟，并保持具有竞争力的交货时间。",
+        "我们跨越6个核心系列的200多种产品款式绝非现成的模板——它们代表了多年来结合欧洲审美趋势和真实买家反馈的设计迭代。对于需要独特产品的客户，我们的OEM和ODM能力允许对尺寸、形状、照明、智能功能、材料和品牌进行完全定制。",
+        "在包括CE、RoHS和IP66防水在内的国际认证支持下，我们的产品满足欧洲、北美、中东及其他地区市场的合规要求。我们不仅仅是制造镜子——我们与进口商、分销商、室内设计师和开发商建立长期合作伙伴关系，满足他们对一致性、精确性以及年复一年可靠供应商的需求。"
+      ]
     },
     home: {
       companyName: "嘉兴诚泰镜业有限公司",
@@ -66,21 +77,12 @@ export const zh = {
       whyUs: {
         title1: "为什么选择",
         title2: "诚泰？",
-        desc: "我们不仅仅制造镜子；我们建立基于信任、质量和可靠性的长期合作伙伴关系。",
-        points: [
-          "完整的知识产权和专利",
-          "平均响应时间低于8小时",
-          "85.7% 按时交货率",
-          "超过270,000美元的验证平台订单"
-        ],
-        cert: {
-          title: "认证的卓越",
-          desc: "所有产品均通过严格的国际安全和质量认证，包括CE、RoHS和IP66防水标准。"
-        },
-        logistics: {
-          title: "全球物流",
-          desc: "从产品咨询到售后服务的端到端支持。可通过快递、空运、海运和陆运发往全球。"
-        }
+        paragraphs: [
+          "凭借在镜子制造领域近20年的专注经验，嘉兴诚泰镜业有限公司建立了超越任何单一销售渠道的声誉。我们拥有50,000多平方米的生产综合体、两家独立工厂以及一支由200多名熟练工人组成的团队，这赋予了我们处理几乎任何规模订单的能力和灵活性——从精品室内设计项目到大型酒店和房地产开发。",
+          "我们将整个生产过程掌握在自己手中。从原玻璃加工和LED集成到框架制造和智能功能组装，制造的每个阶段都在同一屋檐下进行，并由专门的QA/QC检查员监督。这种垂直整合意味着我们在每个步骤都控制质量，消除第三方延迟，并保持具有竞争力的交货时间。",
+          "我们跨越6个核心系列的200多种产品款式绝非现成的模板——它们代表了多年来结合欧洲审美趋势和真实买家反馈的设计迭代。对于需要独特产品的客户，我们的OEM和ODM能力允许对尺寸、形状、照明、智能功能、材料和品牌进行完全定制。",
+          "在包括CE、RoHS和IP66防水在内的国际认证支持下，我们的产品满足欧洲、北美、中东及其他地区市场的合规要求。我们不仅仅是制造镜子——我们与进口商、分销商、室内设计师和开发商建立长期合作伙伴关系，满足他们对一致性、精确性以及年复一年可靠供应商的需求。"
+        ]
       },
       cta: {
         title: "准备好提升您的空间了吗？",
@@ -93,7 +95,18 @@ export const zh = {
       catalog: "产品目录",
       desc: "浏览我们丰富的优质镜子系列，包括智能LED技术、优雅的化妆镜设计和可定制选项。",
       noProducts: "没有找到符合您标准的产品。",
-      viewDetails: "查看详情"
+      viewDetails: "查看详情",
+      allCategories: "所有类别",
+      categories: {
+        "New Arrival": "新品上市",
+        "Hot Sale": "热销产品",
+        "Led Lighted Mirror": "LED发光镜",
+        "Bathroom Mirror without led": "无LED浴室镜",
+        "Full Length Dressing Mirror": "全身穿衣镜",
+        "Irregular Mirror": "异形镜"
+      },
+      priceRange: "价格区间",
+      msrp: "建议零售价"
     },
     productDetail: {
       backToCatalog: "返回目录",
@@ -115,7 +128,8 @@ export const zh = {
         tabs: {
           products: "产品",
           rfqs: "询价单",
-          employees: "员工"
+          employees: "员工",
+          settings: "设置"
         },
         products: {
           uncategorized: "未分类",
@@ -139,6 +153,21 @@ export const zh = {
             pending: "待批准",
             rejected: "已拒绝"
           }
+        },
+        settings: {
+          title: "网站设置",
+          heroBgLabel: "首页推广图片",
+          heroBgPlaceholder: "https://example.com/image.jpg",
+          heroBgHelp: "添加图片URL或上传图片。如果未提供，将使用默认背景。",
+          preview: "预览：",
+          save: "保存设置",
+          saving: "保存中...",
+          saveSuccess: "设置保存成功！",
+          setupRequired: "需要设置数据库",
+          setupDesc: "要启用网站设置，请在您的Supabase SQL编辑器中运行以下SQL命令：",
+          setupBtn: "我已运行SQL命令",
+          addImage: "添加图片",
+          removeImage: "移除"
         }
       },
       login: {
@@ -166,11 +195,13 @@ export const zh = {
       productForm: {
         backToDashboard: "返回仪表盘",
         supabaseSetupTitle: "需要设置 Supabase",
-        supabaseSetupDesc: "要启用图片上传，请将 VITE_SUPABASE_URL 和 VITE_SUPABASE_ANON_KEY 添加到您的 AI Studio Secrets 中。",
+        supabaseSetupDesc: "要启用图片上传，请将 VITE_SUPABASE_URL 和 VITE_SUPABASE_ANON_KEY 添加到您的环境变量（或 AI Studio Secrets）中，并重新构建应用。",
         editProduct: "编辑产品",
         addProduct: "添加新产品",
         productTitle: "产品标题",
         category: "类别",
+        priceRange: "价格区间",
+        msrp: "建议零售价",
         shortDesc: "简短描述",
         longDetails: "详细信息 (允许富文本 / HTML)",
         images: "图片",
@@ -191,7 +222,7 @@ export const zh = {
           specValue: "例如：24x36 英寸"
         },
         alerts: {
-          supabaseNotConfigured: "未配置 Supabase。请将 VITE_SUPABASE_URL 和 VITE_SUPABASE_ANON_KEY 添加到您的 AI Studio Secrets 中。",
+          supabaseNotConfigured: "未配置 Supabase。请将 VITE_SUPABASE_URL 和 VITE_SUPABASE_ANON_KEY 添加到您的环境变量中并重新构建。",
           bucketNotFound: "未找到存储桶 \"product-images\"。请在您的 Supabase 仪表板中创建它并将其设置为公开。",
           uploadFailed: "上传图片失败：{{message}}",
           saveFailed: "保存产品失败。请检查控制台以获取详细信息。"
