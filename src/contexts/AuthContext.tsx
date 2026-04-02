@@ -6,6 +6,7 @@ interface AuthContextType {
   user: User | null;
   isAdmin: boolean;
   isMasterAdmin: boolean;
+  role: string | null;
   isPending: boolean;
   loading: boolean;
   login: () => Promise<void>;
@@ -22,6 +23,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isMasterAdmin, setIsMasterAdmin] = useState(false);
+  const [role, setRole] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -61,6 +63,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (masterAdmin) {
         setIsAdmin(true);
+        setRole('admin');
         setIsPending(false);
       } else {
         try {
@@ -73,6 +76,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           if (error) {
             console.error("Error fetching user role:", error);
             setIsAdmin(false);
+            setRole(null);
             setIsPending(true); // Default to pending if error
             setLoading(false);
             return;
@@ -80,20 +84,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
           if (profile) {
             setIsAdmin(profile.role === 'admin' || profile.role === 'employee');
+            setRole(profile.role);
             setIsPending(profile.role === 'pending');
           } else {
             setIsAdmin(false);
+            setRole(null);
             setIsPending(true);
           }
         } catch (err) {
           console.error("Error fetching user role:", err);
           setIsAdmin(false);
+          setRole(null);
           setIsPending(true);
         }
       }
     } else {
       setIsAdmin(false);
       setIsMasterAdmin(false);
+      setRole(null);
       setIsPending(false);
     }
     
@@ -144,6 +152,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (profileError && profileError.code !== '23505') {
           console.error("Profile creation error:", profileError);
         }
+        
+        // Sign out immediately after registration so they don't stay logged in as a pending user
+        await supabase.auth.signOut();
       }
     } catch (error: any) {
       console.error("Registration failed", error);
@@ -160,7 +171,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAdmin, isMasterAdmin, isPending, loading, login, logout, loginWithEmail, registerWithEmail }}>
+    <AuthContext.Provider value={{ user, isAdmin, isMasterAdmin, role, isPending, loading, login, logout, loginWithEmail, registerWithEmail }}>
       {children}
     </AuthContext.Provider>
   );

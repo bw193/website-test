@@ -5,7 +5,7 @@ import { Sparkles, LogIn, UserPlus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 export default function AdminLogin() {
-  const { user, isAdmin, isPending, loginWithEmail, registerWithEmail, loading } = useAuth();
+  const { user, isAdmin, isPending, loginWithEmail, registerWithEmail, loading, logout } = useAuth();
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [error, setError] = useState<string | null>(null);
@@ -13,6 +13,7 @@ export default function AdminLogin() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [registrationSuccess, setRegistrationSuccess] = useState(false);
 
   useEffect(() => {
     if (user && isAdmin) {
@@ -23,10 +24,12 @@ export default function AdminLogin() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setRegistrationSuccess(false);
     setIsLoading(true);
     try {
       if (isRegistering) {
         await registerWithEmail(email, password);
+        setRegistrationSuccess(true);
       } else {
         await loginWithEmail(email, password);
       }
@@ -58,6 +61,12 @@ export default function AdminLogin() {
               <span className="block sm:inline">{error}</span>
             </div>
           )}
+          {registrationSuccess && !user && (
+            <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded relative mb-4" role="alert">
+              <strong className="font-bold">Registration successful! </strong>
+              <span className="block sm:inline">Your account is pending approval from an administrator. You will be able to log in once approved.</span>
+            </div>
+          )}
           {user && isPending ? (
             <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded relative mb-4" role="alert">
               <strong className="font-bold">{t('admin.login.pendingTitle')} </strong>
@@ -70,56 +79,65 @@ export default function AdminLogin() {
             </div>
           ) : null}
           
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-stone-700">{t('admin.login.email')}</label>
-              <div className="mt-1">
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2 border border-stone-300 rounded-md shadow-sm placeholder-stone-400 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm"
-                />
-              </div>
+          {user ? (
+            <div className="mt-6">
+              <button
+                onClick={() => logout()}
+                className="w-full flex justify-center py-3 px-4 border border-stone-300 rounded-md shadow-sm text-sm font-medium text-stone-700 bg-white hover:bg-stone-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
+              >
+                Sign Out
+              </button>
             </div>
+          ) : (
+            <>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-stone-700">{t('admin.login.email')}</label>
+                  <div className="mt-1">
+                    <input
+                      type="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="appearance-none block w-full px-3 py-2 border border-stone-300 rounded-md shadow-sm placeholder-stone-400 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm"
+                    />
+                  </div>
+                </div>
 
-            <div>
-              <label className="block text-sm font-medium text-stone-700">{t('admin.login.password')}</label>
-              <div className="mt-1">
-                <input
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2 border border-stone-300 rounded-md shadow-sm placeholder-stone-400 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm"
-                />
+                <div>
+                  <label className="block text-sm font-medium text-stone-700">{t('admin.login.password')}</label>
+                  <div className="mt-1">
+                    <input
+                      type="password"
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="appearance-none block w-full px-3 py-2 border border-stone-300 rounded-md shadow-sm placeholder-stone-400 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading || isLoading}
+                  className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 disabled:opacity-50"
+                >
+                  {isRegistering ? <UserPlus className="w-5 h-5 mr-2" /> : <LogIn className="w-5 h-5 mr-2" />}
+                  {isRegistering ? t('admin.login.registerBtn') : t('admin.login.signInBtn')}
+                </button>
+              </form>
+
+              <div className="mt-6 text-center">
+                <button
+                  type="button"
+                  onClick={() => setIsRegistering(!isRegistering)}
+                  className="text-sm text-amber-600 hover:text-amber-500 font-medium"
+                >
+                  {isRegistering ? t('admin.login.alreadyHaveAccount') : t('admin.login.needAccount')}
+                </button>
               </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading || isLoading}
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 disabled:opacity-50"
-            >
-              {isRegistering ? <UserPlus className="w-5 h-5 mr-2" /> : <LogIn className="w-5 h-5 mr-2" />}
-              {isRegistering ? t('admin.login.registerBtn') : t('admin.login.signInBtn')}
-            </button>
-
-
-          </form>
-
-
-
-          <div className="mt-6 text-center">
-            <button
-              type="button"
-              onClick={() => setIsRegistering(!isRegistering)}
-              className="text-sm text-amber-600 hover:text-amber-500 font-medium"
-            >
-              {isRegistering ? t('admin.login.alreadyHaveAccount') : t('admin.login.needAccount')}
-            </button>
-          </div>
+            </>
+          )}
         </div>
       </div>
     </div>

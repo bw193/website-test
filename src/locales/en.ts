@@ -63,6 +63,10 @@ export const en = {
           partner: "Partner With Us"
         }
       },
+      certificates: {
+        subtitle: "Our Qualifications",
+        title: "Global Certifications"
+      },
       process: {
         subtitle: "Excellence in Every Step",
         title: "The Manufacturing Process",

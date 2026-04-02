@@ -33,22 +33,22 @@ export default function Navbar() {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link to="/" className="flex-shrink-0 flex items-center gap-2">
-              <Sparkles className="h-8 w-8 text-amber-500" />
+              <Sparkles className="h-8 w-8 text-amber-600" />
               <span className="font-bold text-xl text-stone-900 tracking-wide">BOLEN</span>
             </Link>
           </div>
           <div className="hidden sm:ml-6 sm:flex sm:items-center sm:space-x-8">
-            <Link to="/" className="text-stone-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-amber-500 text-sm font-medium">
+            <Link to="/" className="text-stone-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-amber-600 text-sm font-medium">
               {t('navbar.home')}
             </Link>
-            <Link to="/products" className="text-stone-500 hover:text-stone-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-amber-500 text-sm font-medium">
+            <Link to="/products" className="text-stone-500 hover:text-stone-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-amber-600 text-sm font-medium">
               {t('navbar.catalog')}
             </Link>
-            <Link to="/our-story" className="text-stone-500 hover:text-stone-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-amber-500 text-sm font-medium">
+            <Link to="/our-story" className="text-stone-500 hover:text-stone-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-amber-600 text-sm font-medium">
               {t('navbar.ourStory')}
             </Link>
             {isAdmin && (
-              <Link to="/admin" className="text-amber-600 hover:text-amber-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-amber-500 text-sm font-medium">
+              <Link to="/admin" className="text-amber-600 hover:text-amber-800 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-amber-600 text-sm font-medium">
                 {t('navbar.adminDashboard')}
               </Link>
             )}
@@ -114,7 +114,7 @@ export default function Navbar() {
                 </div>
               )}
             </div>
-            <button onClick={() => setIsOpen(!isOpen)} className="inline-flex items-center justify-center p-2 rounded-md text-stone-400 hover:text-stone-500 hover:bg-stone-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-amber-500">
+            <button onClick={() => setIsOpen(!isOpen)} className="inline-flex items-center justify-center p-2 rounded-md text-stone-400 hover:text-stone-500 hover:bg-stone-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-amber-600">
               <span className="sr-only">Open main menu</span>
               {isOpen ? <X className="block h-6 w-6" /> : <Menu className="block h-6 w-6" />}
             </button>
@@ -125,18 +125,18 @@ export default function Navbar() {
       {isOpen && (
         <div className="sm:hidden">
           <div className="pt-2 pb-3 space-y-1">
-            <Link to="/" onClick={() => setIsOpen(false)} className="bg-amber-50 border-amber-500 text-amber-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">{t('navbar.home')}</Link>
-            <Link to="/products" onClick={() => setIsOpen(false)} className="border-transparent text-stone-500 hover:bg-stone-50 hover:border-stone-300 hover:text-stone-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">{t('navbar.catalog')}</Link>
-            <Link to="/our-story" onClick={() => setIsOpen(false)} className="border-transparent text-stone-500 hover:bg-stone-50 hover:border-stone-300 hover:text-stone-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">{t('navbar.ourStory')}</Link>
+            <Link to="/" onClick={() => setIsOpen(false)} className="bg-amber-50 border-amber-600 text-amber-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium">{t('navbar.home')}</Link>
+            <Link to="/products" onClick={() => setIsOpen(false)} className="border-transparent text-stone-500 hover:bg-stone-50 hover:border-stone-300 hover:text-stone-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium">{t('navbar.catalog')}</Link>
+            <Link to="/our-story" onClick={() => setIsOpen(false)} className="border-transparent text-stone-500 hover:bg-stone-50 hover:border-stone-300 hover:text-stone-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium">{t('navbar.ourStory')}</Link>
             {isAdmin && (
-              <Link to="/admin" onClick={() => setIsOpen(false)} className="border-transparent text-amber-600 hover:bg-amber-50 hover:border-amber-300 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">{t('navbar.adminDashboard')}</Link>
+              <Link to="/admin" onClick={() => setIsOpen(false)} className="border-transparent text-amber-600 hover:bg-amber-50 hover:border-amber-300 block pl-3 pr-4 py-3 border-l-4 text-base font-medium">{t('navbar.adminDashboard')}</Link>
             )}
             {user ? (
-              <button onClick={() => { logout(); navigate('/'); setIsOpen(false); }} className="w-full text-left border-transparent text-stone-500 hover:bg-stone-50 hover:border-stone-300 hover:text-stone-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
+              <button onClick={() => { logout(); navigate('/'); setIsOpen(false); }} className="w-full text-left border-transparent text-stone-500 hover:bg-stone-50 hover:border-stone-300 hover:text-stone-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium">
                 {t('navbar.logout')}
               </button>
             ) : (
-              <Link to="/admin/login" onClick={() => setIsOpen(false)} className="border-transparent text-stone-500 hover:bg-stone-50 hover:border-stone-300 hover:text-stone-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
+              <Link to="/admin/login" onClick={() => setIsOpen(false)} className="border-transparent text-stone-500 hover:bg-stone-50 hover:border-stone-300 hover:text-stone-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium">
                 {t('navbar.employeeLogin')}
               </Link>
             )}

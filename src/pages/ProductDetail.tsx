@@ -91,7 +91,7 @@ export default function ProductDetail() {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <Loader2 className="h-12 w-12 text-amber-500 animate-spin" />
+        <Loader2 className="h-12 w-12 text-amber-600 animate-spin" />
       </div>
     );
   }
@@ -168,14 +168,14 @@ export default function ProductDetail() {
                 <>
                   <button 
                     onClick={prevImage} 
-                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 p-3 rounded-full shadow-lg hover:bg-white text-stone-800 opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 p-3 rounded-full shadow-lg hover:bg-white text-stone-800 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-300 hover:scale-110"
                     aria-label="Previous image"
                   >
                     <ChevronLeft className="w-5 h-5" />
                   </button>
                   <button 
                     onClick={nextImage} 
-                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 p-3 rounded-full shadow-lg hover:bg-white text-stone-800 opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 p-3 rounded-full shadow-lg hover:bg-white text-stone-800 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-300 hover:scale-110"
                     aria-label="Next image"
                   >
                     <ChevronRight className="w-5 h-5" />
@@ -260,7 +260,7 @@ export default function ProductDetail() {
             {product.specifications && Object.keys(product.specifications).length > 0 && (
               <motion.div variants={fadeInUp} className="mt-10">
                 <h3 className="text-xl font-bold text-stone-900 mb-6 flex items-center gap-2">
-                  <span className="w-1.5 h-6 bg-amber-500 rounded-full"></span>
+                  <span className="w-1.5 h-6 bg-amber-600 rounded-full"></span>
                   {t('productDetail.specifications')}
                 </h3>
                 <div className="bg-white rounded-2xl border border-stone-200 overflow-hidden shadow-sm">
@@ -279,7 +279,7 @@ export default function ProductDetail() {
             {product.details && (
               <motion.div variants={fadeInUp} className="mt-10">
                 <h3 className="text-xl font-bold text-stone-900 mb-6 flex items-center gap-2">
-                  <span className="w-1.5 h-6 bg-amber-500 rounded-full"></span>
+                  <span className="w-1.5 h-6 bg-amber-600 rounded-full"></span>
                   {t('productDetail.productDetails')}
                 </h3>
                 <div className="prose prose-amber prose-stone max-w-none text-stone-600 whitespace-pre-wrap leading-relaxed bg-white p-6 rounded-2xl border border-stone-200 shadow-sm">
@@ -355,7 +355,7 @@ export default function ProductDetail() {
                   <button
                     type="submit"
                     disabled={rfqStatus === 'submitting'}
-                    className="w-full flex justify-center items-center py-4 px-4 border border-transparent rounded-xl shadow-md text-base font-bold text-stone-900 bg-amber-400 hover:bg-amber-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 disabled:opacity-50 transition-all hover:shadow-lg hover:-translate-y-0.5"
+                    className="w-full flex justify-center items-center py-4 px-4 border border-transparent rounded-xl shadow-md text-base font-bold text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 disabled:opacity-50 transition-all hover:shadow-lg hover:-translate-y-0.5"
                   >
                     {rfqStatus === 'submitting' ? (
                       <Loader2 className="w-5 h-5 animate-spin" />

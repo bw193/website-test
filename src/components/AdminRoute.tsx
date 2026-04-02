@@ -9,7 +9,7 @@ export default function AdminRoute() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <Loader2 className="h-12 w-12 text-amber-500 animate-spin" />
+        <Loader2 className="h-12 w-12 text-amber-600 animate-spin" />
       </div>
     );
   }

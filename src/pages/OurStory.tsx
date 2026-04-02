@@ -39,7 +39,7 @@ export default function OurStory() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.4 }}
-            className="text-6xl md:text-8xl lg:text-9xl font-serif text-white mb-8 leading-none"
+            className="text-5xl sm:text-6xl md:text-8xl lg:text-9xl font-serif text-white mb-8 leading-none"
           >
             {t('ourStoryPage.title')}
           </motion.h1>

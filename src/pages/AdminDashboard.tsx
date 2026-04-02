@@ -23,11 +23,11 @@ interface RFQ {
 interface Employee {
   id: string;
   email: string;
-  role: 'admin' | 'pending' | 'rejected';
+  role: 'admin' | 'employee' | 'pending' | 'rejected';
 }
 
 export default function AdminDashboard() {
-  const { isMasterAdmin } = useAuth();
+  const { isMasterAdmin, role } = useAuth();
   const { t } = useTranslation();
   const [products, setProducts] = useState<Product[]>([]);
   const [rfqs, setRfqs] = useState<RFQ[]>([]);
@@ -56,7 +56,7 @@ export default function AdminDashboard() {
           .order('created_at', { ascending: false });
         if (error) throw error;
         setRfqs(data || []);
-      } else if (activeTab === 'employees' && isMasterAdmin) {
+      } else if (activeTab === 'employees' && (role === 'admin' || isMasterAdmin)) {
         const { data, error } = await supabase
           .from('profiles')
           .select('*')
@@ -84,7 +84,7 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleUpdateEmployeeStatus = async (id: string, role: 'admin' | 'rejected') => {
+  const handleUpdateEmployeeStatus = async (id: string, role: 'admin' | 'employee' | 'rejected') => {
     try {
       const { error } = await supabase
         .from('profiles')
@@ -126,7 +126,7 @@ export default function AdminDashboard() {
             <Inbox className="h-5 w-5 mr-2" />
             {t('admin.dashboard.tabs.rfqs')}
           </button>
-          {isMasterAdmin && (
+          {(role === 'admin' || isMasterAdmin) && (
             <button
               onClick={() => setActiveTab('employees')}
               className={`${activeTab === 'employees' ? 'border-amber-500 text-amber-600' : 'border-transparent text-stone-500 hover:text-stone-700 hover:border-stone-300'} whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm flex items-center`}
@@ -147,7 +147,7 @@ export default function AdminDashboard() {
 
       {loading ? (
         <div className="flex justify-center py-12">
-          <Loader2 className="h-8 w-8 text-amber-500 animate-spin" />
+          <Loader2 className="h-8 w-8 text-amber-600 animate-spin" />
         </div>
       ) : activeTab === 'products' ? (
         <div className="bg-white shadow overflow-hidden sm:rounded-md">
@@ -218,20 +218,33 @@ export default function AdminDashboard() {
                     <div>
                       <p className="text-sm font-medium text-amber-600 truncate">{employee.email}</p>
                       <p className="mt-2 flex items-center text-sm text-stone-500">
-                        {t('admin.dashboard.employees.status')} <span className={`ml-1 font-semibold ${employee.role === 'admin' ? 'text-green-600' : employee.role === 'rejected' ? 'text-red-600' : 'text-yellow-600'}`}>{t(`admin.dashboard.employees.roles.${employee.role}`)}</span>
+                        {t('admin.dashboard.employees.status')} <span className={`ml-1 font-semibold ${employee.role === 'admin' ? 'text-green-600' : employee.role === 'employee' ? 'text-amber-600' : employee.role === 'rejected' ? 'text-red-600' : 'text-yellow-600'}`}>{employee.role.charAt(0).toUpperCase() + employee.role.slice(1)}</span>
                       </p>
                     </div>
                   </div>
-                  <div className="ml-5 flex-shrink-0 flex gap-2">
-                    {employee.role !== 'admin' && (
-                      <button onClick={() => handleUpdateEmployeeStatus(employee.id, 'admin')} className="p-2 text-green-600 hover:bg-green-50 rounded-full" title={t('admin.dashboard.employees.approve')}>
-                        <Check className="h-5 w-5" />
-                      </button>
-                    )}
-                    {employee.role !== 'rejected' && (
-                      <button onClick={() => handleUpdateEmployeeStatus(employee.id, 'rejected')} className="p-2 text-red-600 hover:bg-red-50 rounded-full" title={t('admin.dashboard.employees.reject')}>
-                        <X className="h-5 w-5" />
-                      </button>
+                  <div className="ml-5 flex-shrink-0 flex gap-2 items-center">
+                    {employee.role === 'pending' ? (
+                      <>
+                        <button onClick={() => handleUpdateEmployeeStatus(employee.id, 'employee')} className="px-3 py-1 text-sm bg-amber-50 text-amber-600 hover:bg-amber-100 rounded-md font-medium">
+                          Approve as Employee
+                        </button>
+                        <button onClick={() => handleUpdateEmployeeStatus(employee.id, 'admin')} className="px-3 py-1 text-sm bg-green-50 text-green-600 hover:bg-green-100 rounded-md font-medium">
+                          Approve as Admin
+                        </button>
+                        <button onClick={() => handleUpdateEmployeeStatus(employee.id, 'rejected')} className="p-2 text-red-600 hover:bg-red-50 rounded-full" title={t('admin.dashboard.employees.reject')}>
+                          <X className="h-5 w-5" />
+                        </button>
+                      </>
+                    ) : (
+                      <select 
+                        value={employee.role}
+                        onChange={(e) => handleUpdateEmployeeStatus(employee.id, e.target.value as 'admin' | 'employee' | 'rejected')}
+                        className="text-sm border-stone-300 rounded-md shadow-sm focus:border-amber-500 focus:ring-amber-500"
+                      >
+                        <option value="employee">Employee</option>
+                        <option value="admin">Admin</option>
+                        <option value="rejected">Rejected</option>
+                      </select>
                     )}
                   </div>
                 </div>
@@ -243,7 +256,7 @@ export default function AdminDashboard() {
           </ul>
         </div>
       ) : activeTab === 'settings' ? (
-        <React.Suspense fallback={<div className="flex justify-center py-12"><Loader2 className="h-8 w-8 text-amber-500 animate-spin" /></div>}>
+        <React.Suspense fallback={<div className="flex justify-center py-12"><Loader2 className="h-8 w-8 text-amber-600 animate-spin" /></div>}>
           {React.createElement(React.lazy(() => import('./AdminSettings')))}
         </React.Suspense>
       ) : null}

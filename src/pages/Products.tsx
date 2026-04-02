@@ -28,6 +28,8 @@ export default function Products() {
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [heroBgs, setHeroBgs] = useState<string[]>([]);
+  const [currentBgIndex, setCurrentBgIndex] = useState(0);
   const { t } = useTranslation();
 
   const normalizeCategory = (cat: string | undefined | null) => {
@@ -64,6 +66,28 @@ export default function Products() {
             console.error("Error parsing categories", e);
           }
         }
+
+        // Fetch hero backgrounds
+        const { data: heroData, error: heroError } = await supabase
+          .from('site_settings')
+          .select('value')
+          .eq('key', 'hero_bg')
+          .single();
+
+        if (!heroError && heroData && heroData.value) {
+          try {
+            const parsed = JSON.parse(heroData.value);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              setHeroBgs(parsed);
+            } else if (typeof heroData.value === 'string' && heroData.value.length > 0 && !heroData.value.startsWith('[')) {
+              setHeroBgs([heroData.value]);
+            }
+          } catch (e) {
+            if (typeof heroData.value === 'string' && heroData.value.length > 0) {
+              setHeroBgs([heroData.value]);
+            }
+          }
+        }
       } catch (error) {
         console.error("Error fetching data", error);
       } finally {
@@ -73,6 +97,16 @@ export default function Products() {
 
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (heroBgs.length <= 1) return;
+    
+    const interval = setInterval(() => {
+      setCurrentBgIndex((prev) => (prev + 1) % heroBgs.length);
+    }, 5000);
+    
+    return () => clearInterval(interval);
+  }, [heroBgs.length, currentBgIndex]);
 
   const filteredProducts = products.filter(p => {
     const matchesCategory = selectedCategory ? normalizeCategory(p.category) === normalizeCategory(selectedCategory) : true;
@@ -158,7 +192,7 @@ export default function Products() {
 
         {loading ? (
           <div className="flex justify-center items-center h-64">
-            <Loader2 className="h-10 w-10 text-amber-500 animate-spin" />
+            <Loader2 className="h-10 w-10 text-amber-600 animate-spin" />
           </div>
         ) : (
           <AnimatePresence mode="wait">
@@ -168,27 +202,64 @@ export default function Products() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="text-center py-24 bg-white rounded-3xl border border-stone-100 shadow-sm"
+                className="w-full rounded-3xl overflow-hidden shadow-lg relative min-h-[500px] flex items-center justify-center bg-stone-100"
               >
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-stone-100 mb-6">
-                  <PackageX className="h-8 w-8 text-stone-400" />
-                </div>
-                <h3 className="text-xl font-semibold text-stone-900 mb-2">No products found</h3>
-                <p className="text-stone-500 max-w-md mx-auto">
-                  {searchQuery 
-                    ? `We couldn't find anything matching "${searchQuery}". Try adjusting your search or filters.`
-                    : t('products.noProducts')}
-                </p>
+                {heroBgs.length > 0 ? (
+                  <>
+                    <AnimatePresence mode="wait">
+                      <motion.img
+                        key={currentBgIndex}
+                        initial={{ opacity: 0, scale: 1.05 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 1.5, ease: "easeInOut" }}
+                        className="absolute inset-0 w-full h-full object-cover"
+                        src={heroBgs[currentBgIndex]}
+                        alt="Promotion"
+                        referrerPolicy="no-referrer"
+                      />
+                    </AnimatePresence>
+                    
+                    {heroBgs.length > 1 && (
+                      <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+                        {heroBgs.map((_, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => setCurrentBgIndex(idx)}
+                            className={`w-2.5 h-2.5 rounded-full transition-all ${idx === currentBgIndex ? 'bg-amber-600 w-8' : 'bg-white/50 hover:bg-white/80'}`}
+                            aria-label={`Go to image ${idx + 1}`}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="text-center py-24 w-full h-full flex flex-col items-center justify-center">
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-stone-200 mb-6">
+                      <PackageX className="h-8 w-8 text-stone-400" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-stone-900 mb-2">No products found</h3>
+                    <p className="text-stone-500 max-w-md mx-auto">
+                      {searchQuery 
+                        ? `We couldn't find anything matching "${searchQuery}". Try adjusting your search or filters.`
+                        : t('products.noProducts')}
+                    </p>
+                  </div>
+                )}
+                
                 {(searchQuery || selectedCategory) && (
-                  <button
-                    onClick={() => {
-                      setSearchQuery('');
-                      setSelectedCategory(null);
-                    }}
-                    className="mt-6 px-6 py-2 bg-stone-900 text-white rounded-full text-sm font-medium hover:bg-stone-800 transition-colors"
-                  >
-                    Clear all filters
-                  </button>
+                  <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20">
+                    <button
+                      onClick={() => {
+                        setSearchQuery('');
+                        setSelectedCategory(null);
+                      }}
+                      className="px-6 py-3 bg-stone-900/90 backdrop-blur-md text-white rounded-full text-sm font-medium hover:bg-stone-800 transition-colors shadow-xl border border-white/20 flex items-center gap-2"
+                    >
+                      <PackageX className="w-4 h-4" />
+                      Clear all filters
+                    </button>
+                  </div>
                 )}
               </motion.div>
             ) : (

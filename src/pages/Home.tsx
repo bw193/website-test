@@ -5,6 +5,7 @@ import { ArrowRight, Globe, ShieldCheck, Truck, Factory, Lightbulb, Users, Clock
 import { useTranslation, Trans } from 'react-i18next';
 import { supabase } from '../supabase';
 import { AnimatePresence } from 'motion/react';
+import ProductCard from '../components/ProductCard';
 
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
@@ -23,12 +24,15 @@ const staggerContainer = {
 
 export default function Home() {
   const { t } = useTranslation();
-  const [heroBgs, setHeroBgs] = useState<string[]>(['https://picsum.photos/seed/warm-interior-mirror/1920/1080?blur=2']);
+  const [heroBgs, setHeroBgs] = useState<string[]>([]);
   const [currentBgIndex, setCurrentBgIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [featuredProducts, setFeaturedProducts] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchSettings = async () => {
       try {
+        // Fetch hero background settings
         const { data, error } = await supabase
           .from('site_settings')
           .select('value')
@@ -42,16 +46,38 @@ export default function Home() {
               setHeroBgs(parsed);
             } else if (typeof data.value === 'string' && data.value.length > 0 && !data.value.startsWith('[')) {
               setHeroBgs([data.value]);
+            } else {
+              setHeroBgs(['https://picsum.photos/seed/warm-interior-mirror/1920/1080?blur=2']);
             }
           } catch (e) {
             if (typeof data.value === 'string' && data.value.length > 0) {
               setHeroBgs([data.value]);
+            } else {
+              setHeroBgs(['https://picsum.photos/seed/warm-interior-mirror/1920/1080?blur=2']);
             }
           }
+        } else {
+          setHeroBgs(['https://picsum.photos/seed/warm-interior-mirror/1920/1080?blur=2']);
+        }
+
+        // Fetch featured products
+        const { data: productsData, error: productsError } = await supabase
+          .from('products')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(6);
+          
+        if (!productsError && productsData) {
+          setFeaturedProducts(productsData);
         }
       } catch (err) {
         // Ignore errors if table doesn't exist or setting not found
-        console.error("Could not fetch hero background:", err);
+        console.error("Could not fetch data:", err);
+        if (heroBgs.length === 0) {
+          setHeroBgs(['https://picsum.photos/seed/warm-interior-mirror/1920/1080?blur=2']);
+        }
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchSettings();
@@ -65,7 +91,7 @@ export default function Home() {
     }, 5000); // Change image every 5 seconds
     
     return () => clearInterval(interval);
-  }, [heroBgs.length]);
+  }, [heroBgs.length, currentBgIndex]);
 
   const nextBg = () => {
     setCurrentBgIndex((prev) => (prev + 1) % heroBgs.length);
@@ -80,84 +106,95 @@ export default function Home() {
   return (
     <div className="bg-[#FAF9F6] text-stone-800 font-sans overflow-hidden">
       {/* Hero Section */}
-      <div className="relative bg-stone-900 min-h-[90vh] flex items-center overflow-hidden">
-        <div className="absolute inset-0">
-          <AnimatePresence mode="wait">
-            <motion.img
-              key={currentBgIndex}
-              initial={{ opacity: 0, scale: 1.05 }}
-              animate={{ opacity: isDefaultBg ? 0.4 : 1, scale: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 1.5, ease: "easeInOut" }}
-              className="absolute inset-0 w-full h-full object-cover"
-              src={heroBgs[currentBgIndex]}
-              alt="Premium Mirrors"
-              referrerPolicy="no-referrer"
-            />
-          </AnimatePresence>
-          {isDefaultBg && (
-            <div className="absolute inset-0 bg-gradient-to-r from-stone-900 via-stone-900/80 to-transparent mix-blend-multiply" />
-          )}
-        </div>
-        
-        {heroBgs.length > 1 && (
-          <>
-            <button 
-              onClick={prevBg}
-              className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-black/20 text-white/70 hover:bg-black/40 hover:text-white transition-all backdrop-blur-sm"
-              aria-label="Previous image"
-            >
-              <ChevronLeft className="w-8 h-8" />
-            </button>
-            <button 
-              onClick={nextBg}
-              className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-black/20 text-white/70 hover:bg-black/40 hover:text-white transition-all backdrop-blur-sm"
-              aria-label="Next image"
-            >
-              <ChevronRight className="w-8 h-8" />
-            </button>
-            <div className="absolute bottom-24 left-1/2 -translate-x-1/2 z-20 flex gap-2">
-              {heroBgs.map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setCurrentBgIndex(idx)}
-                  className={`w-2.5 h-2.5 rounded-full transition-all ${idx === currentBgIndex ? 'bg-amber-400 w-8' : 'bg-white/50 hover:bg-white/80'}`}
-                  aria-label={`Go to image ${idx + 1}`}
-                />
-              ))}
-            </div>
-          </>
-        )}
-        
-        {isDefaultBg && (
-          <div className="relative max-w-7xl mx-auto py-24 px-4 sm:py-32 sm:px-6 lg:px-8 w-full z-10">
-            <motion.div 
-              variants={staggerContainer}
-              initial="hidden"
-              animate="visible"
-              className="max-w-3xl"
-            >
-              <motion.span variants={fadeIn} className="inline-block text-amber-500 font-semibold tracking-wider uppercase mb-4 tracking-[0.2em] text-sm">
-                {t('home.companyName')}
-              </motion.span>
-              <motion.h1 variants={fadeIn} className="text-5xl font-extrabold tracking-tight text-white sm:text-6xl lg:text-7xl leading-[1.1]">
-                {t('home.heroTitle1')} <br />
-                <span className="text-amber-400 font-serif italic font-light">{t('home.heroTitle2')}</span>
-              </motion.h1>
-              <motion.p variants={fadeIn} className="mt-6 text-xl text-stone-300 max-w-2xl leading-relaxed font-light">
-                <Trans i18nKey="home.heroDesc" components={{ 1: <strong /> }} />
-              </motion.p>
-              <motion.div variants={fadeIn} className="mt-10 flex flex-wrap gap-4">
-                <Link to="/products" className="group inline-flex items-center px-8 py-4 border border-transparent text-base font-medium rounded-full text-stone-900 bg-amber-400 hover:bg-amber-500 transition-all duration-300 shadow-[0_0_20px_rgba(251,191,36,0.3)] hover:shadow-[0_0_30px_rgba(251,191,36,0.5)]">
-                  {t('home.exploreBtn')} 
-                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                </Link>
-                <Link to="/our-story" className="inline-flex items-center px-8 py-4 border border-stone-300/30 text-base font-medium rounded-full text-stone-200 bg-white/5 hover:bg-white/10 backdrop-blur-sm transition-all duration-300">
-                  {t('home.ourStoryBtn')}
-                </Link>
-              </motion.div>
-            </motion.div>
+      <div className="relative bg-stone-900 min-h-[90vh] flex items-center justify-center overflow-hidden group">
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center z-10">
+            <div className="w-12 h-12 border-4 border-stone-700 border-t-amber-500 rounded-full animate-spin mb-4"></div>
+            <p className="text-stone-400 text-sm font-medium tracking-widest uppercase animate-pulse">Loading...</p>
           </div>
+        ) : (
+          <>
+            <div className="absolute inset-0">
+              <AnimatePresence mode="wait">
+                {heroBgs.length > 0 && (
+                  <motion.img
+                    key={currentBgIndex}
+                    initial={{ opacity: 0, scale: 1.05 }}
+                    animate={{ opacity: isDefaultBg ? 0.4 : 1, scale: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 1.5, ease: "easeInOut" }}
+                    className="absolute inset-0 w-full h-full object-cover"
+                    src={heroBgs[currentBgIndex]}
+                    alt="Premium Mirrors"
+                    referrerPolicy="no-referrer"
+                  />
+                )}
+              </AnimatePresence>
+              {isDefaultBg && (
+                <div className="absolute inset-0 bg-gradient-to-r from-stone-900 via-stone-900/80 to-transparent mix-blend-multiply" />
+              )}
+            </div>
+            
+            {heroBgs.length > 1 && (
+              <>
+                <button 
+                  onClick={prevBg}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-black/20 text-white/70 hover:bg-black/40 hover:text-white transition-all backdrop-blur-sm opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
+                  aria-label="Previous image"
+                >
+                  <ChevronLeft className="w-8 h-8" />
+                </button>
+                <button 
+                  onClick={nextBg}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-black/20 text-white/70 hover:bg-black/40 hover:text-white transition-all backdrop-blur-sm opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
+                  aria-label="Next image"
+                >
+                  <ChevronRight className="w-8 h-8" />
+                </button>
+                <div className="absolute bottom-24 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+                  {heroBgs.map((_, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setCurrentBgIndex(idx)}
+                      className={`w-2.5 h-2.5 rounded-full transition-all ${idx === currentBgIndex ? 'bg-amber-400 w-8' : 'bg-white/50 hover:bg-white/80'}`}
+                      aria-label={`Go to image ${idx + 1}`}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
+            
+            {isDefaultBg && (
+              <div className="relative max-w-7xl mx-auto py-24 px-4 sm:py-32 sm:px-6 lg:px-8 w-full z-10">
+                <motion.div 
+                  variants={staggerContainer}
+                  initial="hidden"
+                  animate="visible"
+                  className="max-w-3xl"
+                >
+                  <motion.span variants={fadeIn} className="inline-block text-amber-500 font-semibold tracking-wider uppercase mb-4 tracking-[0.2em] text-sm">
+                    {t('home.companyName')}
+                  </motion.span>
+                  <motion.h1 variants={fadeIn} className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-[1.1]">
+                    {t('home.heroTitle1')} <br />
+                    <span className="text-amber-400 font-serif italic font-light">{t('home.heroTitle2')}</span>
+                  </motion.h1>
+                  <motion.p variants={fadeIn} className="mt-6 text-xl text-stone-300 max-w-2xl leading-relaxed font-light">
+                    <Trans i18nKey="home.heroDesc" components={{ 1: <strong /> }} />
+                  </motion.p>
+                  <motion.div variants={fadeIn} className="mt-10 flex flex-col sm:flex-row gap-4">
+                    <Link to="/products" className="group inline-flex justify-center items-center px-8 py-4 border border-transparent text-base font-medium rounded-full text-stone-900 bg-amber-400 hover:bg-amber-500 transition-all duration-300 shadow-[0_0_20px_rgba(251,191,36,0.3)] hover:shadow-[0_0_30px_rgba(251,191,36,0.5)] w-full sm:w-auto">
+                      {t('home.exploreBtn')} 
+                      <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                    </Link>
+                    <Link to="/our-story" className="inline-flex justify-center items-center px-8 py-4 border border-stone-300/30 text-base font-medium rounded-full text-stone-200 bg-white/5 hover:bg-white/10 backdrop-blur-sm transition-all duration-300 w-full sm:w-auto">
+                      {t('home.ourStoryBtn')}
+                    </Link>
+                  </motion.div>
+                </motion.div>
+              </div>
+            )}
+          </>
         )}
       </div>
 
@@ -265,68 +302,100 @@ export default function Home() {
             </motion.div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[300px]">
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              className="md:col-span-2 md:row-span-2 relative rounded-3xl overflow-hidden group cursor-pointer"
-            >
-              <img src="https://picsum.photos/seed/smart-mirror/1200/800" alt="Smart Mirrors" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" referrerPolicy="no-referrer" />
-              <div className="absolute inset-0 bg-gradient-to-t from-stone-900 via-stone-900/40 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-500" />
-              <div className="absolute bottom-0 left-0 p-8 md:p-12 w-full">
-                <span className="inline-block px-3 py-1 bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-full text-xs font-semibold tracking-wider uppercase mb-4 backdrop-blur-sm">{t('home.collections.smart.tag')}</span>
-                <h3 className="text-3xl md:text-4xl font-serif mb-3">{t('home.collections.smart.title')}</h3>
-                <p className="text-stone-300 max-w-md font-light mb-6 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500">
-                  {t('home.collections.smart.desc')}
-                </p>
-                <Link to="/products" className="inline-flex items-center text-white font-medium">
-                  {t('home.collections.smart.explore')} <ChevronRight className="ml-1 h-5 w-5" />
-                </Link>
-              </div>
-            </motion.div>
+          {featuredProducts.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              {featuredProducts.map((product, idx) => (
+                <motion.div 
+                  key={product.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: idx * 0.1 }}
+                >
+                  <ProductCard
+                    id={product.id}
+                    title={product.title}
+                    description={product.description}
+                    image={product.images?.[0]}
+                    category={product.category}
+                    priceRange={product.price_range}
+                    msrp={product.msrp}
+                  />
+                </motion.div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[300px]">
+              <>
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  className="md:col-span-2 md:row-span-2 relative rounded-3xl overflow-hidden group cursor-pointer"
+                >
+                  <Link to="/products" className="block w-full h-full">
+                    <img src="https://picsum.photos/seed/smart-mirror/1200/800" alt="Smart Mirrors" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" referrerPolicy="no-referrer" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-90 group-hover:opacity-100 transition-opacity duration-500" />
+                    <div className="absolute bottom-0 left-0 p-8 md:p-12 w-full">
+                      <span className="inline-block px-3 py-1 bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-full text-xs font-semibold tracking-wider uppercase mb-4 backdrop-blur-sm shadow-sm">{t('home.collections.smart.tag')}</span>
+                      <h3 className="text-3xl md:text-4xl font-serif mb-3 drop-shadow-md">{t('home.collections.smart.title')}</h3>
+                      <p className="text-stone-200 max-w-md font-light mb-6 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 drop-shadow-sm">
+                        {t('home.collections.smart.desc')}
+                      </p>
+                      <span className="inline-flex items-center text-white font-medium drop-shadow-sm">
+                        {t('home.collections.smart.explore')} <ChevronRight className="ml-1 h-5 w-5" />
+                      </span>
+                    </div>
+                  </Link>
+                </motion.div>
 
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="relative rounded-3xl overflow-hidden group cursor-pointer"
-            >
-              <img src="https://picsum.photos/seed/vanity-mirror/600/600" alt="Vanity Mirrors" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" referrerPolicy="no-referrer" />
-              <div className="absolute inset-0 bg-gradient-to-t from-stone-900 via-stone-900/20 to-transparent opacity-80" />
-              <div className="absolute bottom-0 left-0 p-8 w-full">
-                <h3 className="text-2xl font-serif mb-2">{t('home.collections.vanity.title')}</h3>
-                <p className="text-stone-300 text-sm font-light mb-4 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500">
-                  {t('home.collections.vanity.desc')}
-                </p>
-                <Link to="/products" className="inline-flex items-center text-white font-medium text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                  {t('home.collections.vanity.explore')} <ChevronRight className="ml-1 h-4 w-4" />
-                </Link>
-              </div>
-            </motion.div>
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.2 }}
+                  className="relative rounded-3xl overflow-hidden group cursor-pointer"
+                >
+                  <Link to="/products" className="block w-full h-full">
+                    <img src="https://picsum.photos/seed/vanity-mirror/600/600" alt="Vanity Mirrors" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" referrerPolicy="no-referrer" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-90 group-hover:opacity-100 transition-opacity duration-500" />
+                    <div className="absolute bottom-0 left-0 p-8 w-full">
+                      <h3 className="text-2xl font-serif mb-2 drop-shadow-md">{t('home.collections.vanity.title')}</h3>
+                      <p className="text-stone-200 text-sm font-light mb-4 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 drop-shadow-sm">
+                        {t('home.collections.vanity.desc')}
+                      </p>
+                      <span className="inline-flex items-center text-white font-medium text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500 drop-shadow-sm">
+                        {t('home.collections.vanity.explore')} <ChevronRight className="ml-1 h-4 w-4" />
+                      </span>
+                    </div>
+                  </Link>
+                </motion.div>
 
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.4 }}
-              className="relative rounded-3xl overflow-hidden group cursor-pointer bg-stone-800 p-8 flex flex-col justify-between border border-stone-700 hover:border-amber-500/50 transition-colors"
-            >
-              <div>
-                <div className="h-12 w-12 rounded-full bg-stone-700 flex items-center justify-center mb-6">
-                  <Factory className="h-6 w-6 text-amber-400" />
-                </div>
-                <h3 className="text-2xl font-serif mb-3">{t('home.collections.oem.title')}</h3>
-                <p className="text-stone-400 text-sm font-light leading-relaxed">
-                  {t('home.collections.oem.desc')}
-                </p>
-              </div>
-              <Link to="/products" className="inline-flex items-center text-amber-400 font-medium mt-6">
-                {t('home.collections.oem.partner')} <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </motion.div>
-          </div>
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.4 }}
+                  className="relative rounded-3xl overflow-hidden group cursor-pointer bg-stone-800 p-8 flex flex-col justify-between border border-stone-700 hover:border-amber-500/50 transition-colors"
+                >
+                  <Link to="/products" className="block w-full h-full flex flex-col justify-between">
+                    <div>
+                      <div className="h-12 w-12 rounded-full bg-stone-700 flex items-center justify-center mb-6">
+                        <Factory className="h-6 w-6 text-amber-400" />
+                      </div>
+                      <h3 className="text-2xl font-serif mb-3">{t('home.collections.oem.title')}</h3>
+                      <p className="text-stone-400 text-sm font-light leading-relaxed">
+                        {t('home.collections.oem.desc')}
+                      </p>
+                    </div>
+                    <span className="inline-flex items-center text-amber-400 font-medium mt-6">
+                      {t('home.collections.oem.partner')} <ArrowRight className="ml-2 h-4 w-4" />
+                    </span>
+                  </Link>
+                </motion.div>
+              </>
+            </div>
+          )}
         </div>
       </div>
 
@@ -394,6 +463,60 @@ export default function Home() {
                 </div>
               </div>
             </motion.div>
+          </div>
+        </div>
+      </div>
+
+      {/* Certificates Section */}
+      <div className="py-16 bg-white border-t border-stone-100 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-10 text-center">
+          <span className="text-amber-600 font-semibold tracking-wider uppercase text-sm mb-2 block">{t('home.certificates.subtitle')}</span>
+          <h2 className="text-3xl font-serif text-stone-900">{t('home.certificates.title')}</h2>
+        </div>
+        
+        <div className="relative w-full overflow-hidden flex group">
+          <style>
+            {`
+              @keyframes marquee {
+                0% { transform: translateX(0%); }
+                100% { transform: translateX(-50%); }
+              }
+              .animate-marquee {
+                animation: marquee 30s linear infinite;
+              }
+              .group:hover .animate-marquee {
+                animation-play-state: paused;
+              }
+            `}
+          </style>
+          
+          <div className="flex animate-marquee whitespace-nowrap w-max">
+            {/* First set of images */}
+            {[
+              "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/au.png",
+              "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/CE(1)(1).jpg",
+              "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/IP44.jpg",
+              "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/UKCA.jpg",
+              "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/UL2.jpg",
+              "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/ctce.png"
+            ].map((url, idx) => (
+              <div key={`cert-1-${idx}`} className="mx-8 flex-none w-48 h-32 flex items-center justify-center grayscale hover:grayscale-0 transition-all duration-300">
+                <img src={url} alt={`Certificate ${idx + 1}`} className="max-w-full max-h-full object-contain" referrerPolicy="no-referrer" />
+              </div>
+            ))}
+            {/* Duplicate set for seamless scrolling */}
+            {[
+              "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/au.png",
+              "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/CE(1)(1).jpg",
+              "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/IP44.jpg",
+              "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/UKCA.jpg",
+              "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/UL2.jpg",
+              "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/ctce.png"
+            ].map((url, idx) => (
+              <div key={`cert-2-${idx}`} className="mx-8 flex-none w-48 h-32 flex items-center justify-center grayscale hover:grayscale-0 transition-all duration-300">
+                <img src={url} alt={`Certificate ${idx + 1}`} className="max-w-full max-h-full object-contain" referrerPolicy="no-referrer" />
+              </div>
+            ))}
           </div>
         </div>
       </div>

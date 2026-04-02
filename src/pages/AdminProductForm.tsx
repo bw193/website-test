@@ -235,7 +235,7 @@ export default function AdminProductForm() {
   };
 
   if (loading) {
-    return <div className="flex justify-center py-24"><Loader2 className="h-8 w-8 text-amber-500 animate-spin" /></div>;
+    return <div className="flex justify-center py-24"><Loader2 className="h-8 w-8 text-amber-600 animate-spin" /></div>;
   }
 
   return (

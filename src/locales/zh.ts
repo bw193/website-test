@@ -63,6 +63,10 @@ export const zh = {
           partner: "与我们合作"
         }
       },
+      certificates: {
+        subtitle: "我们的资质",
+        title: "全球认证"
+      },
       process: {
         subtitle: "卓越的每一步",
         title: "制造过程",

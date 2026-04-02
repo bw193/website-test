@@ -8,7 +8,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <Sparkles className="h-8 w-8 text-amber-500" />
+              <Sparkles className="h-8 w-8 text-amber-600" />
               <span className="font-bold text-xl tracking-wide">BOLEN</span>
             </div>
             <p className="text-stone-400 text-sm">
