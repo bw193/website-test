@@ -6,6 +6,7 @@ import { useTranslation, Trans } from 'react-i18next';
 import { supabase } from '../supabase';
 import { AnimatePresence } from 'motion/react';
 import ProductCard from '../components/ProductCard';
+import GlobalMap from '../components/GlobalMap';
 
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
@@ -190,46 +191,28 @@ export default function Home() {
       </div>
 
       {/* About Section */}
-      <div id="about" className="py-32 overflow-hidden bg-white relative">
-        {/* Subtle background pattern */}
-        <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23000000\' fill-opacity=\'1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")' }}></div>
-        
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="lg:grid lg:grid-cols-12 lg:gap-20 items-center">
+      <div id="about" className="py-24 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="lg:grid lg:grid-cols-12 lg:gap-12 items-center">
             <motion.div 
               initial={{ opacity: 0, x: -50 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-              className="lg:col-span-5"
+              transition={{ duration: 0.8 }}
+              className="lg:col-span-4"
             >
-              <div className="flex items-center gap-4 mb-6">
-                <div className="h-px w-12 bg-amber-600"></div>
-                <span className="text-amber-600 font-semibold tracking-widest uppercase text-xs">{t('home.about.heritage')}</span>
+              <span className="text-amber-600 font-semibold tracking-wider uppercase text-sm mb-2 block">{t('home.about.heritage')}</span>
+              <h2 className="text-4xl font-serif text-stone-900 sm:text-5xl mb-6 leading-tight">{t('home.about.title1')} <span className="italic text-amber-700">{t('home.about.title2')}</span></h2>
+              <div className="space-y-6 text-lg text-stone-600 font-light leading-relaxed">
+                <p>{t('home.about.desc1')}</p>
               </div>
-              <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif text-stone-900 mb-8 leading-[1.1] tracking-tight">
-                {t('home.about.title1')} <br/>
-                <span className="italic text-stone-500 font-light">{t('home.about.title2')}</span>
-              </h2>
-              <div className="space-y-6 text-lg text-stone-600 font-light leading-relaxed mb-10">
-                <p className="first-letter:text-4xl first-letter:font-serif first-letter:text-stone-900 first-letter:mr-1 first-letter:float-left">{t('home.about.desc1')}</p>
-                <p>{t('home.about.desc2')}</p>
-              </div>
-              
-              <div className="flex flex-col sm:flex-row sm:items-center gap-8">
-                <Link to="/our-story" className="inline-flex items-center justify-center px-8 py-4 bg-stone-900 text-white text-sm font-medium tracking-wider uppercase hover:bg-stone-800 transition-colors group">
-                  {t('nav.ourStory')}
-                  <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </Link>
-                
-                <div className="flex items-center space-x-4">
-                  <div className="flex -space-x-3">
-                    {[1, 2, 3].map((i) => (
-                      <img key={i} className="inline-block h-12 w-12 rounded-full ring-4 ring-white object-cover shadow-sm" src={`https://picsum.photos/seed/worker${i}/100/100`} alt="Worker" width="48" height="48" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
-                    ))}
-                  </div>
-                  <p className="text-xs text-stone-500 font-medium uppercase tracking-wider max-w-[100px] leading-tight">{t('home.about.backedBy')}</p>
+              <div className="mt-8 flex items-center space-x-4">
+                <div className="flex -space-x-2">
+                  {[1, 2, 3, 4].map((i) => (
+                    <img key={i} className="inline-block h-10 w-10 rounded-full ring-2 ring-white object-cover" src={`https://picsum.photos/seed/worker${i}/100/100`} alt="Worker" width="40" height="40" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
+                  ))}
                 </div>
+                <p className="text-sm text-stone-500 font-medium">{t('home.about.backedBy')}</p>
               </div>
             </motion.div>
             
@@ -237,36 +220,21 @@ export default function Home() {
               initial={{ opacity: 0, x: 50 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-              className="mt-16 lg:mt-0 lg:col-span-7 relative"
+              transition={{ duration: 0.8 }}
+              className="mt-12 lg:mt-0 relative lg:col-span-8"
             >
-              <div className="relative">
-                {/* Offset background block */}
-                <div className="absolute -inset-4 md:-inset-8 bg-stone-100 rounded-[2.5rem] transform translate-x-4 translate-y-4 md:translate-x-8 md:translate-y-8 -z-10"></div>
-                
-                <div className="aspect-[4/5] md:aspect-[3/4] rounded-3xl overflow-hidden shadow-2xl relative group">
-                  <img src="https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/building.jpg" alt="Factory" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000 ease-out" width="800" height="1000" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-stone-900/80 via-stone-900/20 to-transparent opacity-80" />
-                  
-                  <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                    <div className="w-12 h-px bg-amber-500 mb-6"></div>
-                    <p className="text-3xl md:text-4xl font-serif italic mb-3 text-white leading-tight">{t('home.about.quote')}</p>
-                    <p className="text-sm text-stone-300 uppercase tracking-[0.2em] font-medium">{t('home.about.corePrinciple')}</p>
-                  </div>
+              <div className="aspect-[16/9] lg:aspect-[2/1] rounded-3xl overflow-hidden shadow-2xl relative">
+                <GlobalMap />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#111827]/80 via-transparent to-transparent pointer-events-none" />
+                <div className="absolute bottom-6 left-6 right-6 text-white pointer-events-none">
+                  <p className="text-xl font-serif italic mb-1">{t('home.about.quote')}</p>
+                  <p className="text-xs text-stone-400 uppercase tracking-widest">{t('home.about.corePrinciple')}</p>
                 </div>
-                
-                {/* Floating badge */}
-                <motion.div 
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.5, duration: 0.5 }}
-                  className="absolute -top-6 -right-6 md:-top-10 md:-right-10 bg-white p-6 rounded-full shadow-xl flex flex-col items-center justify-center w-32 h-32 md:w-40 md:h-40 z-20"
-                >
-                  <span className="text-3xl md:text-4xl font-serif text-stone-900 mb-1">20+</span>
-                  <span className="text-[10px] md:text-xs text-stone-500 uppercase tracking-widest text-center font-medium">Years of<br/>Excellence</span>
-                </motion.div>
               </div>
+              
+              {/* Decorative element */}
+              <div className="absolute -top-6 -right-6 w-32 h-32 bg-amber-100 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-pulse" />
+              <div className="absolute -bottom-6 -left-6 w-40 h-40 bg-stone-200 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-pulse" style={{ animationDelay: '2s' }} />
             </motion.div>
           </div>
         </div>
