@@ -30,7 +30,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ id, title, description, image
             src={image || 'https://picsum.photos/seed/mirror/400/500'}
             alt={title}
             className="w-full h-full object-center object-cover transition-transform duration-700 group-hover:scale-105"
+            width="400"
+            height="500"
             referrerPolicy="no-referrer"
+            loading="lazy"
+            decoding="async"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-stone-900/60 via-stone-900/0 to-stone-900/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
           

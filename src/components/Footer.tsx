@@ -1,7 +1,13 @@
 import React from 'react';
 import { Sparkles, Mail, Phone, MapPin } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 
 export default function Footer() {
+  const location = useLocation();
+  if (location.pathname === '/our-story') {
+    return null;
+  }
+
   return (
     <footer className="bg-stone-900 text-white">
       <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
@@ -19,8 +25,8 @@ export default function Footer() {
           <div>
             <h3 className="text-sm font-semibold uppercase tracking-wider mb-4 text-amber-500">Contact</h3>
             <ul className="space-y-2 text-stone-400 text-sm">
-              <li className="flex items-center gap-2"><Mail className="h-4 w-4" /> sales@bolen.com</li>
-              <li className="flex items-center gap-2"><Phone className="h-4 w-4" /> +1 (555) 123-4567</li>
+              <li className="flex items-center gap-2"><Mail className="h-4 w-4" /> bolen2@cnjxctm.com</li>
+              <li className="flex items-center gap-2"><Phone className="h-4 w-4" /> +86 18058603602</li>
               <li className="flex items-center gap-2"><MapPin className="h-4 w-4" /> Jiaxing, Zhejiang, China</li>
             </ul>
           </div>

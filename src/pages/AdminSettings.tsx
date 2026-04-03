@@ -114,7 +114,10 @@ export default function AdminSettings() {
 
       const { error: uploadError } = await supabase.storage
         .from('product-images')
-        .upload(filePath, file);
+        .upload(filePath, file, {
+          cacheControl: '31536000',
+          upsert: true
+        });
 
       if (uploadError) throw uploadError;
 

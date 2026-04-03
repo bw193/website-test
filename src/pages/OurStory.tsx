@@ -1,197 +1,272 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'motion/react';
 import { useTranslation } from 'react-i18next';
-import { ArrowDown } from 'lucide-react';
+import { ArrowDown, Factory, Globe } from 'lucide-react';
 
 export default function OurStory() {
   const { t } = useTranslation();
   const paragraphs = t('ourStoryPage.paragraphs', { returnObjects: true }) as string[];
-  const { scrollYProgress } = useScroll();
-  const y = useTransform(scrollYProgress, [0, 1], ['0%', '50%']);
+  
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end end"]
+  });
+
+  const heroY = useTransform(scrollYProgress, [0, 0.2], ['0%', '20%']);
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.15], [1, 0]);
 
   return (
-    <div className="bg-[#FAF9F6] min-h-screen overflow-hidden">
+    <div ref={containerRef} className="bg-[#FAF9F6] min-h-screen selection:bg-stone-200 selection:text-stone-900">
       {/* Hero Section */}
-      <section className="relative h-screen flex items-center justify-center overflow-hidden">
+      <section className="relative h-screen flex items-center justify-center overflow-hidden bg-stone-900">
         <motion.div 
-          style={{ y }}
+          style={{ y: heroY, opacity: heroOpacity }}
           className="absolute inset-0 z-0"
         >
-          <div className="absolute inset-0 bg-stone-900/40 z-10" />
+          <div className="absolute inset-0 bg-gradient-to-b from-stone-900/60 via-stone-900/40 to-stone-900/80 z-10 mix-blend-multiply" />
           <img 
             src="https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/building.jpg" 
             alt="Factory Building" 
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover object-center scale-105"
+            width="1920"
+            height="1080"
             referrerPolicy="no-referrer"
+            fetchPriority="high"
+            decoding="async"
           />
         </motion.div>
 
-        <div className="relative z-20 text-center px-4 max-w-5xl mx-auto mt-20">
-          <motion.p 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-amber-400 font-medium tracking-[0.2em] uppercase text-sm md:text-base mb-6"
+        <div className="relative z-20 text-center px-4 max-w-5xl mx-auto mt-20 flex flex-col items-center">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+            className="mb-8"
           >
-            {t('ourStoryPage.subtitle')}
-          </motion.p>
+            <span className="px-4 py-1.5 rounded-full border border-white/20 text-white/80 text-xs font-medium tracking-[0.2em] uppercase backdrop-blur-sm">
+              {t('ourStoryPage.subtitle')}
+            </span>
+          </motion.div>
+          
           <motion.h1 
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 0.4 }}
-            className="text-5xl sm:text-6xl md:text-8xl lg:text-9xl font-serif text-white mb-8 leading-none"
+            transition={{ duration: 1.2, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            className="text-6xl sm:text-7xl md:text-8xl lg:text-[10rem] font-serif text-white mb-8 leading-[0.9] tracking-tight"
           >
             {t('ourStoryPage.title')}
           </motion.h1>
+          
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 1, delay: 1 }}
-            className="absolute bottom-12 left-1/2 -translate-x-1/2 text-white/70 flex flex-col items-center gap-2"
+            transition={{ duration: 1, delay: 1.2 }}
+            className="absolute bottom-12 left-1/2 -translate-x-1/2 text-white/50 flex flex-col items-center gap-3"
           >
-            <span className="text-xs uppercase tracking-widest">Scroll to explore</span>
-            <ArrowDown className="w-4 h-4 animate-bounce" />
+            <span className="text-[10px] uppercase tracking-[0.3em] font-medium">Discover</span>
+            <div className="w-px h-12 bg-gradient-to-b from-white/50 to-transparent relative overflow-hidden">
+              <motion.div 
+                className="absolute top-0 left-0 w-full h-1/2 bg-white"
+                animate={{ y: ['-100%', '200%'] }}
+                transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+              />
+            </div>
           </motion.div>
         </div>
       </section>
 
       {/* Chapter 1: Heritage & Scale */}
-      <section className="py-24 md:py-32 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 items-center">
+      <section className="py-32 md:py-48 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative z-10 bg-[#FAF9F6]">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 items-center">
           <motion.div 
-            initial={{ opacity: 0, x: -50 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8 }}
-            className="lg:col-span-5 space-y-8"
+            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+            className="lg:col-span-5 space-y-10"
           >
-            <div className="flex items-center gap-4">
-              <span className="h-px w-12 bg-amber-600"></span>
-              <span className="text-amber-600 font-medium tracking-widest uppercase text-sm">01 / Heritage</span>
+            <div className="flex items-center gap-6">
+              <span className="text-stone-300 font-serif text-6xl leading-none">01</span>
+              <div className="h-px w-16 bg-stone-300"></div>
+              <span className="text-stone-500 font-medium tracking-[0.2em] uppercase text-xs">Heritage</span>
             </div>
-            <h2 className="text-4xl md:text-5xl font-serif text-stone-900 leading-tight">
-              Two decades of <br/><span className="italic text-stone-500">dedicated craftsmanship.</span>
+            
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif text-stone-900 leading-[1.1] tracking-tight">
+              Two decades of <br/>
+              <span className="italic text-stone-500 font-light">dedicated craftsmanship.</span>
             </h2>
-            <div className="space-y-6 text-lg text-stone-600 font-light leading-relaxed">
-              <p>{paragraphs[0]}</p>
+            
+            <div className="space-y-6 text-lg text-stone-600 font-light leading-relaxed max-w-md">
+              <p className="first-letter:text-5xl first-letter:font-serif first-letter:text-stone-900 first-letter:mr-2 first-letter:float-left">{paragraphs[0]}</p>
             </div>
           </motion.div>
 
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 1 }}
-            className="lg:col-span-7 relative"
-          >
-            <div className="aspect-[4/5] md:aspect-[16/10] rounded-2xl overflow-hidden shadow-2xl">
+          <div className="lg:col-span-7 relative">
+            <motion.div 
+              initial={{ opacity: 0, clipPath: 'inset(10% 10% 10% 10%)' }}
+              whileInView={{ opacity: 1, clipPath: 'inset(0% 0% 0% 0%)' }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
+              className="aspect-[4/5] md:aspect-[4/3] overflow-hidden"
+            >
               <img 
                 src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=2000&auto=format&fit=crop" 
                 alt="Craftsmanship" 
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover hover:scale-105 transition-transform duration-1000 ease-out"
+                width="2000"
+                height="1333"
                 referrerPolicy="no-referrer"
+                loading="lazy"
+                decoding="async"
               />
-            </div>
+            </motion.div>
+            
             {/* Floating Stat Card */}
             <motion.div 
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, y: 30, x: 30 }}
+              whileInView={{ opacity: 1, y: 0, x: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-              className="absolute -bottom-8 -left-8 md:-bottom-12 md:-left-12 bg-white p-8 rounded-2xl shadow-xl max-w-xs hidden sm:block"
+              transition={{ duration: 1, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+              className="absolute -bottom-10 -left-10 md:-bottom-16 md:-left-16 bg-stone-900 p-10 max-w-xs hidden sm:flex flex-col justify-center"
             >
-              <p className="text-5xl font-serif text-stone-900 mb-2">50k+</p>
-              <p className="text-sm text-stone-500 uppercase tracking-wider font-medium">Sq. Meters of Production Space</p>
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Chapter 2: Vertical Integration */}
-      <section className="py-24 md:py-32 bg-stone-900 text-stone-100 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 items-center">
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 1 }}
-              className="lg:col-span-6 order-2 lg:order-1"
-            >
-              <div className="grid grid-cols-2 gap-4 md:gap-6">
-                <div className="space-y-4 md:space-y-6 mt-12 md:mt-24">
-                  <div className="aspect-[3/4] rounded-2xl overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1618220179428-22790b46a0eb?q=80&w=1000&auto=format&fit=crop" alt="Production Detail" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-                  </div>
-                  <div className="aspect-square rounded-2xl overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=1000&auto=format&fit=crop" alt="Materials" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-                  </div>
-                </div>
-                <div className="space-y-4 md:space-y-6">
-                  <div className="aspect-square rounded-2xl overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=1000&auto=format&fit=crop" alt="Quality Control" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-                  </div>
-                  <div className="aspect-[3/4] rounded-2xl overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1600566752355-35792bedcfea?q=80&w=1000&auto=format&fit=crop" alt="Finished Product" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-
-            <motion.div 
-              initial={{ opacity: 0, x: 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.8 }}
-              className="lg:col-span-6 order-1 lg:order-2 space-y-8"
-            >
-              <div className="flex items-center gap-4">
-                <span className="h-px w-12 bg-amber-500"></span>
-                <span className="text-amber-500 font-medium tracking-widest uppercase text-sm">02 / Process</span>
-              </div>
-              <h2 className="text-4xl md:text-5xl font-serif text-white leading-tight">
-                Vertical integration <br/><span className="italic text-stone-400">under one roof.</span>
-              </h2>
-              <div className="space-y-6 text-lg text-stone-400 font-light leading-relaxed">
-                <p>{paragraphs[1]}</p>
-              </div>
+              <div className="w-12 h-px bg-stone-700 mb-8"></div>
+              <p className="text-6xl font-serif text-white mb-4">50k<span className="text-stone-500">+</span></p>
+              <p className="text-xs text-stone-400 uppercase tracking-[0.2em] font-medium leading-relaxed">Sq. Meters of<br/>Production Space</p>
             </motion.div>
           </div>
         </div>
       </section>
 
+      {/* Chapter 2: Vertical Integration */}
+      <section className="py-32 md:py-48 bg-stone-100 px-4 sm:px-6 lg:px-8 relative">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24">
+            
+            {/* Sticky Text Content */}
+            <div className="lg:col-span-5 order-1 lg:order-2">
+              <div className="sticky top-32 space-y-10">
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8 }}
+                  className="flex items-center gap-6"
+                >
+                  <span className="text-stone-300 font-serif text-6xl leading-none">02</span>
+                  <div className="h-px w-16 bg-stone-300"></div>
+                  <span className="text-stone-500 font-medium tracking-[0.2em] uppercase text-xs">Process</span>
+                </motion.div>
+                
+                <motion.h2 
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8, delay: 0.1 }}
+                  className="text-4xl md:text-5xl lg:text-6xl font-serif text-stone-900 leading-[1.1] tracking-tight"
+                >
+                  Vertical integration <br/>
+                  <span className="italic text-stone-500 font-light">under one roof.</span>
+                </motion.h2>
+                
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8, delay: 0.2 }}
+                  className="space-y-6 text-lg text-stone-600 font-light leading-relaxed"
+                >
+                  <p>{paragraphs[1]}</p>
+                </motion.div>
+              </div>
+            </div>
+
+            {/* Image Grid */}
+            <div className="lg:col-span-7 order-2 lg:order-1">
+              <div className="grid grid-cols-2 gap-4 md:gap-8">
+                <div className="space-y-4 md:space-y-8 mt-12 md:mt-24">
+                  <motion.div 
+                    initial={{ opacity: 0, y: 50 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-50px" }}
+                    transition={{ duration: 0.8 }}
+                    className="aspect-[3/4] overflow-hidden bg-stone-200"
+                  >
+                    <img src="https://images.unsplash.com/photo-1618220179428-22790b46a0eb?q=80&w=1000&auto=format&fit=crop" alt="Production Detail" className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" width="1000" height="1333" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
+                  </motion.div>
+                  <motion.div 
+                    initial={{ opacity: 0, y: 50 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-50px" }}
+                    transition={{ duration: 0.8, delay: 0.2 }}
+                    className="aspect-square overflow-hidden bg-stone-200"
+                  >
+                    <img src="https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=1000&auto=format&fit=crop" alt="Materials" className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" width="1000" height="1000" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
+                  </motion.div>
+                </div>
+                <div className="space-y-4 md:space-y-8">
+                  <motion.div 
+                    initial={{ opacity: 0, y: 50 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-50px" }}
+                    transition={{ duration: 0.8, delay: 0.1 }}
+                    className="aspect-square overflow-hidden bg-stone-200"
+                  >
+                    <img src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=1000&auto=format&fit=crop" alt="Quality Control" className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" width="1000" height="1000" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
+                  </motion.div>
+                  <motion.div 
+                    initial={{ opacity: 0, y: 50 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-50px" }}
+                    transition={{ duration: 0.8, delay: 0.3 }}
+                    className="aspect-[3/4] overflow-hidden bg-stone-200"
+                  >
+                    <img src="https://images.unsplash.com/photo-1600566752355-35792bedcfea?q=80&w=1000&auto=format&fit=crop" alt="Finished Product" className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" width="1000" height="1333" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
+                  </motion.div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
       {/* Chapter 3: Innovation & Partnership */}
-      <section className="py-24 md:py-32 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="text-center max-w-3xl mx-auto mb-20">
+      <section className="py-32 md:py-48 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div className="text-center max-w-3xl mx-auto mb-24">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="flex items-center justify-center gap-4 mb-6"
+            className="flex items-center justify-center gap-6 mb-8"
           >
-            <span className="h-px w-8 bg-amber-600"></span>
-            <span className="text-amber-600 font-medium tracking-widest uppercase text-sm">03 / The Future</span>
-            <span className="h-px w-8 bg-amber-600"></span>
+            <div className="h-px w-12 bg-stone-300"></div>
+            <span className="text-stone-500 font-medium tracking-[0.2em] uppercase text-xs">03 / The Future</span>
+            <div className="h-px w-12 bg-stone-300"></div>
           </motion.div>
           <motion.h2 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-            className="text-4xl md:text-5xl font-serif text-stone-900 leading-tight mb-8"
+            transition={{ delay: 0.1 }}
+            className="text-4xl md:text-5xl lg:text-6xl font-serif text-stone-900 leading-[1.1] tracking-tight mb-8"
           >
-            Building partnerships <br/><span className="italic text-stone-500">that last.</span>
+            Building partnerships <br/>
+            <span className="italic text-stone-500 font-light">that last.</span>
           </motion.h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-24">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
           <motion.div 
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="bg-white p-10 md:p-12 rounded-3xl shadow-sm border border-stone-100"
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="group relative bg-white p-12 md:p-16 border border-stone-200 hover:border-stone-300 transition-colors duration-500 flex flex-col items-start"
           >
+            <div className="w-12 h-12 bg-stone-100 rounded-full flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-500">
+              <Factory className="w-5 h-5 text-stone-600" />
+            </div>
             <h3 className="text-2xl font-serif text-stone-900 mb-6">Design & Innovation</h3>
             <p className="text-lg text-stone-600 font-light leading-relaxed">
               {paragraphs[2]}
@@ -202,9 +277,12 @@ export default function OurStory() {
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="bg-white p-10 md:p-12 rounded-3xl shadow-sm border border-stone-100"
+            transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+            className="group relative bg-white p-12 md:p-16 border border-stone-200 hover:border-stone-300 transition-colors duration-500 flex flex-col items-start"
           >
+            <div className="w-12 h-12 bg-stone-100 rounded-full flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-500">
+              <Globe className="w-5 h-5 text-stone-600" />
+            </div>
             <h3 className="text-2xl font-serif text-stone-900 mb-6">Global Compliance</h3>
             <p className="text-lg text-stone-600 font-light leading-relaxed">
               {paragraphs[3]}

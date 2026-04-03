@@ -3,20 +3,30 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
-import Home from './pages/Home';
-import OurStory from './pages/OurStory';
-import Products from './pages/Products';
-import ProductDetail from './pages/ProductDetail';
-import AdminLogin from './pages/AdminLogin';
-import AdminDashboard from './pages/AdminDashboard';
-import AdminProductForm from './pages/AdminProductForm';
-import AdminRoute from './components/AdminRoute';
 import { hasSupabaseConfig } from './supabase';
+
+// Lazy load pages for better performance
+const Home = lazy(() => import('./pages/Home'));
+const OurStory = lazy(() => import('./pages/OurStory'));
+const Products = lazy(() => import('./pages/Products'));
+const ProductDetail = lazy(() => import('./pages/ProductDetail'));
+const RFQ = lazy(() => import('./pages/RFQ'));
+const AdminLogin = lazy(() => import('./pages/AdminLogin'));
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
+const AdminProductForm = lazy(() => import('./pages/AdminProductForm'));
+const AdminRoute = lazy(() => import('./components/AdminRoute'));
+
+// Loading fallback
+const PageLoader = () => (
+  <div className="flex-1 flex items-center justify-center min-h-[50vh]">
+    <div className="w-12 h-12 border-4 border-stone-200 border-t-amber-500 rounded-full animate-spin"></div>
+  </div>
+);
 
 export default function App() {
   return (
@@ -29,21 +39,24 @@ export default function App() {
             </div>
           )}
           <Navbar />
-          <main className="flex-1">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/our-story" element={<OurStory />} />
-              <Route path="/products" element={<Products />} />
-              <Route path="/products/:id" element={<ProductDetail />} />
-              
-              <Route path="/admin/login" element={<AdminLogin />} />
-              
-              <Route element={<AdminRoute />}>
-                <Route path="/admin" element={<AdminDashboard />} />
-                <Route path="/admin/products/new" element={<AdminProductForm />} />
-                <Route path="/admin/products/:id" element={<AdminProductForm />} />
-              </Route>
-            </Routes>
+          <main className="flex-1 flex flex-col">
+            <Suspense fallback={<PageLoader />}>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/our-story" element={<OurStory />} />
+                <Route path="/products" element={<Products />} />
+                <Route path="/products/:id" element={<ProductDetail />} />
+                <Route path="/rfq" element={<RFQ />} />
+                
+                <Route path="/admin/login" element={<AdminLogin />} />
+                
+                <Route element={<AdminRoute />}>
+                  <Route path="/admin" element={<AdminDashboard />} />
+                  <Route path="/admin/products/new" element={<AdminProductForm />} />
+                  <Route path="/admin/products/:id" element={<AdminProductForm />} />
+                </Route>
+              </Routes>
+            </Suspense>
           </main>
           <Footer />
         </div>

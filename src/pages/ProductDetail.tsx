@@ -160,7 +160,11 @@ export default function ProductDetail() {
                   src={product.images[currentImageIndex] || 'https://picsum.photos/seed/mirror/800/800'}
                   alt={product.title}
                   className="w-full h-full object-center object-cover"
+                  width="800"
+                  height="800"
                   referrerPolicy="no-referrer"
+                  fetchPriority="high"
+                  decoding="async"
                 />
               </AnimatePresence>
               
@@ -202,7 +206,7 @@ export default function ProductDetail() {
                         : 'border border-stone-200 hover:border-amber-300 hover:shadow-md'
                     }`}
                   >
-                    <img src={img} alt={`Thumbnail ${idx}`} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                    <img src={img} alt={`Thumbnail ${idx}`} className="w-full h-full object-cover" width="160" height="160" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
                   </button>
                 ))}
               </motion.div>

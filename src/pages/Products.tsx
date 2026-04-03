@@ -217,6 +217,8 @@ export default function Products() {
                         src={heroBgs[currentBgIndex]}
                         alt="Promotion"
                         referrerPolicy="no-referrer"
+                        fetchPriority="high"
+                        decoding="async"
                       />
                     </AnimatePresence>
                     

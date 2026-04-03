@@ -81,6 +81,12 @@ export const en = {
       whyUs: {
         title1: "Why Partner With",
         title2: "Chengtai?",
+        features: [
+          { title: "Massive Capacity & Experience" },
+          { title: "Vertical Integration" },
+          { title: "OEM & ODM Customization" },
+          { title: "Certified Global Quality" }
+        ],
         paragraphs: [
           "With nearly 20 years of dedicated experience in mirror manufacturing, Jiaxing Chengtai Mirror Co., Ltd. has built a reputation that goes far beyond any single sales channel. Our 50,000+ square meter production complex, two independent factories, and a team of over 200 skilled workers give us the capacity and flexibility to handle orders of virtually any scale — from boutique interior design projects to large-scale hotel and real estate developments.",
           "We own the entire production process in-house. From raw glass processing and LED integration to frame fabrication and smart feature assembly, every stage of manufacturing is handled under one roof and overseen by dedicated QA/QC inspectors. This vertical integration means we control quality at every step, eliminate third-party delays, and keep lead times competitive.",
