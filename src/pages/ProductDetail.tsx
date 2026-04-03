@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { Loader2, CheckCircle2, ChevronLeft, ChevronRight, ArrowLeft, Send, ShieldCheck, Truck, Clock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'motion/react';
+import ReactMarkdown from 'react-markdown';
 
 interface Product {
   id: string;
@@ -286,8 +287,8 @@ export default function ProductDetail() {
                   <span className="w-1.5 h-6 bg-amber-600 rounded-full"></span>
                   {t('productDetail.productDetails')}
                 </h3>
-                <div className="prose prose-amber prose-stone max-w-none text-stone-600 whitespace-pre-wrap leading-relaxed bg-white p-6 rounded-2xl border border-stone-200 shadow-sm">
-                  {product.details}
+                <div className="prose prose-amber prose-stone max-w-none text-stone-600 leading-relaxed bg-white p-6 rounded-2xl border border-stone-200 shadow-sm">
+                  <ReactMarkdown>{product.details}</ReactMarkdown>
                 </div>
               </motion.div>
             )}

@@ -204,50 +204,17 @@ export default function Products() {
                 exit={{ opacity: 0, y: -20 }}
                 className="w-full rounded-3xl overflow-hidden shadow-lg relative min-h-[500px] flex items-center justify-center bg-stone-100"
               >
-                {heroBgs.length > 0 ? (
-                  <>
-                    <AnimatePresence mode="wait">
-                      <motion.img
-                        key={currentBgIndex}
-                        initial={{ opacity: 0, scale: 1.05 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 1.5, ease: "easeInOut" }}
-                        className="absolute inset-0 w-full h-full object-cover"
-                        src={heroBgs[currentBgIndex]}
-                        alt="Promotion"
-                        referrerPolicy="no-referrer"
-                        fetchPriority="high"
-                        decoding="async"
-                      />
-                    </AnimatePresence>
-                    
-                    {heroBgs.length > 1 && (
-                      <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-20 flex gap-2">
-                        {heroBgs.map((_, idx) => (
-                          <button
-                            key={idx}
-                            onClick={() => setCurrentBgIndex(idx)}
-                            className={`w-2.5 h-2.5 rounded-full transition-all ${idx === currentBgIndex ? 'bg-amber-600 w-8' : 'bg-white/50 hover:bg-white/80'}`}
-                            aria-label={`Go to image ${idx + 1}`}
-                          />
-                        ))}
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <div className="text-center py-24 w-full h-full flex flex-col items-center justify-center">
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-stone-200 mb-6">
-                      <PackageX className="h-8 w-8 text-stone-400" />
-                    </div>
-                    <h3 className="text-xl font-semibold text-stone-900 mb-2">No products found</h3>
-                    <p className="text-stone-500 max-w-md mx-auto">
-                      {searchQuery 
-                        ? `We couldn't find anything matching "${searchQuery}". Try adjusting your search or filters.`
-                        : t('products.noProducts')}
-                    </p>
+                <div className="text-center py-24 w-full h-full flex flex-col items-center justify-center">
+                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-stone-200 mb-6">
+                    <PackageX className="h-8 w-8 text-stone-400" />
                   </div>
-                )}
+                  <h3 className="text-xl font-semibold text-stone-900 mb-2">No products found</h3>
+                  <p className="text-stone-500 max-w-md mx-auto">
+                    {searchQuery 
+                      ? `We couldn't find anything matching "${searchQuery}". Try adjusting your search or filters.`
+                      : t('products.noProducts')}
+                  </p>
+                </div>
                 
                 {(searchQuery || selectedCategory) && (
                   <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20">

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Menu, X, Sparkles, Globe } from 'lucide-react';
+import { Menu, X, Globe } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 export default function Navbar() {
@@ -33,7 +33,7 @@ export default function Navbar() {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link to="/" className="flex-shrink-0 flex items-center gap-2">
-              <Sparkles className="h-8 w-8 text-amber-600" />
+              <img src="https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/logo.png" alt="BOLEN Logo" className="h-10 w-auto" />
               <span className="font-bold text-xl text-stone-900 tracking-wide">BOLEN</span>
             </Link>
           </div>

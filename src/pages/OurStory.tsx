@@ -104,16 +104,16 @@ export default function OurStory() {
 
           <div className="lg:col-span-7 relative">
             <motion.div 
-              initial={{ opacity: 0, clipPath: 'inset(10% 10% 10% 10%)' }}
-              whileInView={{ opacity: 1, clipPath: 'inset(0% 0% 0% 0%)' }}
+              initial={{ opacity: 0, clipPath: 'inset(10% 10% 10% 10%)', scale: 0.95 }}
+              whileInView={{ opacity: 1, clipPath: 'inset(0% 0% 0% 0%)', scale: 1 }}
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
-              className="aspect-[4/5] md:aspect-[4/3] overflow-hidden"
+              className="aspect-[4/5] md:aspect-[4/3] overflow-hidden rounded-3xl shadow-2xl"
             >
               <img 
-                src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=2000&auto=format&fit=crop" 
+                src="https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/factory1.jpg" 
                 alt="Craftsmanship" 
-                className="w-full h-full object-cover hover:scale-105 transition-transform duration-1000 ease-out"
+                className="w-full h-full object-cover hover:scale-110 transition-transform duration-1000 ease-out"
                 width="2000"
                 height="1333"
                 referrerPolicy="no-referrer"
@@ -124,14 +124,14 @@ export default function OurStory() {
             
             {/* Floating Stat Card */}
             <motion.div 
-              initial={{ opacity: 0, y: 30, x: 30 }}
-              whileInView={{ opacity: 1, y: 0, x: 0 }}
+              initial={{ opacity: 0, y: 50, x: 50, rotate: 5 }}
+              whileInView={{ opacity: 1, y: 0, x: 0, rotate: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 1, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
-              className="absolute -bottom-10 -left-10 md:-bottom-16 md:-left-16 bg-stone-900 p-10 max-w-xs hidden sm:flex flex-col justify-center"
+              transition={{ duration: 1, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
+              className="absolute -bottom-10 -left-10 md:-bottom-16 md:-left-16 bg-stone-900 p-10 max-w-xs hidden sm:flex flex-col justify-center rounded-3xl shadow-2xl border border-stone-800"
             >
-              <div className="w-12 h-px bg-stone-700 mb-8"></div>
-              <p className="text-6xl font-serif text-white mb-4">50k<span className="text-stone-500">+</span></p>
+              <div className="w-12 h-px bg-amber-600 mb-8"></div>
+              <p className="text-6xl font-serif text-white mb-4">50k<span className="text-amber-500">+</span></p>
               <p className="text-xs text-stone-400 uppercase tracking-[0.2em] font-medium leading-relaxed">Sq. Meters of<br/>Production Space</p>
             </motion.div>
           </div>
@@ -186,42 +186,42 @@ export default function OurStory() {
               <div className="grid grid-cols-2 gap-4 md:gap-8">
                 <div className="space-y-4 md:space-y-8 mt-12 md:mt-24">
                   <motion.div 
-                    initial={{ opacity: 0, y: 50 }}
-                    whileInView={{ opacity: 1, y: 0 }}
+                    initial={{ opacity: 0, y: 50, scale: 0.95 }}
+                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
                     viewport={{ once: true, margin: "-50px" }}
-                    transition={{ duration: 0.8 }}
-                    className="aspect-[3/4] overflow-hidden bg-stone-200"
+                    transition={{ duration: 0.8, ease: "easeOut" }}
+                    className="aspect-[3/4] overflow-hidden bg-stone-200 rounded-3xl shadow-xl"
                   >
-                    <img src="https://images.unsplash.com/photo-1618220179428-22790b46a0eb?q=80&w=1000&auto=format&fit=crop" alt="Production Detail" className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" width="1000" height="1333" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
+                    <img src="https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/factory2.jpg" alt="Production Detail" className="w-full h-full object-cover hover:scale-110 transition-transform duration-1000" width="1000" height="1333" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
                   </motion.div>
                   <motion.div 
-                    initial={{ opacity: 0, y: 50 }}
-                    whileInView={{ opacity: 1, y: 0 }}
+                    initial={{ opacity: 0, y: 50, scale: 0.95 }}
+                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
                     viewport={{ once: true, margin: "-50px" }}
-                    transition={{ duration: 0.8, delay: 0.2 }}
-                    className="aspect-square overflow-hidden bg-stone-200"
+                    transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+                    className="aspect-square overflow-hidden bg-stone-200 rounded-3xl shadow-xl"
                   >
-                    <img src="https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=1000&auto=format&fit=crop" alt="Materials" className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" width="1000" height="1000" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
+                    <img src="https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/factory3.jpg" alt="Materials" className="w-full h-full object-cover hover:scale-110 transition-transform duration-1000" width="1000" height="1000" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
                   </motion.div>
                 </div>
                 <div className="space-y-4 md:space-y-8">
                   <motion.div 
-                    initial={{ opacity: 0, y: 50 }}
-                    whileInView={{ opacity: 1, y: 0 }}
+                    initial={{ opacity: 0, y: 50, scale: 0.95 }}
+                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
                     viewport={{ once: true, margin: "-50px" }}
-                    transition={{ duration: 0.8, delay: 0.1 }}
-                    className="aspect-square overflow-hidden bg-stone-200"
+                    transition={{ duration: 0.8, delay: 0.1, ease: "easeOut" }}
+                    className="aspect-square overflow-hidden bg-stone-200 rounded-3xl shadow-xl"
                   >
-                    <img src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=1000&auto=format&fit=crop" alt="Quality Control" className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" width="1000" height="1000" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
+                    <img src="https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/factory4.jpg" alt="Quality Control" className="w-full h-full object-cover hover:scale-110 transition-transform duration-1000" width="1000" height="1000" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
                   </motion.div>
                   <motion.div 
-                    initial={{ opacity: 0, y: 50 }}
-                    whileInView={{ opacity: 1, y: 0 }}
+                    initial={{ opacity: 0, y: 50, scale: 0.95 }}
+                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
                     viewport={{ once: true, margin: "-50px" }}
-                    transition={{ duration: 0.8, delay: 0.3 }}
-                    className="aspect-[3/4] overflow-hidden bg-stone-200"
+                    transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
+                    className="aspect-[3/4] overflow-hidden bg-stone-200 rounded-3xl shadow-xl"
                   >
-                    <img src="https://images.unsplash.com/photo-1600566752355-35792bedcfea?q=80&w=1000&auto=format&fit=crop" alt="Finished Product" className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" width="1000" height="1333" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
+                    <img src="https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/factory5.jpg" alt="Finished Product" className="w-full h-full object-cover hover:scale-110 transition-transform duration-1000" width="1000" height="1333" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
                   </motion.div>
                 </div>
               </div>
@@ -258,14 +258,14 @@ export default function OurStory() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
           <motion.div 
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 40, rotateX: -10 }}
+            whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="group relative bg-white p-12 md:p-16 border border-stone-200 hover:border-stone-300 transition-colors duration-500 flex flex-col items-start"
+            className="group relative bg-white p-12 md:p-16 border border-stone-200 hover:border-stone-300 hover:shadow-2xl transition-all duration-500 flex flex-col items-start rounded-3xl"
           >
-            <div className="w-12 h-12 bg-stone-100 rounded-full flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-500">
-              <Factory className="w-5 h-5 text-stone-600" />
+            <div className="w-16 h-16 bg-stone-50 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 group-hover:bg-amber-50 group-hover:text-amber-600 transition-all duration-500 shadow-sm border border-stone-100">
+              <Factory className="w-7 h-7 text-stone-600 group-hover:text-amber-600 transition-colors" />
             </div>
             <h3 className="text-2xl font-serif text-stone-900 mb-6">Design & Innovation</h3>
             <p className="text-lg text-stone-600 font-light leading-relaxed">
@@ -274,14 +274,14 @@ export default function OurStory() {
           </motion.div>
 
           <motion.div 
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 40, rotateX: -10 }}
+            whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-            className="group relative bg-white p-12 md:p-16 border border-stone-200 hover:border-stone-300 transition-colors duration-500 flex flex-col items-start"
+            className="group relative bg-white p-12 md:p-16 border border-stone-200 hover:border-stone-300 hover:shadow-2xl transition-all duration-500 flex flex-col items-start rounded-3xl"
           >
-            <div className="w-12 h-12 bg-stone-100 rounded-full flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-500">
-              <Globe className="w-5 h-5 text-stone-600" />
+            <div className="w-16 h-16 bg-stone-50 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 group-hover:bg-amber-50 group-hover:text-amber-600 transition-all duration-500 shadow-sm border border-stone-100">
+              <Globe className="w-7 h-7 text-stone-600 group-hover:text-amber-600 transition-colors" />
             </div>
             <h3 className="text-2xl font-serif text-stone-900 mb-6">Global Compliance</h3>
             <p className="text-lg text-stone-600 font-light leading-relaxed">

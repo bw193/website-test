@@ -1,9 +1,12 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { supabase, hasSupabaseConfig } from '../supabase';
-import { useForm, useFieldArray } from 'react-hook-form';
+import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import { Loader2, ArrowLeft, Plus, Trash2, Upload } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import MDEditor from '@uiw/react-md-editor';
+import '@uiw/react-md-editor/markdown-editor.css';
+import '@uiw/react-markdown-preview/markdown.css';
 
 interface ProductForm {
   title: string;
@@ -294,8 +297,22 @@ export default function AdminProductForm() {
             </div>
 
             <div className="sm:col-span-6">
-              <label className="block text-sm font-medium text-stone-700">{t('admin.productForm.longDetails')}</label>
-              <textarea rows={6} {...register('details')} className="mt-1 block w-full border border-stone-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm" />
+              <label className="block text-sm font-medium text-stone-700 mb-1">{t('admin.productForm.longDetails')}</label>
+              <Controller
+                name="details"
+                control={control}
+                render={({ field }) => (
+                  <div data-color-mode="light">
+                    <MDEditor
+                      value={field.value || ''}
+                      onChange={field.onChange}
+                      preview="edit"
+                      height={300}
+                      className="w-full"
+                    />
+                  </div>
+                )}
+              />
             </div>
           </div>
 
