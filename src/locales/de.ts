@@ -11,7 +11,7 @@ export const de = {
       companyName: "Jiaxing Chengtai Mirror Co., Ltd.",
       heroTitle1: "Künstlerisch Raffiniert,",
       heroTitle2: "Funktional Brillant.",
-      heroDesc: "Gegründet 2005 und unter unserer Marke <1>BOLEN</1> tätig, kombinieren wir italienische Designinspiration mit fast zwei Jahrzehnten moderner Fertigungsexpertise, um weltweit Premium-Spiegel zu liefern.",
+      heroDesc: "Gegründet 2005 (mit einer Geschichte, die bis 1995 zurückreicht) und unter unserer Marke <1>BOLEN</1> tätig, kombinieren wir italienische Designinspiration mit über zwei Jahrzehnten moderner Fertigungsexpertise, um weltweit Premium-Spiegel zu liefern.",
       exploreBtn: "Entdecken Sie unsere Kollektion",
       ourStoryBtn: "Unsere Geschichte",
       stats: {
@@ -33,7 +33,7 @@ export const de = {
       collections: {
         subtitle: "Kollektionen",
         title: "Vielseitig & Maßgeschneidert",
-        desc: "Unser Katalog umfasst 6 Serien, die für Wohn-, Gewerbe-, Hotel- und Luxusprojektanwendungen konzipiert sind.",
+        desc: "Unser Katalog umfasst mehrere Serien, die für Wohn-, Gewerbe-, Hotel- und Luxusprojektanwendungen konzipiert sind.",
         viewAll: "Alle Produkte ansehen",
         smart: {
           tag: "Flaggschiff",
@@ -48,7 +48,7 @@ export const de = {
         },
         oem: {
           title: "OEM / ODM Dienstleistungen",
-          desc: "Spezifizieren Sie Größe, Beleuchtung, Rahmenmaterial, intelligente Funktionen und Verpackung. Flexible Mindestbestellmengen ab 2–10 Stück.",
+          desc: "Passen Sie Größe, Material, Funktion, Logo und Verpackung an die Kundenbedürfnisse an.",
           partner: "Arbeiten Sie mit uns zusammen"
         }
       },
@@ -57,7 +57,7 @@ export const de = {
         title: "Der Herstellungsprozess",
         desc: "Vom Rohmaterial bis zur weltweiten Lieferung behalten wir die strenge Kontrolle über jede Produktionsphase.",
         steps: {
-          s1: { title: "F&E Design", desc: "Italienisch inspirierte Ästhetik kombiniert mit moderner Smart-Technologie." },
+          s1: { title: "F&E Design", desc: "Passen Sie Größe, Material, Funktion, Logo und Verpackung an die Kundenbedürfnisse an." },
           s2: { title: "Präzisionshandwerk", desc: "Automatisches Schneiden, Kanten und Montieren in unserer 50.000 qm großen Anlage." },
           s3: { title: "Qualitätssicherung", desc: "Strenge Tests auf IP66-Wasserdichtigkeit, CE- und RoHS-Konformität." },
           s4: { title: "Weltweiter Export", desc: "Sichere Verpackung und Logistik in über 50 Länder weltweit." }

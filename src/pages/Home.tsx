@@ -25,7 +25,9 @@ const staggerContainer = {
 
 export default function Home() {
   const { t } = useTranslation();
-  const [heroBgs, setHeroBgs] = useState<string[]>([]);
+  const [heroBgs, setHeroBgs] = useState<string[]>([
+    "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-images/site-assets/1773994889396-9i4t1ap.jpg"
+  ]);
   const [currentBgIndex, setCurrentBgIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [featuredProducts, setFeaturedProducts] = useState<any[]>([]);
@@ -104,62 +106,52 @@ export default function Home() {
     <div className="bg-[#FAF9F6] text-stone-800 font-sans overflow-hidden">
       {/* Hero Section */}
       <div className="relative bg-stone-900 min-h-[90vh] flex items-center justify-center overflow-hidden group">
-        {isLoading ? (
-          <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
-            <div className="w-16 h-16 border-4 border-stone-700 border-t-amber-500 rounded-full animate-spin mb-4"></div>
-            <div className="text-amber-500 font-medium tracking-widest animate-pulse">LOADING</div>
-          </div>
-        ) : (
-          <>
-            <div className="absolute inset-0">
-              <AnimatePresence>
-                {heroBgs.length > 0 && (
-                  <motion.img
-                    key={currentBgIndex}
-                    initial={{ opacity: 0, scale: 1.05 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 1.5, ease: "easeInOut" }}
-                    className="absolute inset-0 w-full h-full object-cover"
-                    src={heroBgs[currentBgIndex]}
-                    alt="Premium Mirrors"
-                    referrerPolicy="no-referrer"
-                    fetchPriority="high"
-                    decoding="async"
-                  />
-                )}
-              </AnimatePresence>
-            </div>
-            
-            {heroBgs.length > 1 && (
-              <>
-                <button 
-                  onClick={prevBg}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-black/20 text-white/70 hover:bg-black/40 hover:text-white transition-all backdrop-blur-sm opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
-                  aria-label="Previous image"
-                >
-                  <ChevronLeft className="w-8 h-8" />
-                </button>
-                <button 
-                  onClick={nextBg}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-black/20 text-white/70 hover:bg-black/40 hover:text-white transition-all backdrop-blur-sm opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
-                  aria-label="Next image"
-                >
-                  <ChevronRight className="w-8 h-8" />
-                </button>
-                <div className="absolute bottom-24 left-1/2 -translate-x-1/2 z-20 flex gap-2">
-                  {heroBgs.map((_, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => setCurrentBgIndex(idx)}
-                      className={`w-2.5 h-2.5 rounded-full transition-all ${idx === currentBgIndex ? 'bg-amber-400 w-8' : 'bg-white/50 hover:bg-white/80'}`}
-                      aria-label={`Go to image ${idx + 1}`}
-                    />
-                  ))}
-                </div>
-              </>
+        <div className="absolute inset-0">
+          <AnimatePresence>
+            {heroBgs.length > 0 && (
+              <motion.img
+                key={currentBgIndex}
+                initial={{ opacity: 0, scale: 1.05 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 1.5, ease: "easeInOut" }}
+                className="absolute inset-0 w-full h-full object-cover"
+                src={heroBgs[currentBgIndex]}
+                alt="Premium Mirrors"
+                referrerPolicy="no-referrer"
+                fetchPriority="high"
+                decoding="async"
+              />
             )}
-            
+          </AnimatePresence>
+        </div>
+
+        {heroBgs.length > 1 && (
+          <>
+            <button 
+              onClick={prevBg}
+              className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-black/20 text-white/70 hover:bg-black/40 hover:text-white transition-all backdrop-blur-sm opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
+              aria-label="Previous image"
+            >
+              <ChevronLeft className="w-8 h-8" />
+            </button>
+            <button 
+              onClick={nextBg}
+              className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-black/20 text-white/70 hover:bg-black/40 hover:text-white transition-all backdrop-blur-sm opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
+              aria-label="Next image"
+            >
+              <ChevronRight className="w-8 h-8" />
+            </button>
+            <div className="absolute bottom-24 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+              {heroBgs.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setCurrentBgIndex(idx)}
+                  className={`w-2.5 h-2.5 rounded-full transition-all ${idx === currentBgIndex ? 'bg-amber-400 w-8' : 'bg-white/50 hover:bg-white/80'}`}
+                  aria-label={`Go to image ${idx + 1}`}
+                />
+              ))}
+            </div>
           </>
         )}
       </div>
@@ -191,57 +183,43 @@ export default function Home() {
       </div>
 
       {/* About Section */}
-      <div id="about" className="py-24 overflow-hidden">
+      <div id="about" className="py-24 overflow-hidden bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="lg:grid lg:grid-cols-12 lg:gap-12 items-center">
-            <motion.div 
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              className="lg:col-span-4"
-            >
-              <span className="text-amber-600 font-semibold tracking-wider uppercase text-sm mb-2 block">{t('home.about.heritage')}</span>
-              <h2 className="text-4xl font-serif text-stone-900 sm:text-5xl mb-6 leading-tight">{t('home.about.title1')} <span className="italic text-amber-700">{t('home.about.title2')}</span></h2>
-              <div className="space-y-6 text-lg text-stone-600 font-light leading-relaxed">
-                <p>{t('home.about.desc1')}</p>
-              </div>
-              <div className="mt-8 flex items-center space-x-4">
-                <div className="flex -space-x-2">
-                  {[1, 2, 3, 4].map((i) => (
-                    <img key={i} className="inline-block h-10 w-10 rounded-full ring-2 ring-white object-cover" src={`https://picsum.photos/seed/worker${i}/100/100`} alt="Worker" width="40" height="40" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
-                  ))}
-                </div>
-                <p className="text-sm text-stone-500 font-medium">{t('home.about.backedBy')}</p>
-              </div>
-            </motion.div>
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-12 max-w-4xl mx-auto"
+          >
+            <h2 className="text-4xl font-serif text-stone-900 sm:text-5xl leading-tight mb-6">
+              Global Reach: <span className="italic text-amber-700">From Shanghai to the World</span>
+            </h2>
+            <p className="text-lg text-stone-600 font-light leading-relaxed">
+              Headquartered in Jiaxing, Zhejiang, China—just 60 kilometers from Shanghai—Chengtai has grown into a fully integrated enterprise specializing in the research, development, manufacturing, and global export of premium mirror products.
+            </p>
+          </motion.div>
+          
+          <motion.div 
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="relative w-full"
+          >
+            <div className="aspect-[16/9] lg:aspect-[21/9] rounded-3xl overflow-hidden shadow-xl relative border border-stone-200">
+              <GlobalMap />
+            </div>
             
-            <motion.div 
-              initial={{ opacity: 0, x: 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              className="mt-12 lg:mt-0 relative lg:col-span-8"
-            >
-              <div className="aspect-[16/9] lg:aspect-[2/1] rounded-3xl overflow-hidden shadow-2xl relative">
-                <GlobalMap />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#111827]/80 via-transparent to-transparent pointer-events-none" />
-                <div className="absolute bottom-6 left-6 right-6 text-white pointer-events-none">
-                  <p className="text-xl font-serif italic mb-1">{t('home.about.quote')}</p>
-                  <p className="text-xs text-stone-400 uppercase tracking-widest">{t('home.about.corePrinciple')}</p>
-                </div>
-              </div>
-              
-              {/* Decorative element */}
-              <div className="absolute -top-6 -right-6 w-32 h-32 bg-amber-100 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-pulse" />
-              <div className="absolute -bottom-6 -left-6 w-40 h-40 bg-stone-200 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-pulse" style={{ animationDelay: '2s' }} />
-            </motion.div>
-          </div>
+            {/* Decorative element */}
+            <div className="absolute -top-6 -right-6 w-32 h-32 bg-amber-100 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-pulse" />
+            <div className="absolute -bottom-6 -left-6 w-40 h-40 bg-stone-200 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-pulse" style={{ animationDelay: '2s' }} />
+          </motion.div>
         </div>
       </div>
 
       {/* Featured Collections (Bento Grid) */}
-      <div className="py-24 bg-stone-900 text-white">
+      <div className="py-24 bg-stone-50 text-stone-900 border-t border-stone-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
             <motion.div 
@@ -250,9 +228,9 @@ export default function Home() {
               viewport={{ once: true }}
               className="max-w-2xl"
             >
-              <span className="text-amber-500 font-semibold tracking-wider uppercase text-sm mb-2 block">{t('home.collections.subtitle')}</span>
+              <span className="text-amber-600 font-semibold tracking-wider uppercase text-sm mb-2 block">{t('home.collections.subtitle')}</span>
               <h2 className="text-4xl font-serif sm:text-5xl mb-4">{t('home.collections.title')}</h2>
-              <p className="text-lg text-stone-400 font-light">
+              <p className="text-lg text-stone-600 font-light">
                 {t('home.collections.desc')}
               </p>
             </motion.div>
@@ -262,15 +240,28 @@ export default function Home() {
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
             >
-              <Link to="/products" className="inline-flex items-center text-amber-400 hover:text-amber-300 font-medium transition-colors group">
+              <Link to="/products" className="inline-flex items-center text-amber-600 hover:text-amber-700 font-medium transition-colors group">
                 {t('home.collections.viewAll')} <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Link>
             </motion.div>
           </div>
 
           {isLoading ? (
-            <div className="flex justify-center items-center py-24">
-              <div className="w-10 h-10 border-4 border-stone-700 border-t-amber-500 rounded-full animate-spin"></div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} className="bg-white rounded-2xl flex flex-col h-full overflow-hidden shadow-sm border border-stone-100 relative animate-pulse">
+                  <div className="relative aspect-[4/5] overflow-hidden bg-stone-200"></div>
+                  <div className="p-5 flex flex-col flex-1">
+                    <div className="mb-3 w-20 h-5 bg-stone-200 rounded-md"></div>
+                    <div className="w-3/4 h-6 bg-stone-200 rounded mb-2"></div>
+                    <div className="w-full h-4 bg-stone-200 rounded mb-2"></div>
+                    <div className="w-5/6 h-4 bg-stone-200 rounded mb-4"></div>
+                    <div className="mt-auto pt-4 border-t border-stone-100">
+                      <div className="w-24 h-6 bg-stone-200 rounded"></div>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           ) : featuredProducts.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -306,7 +297,7 @@ export default function Home() {
                   <Link to="/products" className="block w-full h-full">
                     <img src="https://picsum.photos/seed/smart-mirror/800/600" alt="Smart Mirrors" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" width="800" height="600" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-90 group-hover:opacity-100 transition-opacity duration-500" />
-                    <div className="absolute bottom-0 left-0 p-8 md:p-12 w-full">
+                    <div className="absolute bottom-0 left-0 p-8 md:p-12 w-full text-white">
                       <span className="inline-block px-3 py-1 bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-full text-xs font-semibold tracking-wider uppercase mb-4 backdrop-blur-sm shadow-sm">{t('home.collections.smart.tag')}</span>
                       <h3 className="text-3xl md:text-4xl font-serif mb-3 drop-shadow-md">{t('home.collections.smart.title')}</h3>
                       <p className="text-stone-200 max-w-md font-light mb-6 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 drop-shadow-sm">
@@ -329,7 +320,7 @@ export default function Home() {
                   <Link to="/products" className="block w-full h-full">
                     <img src="https://picsum.photos/seed/vanity-mirror/400/400" alt="Vanity Mirrors" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" width="400" height="400" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-90 group-hover:opacity-100 transition-opacity duration-500" />
-                    <div className="absolute bottom-0 left-0 p-8 w-full">
+                    <div className="absolute bottom-0 left-0 p-8 w-full text-white">
                       <h3 className="text-2xl font-serif mb-2 drop-shadow-md">{t('home.collections.vanity.title')}</h3>
                       <p className="text-stone-200 text-sm font-light mb-4 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 drop-shadow-sm">
                         {t('home.collections.vanity.desc')}
@@ -346,19 +337,19 @@ export default function Home() {
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
                   transition={{ delay: 0.4 }}
-                  className="relative rounded-3xl overflow-hidden group cursor-pointer bg-stone-800 p-8 flex flex-col justify-between border border-stone-700 hover:border-amber-500/50 transition-colors"
+                  className="relative rounded-3xl overflow-hidden group cursor-pointer bg-white p-8 flex flex-col justify-between border border-stone-200 hover:border-amber-500/50 hover:shadow-lg transition-all"
                 >
                   <Link to="/products" className="block w-full h-full flex flex-col justify-between">
                     <div>
-                      <div className="h-12 w-12 rounded-full bg-stone-700 flex items-center justify-center mb-6">
-                        <Factory className="h-6 w-6 text-amber-400" />
+                      <div className="h-12 w-12 rounded-full bg-stone-100 flex items-center justify-center mb-6">
+                        <Factory className="h-6 w-6 text-amber-600" />
                       </div>
-                      <h3 className="text-2xl font-serif mb-3">{t('home.collections.oem.title')}</h3>
-                      <p className="text-stone-400 text-sm font-light leading-relaxed">
+                      <h3 className="text-2xl font-serif mb-3 text-stone-900">{t('home.collections.oem.title')}</h3>
+                      <p className="text-stone-600 text-sm font-light leading-relaxed">
                         {t('home.collections.oem.desc')}
                       </p>
                     </div>
-                    <span className="inline-flex items-center text-amber-400 font-medium mt-6">
+                    <span className="inline-flex items-center text-amber-600 font-medium mt-6">
                       {t('home.collections.oem.partner')} <ArrowRight className="ml-2 h-4 w-4" />
                     </span>
                   </Link>

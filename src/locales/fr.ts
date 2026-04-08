@@ -11,7 +11,7 @@ export const fr = {
       companyName: "Jiaxing Chengtai Mirror Co., Ltd.",
       heroTitle1: "Artistiquement Raffiné,",
       heroTitle2: "Fonctionnellement Brillant.",
-      heroDesc: "Fondée en 2005 et opérant sous notre marque <1>BOLEN</1>, nous combinons l'inspiration du design italien avec près de deux décennies d'expertise en fabrication moderne pour fournir des miroirs haut de gamme dans le monde entier.",
+      heroDesc: "Fondée en 2005 (avec une histoire remontant à 1995) et opérant sous notre marque <1>BOLEN</1>, nous combinons l'inspiration du design italien avec plus de deux décennies d'expertise en fabrication moderne pour fournir des miroirs haut de gamme dans le monde entier.",
       exploreBtn: "Explorer Notre Collection",
       ourStoryBtn: "Notre Histoire",
       stats: {
@@ -33,7 +33,7 @@ export const fr = {
       collections: {
         subtitle: "Collections",
         title: "Polyvalent et Sur Mesure",
-        desc: "Notre catalogue comprend 6 séries conçues pour des applications résidentielles, commerciales, hôtelières et de projets de luxe.",
+        desc: "Notre catalogue comprend plusieurs séries conçues pour des applications résidentielles, commerciales, hôtelières et de projets de luxe.",
         viewAll: "Voir Tous les Produits",
         smart: {
           tag: "Phare",
@@ -48,7 +48,7 @@ export const fr = {
         },
         oem: {
           title: "Services OEM / ODM",
-          desc: "Spécifiez la taille, l'éclairage, le matériau du cadre, les fonctions intelligentes et l'emballage. MOQ flexibles à partir de 2-10 pièces.",
+          desc: "Personnalisez la taille, le matériau, la fonction, le logo et l'emballage en fonction des besoins du client.",
           partner: "Devenez Partenaire"
         }
       },
@@ -57,7 +57,7 @@ export const fr = {
         title: "Le Processus de Fabrication",
         desc: "Des matières premières à la livraison mondiale, nous maintenons un contrôle strict sur chaque phase de production.",
         steps: {
-          s1: { title: "Conception R&D", desc: "Esthétique d'inspiration italienne combinée à une technologie intelligente moderne." },
+          s1: { title: "Conception R&D", desc: "Personnalisez la taille, le matériau, la fonction, le logo et l'emballage en fonction des besoins du client." },
           s2: { title: "Artisanat de Précision", desc: "Découpe, bordage et assemblage automatisés dans notre installation de 50k m²." },
           s3: { title: "Assurance Qualité", desc: "Tests rigoureux pour l'étanchéité IP66, la conformité CE et RoHS." },
           s4: { title: "Exportation Mondiale", desc: "Emballage et logistique sécurisés vers plus de 50 pays dans le monde." }

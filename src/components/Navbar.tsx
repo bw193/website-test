@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Menu, X, Globe } from 'lucide-react';
+import { Menu, X, Globe, Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 export default function Navbar() {
@@ -33,23 +33,26 @@ export default function Navbar() {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link to="/" className="flex-shrink-0 flex items-center gap-2">
-              <img src="https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/logo.png" alt="BOLEN Logo" className="h-10 w-auto" />
+              <Sparkles className="h-8 w-8 text-amber-600" />
               <span className="font-bold text-xl text-stone-900 tracking-wide">BOLEN</span>
             </Link>
+            <div className="hidden sm:ml-10 sm:flex sm:items-center sm:space-x-8">
+              <Link to="/" className="text-stone-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-amber-600 text-sm font-medium">
+                {t('navbar.home')}
+              </Link>
+              <Link to="/products" className="text-stone-500 hover:text-stone-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-amber-600 text-sm font-medium">
+                {t('navbar.catalog')}
+              </Link>
+              <Link to="/our-story" className="text-stone-500 hover:text-stone-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-amber-600 text-sm font-medium">
+                {t('navbar.ourStory')}
+              </Link>
+              <Link to="/rfq" className="text-stone-500 hover:text-stone-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-amber-600 text-sm font-medium">
+                {t('productDetail.requestQuote')}
+              </Link>
+            </div>
           </div>
-          <div className="hidden sm:ml-6 sm:flex sm:items-center sm:space-x-8">
-            <Link to="/" className="text-stone-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-amber-600 text-sm font-medium">
-              {t('navbar.home')}
-            </Link>
-            <Link to="/products" className="text-stone-500 hover:text-stone-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-amber-600 text-sm font-medium">
-              {t('navbar.catalog')}
-            </Link>
-            <Link to="/our-story" className="text-stone-500 hover:text-stone-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-amber-600 text-sm font-medium">
-              {t('navbar.ourStory')}
-            </Link>
-            <Link to="/rfq" className="text-stone-500 hover:text-stone-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-amber-600 text-sm font-medium">
-              {t('productDetail.requestQuote')}
-            </Link>
+          
+          <div className="hidden sm:flex sm:items-center sm:space-x-6">
             {isAdmin && (
               <Link to="/admin" className="text-amber-600 hover:text-amber-800 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-amber-600 text-sm font-medium">
                 {t('navbar.adminDashboard')}

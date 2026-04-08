@@ -91,8 +91,28 @@ export default function ProductDetail() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <Loader2 className="h-12 w-12 text-amber-600 animate-spin" />
+      <div className="bg-stone-50 min-h-screen py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-stone-100 animate-pulse">
+            <div className="flex flex-col lg:flex-row">
+              <div className="w-full lg:w-1/2 p-8 lg:p-12 bg-stone-100">
+                <div className="aspect-square bg-stone-200 rounded-2xl mb-6"></div>
+                <div className="flex gap-4">
+                  {[1, 2, 3, 4].map((i) => (
+                    <div key={i} className="w-24 h-24 bg-stone-200 rounded-xl"></div>
+                  ))}
+                </div>
+              </div>
+              <div className="w-full lg:w-1/2 p-8 lg:p-12 flex flex-col">
+                <div className="w-24 h-6 bg-stone-200 rounded-md mb-4"></div>
+                <div className="w-3/4 h-10 bg-stone-200 rounded-md mb-6"></div>
+                <div className="w-full h-24 bg-stone-200 rounded-md mb-8"></div>
+                <div className="w-1/3 h-8 bg-stone-200 rounded-md mb-12"></div>
+                <div className="w-full h-48 bg-stone-200 rounded-2xl"></div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }

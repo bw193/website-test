@@ -1,5 +1,5 @@
 import React from 'react';
-import { Mail, Phone, MapPin } from 'lucide-react';
+import { Mail, Phone, MapPin, Sparkles } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 
 export default function Footer() {
@@ -14,8 +14,8 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <img src="https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/logo.png" alt="BOLEN Logo" className="h-10 w-auto brightness-0 invert" />
-              <span className="font-bold text-xl tracking-wide">BOLEN</span>
+              <Sparkles className="h-8 w-8 text-amber-600" />
+              <span className="font-bold text-xl text-white tracking-wide">BOLEN</span>
             </div>
             <p className="text-stone-400 text-sm">
               Jiaxing Chengtai Mirror Co., Ltd.<br/>

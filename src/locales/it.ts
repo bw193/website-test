@@ -11,7 +11,7 @@ export const it = {
       companyName: "Jiaxing Chengtai Mirror Co., Ltd.",
       heroTitle1: "Artisticamente Raffinato,",
       heroTitle2: "Funzionalmente Brillante.",
-      heroDesc: "Fondata nel 2005 e operante con il nostro marchio <1>BOLEN</1>, combiniamo l'ispirazione del design italiano con quasi due decenni di moderna esperienza manifatturiera per fornire specchi premium in tutto il mondo.",
+      heroDesc: "Fondata nel 2005 (con una storia che risale al 1995) e operante con il nostro marchio <1>BOLEN</1>, combiniamo l'ispirazione del design italiano con oltre due decenni di moderna esperienza manifatturiera per fornire specchi premium in tutto il mondo.",
       exploreBtn: "Esplora la Nostra Collezione",
       ourStoryBtn: "La Nostra Storia",
       stats: {
@@ -33,7 +33,7 @@ export const it = {
       collections: {
         subtitle: "Collezioni",
         title: "Versatile e Personalizzato",
-        desc: "Il nostro catalogo comprende 6 serie progettate per applicazioni residenziali, commerciali, alberghiere e di lusso.",
+        desc: "Il nostro catalogo comprende diverse serie progettate per applicazioni residenziali, commerciali, alberghiere e di lusso.",
         viewAll: "Vedi Tutti i Prodotti",
         smart: {
           tag: "Ammiraglia",
@@ -48,7 +48,7 @@ export const it = {
         },
         oem: {
           title: "Servizi OEM / ODM",
-          desc: "Specifica dimensioni, illuminazione, materiale del telaio, funzioni intelligenti e imballaggio. MOQ flessibili a partire da 2–10 pezzi.",
+          desc: "Personalizza dimensioni, materiale, funzione, logo e imballaggio in base alle esigenze del cliente.",
           partner: "Collabora con Noi"
         }
       },
@@ -57,7 +57,7 @@ export const it = {
         title: "Il Processo di Produzione",
         desc: "Dalle materie prime alla consegna globale, manteniamo un rigoroso controllo su ogni fase della produzione.",
         steps: {
-          s1: { title: "Design R&S", desc: "Estetica di ispirazione italiana combinata con la moderna tecnologia smart." },
+          s1: { title: "Design R&S", desc: "Personalizza dimensioni, materiale, funzione, logo e imballaggio in base alle esigenze del cliente." },
           s2: { title: "Artigianato di Precisione", desc: "Taglio, bordatura e assemblaggio automatizzati nella nostra struttura di 50.000 mq." },
           s3: { title: "Garanzia di Qualità", desc: "Test rigorosi per impermeabilità IP66, conformità CE e RoHS." },
           s4: { title: "Esportazione Globale", desc: "Imballaggio e logistica sicuri in oltre 50 paesi in tutto il mondo." }

@@ -28,8 +28,6 @@ export default function Products() {
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [heroBgs, setHeroBgs] = useState<string[]>([]);
-  const [currentBgIndex, setCurrentBgIndex] = useState(0);
   const { t } = useTranslation();
 
   const normalizeCategory = (cat: string | undefined | null) => {
@@ -66,28 +64,6 @@ export default function Products() {
             console.error("Error parsing categories", e);
           }
         }
-
-        // Fetch hero backgrounds
-        const { data: heroData, error: heroError } = await supabase
-          .from('site_settings')
-          .select('value')
-          .eq('key', 'hero_bg')
-          .single();
-
-        if (!heroError && heroData && heroData.value) {
-          try {
-            const parsed = JSON.parse(heroData.value);
-            if (Array.isArray(parsed) && parsed.length > 0) {
-              setHeroBgs(parsed);
-            } else if (typeof heroData.value === 'string' && heroData.value.length > 0 && !heroData.value.startsWith('[')) {
-              setHeroBgs([heroData.value]);
-            }
-          } catch (e) {
-            if (typeof heroData.value === 'string' && heroData.value.length > 0) {
-              setHeroBgs([heroData.value]);
-            }
-          }
-        }
       } catch (error) {
         console.error("Error fetching data", error);
       } finally {
@@ -97,16 +73,6 @@ export default function Products() {
 
     fetchData();
   }, []);
-
-  useEffect(() => {
-    if (heroBgs.length <= 1) return;
-    
-    const interval = setInterval(() => {
-      setCurrentBgIndex((prev) => (prev + 1) % heroBgs.length);
-    }, 5000);
-    
-    return () => clearInterval(interval);
-  }, [heroBgs.length, currentBgIndex]);
 
   const filteredProducts = products.filter(p => {
     const matchesCategory = selectedCategory ? normalizeCategory(p.category) === normalizeCategory(selectedCategory) : true;
@@ -191,8 +157,21 @@ export default function Products() {
         </div>
 
         {loading ? (
-          <div className="flex justify-center items-center h-64">
-            <Loader2 className="h-10 w-10 text-amber-600 animate-spin" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8">
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+              <div key={i} className="bg-white rounded-2xl flex flex-col h-full overflow-hidden shadow-sm border border-stone-100 relative animate-pulse">
+                <div className="relative aspect-[4/5] overflow-hidden bg-stone-200"></div>
+                <div className="p-5 flex flex-col flex-1">
+                  <div className="mb-3 w-20 h-5 bg-stone-200 rounded-md"></div>
+                  <div className="w-3/4 h-6 bg-stone-200 rounded mb-2"></div>
+                  <div className="w-full h-4 bg-stone-200 rounded mb-2"></div>
+                  <div className="w-5/6 h-4 bg-stone-200 rounded mb-4"></div>
+                  <div className="mt-auto pt-4 border-t border-stone-100">
+                    <div className="w-24 h-6 bg-stone-200 rounded"></div>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         ) : (
           <AnimatePresence mode="wait">

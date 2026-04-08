@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../supabase';
-import { Loader2, Save, Image as ImageIcon, Upload, Plus, Trash2 } from 'lucide-react';
+import { Loader2, Save, Image as ImageIcon, Upload, Plus, Trash2, Settings as SettingsIcon, LayoutTemplate, Tags } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 export default function AdminSettings() {
@@ -178,15 +178,20 @@ export default function AdminSettings() {
   };
 
   if (loading) {
-    return <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-amber-600" /></div>;
+    return <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-stone-400" /></div>;
   }
 
   if (needsSetup) {
     return (
-      <div className="bg-white rounded-xl shadow-sm border border-red-200 p-6">
-        <h3 className="text-lg font-medium text-red-800 mb-2">{t('admin.dashboard.settings.setupRequired')}</h3>
-        <p className="text-stone-600 mb-4">{t('admin.dashboard.settings.setupDesc')}</p>
-        <pre className="bg-stone-900 text-stone-100 p-4 rounded-md overflow-x-auto text-sm">
+      <div className="bg-white rounded-2xl shadow-sm border border-red-200 p-8">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="p-2 bg-red-100 text-red-600 rounded-lg">
+            <SettingsIcon className="h-6 w-6" />
+          </div>
+          <h3 className="text-xl font-bold text-red-900">{t('admin.dashboard.settings.setupRequired')}</h3>
+        </div>
+        <p className="text-stone-600 mb-6 leading-relaxed">{t('admin.dashboard.settings.setupDesc')}</p>
+        <pre className="bg-stone-900 text-stone-100 p-6 rounded-xl overflow-x-auto text-sm font-mono leading-relaxed">
 {`CREATE TABLE IF NOT EXISTS site_settings (
   key TEXT PRIMARY KEY,
   value TEXT
@@ -206,7 +211,7 @@ NOTIFY pgrst, 'reload schema';`}
         </pre>
         <button 
           onClick={() => window.location.reload()}
-          className="mt-4 px-4 py-2 bg-stone-900 text-white rounded-md hover:bg-stone-800"
+          className="mt-6 px-6 py-2.5 bg-stone-900 text-white rounded-xl hover:bg-stone-800 font-medium transition-colors"
         >
           {t('admin.dashboard.settings.setupBtn')}
         </button>
@@ -215,39 +220,52 @@ NOTIFY pgrst, 'reload schema';`}
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-stone-200 p-6">
-      <h2 className="text-xl font-bold text-stone-900 mb-6">{t('admin.dashboard.settings.title')}</h2>
-      
+    <div className="space-y-8">
       {error && (
-        <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-md text-sm">
+        <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm font-medium">
           {error}
         </div>
       )}
 
-      <div className="space-y-6 max-w-2xl">
-        <div>
-          <label className="block text-sm font-medium text-stone-700 mb-4">
+      {/* Hero Backgrounds */}
+      <div className="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden">
+        <div className="px-6 py-5 border-b border-stone-100 bg-stone-50/50 flex items-center justify-between">
+          <h3 className="text-base font-semibold text-stone-900 flex items-center gap-2">
+            <LayoutTemplate className="h-5 w-5 text-stone-400" />
             {t('admin.dashboard.settings.heroBgLabel')}
-          </label>
+          </h3>
+          <button
+            type="button"
+            onClick={handleAddBg}
+            className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg text-stone-700 bg-stone-100 hover:bg-stone-200 transition-colors"
+          >
+            <Plus className="h-3.5 w-3.5 mr-1" />
+            {t('admin.dashboard.settings.addImage')}
+          </button>
+        </div>
+        <div className="p-6">
+          <p className="text-sm text-stone-500 mb-6">
+            {t('admin.dashboard.settings.heroBgHelp')}
+          </p>
           
           <div className="space-y-4">
             {heroBgs.map((bg, index) => (
-              <div key={index} className="flex gap-4 items-start">
-                <div className="flex-1">
-                  <div className="relative rounded-md shadow-sm">
+              <div key={index} className="flex flex-col sm:flex-row gap-4 items-start sm:items-center p-4 bg-stone-50 rounded-xl border border-stone-200">
+                <div className="flex-1 w-full">
+                  <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <ImageIcon className="h-5 w-5 text-stone-400" />
+                      <ImageIcon className="h-4 w-4 text-stone-400" />
                     </div>
                     <input
                       type="text"
                       value={bg}
                       onChange={(e) => handleBgChange(index, e.target.value)}
                       placeholder={t('admin.dashboard.settings.heroBgPlaceholder')}
-                      className="focus:ring-amber-500 focus:border-amber-500 block w-full pl-10 sm:text-sm border-stone-300 rounded-md py-2 px-3 border"
+                      className="block w-full pl-10 rounded-xl border-stone-200 py-2 text-sm focus:border-stone-900 focus:ring-1 focus:ring-stone-900 bg-white"
                     />
                   </div>
                 </div>
-                <div>
+                <div className="flex items-center gap-2 w-full sm:w-auto">
                   <input
                     type="file"
                     accept="image/*"
@@ -259,109 +277,98 @@ NOTIFY pgrst, 'reload schema';`}
                     type="button"
                     onClick={() => document.getElementById(`file-upload-${index}`)?.click()}
                     disabled={uploading}
-                    className="inline-flex items-center px-4 py-2 border border-stone-300 rounded-md shadow-sm text-sm font-medium text-stone-700 bg-white hover:bg-stone-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 disabled:opacity-50"
+                    className="flex-1 sm:flex-none inline-flex justify-center items-center px-4 py-2 border border-stone-200 rounded-xl shadow-sm text-sm font-medium text-stone-700 bg-white hover:bg-stone-50 transition-colors disabled:opacity-50"
                   >
-                    {uploading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Upload className="h-4 w-4 mr-2" />}
+                    {uploading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Upload className="h-4 w-4 mr-2 text-stone-400" />}
                     Upload
                   </button>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveBg(index)}
+                    className="p-2 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    title={t('admin.dashboard.settings.removeImage')}
+                  >
+                    <Trash2 className="h-5 w-5" />
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => handleRemoveBg(index)}
-                  className="p-2 text-red-600 hover:bg-red-50 rounded-md"
-                  title={t('admin.dashboard.settings.removeImage')}
-                >
-                  <Trash2 className="h-5 w-5" />
-                </button>
               </div>
             ))}
           </div>
 
-          <div className="mt-4 flex justify-between items-center">
-            <button
-              type="button"
-              onClick={handleAddBg}
-              className="inline-flex items-center px-4 py-2 border border-stone-300 rounded-md shadow-sm text-sm font-medium text-stone-700 bg-white hover:bg-stone-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              {t('admin.dashboard.settings.addImage')}
-            </button>
-            <p className="text-sm text-stone-500">
-              {t('admin.dashboard.settings.heroBgHelp')}
-            </p>
-          </div>
-        </div>
-
-        {heroBgs.some(bg => bg.trim() !== '') && (
-          <div className="mt-8">
-            <p className="text-sm font-medium text-stone-700 mb-4">{t('admin.dashboard.settings.preview')}</p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {heroBgs.filter(bg => bg.trim() !== '').map((bg, index) => (
-                <div key={index} className="aspect-video w-full rounded-lg overflow-hidden border border-stone-200 bg-stone-100 relative">
-                  <img src={bg} alt={`Hero Background Preview ${index + 1}`} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-                  <div className="absolute top-2 left-2 bg-black/50 text-white text-xs px-2 py-1 rounded">
-                    {index + 1}
+          {heroBgs.some(bg => bg.trim() !== '') && (
+            <div className="mt-8 pt-6 border-t border-stone-100">
+              <p className="text-sm font-semibold text-stone-900 mb-4">{t('admin.dashboard.settings.preview')}</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {heroBgs.filter(bg => bg.trim() !== '').map((bg, index) => (
+                  <div key={index} className="aspect-video w-full rounded-xl overflow-hidden border border-stone-200 bg-stone-100 relative group">
+                    <img src={bg} alt={`Hero Background Preview ${index + 1}`} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                    <div className="absolute inset-0 bg-stone-900/10 group-hover:bg-transparent transition-colors"></div>
+                    <div className="absolute top-2 left-2 bg-stone-900/80 text-white text-xs font-bold px-2 py-1 rounded-md backdrop-blur-sm">
+                      Slide {index + 1}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
+      </div>
 
-        <div className="pt-8 border-t border-stone-200">
-          <label className="block text-sm font-medium text-stone-700 mb-4">
+      {/* Categories */}
+      <div className="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden">
+        <div className="px-6 py-5 border-b border-stone-100 bg-stone-50/50 flex items-center justify-between">
+          <h3 className="text-base font-semibold text-stone-900 flex items-center gap-2">
+            <Tags className="h-5 w-5 text-stone-400" />
             Product Categories
-          </label>
+          </h3>
+          <button
+            type="button"
+            onClick={handleAddCategory}
+            className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg text-stone-700 bg-stone-100 hover:bg-stone-200 transition-colors"
+          >
+            <Plus className="h-3.5 w-3.5 mr-1" />
+            Add Category
+          </button>
+        </div>
+        <div className="p-6">
+          <p className="text-sm text-stone-500 mb-6">
+            Manage product categories shown in the catalog and product form.
+          </p>
           
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {categories.map((cat, index) => (
-              <div key={index} className="flex gap-4 items-center">
-                <div className="flex-1">
-                  <input
-                    type="text"
-                    value={cat}
-                    onChange={(e) => handleCategoryChange(index, e.target.value)}
-                    placeholder="Category Name (e.g., New Arrival)"
-                    className="focus:ring-amber-500 focus:border-amber-500 block w-full sm:text-sm border-stone-300 rounded-md py-2 px-3 border"
-                  />
-                </div>
+              <div key={index} className="flex items-center gap-2 bg-stone-50 p-2 rounded-xl border border-stone-200">
+                <input
+                  type="text"
+                  value={cat}
+                  onChange={(e) => handleCategoryChange(index, e.target.value)}
+                  placeholder="Category Name"
+                  className="block w-full rounded-lg border-transparent py-1.5 px-3 text-sm focus:border-stone-900 focus:ring-1 focus:ring-stone-900 bg-white shadow-sm"
+                />
                 <button
                   type="button"
                   onClick={() => handleRemoveCategory(index)}
-                  className="p-2 text-red-600 hover:bg-red-50 rounded-md"
+                  className="p-1.5 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors shrink-0"
                   title="Remove Category"
                 >
-                  <Trash2 className="h-5 w-5" />
+                  <Trash2 className="h-4 w-4" />
                 </button>
               </div>
             ))}
           </div>
-
-          <div className="mt-4 flex justify-between items-center">
-            <button
-              type="button"
-              onClick={handleAddCategory}
-              className="inline-flex items-center px-4 py-2 border border-stone-300 rounded-md shadow-sm text-sm font-medium text-stone-700 bg-white hover:bg-stone-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Add Category
-            </button>
-            <p className="text-sm text-stone-500">
-              Manage product categories shown in the catalog and product form.
-            </p>
-          </div>
         </div>
+      </div>
 
-        <div className="pt-6 border-t border-stone-100">
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 disabled:opacity-50"
-          >
-            {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
-            {saving ? t('admin.dashboard.settings.saving') : t('admin.dashboard.settings.save')}
-          </button>
-        </div>
+      {/* Save Button */}
+      <div className="flex justify-end">
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          className="inline-flex items-center px-6 py-3 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-stone-900 hover:bg-stone-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-stone-900 disabled:opacity-50 transition-colors"
+        >
+          {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
+          {saving ? t('admin.dashboard.settings.saving') : t('admin.dashboard.settings.save')}
+        </button>
       </div>
     </div>
   );

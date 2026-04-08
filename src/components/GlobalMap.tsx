@@ -13,24 +13,24 @@ const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 const center: [number, number] = [120.75, 30.75]; // Jiaxing, China
 
 const destinations = [
-  { name: "America", coordinates: [-100, 40] as [number, number], color: "#fb7185", bg: "#ffe4e6" }, // Rose
-  { name: "Canada", coordinates: [-106, 56] as [number, number], color: "#fbbf24", bg: "#fef3c7" }, // Amber
-  { name: "South America", coordinates: [-55, -10] as [number, number], color: "#fbbf24", bg: "#fef3c7" },
-  { name: "Europe", coordinates: [10, 51] as [number, number], color: "#fbbf24", bg: "#fef3c7" },
-  { name: "Middle East", coordinates: [45, 25] as [number, number], color: "#fbbf24", bg: "#fef3c7" },
-  { name: "Thailand", coordinates: [100, 15] as [number, number], color: "#fbbf24", bg: "#fef3c7" },
-  { name: "Australia", coordinates: [133, -25] as [number, number], color: "#fbbf24", bg: "#fef3c7" },
-  { name: "Russia", coordinates: [100, 60] as [number, number], color: "#fbbf24", bg: "#fef3c7" },
+  { name: "America", coordinates: [-100, 40] as [number, number], color: "#e11d48", bg: "#ffe4e6" }, // Rose-600
+  { name: "Canada", coordinates: [-106, 56] as [number, number], color: "#ea580c", bg: "#ffedd5" }, // Orange-600
+  { name: "South America", coordinates: [-55, -10] as [number, number], color: "#ea580c", bg: "#ffedd5" },
+  { name: "Europe", coordinates: [10, 51] as [number, number], color: "#ea580c", bg: "#ffedd5" },
+  { name: "Middle East", coordinates: [45, 25] as [number, number], color: "#ea580c", bg: "#ffedd5" },
+  { name: "Thailand", coordinates: [100, 15] as [number, number], color: "#ea580c", bg: "#ffedd5" },
+  { name: "Australia", coordinates: [133, -25] as [number, number], color: "#ea580c", bg: "#ffedd5" },
+  { name: "Russia", coordinates: [100, 60] as [number, number], color: "#ea580c", bg: "#ffedd5" },
 ];
 
 export default function GlobalMap() {
   return (
-    <div className="w-full h-full bg-[#111827] rounded-3xl overflow-hidden relative shadow-2xl border border-stone-800">
+    <div className="w-full h-full bg-stone-50 rounded-3xl overflow-hidden relative shadow-xl border border-stone-200">
       <ComposableMap
         projection="geoMercator"
         projectionConfig={{
-          scale: 130,
-          center: [20, 20]
+          scale: 140,
+          center: [10, 30]
         }}
         width={1000}
         height={450}
@@ -42,12 +42,12 @@ export default function GlobalMap() {
               <Geography
                 key={geo.rsmKey}
                 geography={geo}
-                fill="#1f2937"
-                stroke="#374151"
+                fill="#e7e5e4"
+                stroke="#ffffff"
                 strokeWidth={0.5}
                 style={{
                   default: { outline: "none" },
-                  hover: { outline: "none", fill: "#374151" },
+                  hover: { outline: "none", fill: "#d6d3d1" },
                   pressed: { outline: "none" },
                 }}
               />
@@ -64,7 +64,7 @@ export default function GlobalMap() {
             stroke={dest.color}
             strokeWidth={1.5}
             strokeLinecap="round"
-            className="opacity-80"
+            className="opacity-60"
             style={{
               strokeDasharray: "4 4",
               animation: "dash 10s linear infinite"
@@ -74,10 +74,10 @@ export default function GlobalMap() {
 
         {/* Markers */}
         <Marker coordinates={center}>
-          <circle r={4} fill="#60a5fa" />
-          <circle r={12} fill="#60a5fa" className="opacity-30 animate-ping" />
-          <rect x={10} y={-10} width={40} height={20} fill="#fef3c7" rx={4} />
-          <text textAnchor="middle" x={30} y={4} style={{ fontFamily: "system-ui", fill: "#1f2937", fontSize: "10px", fontWeight: "600" }}>
+          <circle r={4} fill="#2563eb" />
+          <circle r={12} fill="#3b82f6" className="opacity-30 animate-ping" />
+          <rect x={10} y={-10} width={40} height={20} fill="#dbeafe" rx={4} />
+          <text textAnchor="middle" x={30} y={4} style={{ fontFamily: "system-ui", fill: "#1e3a8a", fontSize: "10px", fontWeight: "600" }}>
             China
           </text>
         </Marker>
@@ -119,7 +119,7 @@ export default function GlobalMap() {
               textAnchor="middle"
               x={dest.coordinates[0] < center[0] ? -35 : 35}
               y={4}
-              style={{ fontFamily: "system-ui", fill: "#1f2937", fontSize: "10px", fontWeight: "600" }}
+              style={{ fontFamily: "system-ui", fill: "#78350f", fontSize: "10px", fontWeight: "600" }}
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}

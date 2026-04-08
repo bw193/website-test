@@ -11,7 +11,7 @@ export const es = {
       companyName: "Jiaxing Chengtai Mirror Co., Ltd.",
       heroTitle1: "Artísticamente Refinado,",
       heroTitle2: "Funcionalmente Brillante.",
-      heroDesc: "Fundada en 2005 y operando bajo nuestra marca <1>BOLEN</1>, combinamos la inspiración del diseño italiano con casi dos décadas de experiencia en fabricación moderna para ofrecer espejos de primera calidad en todo el mundo.",
+      heroDesc: "Fundada en 2005 (con una historia que se remonta a 1995) y operando bajo nuestra marca <1>BOLEN</1>, combinamos la inspiración del diseño italiano con más de dos décadas de experiencia en fabricación moderna para ofrecer espejos de primera calidad en todo el mundo.",
       exploreBtn: "Explorar Nuestra Colección",
       ourStoryBtn: "Nuestra Historia",
       stats: {
@@ -33,7 +33,7 @@ export const es = {
       collections: {
         subtitle: "Colecciones",
         title: "Versátil y Personalizado",
-        desc: "Nuestro catálogo abarca 6 series diseñadas para aplicaciones residenciales, comerciales, hoteleras y proyectos de lujo.",
+        desc: "Nuestro catálogo abarca múltiples series diseñadas para aplicaciones residenciales, comerciales, hoteleras y proyectos de lujo.",
         viewAll: "Ver Todos los Productos",
         smart: {
           tag: "Insignia",
@@ -48,7 +48,7 @@ export const es = {
         },
         oem: {
           title: "Servicios OEM / ODM",
-          desc: "Especifique tamaño, iluminación, material del marco, funciones inteligentes y embalaje. MOQ flexibles desde 2-10 piezas.",
+          desc: "Personalice tamaño, material, función, logotipo y embalaje según las necesidades del cliente.",
           partner: "Asóciese con Nosotros"
         }
       },
@@ -57,7 +57,7 @@ export const es = {
         title: "El Proceso de Fabricación",
         desc: "Desde las materias primas hasta la entrega global, mantenemos un estricto control sobre cada fase de producción.",
         steps: {
-          s1: { title: "Diseño I+D", desc: "Estética de inspiración italiana combinada con tecnología inteligente moderna." },
+          s1: { title: "Diseño I+D", desc: "Personalice tamaño, material, función, logotipo y embalaje según las necesidades del cliente." },
           s2: { title: "Artesanía de Precisión", desc: "Corte, canteado y ensamblaje automatizados en nuestras instalaciones de 50k metros cuadrados." },
           s3: { title: "Garantía de Calidad", desc: "Pruebas rigurosas para impermeabilización IP66, cumplimiento CE y RoHS." },
           s4: { title: "Exportación Global", desc: "Embalaje y logística seguros a más de 50 países en todo el mundo." }

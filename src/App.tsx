@@ -8,12 +8,13 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import ScrollToTop from './components/ScrollToTop';
 import { hasSupabaseConfig } from './supabase';
+import Home from './pages/Home';
+import Products from './pages/Products';
 
 // Lazy load pages for better performance
-const Home = lazy(() => import('./pages/Home'));
 const OurStory = lazy(() => import('./pages/OurStory'));
-const Products = lazy(() => import('./pages/Products'));
 const ProductDetail = lazy(() => import('./pages/ProductDetail'));
 const RFQ = lazy(() => import('./pages/RFQ'));
 const AdminLogin = lazy(() => import('./pages/AdminLogin'));
@@ -23,7 +24,7 @@ const AdminRoute = lazy(() => import('./components/AdminRoute'));
 
 // Loading fallback
 const PageLoader = () => (
-  <div className="flex-1 flex items-center justify-center min-h-[50vh]">
+  <div className="flex-1 flex items-center justify-center min-h-screen">
     <div className="w-12 h-12 border-4 border-stone-200 border-t-amber-500 rounded-full animate-spin"></div>
   </div>
 );
@@ -32,6 +33,7 @@ export default function App() {
   return (
     <AuthProvider>
       <Router>
+        <ScrollToTop />
         <div className="min-h-screen flex flex-col font-sans text-gray-900 bg-gray-50">
           {!hasSupabaseConfig && (
             <div className="bg-amber-600 text-white text-center py-2 px-4 text-sm font-medium">

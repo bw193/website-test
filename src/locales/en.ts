@@ -12,9 +12,9 @@ export const en = {
       title: "Our Story",
       subtitle: "Jiaxing Chengtai Mirror Co., Ltd.",
       paragraphs: [
-        "With nearly 20 years of dedicated experience in mirror manufacturing, Jiaxing Chengtai Mirror Co., Ltd. has built a reputation that goes far beyond any single sales channel. Our 50,000+ square meter production complex, two independent factories, and a team of over 200 skilled workers give us the capacity and flexibility to handle orders of virtually any scale — from boutique interior design projects to large-scale hotel and real estate developments.",
+        "With over 20 years of dedicated experience in mirror manufacturing (tracing its roots back to 1995), Jiaxing Chengtai Mirror Co., Ltd. has built a reputation that goes far beyond any single sales channel. Our 50,000+ square meter production complex, two independent factories, and a team of over 200 skilled workers give us the capacity and flexibility to handle orders of virtually any scale — from boutique interior design projects to large-scale hotel and real estate developments.",
         "We own the entire production process in-house. From raw glass processing and LED integration to frame fabrication and smart feature assembly, every stage of manufacturing is handled under one roof and overseen by dedicated QA/QC inspectors. This vertical integration means we control quality at every step, eliminate third-party delays, and keep lead times competitive.",
-        "Our 200+ product styles across 6 core series are not off-the-shelf templates — they represent years of design iteration informed by both European aesthetic trends and real-world buyer feedback. For clients who need something unique, our OEM and ODM capabilities allow full customization of size, shape, lighting, smart features, materials, and branding.",
+        "Our 200+ product styles across multiple core series are not off-the-shelf templates — they represent years of design iteration informed by both European aesthetic trends and real-world buyer feedback. For clients who need something unique, our OEM and ODM capabilities allow full customization of size, shape, lighting, smart features, materials, and branding.",
         "Backed by international certifications including CE, RoHS, and IP66 waterproofing, our products meet the compliance requirements of markets across Europe, North America, the Middle East, and beyond. We don't just manufacture mirrors — we build long-term partnerships with importers, distributors, interior designers, and developers who demand consistency, precision, and a supplier they can rely on year after year."
       ]
     },
@@ -22,7 +22,7 @@ export const en = {
       companyName: "Jiaxing Chengtai Mirror Co., Ltd.",
       heroTitle1: "Artistically Refined,",
       heroTitle2: "Functionally Brilliant.",
-      heroDesc: "Founded in 2005 and operating under our brand <1>BOLEN</1>, we combine Italian design inspiration with nearly two decades of modern manufacturing expertise to deliver premium mirrors worldwide.",
+      heroDesc: "Founded in 2005 (with history tracing back to 1995) and operating under our brand <1>BOLEN</1>, we combine Italian design inspiration with over two decades of modern manufacturing expertise to deliver premium mirrors worldwide.",
       exploreBtn: "Explore Our Collection",
       ourStoryBtn: "Our Story",
       stats: {
@@ -44,7 +44,7 @@ export const en = {
       collections: {
         subtitle: "Collections",
         title: "Versatile & Custom",
-        desc: "Our catalog spans 6 series designed for residential, commercial, hotel, and luxury project applications.",
+        desc: "Our catalog spans multiple series designed for residential, commercial, hotel, and luxury project applications.",
         viewAll: "View All Products",
         smart: {
           tag: "Flagship",
@@ -59,7 +59,7 @@ export const en = {
         },
         oem: {
           title: "OEM / ODM Services",
-          desc: "Specify size, lighting, frame material, smart features, and packaging. Flexible MOQs starting at 2–10 pieces.",
+          desc: "Customize size, material, function, logo, and packaging based on customer needs.",
           partner: "Partner With Us"
         }
       },
@@ -72,7 +72,7 @@ export const en = {
         title: "The Manufacturing Process",
         desc: "From raw materials to global delivery, we maintain strict control over every phase of production.",
         steps: {
-          s1: { title: "R&D Design", desc: "Italian-inspired aesthetics combined with modern smart technology." },
+          s1: { title: "R&D Design", desc: "Customize size, material, function, logo, and packaging based on customer needs." },
           s2: { title: "Precision Craft", desc: "Automated cutting, edging, and assembly in our 50k sqm facility." },
           s3: { title: "Quality Assurance", desc: "Rigorous testing for IP66 waterproofing, CE, and RoHS compliance." },
           s4: { title: "Global Export", desc: "Secure packaging and logistics to over 50 countries worldwide." }
@@ -88,9 +88,9 @@ export const en = {
           { title: "Certified Global Quality" }
         ],
         paragraphs: [
-          "With nearly 20 years of dedicated experience in mirror manufacturing, Jiaxing Chengtai Mirror Co., Ltd. has built a reputation that goes far beyond any single sales channel. Our 50,000+ square meter production complex, two independent factories, and a team of over 200 skilled workers give us the capacity and flexibility to handle orders of virtually any scale — from boutique interior design projects to large-scale hotel and real estate developments.",
+          "With over 20 years of dedicated experience in mirror manufacturing (tracing its roots back to 1995), Jiaxing Chengtai Mirror Co., Ltd. has built a reputation that goes far beyond any single sales channel. Our 50,000+ square meter production complex, two independent factories, and a team of over 200 skilled workers give us the capacity and flexibility to handle orders of virtually any scale — from boutique interior design projects to large-scale hotel and real estate developments.",
           "We own the entire production process in-house. From raw glass processing and LED integration to frame fabrication and smart feature assembly, every stage of manufacturing is handled under one roof and overseen by dedicated QA/QC inspectors. This vertical integration means we control quality at every step, eliminate third-party delays, and keep lead times competitive.",
-          "Our 200+ product styles across 6 core series are not off-the-shelf templates — they represent years of design iteration informed by both European aesthetic trends and real-world buyer feedback. For clients who need something unique, our OEM and ODM capabilities allow full customization of size, shape, lighting, smart features, materials, and branding.",
+          "Our 200+ product styles across multiple core series are not off-the-shelf templates — they represent years of design iteration informed by both European aesthetic trends and real-world buyer feedback. For clients who need something unique, our OEM and ODM capabilities allow full customization of size, shape, lighting, smart features, materials, and branding.",
           "Backed by international certifications including CE, RoHS, and IP66 waterproofing, our products meet the compliance requirements of markets across Europe, North America, the Middle East, and beyond. We don't just manufacture mirrors — we build long-term partnerships with importers, distributors, interior designers, and developers who demand consistency, precision, and a supplier they can rely on year after year."
         ]
       },
