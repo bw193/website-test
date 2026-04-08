@@ -49,5 +49,9 @@
     "typescript": "~5.8.2",
     "vite": "^6.2.0",
     "vite-plugin-node-polyfills": "^0.25.0"
+  },
+  "overrides": {
+    "react": "$react",
+    "react-dom": "$react-dom"
   }
 }
