@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://bolen-mirrors.com/sitemap.xml
+Sitemap: https://bolenmirror.com/sitemap.xml

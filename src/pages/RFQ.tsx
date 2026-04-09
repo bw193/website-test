@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { CheckCircle2, Mail, Phone, MapPin } from 'lucide-react';
 import { supabase } from '../supabase';
+import SEO from '../components/SEO';
 
 interface RFQForm {
   customerName: string;
@@ -43,8 +44,41 @@ export default function RFQ() {
     }
   };
 
+  const contactSchema = {
+    "@context": "https://schema.org",
+    "@type": "ContactPage",
+    "name": "Request for Quote (RFQ) | BOLEN Mirror",
+    "description": "Contact Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) for OEM/ODM inquiries, custom mirror manufacturing, and bulk orders.",
+    "url": "https://bolenmirror.com/rfq",
+    "mainEntity": {
+      "@type": "Organization",
+      "name": "Jiaxing Chengtai Mirror Co., Ltd. (BOLEN)",
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "+86-18058603602",
+        "email": "bolen2@cnjxctm.com",
+        "contactType": "customer service",
+        "areaServed": "Worldwide",
+        "availableLanguage": ["en", "zh"]
+      },
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "No. 1, Building 2, No. 1, Chuangye Road, Wangdian Town",
+        "addressLocality": "Jiaxing",
+        "addressRegion": "Zhejiang",
+        "addressCountry": "CN"
+      }
+    }
+  };
+
   return (
     <div className="bg-stone-50 min-h-screen pt-24 pb-16">
+      <SEO 
+        title="Request for Quote (RFQ) | BOLEN Mirror" 
+        description="Contact Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) for OEM/ODM inquiries, custom mirror manufacturing, and bulk orders."
+        canonicalUrl="https://bolenmirror.com/rfq"
+        schema={contactSchema}
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <motion.h1 

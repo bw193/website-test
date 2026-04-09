@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'motion/react';
 import { useTranslation } from 'react-i18next';
 import { ArrowDown, Factory, Globe } from 'lucide-react';
+import SEO from '../components/SEO';
 
 export default function OurStory() {
   const { t } = useTranslation();
@@ -18,6 +19,11 @@ export default function OurStory() {
 
   return (
     <div ref={containerRef} className="bg-[#FAF9F6] min-h-screen selection:bg-stone-200 selection:text-stone-900">
+      <SEO 
+        title="Our Story | Jiaxing Chengtai Mirror (BOLEN)" 
+        description="Learn about the history and manufacturing excellence of Jiaxing Chengtai Mirror Co., Ltd. (BOLEN), a leader in OEM LED and smart mirrors since 1995."
+        canonicalUrl="https://bolenmirror.com/our-story"
+      />
       {/* Hero Section */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden bg-stone-900">
         <motion.div 

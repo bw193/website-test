@@ -4,6 +4,7 @@ import ProductCard from '../components/ProductCard';
 import { Loader2, Search, SlidersHorizontal, PackageX } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'motion/react';
+import SEO from '../components/SEO';
 
 interface Product {
   id: string;
@@ -83,6 +84,11 @@ export default function Products() {
 
   return (
     <div className="bg-stone-50 min-h-screen pb-24">
+      <SEO 
+        title="Products Catalog | BOLEN Mirror" 
+        description="Explore our wide range of OEM LED mirrors, smart mirrors, vanity mirrors, and bath mirrors. High-quality manufacturing for global brands."
+        canonicalUrl="https://bolenmirror.com/products"
+      />
       {/* Hero Section */}
       <div className="bg-stone-900 text-white py-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
         <div className="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1600566752355-35792bedcfea?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-center" />

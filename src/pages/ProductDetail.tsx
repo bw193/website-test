@@ -6,6 +6,7 @@ import { Loader2, CheckCircle2, ChevronLeft, ChevronRight, ArrowLeft, Send, Shie
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'motion/react';
 import ReactMarkdown from 'react-markdown';
+import SEO from '../components/SEO';
 
 interface Product {
   id: string;
@@ -38,11 +39,15 @@ export default function ProductDetail() {
   useEffect(() => {
     const fetchProduct = async () => {
       if (!id) return;
+      
+      // Extract UUID from slug-id format (UUID is 36 chars)
+      const actualId = id.length > 36 ? id.slice(-36) : id;
+      
       try {
         const { data, error } = await supabase
           .from('products')
           .select('*')
-          .eq('id', id)
+          .eq('id', actualId)
           .single();
 
         if (error) throw error;
@@ -146,8 +151,35 @@ export default function ProductDetail() {
     }
   };
 
+  const slug = product ? product.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') : '';
+  const productUrl = product ? `https://bolenmirror.com/products/${slug}-${product.id}` : '';
+
+  const productSchema = product ? {
+    "@context": "https://schema.org/",
+    "@type": "Product",
+    "name": product.title,
+    "image": product.images,
+    "description": product.description,
+    "sku": product.id,
+    "offers": {
+      "@type": "AggregateOffer",
+      "url": productUrl,
+      "priceCurrency": "USD",
+      "lowPrice": product.price_range ? parseFloat(product.price_range.replace(/[^0-9.]/g, '').split('-')[0]) || 0 : 0,
+      "highPrice": product.price_range && product.price_range.includes('-') ? parseFloat(product.price_range.replace(/[^0-9.-]/g, '').split('-')[1]) || 0 : (product.price_range ? parseFloat(product.price_range.replace(/[^0-9.]/g, '')) || 0 : 0),
+      "offerCount": 1
+    }
+  } : undefined;
+
   return (
     <div className="bg-[#FAF9F6] min-h-screen py-12">
+      <SEO 
+        title={`${product.title} | BOLEN Mirror`}
+        description={product.description || `View details for ${product.title}, a premium mirror from Jiaxing Chengtai Mirror Co., Ltd.`}
+        canonicalUrl={productUrl}
+        ogImage={product.images?.[0]}
+        schema={productSchema}
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Breadcrumb Navigation */}
         <motion.div 

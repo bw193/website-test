@@ -7,6 +7,7 @@ import { supabase } from '../supabase';
 import { AnimatePresence } from 'motion/react';
 import ProductCard from '../components/ProductCard';
 import GlobalMap from '../components/GlobalMap';
+import SEO from '../components/SEO';
 
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
@@ -139,6 +140,7 @@ export default function Home() {
 
   return (
     <div className="bg-[#FAF9F6] text-stone-800 font-sans overflow-hidden">
+      <SEO />
       {/* Hero Section */}
       <div className="relative bg-stone-900 min-h-[90vh] flex items-center justify-center overflow-hidden group">
         <div className="absolute inset-0">

@@ -20,8 +20,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ id, title, description, image
     return val.startsWith('$') ? val : `$${val}`;
   };
 
+  const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+  const productUrl = `/products/${slug}-${id}`;
+
   return (
-    <Link to={`/products/${id}`} className="group block h-full">
+    <Link to={productUrl} className="group block h-full">
       <div className="bg-white rounded-2xl flex flex-col h-full overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 border border-stone-100 relative">
         
         {/* Image Container */}
@@ -32,6 +35,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ id, title, description, image
             className="w-full h-full object-center object-cover transition-transform duration-700 group-hover:scale-105"
             width="400"
             height="500"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             referrerPolicy="no-referrer"
             loading="lazy"
             decoding="async"
