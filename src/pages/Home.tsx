@@ -30,7 +30,21 @@ export default function Home() {
   ]);
   const [currentBgIndex, setCurrentBgIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  const [featuredProducts, setFeaturedProducts] = useState<any[]>([]);
+  const [allProducts, setAllProducts] = useState<any[]>([]);
+  const [categories, setCategories] = useState<string[]>([
+    "New Arrival",
+    "Hot Sale",
+    "Led Lighted Mirror",
+    "Bathroom Mirror without led",
+    "Full Length Dressing Mirror",
+    "Irregular Mirror"
+  ]);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  const normalizeCategory = (cat: string | undefined | null) => {
+    if (!cat) return '';
+    return cat.toLowerCase().replace(/[^a-z0-9]/g, '');
+  };
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -64,15 +78,32 @@ export default function Home() {
           }
         }
 
-        // Fetch featured products
+        // Fetch categories
+        const { data: settingsData, error: settingsError } = await supabase
+          .from('site_settings')
+          .select('value')
+          .eq('key', 'categories')
+          .single();
+
+        if (!settingsError && settingsData && settingsData.value) {
+          try {
+            const parsed = JSON.parse(settingsData.value);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              setCategories(parsed);
+            }
+          } catch (e) {
+            console.error("Error parsing categories", e);
+          }
+        }
+
+        // Fetch all products
         const { data: productsData, error: productsError } = await supabase
           .from('products')
           .select('*')
-          .order('created_at', { ascending: false })
-          .limit(6);
+          .order('created_at', { ascending: false });
           
         if (!productsError && productsData) {
-          setFeaturedProducts(productsData);
+          setAllProducts(productsData);
         }
       } catch (err) {
         // Ignore errors if table doesn't exist or setting not found
@@ -83,6 +114,10 @@ export default function Home() {
     };
     fetchSettings();
   }, []);
+
+  const featuredProducts = allProducts
+    .filter(p => selectedCategory ? normalizeCategory(p.category) === normalizeCategory(selectedCategory) : true)
+    .slice(0, 6);
 
   useEffect(() => {
     if (heroBgs.length <= 1) return;
@@ -221,7 +256,7 @@ export default function Home() {
       {/* Featured Collections (Bento Grid) */}
       <div className="py-24 bg-stone-50 text-stone-900 border-t border-stone-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-6">
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -245,6 +280,38 @@ export default function Home() {
               </Link>
             </motion.div>
           </div>
+
+          {/* Category Filter */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="flex flex-wrap gap-2 mb-12"
+          >
+            <button
+              onClick={() => setSelectedCategory(null)}
+              className={`px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 whitespace-nowrap ${
+                selectedCategory === null
+                  ? 'bg-stone-900 text-white shadow-md scale-105'
+                  : 'bg-stone-100 text-stone-600 hover:bg-stone-200 hover:text-stone-900'
+              }`}
+            >
+              {t('products.allCategories', 'All Categories')}
+            </button>
+            {categories.map((category) => (
+              <button
+                key={category}
+                onClick={() => setSelectedCategory(category)}
+                className={`px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 whitespace-nowrap ${
+                  selectedCategory === category
+                    ? 'bg-stone-900 text-white shadow-md scale-105'
+                    : 'bg-stone-100 text-stone-600 hover:bg-stone-200 hover:text-stone-900'
+                }`}
+              >
+                {category}
+              </button>
+            ))}
+          </motion.div>
 
           {isLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
