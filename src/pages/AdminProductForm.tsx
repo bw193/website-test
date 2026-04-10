@@ -113,7 +113,11 @@ export default function AdminProductForm() {
               price_range: data.price_range || '',
               msrp: data.msrp || '',
               images: data.images && data.images.length > 0 ? data.images.map((url: string) => ({ url })) : [{ url: '' }],
-              specifications: data.specifications && Object.keys(data.specifications).length > 0 ? Object.entries(data.specifications).map(([key, value]) => ({ key, value: value as string })) : [{ key: '', value: '' }]
+              specifications: data.specifications && (Array.isArray(data.specifications) ? data.specifications.length > 0 : Object.keys(data.specifications).length > 0)
+                ? (Array.isArray(data.specifications)
+                    ? data.specifications.map((s: { key: string; value: string }) => ({ key: s.key, value: s.value }))
+                    : Object.entries(data.specifications).map(([key, value]) => ({ key, value: value as string })))
+                : [{ key: '', value: '' }]
             });
           }
         } catch (error) {
@@ -201,12 +205,9 @@ export default function AdminProductForm() {
         price_range: data.price_range,
         msrp: data.msrp,
         images: data.images.map(img => img.url).filter(url => url.trim() !== ''),
-        specifications: data.specifications.reduce((acc, curr) => {
-          if (curr.key.trim() && curr.value.trim()) {
-            acc[curr.key] = curr.value;
-          }
-          return acc;
-        }, {} as Record<string, string>),
+        specifications: data.specifications
+          .filter(curr => curr.key.trim() && curr.value.trim())
+          .map(curr => ({ key: curr.key.trim(), value: curr.value.trim() })),
         updated_at: new Date().toISOString()
       };
 

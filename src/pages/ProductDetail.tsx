@@ -17,7 +17,7 @@ interface Product {
   category?: string;
   price_range?: string;
   msrp?: string;
-  specifications?: Record<string, string>;
+  specifications?: Array<{ key: string; value: string }> | Record<string, string>;
 }
 
 interface RFQForm {
@@ -330,7 +330,7 @@ export default function ProductDetail() {
               </div>
             </motion.div>
 
-            {product.specifications && Object.keys(product.specifications).length > 0 && (
+            {product.specifications && (Array.isArray(product.specifications) ? product.specifications.length > 0 : Object.keys(product.specifications).length > 0) && (
               <motion.div variants={fadeInUp} className="mt-10">
                 <h3 className="text-xl font-bold text-stone-900 mb-6 flex items-center gap-2">
                   <span className="w-1.5 h-6 bg-amber-600 rounded-full"></span>
@@ -338,10 +338,13 @@ export default function ProductDetail() {
                 </h3>
                 <div className="bg-white rounded-2xl border border-stone-200 overflow-hidden shadow-sm">
                   <ul className="divide-y divide-stone-100">
-                    {Object.entries(product.specifications).map(([key, value], idx) => (
-                      <li key={key} className={`flex px-6 py-4 ${idx % 2 === 0 ? 'bg-stone-50/50' : 'bg-white'}`}>
-                        <span className="w-1/3 font-medium text-stone-900">{key}</span>
-                        <span className="w-2/3 text-stone-600">{value}</span>
+                    {(Array.isArray(product.specifications)
+                      ? product.specifications
+                      : Object.entries(product.specifications).map(([key, value]) => ({ key, value }))
+                    ).map((spec, idx) => (
+                      <li key={spec.key} className={`flex px-6 py-4 ${idx % 2 === 0 ? 'bg-stone-50/50' : 'bg-white'}`}>
+                        <span className="w-1/3 font-medium text-stone-900">{spec.key}</span>
+                        <span className="w-2/3 text-stone-600">{spec.value}</span>
                       </li>
                     ))}
                   </ul>
