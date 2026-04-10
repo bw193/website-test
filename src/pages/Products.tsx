@@ -128,9 +128,9 @@ export default function Products() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10">
         <div className="bg-white rounded-2xl shadow-sm border border-stone-200 p-4 md:p-6 mb-12">
-          <div className="flex flex-col md:flex-row gap-6 items-center justify-between">
+          <div className="flex flex-col gap-6">
             {/* Search Bar */}
-            <div className="relative w-full md:w-96">
+            <div className="relative w-full md:max-w-md">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Search className="h-5 w-5 text-stone-400" />
               </div>
@@ -144,13 +144,13 @@ export default function Products() {
             </div>
 
             {/* Categories */}
-            <div className="flex-1 w-full overflow-x-auto pb-2 md:pb-0 hide-scrollbar">
-              <div className="flex md:flex-wrap gap-2 md:justify-end min-w-max md:min-w-0">
+            <div className="w-full overflow-x-auto hide-scrollbar">
+              <div className="flex flex-wrap gap-2">
                 <button
                   onClick={() => setSelectedCategory(null)}
-                  className={`px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 whitespace-nowrap ${
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap ${
                     selectedCategory === null
-                      ? 'bg-stone-900 text-white shadow-md scale-105'
+                      ? 'bg-stone-900 text-white shadow-sm'
                       : 'bg-stone-100 text-stone-600 hover:bg-stone-200 hover:text-stone-900'
                   }`}
                 >
@@ -160,9 +160,9 @@ export default function Products() {
                   <button
                     key={cat}
                     onClick={() => setSelectedCategory(cat)}
-                    className={`px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 whitespace-nowrap ${
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap ${
                       selectedCategory === cat
-                        ? 'bg-stone-900 text-white shadow-md scale-105'
+                        ? 'bg-stone-900 text-white shadow-sm'
                         : 'bg-stone-100 text-stone-600 hover:bg-stone-200 hover:text-stone-900'
                     }`}
                   >
