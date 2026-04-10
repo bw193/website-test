@@ -11,9 +11,9 @@ import Footer from './components/Footer';
 import ScrollToTop from './components/ScrollToTop';
 import { hasSupabaseConfig } from './supabase';
 import Home from './pages/Home';
-import Products from './pages/Products';
 
 // Lazy load pages for better performance
+const Products = lazy(() => import('./pages/Products'));
 const OurStory = lazy(() => import('./pages/OurStory'));
 const ProductDetail = lazy(() => import('./pages/ProductDetail'));
 const RFQ = lazy(() => import('./pages/RFQ'));
@@ -21,6 +21,7 @@ const AdminLogin = lazy(() => import('./pages/AdminLogin'));
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 const AdminProductForm = lazy(() => import('./pages/AdminProductForm'));
 const AdminRoute = lazy(() => import('./components/AdminRoute'));
+const NotFound = lazy(() => import('./pages/NotFound'));
 
 // Loading fallback
 const PageLoader = () => (
@@ -35,13 +36,16 @@ export default function App() {
       <Router>
         <ScrollToTop />
         <div className="min-h-screen flex flex-col font-sans text-gray-900 bg-gray-50">
+          <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100] focus:bg-amber-500 focus:text-white focus:px-4 focus:py-2 focus:rounded-md focus:text-sm focus:font-medium">
+            Skip to content
+          </a>
           {!hasSupabaseConfig && (
             <div className="bg-amber-600 text-white text-center py-2 px-4 text-sm font-medium">
               Supabase Setup Required: Add <code className="bg-amber-700 px-1 rounded">VITE_SUPABASE_URL</code> and <code className="bg-amber-700 px-1 rounded">VITE_SUPABASE_ANON_KEY</code> to your Environment Variables (or AI Studio Secrets) and rebuild the app.
             </div>
           )}
           <Navbar />
-          <main className="flex-1 flex flex-col">
+          <main id="main-content" className="flex-1 flex flex-col">
             <Suspense fallback={<PageLoader />}>
               <Routes>
                 <Route path="/" element={<Home />} />
@@ -57,6 +61,8 @@ export default function App() {
                   <Route path="/admin/products/new" element={<AdminProductForm />} />
                   <Route path="/admin/products/:id" element={<AdminProductForm />} />
                 </Route>
+
+                <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>
           </main>

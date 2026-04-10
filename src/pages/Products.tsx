@@ -84,10 +84,22 @@ export default function Products() {
 
   return (
     <div className="bg-stone-50 min-h-screen pb-24">
-      <SEO 
-        title="Products Catalog | BOLEN Mirror" 
-        description="Explore our wide range of OEM LED mirrors, smart mirrors, vanity mirrors, and bath mirrors. High-quality manufacturing for global brands."
+      <SEO
+        title="LED Mirror Products Catalog | BOLEN Mirror Manufacturer"
+        description="Explore our wide range of OEM LED mirrors, smart mirrors, vanity mirrors, and bath mirrors from a leading LED mirror manufacturer. High-quality manufacturing for global brands."
         canonicalUrl="https://bolenmirror.com/products"
+        schema={{
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          "name": "BOLEN LED Mirror Products Catalog",
+          "description": "Explore our wide range of OEM LED mirrors, smart mirrors, vanity mirrors, and bath mirrors from a leading LED mirror manufacturer.",
+          "url": "https://bolenmirror.com/products",
+          "isPartOf": {
+            "@type": "WebSite",
+            "name": "BOLEN Mirror",
+            "url": "https://bolenmirror.com"
+          }
+        }}
       />
       {/* Hero Section */}
       <div className="bg-stone-900 text-white py-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden">

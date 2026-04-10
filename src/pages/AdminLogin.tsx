@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { Sparkles, LogIn, UserPlus, ArrowLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import SEO from '../components/SEO';
 
 export default function AdminLogin() {
   const { user, isAdmin, isPending, loginWithEmail, registerWithEmail, loading, logout } = useAuth();
@@ -43,6 +44,7 @@ export default function AdminLogin() {
 
   return (
     <div className="min-h-screen bg-white flex">
+      <SEO title="Admin Login | BOLEN Mirror" noindex={true} />
       {/* Left Panel - Form */}
       <div className="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:w-[480px] xl:w-[560px] lg:px-20 xl:px-24">
         <div className="mx-auto w-full max-w-sm lg:w-96">

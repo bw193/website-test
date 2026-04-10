@@ -74,8 +74,8 @@ export default function RFQ() {
   return (
     <div className="bg-stone-50 min-h-screen pt-24 pb-16">
       <SEO 
-        title="Request for Quote (RFQ) | BOLEN Mirror" 
-        description="Contact Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) for OEM/ODM inquiries, custom mirror manufacturing, and bulk orders."
+        title="Request for Quote | BOLEN LED Mirror Manufacturer"
+        description="Contact BOLEN, a leading LED mirror manufacturer, for OEM/ODM inquiries, custom mirror manufacturing, and bulk orders."
         canonicalUrl="https://bolenmirror.com/rfq"
         schema={contactSchema}
       />

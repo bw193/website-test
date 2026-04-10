@@ -19,10 +19,25 @@ export default function OurStory() {
 
   return (
     <div ref={containerRef} className="bg-[#FAF9F6] min-h-screen selection:bg-stone-200 selection:text-stone-900">
-      <SEO 
-        title="Our Story | Jiaxing Chengtai Mirror (BOLEN)" 
-        description="Learn about the history and manufacturing excellence of Jiaxing Chengtai Mirror Co., Ltd. (BOLEN), a leader in OEM LED and smart mirrors since 1995."
+      <SEO
+        title="Our Story | BOLEN LED Mirror Manufacturer"
+        description="Learn about the history and manufacturing excellence of BOLEN (Jiaxing Chengtai Mirror Co., Ltd.), a leading LED mirror manufacturer since 1995 specializing in OEM smart mirrors."
         canonicalUrl="https://bolenmirror.com/our-story"
+        schema={{
+          "@context": "https://schema.org",
+          "@type": "AboutPage",
+          "name": "Our Story — BOLEN LED Mirror Manufacturer",
+          "description": "Learn about the history and manufacturing excellence of BOLEN, a leading LED mirror manufacturer since 1995.",
+          "url": "https://bolenmirror.com/our-story",
+          "mainEntity": {
+            "@type": "Organization",
+            "name": "Jiaxing Chengtai Mirror Co., Ltd. (BOLEN)",
+            "foundingDate": "1995",
+            "url": "https://bolenmirror.com",
+            "numberOfEmployees": { "@type": "QuantitativeValue", "value": 200 },
+            "areaServed": "Worldwide"
+          }
+        }}
       />
       {/* Hero Section */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden bg-stone-900">

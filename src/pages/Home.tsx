@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { ArrowRight, Globe, ShieldCheck, Truck, Factory, Lightbulb, Users, Clock, CheckCircle2, ChevronRight, ChevronLeft, Settings, Palette } from 'lucide-react';
@@ -6,8 +6,9 @@ import { useTranslation, Trans } from 'react-i18next';
 import { supabase } from '../supabase';
 import { AnimatePresence } from 'motion/react';
 import ProductCard from '../components/ProductCard';
-import GlobalMap from '../components/GlobalMap';
 import SEO from '../components/SEO';
+
+const GlobalMap = lazy(() => import('../components/GlobalMap'));
 
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
@@ -140,9 +141,46 @@ export default function Home() {
 
   return (
     <div className="bg-[#FAF9F6] text-stone-800 font-sans overflow-hidden">
-      <SEO />
+      <SEO schema={[
+        {
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          "name": "Jiaxing Chengtai Mirror Co., Ltd. (BOLEN)",
+          "url": "https://bolenmirror.com",
+          "logo": "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/logo.png",
+          "description": "Leading LED mirror manufacturer specializing in OEM LED mirrors, smart mirrors, vanity mirrors, and bath mirrors for global brands.",
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "telephone": "+86-18058603602",
+            "email": "bolen2@cnjxctm.com",
+            "contactType": "customer service",
+            "areaServed": "Worldwide",
+            "availableLanguage": ["en", "zh", "es", "fr", "de", "it"]
+          },
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "No. 1, Building 2, No. 1, Chuangye Road, Wangdian Town",
+            "addressLocality": "Jiaxing",
+            "addressRegion": "Zhejiang",
+            "addressCountry": "CN"
+          },
+          "sameAs": []
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "name": "BOLEN Mirror",
+          "url": "https://bolenmirror.com",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://bolenmirror.com/products?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        }
+      ]} />
       {/* Hero Section */}
       <div className="relative bg-stone-900 min-h-[90vh] flex items-center justify-center overflow-hidden group">
+        <h1 className="sr-only">BOLEN — LED Mirror Manufacturer & OEM Smart Mirror Factory</h1>
         <div className="absolute inset-0">
           <AnimatePresence>
             {heroBgs.length > 0 && (
@@ -154,7 +192,7 @@ export default function Home() {
                 transition={{ duration: 1.5, ease: "easeInOut" }}
                 className="absolute inset-0 w-full h-full object-cover"
                 src={heroBgs[currentBgIndex]}
-                alt="Premium Mirrors"
+                alt="BOLEN LED bathroom mirror manufacturing showcase"
                 referrerPolicy="no-referrer"
                 fetchPriority="high"
                 decoding="async"
@@ -245,7 +283,9 @@ export default function Home() {
             className="relative w-full"
           >
             <div className="aspect-[16/9] lg:aspect-[21/9] rounded-3xl overflow-hidden shadow-xl relative border border-stone-200">
-              <GlobalMap />
+              <Suspense fallback={<div className="w-full h-full bg-stone-200 animate-pulse rounded-3xl" />}>
+                <GlobalMap />
+              </Suspense>
             </div>
             
             {/* Decorative element */}
@@ -541,28 +581,28 @@ export default function Home() {
           <div className="flex animate-marquee whitespace-nowrap w-max">
             {/* First set of images */}
             {[
-              "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/au.png",
-              "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/CE(1)(1).jpg",
-              "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/IP44.jpg",
-              "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/UKCA.jpg",
-              "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/UL2.jpg",
-              "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/ctce.png"
-            ].map((url, idx) => (
+              { url: "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/au.png", alt: "SAA Australia certification" },
+              { url: "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/CE(1)(1).jpg", alt: "CE European conformity certification" },
+              { url: "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/IP44.jpg", alt: "IP44 water and dust resistance rating" },
+              { url: "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/UKCA.jpg", alt: "UKCA United Kingdom conformity certification" },
+              { url: "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/UL2.jpg", alt: "UL safety certification" },
+              { url: "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/ctce.png", alt: "CCC China compulsory certification" }
+            ].map((cert, idx) => (
               <div key={`cert-1-${idx}`} className="mx-8 flex-none w-48 h-32 flex items-center justify-center grayscale hover:grayscale-0 transition-all duration-300">
-                <img src={url} alt={`Certificate ${idx + 1}`} className="max-w-full max-h-full object-contain" width="192" height="128" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
+                <img src={cert.url} alt={cert.alt} className="max-w-full max-h-full object-contain" width="192" height="128" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
               </div>
             ))}
             {/* Duplicate set for seamless scrolling */}
             {[
-              "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/au.png",
-              "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/CE(1)(1).jpg",
-              "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/IP44.jpg",
-              "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/UKCA.jpg",
-              "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/UL2.jpg",
-              "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/ctce.png"
-            ].map((url, idx) => (
+              { url: "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/au.png", alt: "SAA Australia certification" },
+              { url: "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/CE(1)(1).jpg", alt: "CE European conformity certification" },
+              { url: "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/IP44.jpg", alt: "IP44 water and dust resistance rating" },
+              { url: "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/UKCA.jpg", alt: "UKCA United Kingdom conformity certification" },
+              { url: "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/UL2.jpg", alt: "UL safety certification" },
+              { url: "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/ctce.png", alt: "CCC China compulsory certification" }
+            ].map((cert, idx) => (
               <div key={`cert-2-${idx}`} className="mx-8 flex-none w-48 h-32 flex items-center justify-center grayscale hover:grayscale-0 transition-all duration-300">
-                <img src={url} alt={`Certificate ${idx + 1}`} className="max-w-full max-h-full object-contain" width="192" height="128" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
+                <img src={cert.url} alt={cert.alt} className="max-w-full max-h-full object-contain" width="192" height="128" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
               </div>
             ))}
           </div>

@@ -154,30 +154,46 @@ export default function ProductDetail() {
   const slug = product ? product.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') : '';
   const productUrl = product ? `https://bolenmirror.com/products/${slug}-${product.id}` : '';
 
-  const productSchema = product ? {
-    "@context": "https://schema.org/",
-    "@type": "Product",
-    "name": product.title,
-    "image": product.images,
-    "description": product.description,
-    "sku": product.id,
-    "offers": {
-      "@type": "AggregateOffer",
-      "url": productUrl,
-      "priceCurrency": "USD",
-      "lowPrice": product.price_range ? parseFloat(product.price_range.replace(/[^0-9.]/g, '').split('-')[0]) || 0 : 0,
-      "highPrice": product.price_range && product.price_range.includes('-') ? parseFloat(product.price_range.replace(/[^0-9.-]/g, '').split('-')[1]) || 0 : (product.price_range ? parseFloat(product.price_range.replace(/[^0-9.]/g, '')) || 0 : 0),
-      "offerCount": 1
+  const productSchema = product ? [
+    {
+      "@context": "https://schema.org/",
+      "@type": "Product",
+      "name": product.title,
+      "image": product.images,
+      "description": product.description,
+      "sku": product.id,
+      "brand": {
+        "@type": "Brand",
+        "name": "BOLEN"
+      },
+      "offers": {
+        "@type": "AggregateOffer",
+        "url": productUrl,
+        "priceCurrency": "USD",
+        "lowPrice": product.price_range ? parseFloat(product.price_range.replace(/[^0-9.]/g, '').split('-')[0]) || 0 : 0,
+        "highPrice": product.price_range && product.price_range.includes('-') ? parseFloat(product.price_range.replace(/[^0-9.-]/g, '').split('-')[1]) || 0 : (product.price_range ? parseFloat(product.price_range.replace(/[^0-9.]/g, '')) || 0 : 0),
+        "offerCount": 1
+      }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://bolenmirror.com/" },
+        { "@type": "ListItem", "position": 2, "name": "Products", "item": "https://bolenmirror.com/products" },
+        { "@type": "ListItem", "position": 3, "name": product.title, "item": productUrl }
+      ]
     }
-  } : undefined;
+  ] : undefined;
 
   return (
     <div className="bg-[#FAF9F6] min-h-screen py-12">
-      <SEO 
+      <SEO
         title={`${product.title} | BOLEN Mirror`}
         description={product.description || `View details for ${product.title}, a premium mirror from Jiaxing Chengtai Mirror Co., Ltd.`}
         canonicalUrl={productUrl}
         ogImage={product.images?.[0]}
+        ogType="product"
         schema={productSchema}
       />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

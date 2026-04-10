@@ -4,6 +4,7 @@ import { supabase } from '../supabase';
 import { Plus, Edit, Trash2, Loader2, Package, Inbox, Users, Check, X, Settings, LogOut, Search, ChevronRight, Archive } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
+import SEO from '../components/SEO';
 
 interface Product {
   id: string;
@@ -186,6 +187,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-stone-50 pb-12">
+      <SEO title="Admin Dashboard | BOLEN Mirror" noindex={true} />
       {/* Header */}
       <header className="bg-white border-b border-stone-200 sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

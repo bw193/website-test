@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import MDEditor from '@uiw/react-md-editor';
 import '@uiw/react-md-editor/markdown-editor.css';
 import '@uiw/react-markdown-preview/markdown.css';
+import SEO from '../components/SEO';
 
 interface ProductForm {
   title: string;
@@ -243,6 +244,7 @@ export default function AdminProductForm() {
 
   return (
     <div className="min-h-screen bg-stone-50 pb-24">
+      <SEO title="Admin Product Form | BOLEN Mirror" noindex={true} />
       {/* Header */}
       <header className="bg-white border-b border-stone-200 sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

@@ -27,13 +27,15 @@ export default defineConfig(({mode}) => {
     build: {
       rollupOptions: {
         output: {
-          manualChunks: {
-            'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-            'motion': ['motion'],
-            'supabase': ['@supabase/supabase-js'],
-            'i18n': ['i18next', 'react-i18next', 'i18next-browser-languagedetector'],
-            'lucide': ['lucide-react'],
-            'maps': ['react-simple-maps', 'd3-geo']
+          manualChunks(id) {
+            if (id.includes('react-dom') || id.includes('react-router-dom')) return 'react-vendor';
+            if (id.includes('node_modules/react/')) return 'react-vendor';
+            if (id.includes('motion')) return 'motion';
+            if (id.includes('@supabase')) return 'supabase';
+            if (id.includes('i18next')) return 'i18n';
+            if (id.includes('lucide-react')) return 'lucide';
+            if (id.includes('react-simple-maps') || id.includes('d3-geo')) return 'maps';
+            // Don't put md-editor in manualChunks — let it stay in AdminProductForm's lazy chunk
           }
         }
       }

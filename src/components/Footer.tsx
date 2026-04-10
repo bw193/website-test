@@ -1,6 +1,6 @@
 import React from 'react';
 import { Mail, Phone, MapPin, Sparkles } from 'lucide-react';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 export default function Footer() {
   const location = useLocation();
@@ -33,9 +33,9 @@ export default function Footer() {
           <div>
             <h3 className="text-sm font-semibold uppercase tracking-wider mb-4 text-amber-500">Quick Links</h3>
             <ul className="space-y-2 text-stone-400 text-sm">
-              <li><a href="/products" className="hover:text-white transition-colors">Product Catalog</a></li>
-              <li><a href="/#about" className="hover:text-white transition-colors">About Us</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Shipping & Export</a></li>
+              <li><Link to="/products" className="hover:text-white transition-colors">Product Catalog</Link></li>
+              <li><Link to="/our-story" className="hover:text-white transition-colors">Our Story</Link></li>
+              <li><Link to="/rfq" className="hover:text-white transition-colors">Request a Quote</Link></li>
             </ul>
           </div>
         </div>
