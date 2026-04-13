@@ -1,3 +1,4 @@
+import { m } from 'motion/react';
 import React from 'react';
 import {
   ComposableMap,
@@ -6,8 +7,6 @@ import {
   Marker,
   Line
 } from 'react-simple-maps';
-import { motion } from 'motion/react';
-
 const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
 const center: [number, number] = [120.75, 30.75]; // Jiaxing, China
@@ -84,7 +83,7 @@ export default function GlobalMap() {
 
         {destinations.map((dest, i) => (
           <Marker key={`marker-${i}`} coordinates={dest.coordinates}>
-            <motion.circle
+            <m.circle
               r={4}
               fill="transparent"
               stroke={dest.color}
@@ -94,7 +93,7 @@ export default function GlobalMap() {
               viewport={{ once: true }}
               transition={{ delay: 1 + i * 0.1 }}
             />
-            <motion.circle
+            <m.circle
               r={10}
               fill={dest.color}
               className="opacity-20"
@@ -103,7 +102,7 @@ export default function GlobalMap() {
               viewport={{ once: true }}
               transition={{ delay: 1 + i * 0.1, duration: 2, repeat: Infinity }}
             />
-            <motion.rect
+            <m.rect
               x={dest.coordinates[0] < center[0] ? -60 : 10}
               y={-10}
               width={50}
@@ -115,7 +114,7 @@ export default function GlobalMap() {
               viewport={{ once: true }}
               transition={{ delay: 1.2 + i * 0.1 }}
             />
-            <motion.text
+            <m.text
               textAnchor="middle"
               x={dest.coordinates[0] < center[0] ? -35 : 35}
               y={4}
@@ -126,7 +125,7 @@ export default function GlobalMap() {
               transition={{ delay: 1.3 + i * 0.1 }}
             >
               {dest.name}
-            </motion.text>
+            </m.text>
           </Marker>
         ))}
       </ComposableMap>

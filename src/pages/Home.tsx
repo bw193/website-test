@@ -1,10 +1,9 @@
+import { m, AnimatePresence } from 'motion/react';
 import React, { useEffect, useState, lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'motion/react';
 import { ArrowRight, Globe, ShieldCheck, Truck, Factory, Lightbulb, Users, Clock, CheckCircle2, ChevronRight, ChevronLeft, Settings, Palette } from 'lucide-react';
 import { useTranslation, Trans } from 'react-i18next';
 import { supabase } from '../supabase';
-import { AnimatePresence } from 'motion/react';
 import ProductCard from '../components/ProductCard';
 import SEO from '../components/SEO';
 import { optimizeImage } from '../utils/optimizeImage';
@@ -185,7 +184,7 @@ export default function Home() {
         <div className="absolute inset-0">
           <AnimatePresence>
             {heroBgs.length > 0 && (
-              <motion.img
+              <m.img
                 key={currentBgIndex}
                 initial={{ opacity: 0, scale: 1.05 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -223,9 +222,9 @@ export default function Home() {
                 <button
                   key={idx}
                   onClick={() => setCurrentBgIndex(idx)}
-                  className={`w-2.5 h-2.5 rounded-full transition-all ${idx === currentBgIndex ? 'bg-amber-400 w-8' : 'bg-white/50 hover:bg-white/80'}`}
+                  className="p-3"
                   aria-label={`Go to image ${idx + 1}`}
-                />
+                ><span className={`block w-2.5 h-2.5 rounded-full transition-all ${idx === currentBgIndex ? 'bg-amber-400 w-8' : 'bg-white/50 hover:bg-white/80'}`} /></button>
               ))}
             </div>
           </>
@@ -234,7 +233,7 @@ export default function Home() {
 
       {/* Stats Section */}
       <div className="relative -mt-16 z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div 
+        <m.div 
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
@@ -247,21 +246,21 @@ export default function Home() {
             { icon: Lightbulb, value: "200+", label: t('home.stats.styles') },
             { icon: Globe, value: "Global", label: t('home.stats.global') }
           ].map((stat, idx) => (
-            <motion.div key={idx} variants={fadeIn} className="flex flex-col items-center text-center group">
+            <m.div key={idx} variants={fadeIn} className="flex flex-col items-center text-center group">
               <div className="h-14 w-14 rounded-full bg-stone-50 group-hover:bg-amber-50 flex items-center justify-center mb-4 transition-colors duration-300">
                 <stat.icon className="h-7 w-7 text-amber-600" />
               </div>
-              <h3 className="text-3xl font-bold text-stone-900 mb-1 font-serif">{stat.value}</h3>
+              <p className="text-3xl font-bold text-stone-900 mb-1 font-serif">{stat.value}</p>
               <p className="text-xs text-stone-500 uppercase tracking-widest font-semibold">{stat.label}</p>
-            </motion.div>
+            </m.div>
           ))}
-        </motion.div>
+        </m.div>
       </div>
 
       {/* About Section */}
       <div id="about" className="py-24 overflow-hidden bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div 
+          <m.div 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -274,9 +273,9 @@ export default function Home() {
             <p className="text-lg text-stone-600 font-light leading-relaxed">
               Headquartered in Jiaxing, Zhejiang, China—just 60 kilometers from Shanghai—Chengtai has grown into a fully integrated enterprise specializing in the research, development, manufacturing, and global export of premium mirror products.
             </p>
-          </motion.div>
+          </m.div>
           
-          <motion.div 
+          <m.div 
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -292,7 +291,7 @@ export default function Home() {
             {/* Decorative element */}
             <div className="absolute -top-6 -right-6 w-32 h-32 bg-amber-100 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-pulse" />
             <div className="absolute -bottom-6 -left-6 w-40 h-40 bg-stone-200 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-pulse" style={{ animationDelay: '2s' }} />
-          </motion.div>
+          </m.div>
         </div>
       </div>
 
@@ -300,7 +299,7 @@ export default function Home() {
       <div className="py-24 bg-stone-50 text-stone-900 border-t border-stone-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-6">
-            <motion.div 
+            <m.div 
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -311,8 +310,8 @@ export default function Home() {
               <p className="text-lg text-stone-600 font-light">
                 {t('home.collections.desc')}
               </p>
-            </motion.div>
-            <motion.div
+            </m.div>
+            <m.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -321,11 +320,11 @@ export default function Home() {
               <Link to="/products" className="inline-flex items-center text-amber-600 hover:text-amber-700 font-medium transition-colors group">
                 {t('home.collections.viewAll')} <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Link>
-            </motion.div>
+            </m.div>
           </div>
 
           {/* Category Filter */}
-          <motion.div 
+          <m.div 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -354,7 +353,7 @@ export default function Home() {
                 {category}
               </button>
             ))}
-          </motion.div>
+          </m.div>
 
           {isLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -376,7 +375,7 @@ export default function Home() {
           ) : featuredProducts.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {featuredProducts.map((product, idx) => (
-                <motion.div 
+                <m.div 
                   key={product.id}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -392,13 +391,13 @@ export default function Home() {
                     priceRange={product.price_range}
                     msrp={product.msrp}
                   />
-                </motion.div>
+                </m.div>
               ))}
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[300px]">
               <>
-                <motion.div 
+                <m.div 
                   initial={{ opacity: 0, scale: 0.95 }}
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
@@ -418,9 +417,9 @@ export default function Home() {
                       </span>
                     </div>
                   </Link>
-                </motion.div>
+                </m.div>
 
-                <motion.div 
+                <m.div 
                   initial={{ opacity: 0, scale: 0.95 }}
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
@@ -440,9 +439,9 @@ export default function Home() {
                       </span>
                     </div>
                   </Link>
-                </motion.div>
+                </m.div>
 
-                <motion.div 
+                <m.div 
                   initial={{ opacity: 0, scale: 0.95 }}
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
@@ -463,7 +462,7 @@ export default function Home() {
                       {t('home.collections.oem.partner')} <ArrowRight className="ml-2 h-4 w-4" />
                     </span>
                   </Link>
-                </motion.div>
+                </m.div>
               </>
             </div>
           )}
@@ -488,7 +487,7 @@ export default function Home() {
               { step: "03", title: t('home.process.steps.s3.title'), desc: t('home.process.steps.s3.desc') },
               { step: "04", title: t('home.process.steps.s4.title'), desc: t('home.process.steps.s4.desc') }
             ].map((item, idx) => (
-              <motion.div 
+              <m.div 
                 key={idx}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -506,7 +505,7 @@ export default function Home() {
                   <h3 className="text-xl font-bold text-stone-900 mb-2">{item.title}</h3>
                   <p className="text-stone-600 text-sm font-light leading-relaxed">{item.desc}</p>
                 </div>
-              </motion.div>
+              </m.div>
             ))}
           </div>
         </div>
@@ -515,7 +514,7 @@ export default function Home() {
       {/* Why Choose Us */}
       <div className="py-24 bg-stone-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div 
+          <m.div 
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -524,7 +523,7 @@ export default function Home() {
             <h2 className="text-4xl font-serif text-stone-900 sm:text-5xl leading-tight">
               {t('home.whyUs.title1')} <span className="italic text-amber-700">{t('home.whyUs.title2')}</span>
             </h2>
-          </motion.div>
+          </m.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
@@ -533,7 +532,7 @@ export default function Home() {
               { icon: <Palette className="w-8 h-8" />, idx: 2 },
               { icon: <ShieldCheck className="w-8 h-8" />, idx: 3 }
             ].map((item, i) => (
-              <motion.div
+              <m.div
                 key={i}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -550,7 +549,7 @@ export default function Home() {
                 <p className="text-stone-600 leading-relaxed text-sm">
                   {(t('home.whyUs.paragraphs', { returnObjects: true }) as string[])[item.idx]}
                 </p>
-              </motion.div>
+              </m.div>
             ))}
           </div>
         </div>
@@ -617,15 +616,15 @@ export default function Home() {
           <div className="absolute inset-0 bg-stone-900/80" />
         </div>
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <motion.h2 
+          <m.h2 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className="text-4xl font-serif text-white sm:text-5xl mb-6"
           >
             {t('home.cta.title')}
-          </motion.h2>
-          <motion.p 
+          </m.h2>
+          <m.p 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -633,8 +632,8 @@ export default function Home() {
             className="text-xl text-stone-300 font-light mb-10"
           >
             {t('home.cta.desc')}
-          </motion.p>
-          <motion.div 
+          </m.p>
+          <m.div 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -647,7 +646,7 @@ export default function Home() {
             <Link to="/rfq" className="inline-flex justify-center items-center px-8 py-4 border border-stone-300 text-base font-medium rounded-full text-white hover:bg-white/10 transition-colors">
               {t('home.cta.contactSales')}
             </Link>
-          </motion.div>
+          </m.div>
         </div>
       </div>
     </div>

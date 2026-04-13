@@ -10,3 +10,4 @@ coverage/
 lighthouse-*.json
 project_context.md
 website_map.md
+fix_*.cjs

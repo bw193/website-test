@@ -1,5 +1,5 @@
+import { m, useScroll, useTransform } from 'motion/react';
 import React, { useRef } from 'react';
-import { motion, useScroll, useTransform } from 'motion/react';
 import { useTranslation } from 'react-i18next';
 import { ArrowDown, Factory, Globe } from 'lucide-react';
 import SEO from '../components/SEO';
@@ -42,7 +42,7 @@ export default function OurStory() {
       />
       {/* Hero Section */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden bg-stone-900">
-        <motion.div 
+        <m.div 
           style={{ y: heroY, opacity: heroOpacity }}
           className="absolute inset-0 z-0"
         >
@@ -57,10 +57,10 @@ export default function OurStory() {
             fetchPriority="high"
             decoding="async"
           />
-        </motion.div>
+        </m.div>
 
         <div className="relative z-20 text-center px-4 max-w-5xl mx-auto mt-20 flex flex-col items-center">
-          <motion.div
+          <m.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
@@ -69,18 +69,18 @@ export default function OurStory() {
             <span className="px-4 py-1.5 rounded-full border border-white/20 text-white/80 text-xs font-medium tracking-[0.2em] uppercase backdrop-blur-sm">
               {t('ourStoryPage.subtitle')}
             </span>
-          </motion.div>
+          </m.div>
           
-          <motion.h1 
+          <m.h1 
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.2, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
             className="text-6xl sm:text-7xl md:text-8xl lg:text-[10rem] font-serif text-white mb-8 leading-[0.9] tracking-tight"
           >
             {t('ourStoryPage.title')}
-          </motion.h1>
+          </m.h1>
           
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1, delay: 1.2 }}
@@ -88,20 +88,20 @@ export default function OurStory() {
           >
             <span className="text-[10px] uppercase tracking-[0.3em] font-medium">Discover</span>
             <div className="w-px h-12 bg-gradient-to-b from-white/50 to-transparent relative overflow-hidden">
-              <motion.div 
+              <m.div 
                 className="absolute top-0 left-0 w-full h-1/2 bg-white"
                 animate={{ y: ['-100%', '200%'] }}
                 transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
               />
             </div>
-          </motion.div>
+          </m.div>
         </div>
       </section>
 
       {/* Chapter 1: Heritage & Scale */}
       <section className="py-32 md:py-48 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative z-10 bg-[#FAF9F6]">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 items-center">
-          <motion.div 
+          <m.div 
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
@@ -122,10 +122,10 @@ export default function OurStory() {
             <div className="space-y-6 text-lg text-stone-600 font-light leading-relaxed max-w-md">
               <p className="first-letter:text-5xl first-letter:font-serif first-letter:text-stone-900 first-letter:mr-2 first-letter:float-left">{paragraphs[0]}</p>
             </div>
-          </motion.div>
+          </m.div>
 
           <div className="lg:col-span-7 relative">
-            <motion.div 
+            <m.div 
               initial={{ opacity: 0, clipPath: 'inset(10% 10% 10% 10%)', scale: 0.95 }}
               whileInView={{ opacity: 1, clipPath: 'inset(0% 0% 0% 0%)', scale: 1 }}
               viewport={{ once: true, margin: "-100px" }}
@@ -142,10 +142,10 @@ export default function OurStory() {
                 loading="lazy"
                 decoding="async"
               />
-            </motion.div>
+            </m.div>
             
             {/* Floating Stat Card */}
-            <motion.div 
+            <m.div 
               initial={{ opacity: 0, y: 50, x: 50, rotate: 5 }}
               whileInView={{ opacity: 1, y: 0, x: 0, rotate: 0 }}
               viewport={{ once: true }}
@@ -155,7 +155,7 @@ export default function OurStory() {
               <div className="w-12 h-px bg-amber-600 mb-8"></div>
               <p className="text-6xl font-serif text-white mb-4">50k<span className="text-amber-500">+</span></p>
               <p className="text-xs text-stone-400 uppercase tracking-[0.2em] font-medium leading-relaxed">Sq. Meters of<br/>Production Space</p>
-            </motion.div>
+            </m.div>
           </div>
         </div>
       </section>
@@ -168,7 +168,7 @@ export default function OurStory() {
             {/* Sticky Text Content */}
             <div className="lg:col-span-5 order-1 lg:order-2">
               <div className="sticky top-32 space-y-10">
-                <motion.div 
+                <m.div 
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
@@ -178,9 +178,9 @@ export default function OurStory() {
                   <span className="text-stone-300 font-serif text-6xl leading-none">02</span>
                   <div className="h-px w-16 bg-stone-300"></div>
                   <span className="text-stone-500 font-medium tracking-[0.2em] uppercase text-xs">Process</span>
-                </motion.div>
+                </m.div>
                 
-                <motion.h2 
+                <m.h2 
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
@@ -189,9 +189,9 @@ export default function OurStory() {
                 >
                   Vertical integration <br/>
                   <span className="italic text-stone-500 font-light">under one roof.</span>
-                </motion.h2>
+                </m.h2>
                 
-                <motion.div 
+                <m.div 
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
@@ -199,7 +199,7 @@ export default function OurStory() {
                   className="space-y-6 text-lg text-stone-600 font-light leading-relaxed"
                 >
                   <p>{paragraphs[1]}</p>
-                </motion.div>
+                </m.div>
               </div>
             </div>
 
@@ -207,7 +207,7 @@ export default function OurStory() {
             <div className="lg:col-span-7 order-2 lg:order-1">
               <div className="grid grid-cols-2 gap-4 md:gap-8">
                 <div className="space-y-4 md:space-y-8 mt-12 md:mt-24">
-                  <motion.div 
+                  <m.div 
                     initial={{ opacity: 0, y: 50, scale: 0.95 }}
                     whileInView={{ opacity: 1, y: 0, scale: 1 }}
                     viewport={{ once: true, margin: "-50px" }}
@@ -215,8 +215,8 @@ export default function OurStory() {
                     className="aspect-[3/4] overflow-hidden bg-stone-200 rounded-3xl shadow-xl"
                   >
                     <img src="https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/factory2.jpg" alt="Production Detail" className="w-full h-full object-cover hover:scale-110 transition-transform duration-1000" width="1000" height="1333" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
-                  </motion.div>
-                  <motion.div 
+                  </m.div>
+                  <m.div 
                     initial={{ opacity: 0, y: 50, scale: 0.95 }}
                     whileInView={{ opacity: 1, y: 0, scale: 1 }}
                     viewport={{ once: true, margin: "-50px" }}
@@ -224,10 +224,10 @@ export default function OurStory() {
                     className="aspect-square overflow-hidden bg-stone-200 rounded-3xl shadow-xl"
                   >
                     <img src="https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/factory3.jpg" alt="Materials" className="w-full h-full object-cover hover:scale-110 transition-transform duration-1000" width="1000" height="1000" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
-                  </motion.div>
+                  </m.div>
                 </div>
                 <div className="space-y-4 md:space-y-8">
-                  <motion.div 
+                  <m.div 
                     initial={{ opacity: 0, y: 50, scale: 0.95 }}
                     whileInView={{ opacity: 1, y: 0, scale: 1 }}
                     viewport={{ once: true, margin: "-50px" }}
@@ -235,8 +235,8 @@ export default function OurStory() {
                     className="aspect-square overflow-hidden bg-stone-200 rounded-3xl shadow-xl"
                   >
                     <img src="https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/factory4.jpg" alt="Quality Control" className="w-full h-full object-cover hover:scale-110 transition-transform duration-1000" width="1000" height="1000" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
-                  </motion.div>
-                  <motion.div 
+                  </m.div>
+                  <m.div 
                     initial={{ opacity: 0, y: 50, scale: 0.95 }}
                     whileInView={{ opacity: 1, y: 0, scale: 1 }}
                     viewport={{ once: true, margin: "-50px" }}
@@ -244,7 +244,7 @@ export default function OurStory() {
                     className="aspect-[3/4] overflow-hidden bg-stone-200 rounded-3xl shadow-xl"
                   >
                     <img src="https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/factory5.jpg" alt="Finished Product" className="w-full h-full object-cover hover:scale-110 transition-transform duration-1000" width="1000" height="1333" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
-                  </motion.div>
+                  </m.div>
                 </div>
               </div>
             </div>
@@ -256,7 +256,7 @@ export default function OurStory() {
       {/* Chapter 3: Innovation & Partnership */}
       <section className="py-32 md:py-48 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="text-center max-w-3xl mx-auto mb-24">
-          <motion.div 
+          <m.div 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -265,8 +265,8 @@ export default function OurStory() {
             <div className="h-px w-12 bg-stone-300"></div>
             <span className="text-stone-500 font-medium tracking-[0.2em] uppercase text-xs">03 / The Future</span>
             <div className="h-px w-12 bg-stone-300"></div>
-          </motion.div>
-          <motion.h2 
+          </m.div>
+          <m.h2 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -275,11 +275,11 @@ export default function OurStory() {
           >
             Building partnerships <br/>
             <span className="italic text-stone-500 font-light">that last.</span>
-          </motion.h2>
+          </m.h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
-          <motion.div 
+          <m.div 
             initial={{ opacity: 0, y: 40, rotateX: -10 }}
             whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
             viewport={{ once: true }}
@@ -293,9 +293,9 @@ export default function OurStory() {
             <p className="text-lg text-stone-600 font-light leading-relaxed">
               {paragraphs[2]}
             </p>
-          </motion.div>
+          </m.div>
 
-          <motion.div 
+          <m.div 
             initial={{ opacity: 0, y: 40, rotateX: -10 }}
             whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
             viewport={{ once: true }}
@@ -309,7 +309,7 @@ export default function OurStory() {
             <p className="text-lg text-stone-600 font-light leading-relaxed">
               {paragraphs[3]}
             </p>
-          </motion.div>
+          </m.div>
         </div>
       </section>
     </div>

@@ -11,6 +11,8 @@ import Footer from './components/Footer';
 import ScrollToTop from './components/ScrollToTop';
 import { hasSupabaseConfig } from './supabase';
 import Home from './pages/Home';
+import { LazyMotion, domAnimation } from 'motion/react';
+
 
 // Lazy load pages for better performance
 const Products = lazy(() => import('./pages/Products'));
@@ -33,8 +35,9 @@ const PageLoader = () => (
 export default function App() {
   return (
     <AuthProvider>
-      <Router>
-        <ScrollToTop />
+      <LazyMotion features={domAnimation}>
+        <Router>
+          <ScrollToTop />
         <div className="min-h-screen flex flex-col font-sans text-gray-900 bg-gray-50">
           <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100] focus:bg-amber-500 focus:text-white focus:px-4 focus:py-2 focus:rounded-md focus:text-sm focus:font-medium">
             Skip to content
@@ -69,6 +72,7 @@ export default function App() {
           <Footer />
         </div>
       </Router>
+      </LazyMotion>
     </AuthProvider>
   );
 }

@@ -1,5 +1,5 @@
+import { m } from 'motion/react';
 import React, { useState } from 'react';
-import { motion } from 'motion/react';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { CheckCircle2, Mail, Phone, MapPin } from 'lucide-react';
@@ -81,26 +81,26 @@ export default function RFQ() {
       />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <motion.h1 
+          <m.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="text-4xl font-serif text-stone-900 sm:text-5xl mb-4"
           >
             {t('productDetail.requestQuote')}
-          </motion.h1>
-          <motion.p 
+          </m.h1>
+          <m.p 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
             className="text-lg text-stone-600 font-light"
           >
             Interested in wholesale pricing, custom orders, or OEM/ODM services? Send us an inquiry and our sales team will respond within 24 hours.
-          </motion.p>
+          </m.p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           {/* Contact Information */}
-          <motion.div 
+          <m.div 
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
@@ -138,10 +138,10 @@ export default function RFQ() {
                 </div>
               </div>
             </div>
-          </motion.div>
+          </m.div>
 
           {/* RFQ Form */}
-          <motion.div 
+          <m.div 
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.3 }}
@@ -151,7 +151,7 @@ export default function RFQ() {
               <div className="absolute top-0 right-0 w-32 h-32 bg-amber-100 rounded-bl-full -z-10 opacity-50"></div>
               
               {rfqStatus === 'success' ? (
-                <motion.div 
+                <m.div 
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   className="bg-green-50 border border-green-200 rounded-2xl p-12 flex flex-col items-center text-center h-full justify-center"
@@ -162,7 +162,7 @@ export default function RFQ() {
                   <h3 className="text-2xl font-bold text-green-900 mb-2">Inquiry Sent Successfully!</h3>
                   <p className="text-green-700 text-lg">{t('productDetail.rfqSuccess')}</p>
                   <button onClick={() => setRfqStatus('idle')} className="mt-8 px-6 py-3 bg-green-600 text-white rounded-full font-medium hover:bg-green-700 transition-colors">Send another inquiry</button>
-                </motion.div>
+                </m.div>
               ) : (
                 <form onSubmit={handleSubmit(onSubmitRFQ)} className="space-y-6 relative z-10">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -242,7 +242,7 @@ export default function RFQ() {
                 </form>
               )}
             </div>
-          </motion.div>
+          </m.div>
         </div>
       </div>
     </div>

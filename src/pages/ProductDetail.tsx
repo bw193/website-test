@@ -1,10 +1,10 @@
+import { m, AnimatePresence } from 'motion/react';
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { supabase } from '../supabase';
 import { useForm } from 'react-hook-form';
 import { Loader2, CheckCircle2, ChevronLeft, ChevronRight, ArrowLeft, Send, ShieldCheck, Truck, Clock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { motion, AnimatePresence } from 'motion/react';
 import ReactMarkdown from 'react-markdown';
 import SEO from '../components/SEO';
 import { optimizeImage } from '../utils/optimizeImage';
@@ -199,7 +199,7 @@ export default function ProductDetail() {
       />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Breadcrumb Navigation */}
-        <motion.div 
+        <m.div 
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           className="mb-8 flex items-center text-sm font-medium text-stone-500"
@@ -209,19 +209,19 @@ export default function ProductDetail() {
           <Link to="/products" className="hover:text-amber-600 transition-colors">{t('productDetail.backToCatalog')}</Link>
           <ChevronRight className="mx-2 h-4 w-4 text-stone-300" />
           <span className="text-stone-900 truncate max-w-[200px] sm:max-w-none">{product.title}</span>
-        </motion.div>
+        </m.div>
 
         <div className="lg:grid lg:grid-cols-2 lg:gap-x-12 xl:gap-x-16">
           {/* Left Column: Image Gallery (Sticky) */}
           <div className="flex flex-col lg:sticky lg:top-24 lg:self-start">
-            <motion.div 
+            <m.div 
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5 }}
               className="relative aspect-w-4 aspect-h-5 sm:aspect-w-1 sm:aspect-h-1 w-full rounded-2xl overflow-hidden bg-white shadow-sm border border-stone-200 group"
             >
               <AnimatePresence mode="wait">
-                <motion.img
+                <m.img
                   key={currentImageIndex}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -256,11 +256,11 @@ export default function ProductDetail() {
                   </button>
                 </>
               )}
-            </motion.div>
+            </m.div>
             
             {/* Thumbnails */}
             {product.images.length > 1 && (
-              <motion.div 
+              <m.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
@@ -279,40 +279,40 @@ export default function ProductDetail() {
                     <img src={optimizeImage(img, { width: 160, height: 160 })} alt={`Thumbnail ${idx}`} className="w-full h-full object-cover" width="160" height="160" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
                   </button>
                 ))}
-              </motion.div>
+              </m.div>
             )}
           </div>
 
           {/* Right Column: Product Info & RFQ */}
-          <motion.div 
+          <m.div 
             variants={staggerContainer}
             initial="hidden"
             animate="visible"
             className="mt-10 px-4 sm:px-0 lg:mt-0"
           >
             {product.category && (
-              <motion.p variants={fadeInUp} className="text-sm font-bold text-amber-600 uppercase tracking-widest mb-2">
+              <m.p variants={fadeInUp} className="text-sm font-bold text-amber-600 uppercase tracking-widest mb-2">
                 {product.category}
-              </motion.p>
+              </m.p>
             )}
-            <motion.h1 variants={fadeInUp} className="text-3xl font-extrabold tracking-tight text-stone-900 sm:text-4xl lg:text-5xl leading-tight">
+            <m.h1 variants={fadeInUp} className="text-3xl font-extrabold tracking-tight text-stone-900 sm:text-4xl lg:text-5xl leading-tight">
               {product.title}
-            </motion.h1>
+            </m.h1>
             
             {(product.price_range || product.msrp) && (
-              <motion.div variants={fadeInUp} className="mt-6 flex items-baseline gap-4">
+              <m.div variants={fadeInUp} className="mt-6 flex items-baseline gap-4">
                 {product.price_range && <div className="text-3xl font-bold text-stone-900">{formatPrice(product.price_range)}</div>}
                 {product.msrp && <div className="text-lg text-stone-500 line-through decoration-stone-300">{t('products.msrp')}: {formatPrice(product.msrp)}</div>}
-              </motion.div>
+              </m.div>
             )}
 
-            <motion.div variants={fadeInUp} className="mt-8">
+            <m.div variants={fadeInUp} className="mt-8">
               <h3 className="sr-only">Description</h3>
               <p className="text-lg text-stone-600 leading-relaxed font-light">{product.description}</p>
-            </motion.div>
+            </m.div>
 
             {/* Value Props */}
-            <motion.div variants={fadeInUp} className="mt-8 grid grid-cols-2 gap-4 py-6 border-y border-stone-200">
+            <m.div variants={fadeInUp} className="mt-8 grid grid-cols-2 gap-4 py-6 border-y border-stone-200">
               <div className="flex items-center gap-3 text-stone-700">
                 <ShieldCheck className="w-5 h-5 text-amber-600" />
                 <span className="text-sm font-medium">Premium Quality</span>
@@ -329,10 +329,10 @@ export default function ProductDetail() {
                 <CheckCircle2 className="w-5 h-5 text-amber-600" />
                 <span className="text-sm font-medium">OEM/ODM Available</span>
               </div>
-            </motion.div>
+            </m.div>
 
             {product.specifications && (Array.isArray(product.specifications) ? product.specifications.length > 0 : Object.keys(product.specifications).length > 0) && (
-              <motion.div variants={fadeInUp} className="mt-10">
+              <m.div variants={fadeInUp} className="mt-10">
                 <h3 className="text-xl font-bold text-stone-900 mb-6 flex items-center gap-2">
                   <span className="w-1.5 h-6 bg-amber-600 rounded-full"></span>
                   {t('productDetail.specifications')}
@@ -350,11 +350,11 @@ export default function ProductDetail() {
                     ))}
                   </ul>
                 </div>
-              </motion.div>
+              </m.div>
             )}
 
             {product.details && (
-              <motion.div variants={fadeInUp} className="mt-10">
+              <m.div variants={fadeInUp} className="mt-10">
                 <h3 className="text-xl font-bold text-stone-900 mb-6 flex items-center gap-2">
                   <span className="w-1.5 h-6 bg-amber-600 rounded-full"></span>
                   {t('productDetail.productDetails')}
@@ -362,17 +362,17 @@ export default function ProductDetail() {
                 <div className="prose prose-amber prose-stone max-w-none text-stone-600 leading-relaxed bg-white p-6 rounded-2xl border border-stone-200 shadow-sm">
                   <ReactMarkdown>{product.details}</ReactMarkdown>
                 </div>
-              </motion.div>
+              </m.div>
             )}
 
             {/* RFQ Form */}
-            <motion.div variants={fadeInUp} className="mt-12 bg-white rounded-3xl p-8 border border-stone-200 shadow-xl shadow-stone-200/50 relative overflow-hidden">
+            <m.div variants={fadeInUp} className="mt-12 bg-white rounded-3xl p-8 border border-stone-200 shadow-xl shadow-stone-200/50 relative overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 bg-amber-100 rounded-bl-full -z-10 opacity-50"></div>
               <h2 className="text-2xl font-bold text-stone-900 mb-3">{t('productDetail.requestQuote')}</h2>
               <p className="text-stone-500 mb-8 text-sm leading-relaxed max-w-md">Interested in wholesale pricing or custom orders? Send us an inquiry and our sales team will respond within 24 hours.</p>
               
               {rfqStatus === 'success' ? (
-                <motion.div 
+                <m.div 
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   className="bg-green-50 border border-green-200 rounded-2xl p-8 flex flex-col items-center text-center"
@@ -383,7 +383,7 @@ export default function ProductDetail() {
                   <h3 className="text-xl font-bold text-green-900 mb-2">Inquiry Sent Successfully!</h3>
                   <p className="text-green-700">{t('productDetail.rfqSuccess')}</p>
                   <button onClick={() => setRfqStatus('idle')} className="mt-6 text-sm font-medium text-green-700 hover:text-green-800 underline underline-offset-4">Send another inquiry</button>
-                </motion.div>
+                </m.div>
               ) : (
                 <form onSubmit={handleSubmit(onSubmitRFQ)} className="space-y-5 relative z-10">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -445,8 +445,8 @@ export default function ProductDetail() {
                   </button>
                 </form>
               )}
-            </motion.div>
-          </motion.div>
+            </m.div>
+          </m.div>
         </div>
       </div>
     </div>

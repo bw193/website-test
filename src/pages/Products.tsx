@@ -1,9 +1,9 @@
+import { m, AnimatePresence } from 'motion/react';
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabase';
 import ProductCard from '../components/ProductCard';
 import { Loader2, Search, SlidersHorizontal, PackageX } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { motion, AnimatePresence } from 'motion/react';
 import SEO from '../components/SEO';
 
 interface Product {
@@ -107,22 +107,22 @@ export default function Products() {
         <div className="absolute inset-0 bg-gradient-to-b from-stone-900/50 to-stone-900" />
         
         <div className="relative max-w-7xl mx-auto text-center">
-          <motion.h1 
+          <m.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             className="text-4xl md:text-5xl font-extrabold tracking-tight mb-6"
           >
             {t('products.catalog')}
-          </motion.h1>
-          <motion.p 
+          </m.h1>
+          <m.p 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
             className="text-lg md:text-xl text-stone-300 max-w-2xl mx-auto font-light"
           >
             {t('products.desc')}
-          </motion.p>
+          </m.p>
         </div>
       </div>
 
@@ -194,7 +194,7 @@ export default function Products() {
         ) : (
           <AnimatePresence mode="wait">
             {filteredProducts.length === 0 ? (
-              <motion.div 
+              <m.div 
                 key="empty"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -227,9 +227,9 @@ export default function Products() {
                     </button>
                   </div>
                 )}
-              </motion.div>
+              </m.div>
             ) : (
-              <motion.div 
+              <m.div 
                 key="grid"
                 className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-10"
                 initial="hidden"
@@ -243,7 +243,7 @@ export default function Products() {
                 }}
               >
                 {filteredProducts.map((product) => (
-                  <motion.div
+                  <m.div
                     key={product.id}
                     variants={{
                       hidden: { opacity: 0, y: 20 },
@@ -259,9 +259,9 @@ export default function Products() {
                       priceRange={product.price_range}
                       msrp={product.msrp}
                     />
-                  </motion.div>
+                  </m.div>
                 ))}
-              </motion.div>
+              </m.div>
             )}
           </AnimatePresence>
         )}
