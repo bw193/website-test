@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'motion/react';
 import ReactMarkdown from 'react-markdown';
 import SEO from '../components/SEO';
+import { optimizeImage } from '../utils/optimizeImage';
 
 interface Product {
   id: string;
@@ -226,7 +227,7 @@ export default function ProductDetail() {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.3 }}
-                  src={product.images[currentImageIndex] || 'https://picsum.photos/seed/mirror/800/800'}
+                  src={optimizeImage(product.images[currentImageIndex], { width: 800 }) || 'https://picsum.photos/seed/mirror/800/800'}
                   alt={product.title}
                   className="w-full h-full object-center object-cover"
                   width="800"
@@ -275,7 +276,7 @@ export default function ProductDetail() {
                         : 'border border-stone-200 hover:border-amber-300 hover:shadow-md'
                     }`}
                   >
-                    <img src={img} alt={`Thumbnail ${idx}`} className="w-full h-full object-cover" width="160" height="160" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
+                    <img src={optimizeImage(img, { width: 160, height: 160 })} alt={`Thumbnail ${idx}`} className="w-full h-full object-cover" width="160" height="160" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
                   </button>
                 ))}
               </motion.div>

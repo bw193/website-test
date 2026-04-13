@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowRight } from 'lucide-react';
+import { optimizeImage, imageSrcSet } from '../utils/optimizeImage';
 
 interface ProductCardProps {
   id: string;
@@ -30,12 +31,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ id, title, description, image
         {/* Image Container */}
         <div className="relative aspect-[4/5] overflow-hidden bg-stone-100">
           <img
-            src={image || 'https://picsum.photos/seed/mirror/400/500'}
+            src={optimizeImage(image, { width: 400 }) || 'https://picsum.photos/seed/mirror/400/500'}
+            srcSet={imageSrcSet(image, [300, 400, 600])}
             alt={title}
             className="w-full h-full object-center object-cover transition-transform duration-700 group-hover:scale-105"
             width="400"
             height="500"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             referrerPolicy="no-referrer"
             loading="lazy"
             decoding="async"

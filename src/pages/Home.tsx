@@ -7,6 +7,7 @@ import { supabase } from '../supabase';
 import { AnimatePresence } from 'motion/react';
 import ProductCard from '../components/ProductCard';
 import SEO from '../components/SEO';
+import { optimizeImage } from '../utils/optimizeImage';
 
 const GlobalMap = lazy(() => import('../components/GlobalMap'));
 
@@ -191,7 +192,7 @@ export default function Home() {
                 exit={{ opacity: 0 }}
                 transition={{ duration: 1.5, ease: "easeInOut" }}
                 className="absolute inset-0 w-full h-full object-cover"
-                src={heroBgs[currentBgIndex]}
+                src={optimizeImage(heroBgs[currentBgIndex], { width: 1920, quality: 85 })}
                 alt="BOLEN LED bathroom mirror manufacturing showcase"
                 referrerPolicy="no-referrer"
                 fetchPriority="high"
@@ -589,7 +590,7 @@ export default function Home() {
               { url: "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/ctce.png", alt: "CCC China compulsory certification" }
             ].map((cert, idx) => (
               <div key={`cert-1-${idx}`} className="mx-8 flex-none w-48 h-32 flex items-center justify-center grayscale hover:grayscale-0 transition-all duration-300">
-                <img src={cert.url} alt={cert.alt} className="max-w-full max-h-full object-contain" width="192" height="128" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
+                <img src={optimizeImage(cert.url, { width: 192, height: 128 })} alt={cert.alt} className="max-w-full max-h-full object-contain" width="192" height="128" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
               </div>
             ))}
             {/* Duplicate set for seamless scrolling */}
@@ -602,7 +603,7 @@ export default function Home() {
               { url: "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/ctce.png", alt: "CCC China compulsory certification" }
             ].map((cert, idx) => (
               <div key={`cert-2-${idx}`} className="mx-8 flex-none w-48 h-32 flex items-center justify-center grayscale hover:grayscale-0 transition-all duration-300">
-                <img src={cert.url} alt={cert.alt} className="max-w-full max-h-full object-contain" width="192" height="128" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
+                <img src={optimizeImage(cert.url, { width: 192, height: 128 })} alt={cert.alt} className="max-w-full max-h-full object-contain" width="192" height="128" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
               </div>
             ))}
           </div>

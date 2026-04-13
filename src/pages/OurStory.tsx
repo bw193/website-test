@@ -3,6 +3,7 @@ import { motion, useScroll, useTransform } from 'motion/react';
 import { useTranslation } from 'react-i18next';
 import { ArrowDown, Factory, Globe } from 'lucide-react';
 import SEO from '../components/SEO';
+import { optimizeImage } from '../utils/optimizeImage';
 
 export default function OurStory() {
   const { t } = useTranslation();
@@ -47,7 +48,7 @@ export default function OurStory() {
         >
           <div className="absolute inset-0 bg-gradient-to-b from-stone-900/60 via-stone-900/40 to-stone-900/80 z-10 mix-blend-multiply" />
           <img 
-            src="https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/building.jpg" 
+            src={optimizeImage("https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/building.jpg", { width: 1920, quality: 85 })}
             alt="Factory Building" 
             className="w-full h-full object-cover object-center scale-105"
             width="1920"
