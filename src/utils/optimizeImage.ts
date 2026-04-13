@@ -7,7 +7,7 @@
  * and appends width/format/quality params for WebP serving.
  */
 
-const TRANSFORMS_ENABLED = false;
+const TRANSFORMS_ENABLED = true;
 
 export function optimizeImage(
   url: string | undefined | null,
@@ -27,8 +27,7 @@ export function optimizeImage(
   const params = new URLSearchParams();
   if (width) params.set('width', String(width));
   if (height) params.set('height', String(height));
-  params.set('format', 'webp');
-  params.set('quality', String(quality));
+  if (quality !== 80) params.set('quality', String(quality));
 
   transformed += (transformed.includes('?') ? '&' : '?') + params.toString();
   return transformed;
