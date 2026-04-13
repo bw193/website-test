@@ -7,7 +7,7 @@
  * and appends width/format/quality params for WebP serving.
  */
 
-const TRANSFORMS_ENABLED = true;
+const TRANSFORMS_ENABLED = false;
 
 export function optimizeImage(
   url: string | undefined | null,
