@@ -1,7 +1,8 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import LanguageDetector from 'i18next-browser-languagedetector';
 import { en } from './locales/en';
+
+const SUPPORTED_LANGUAGES = ['en', 'zh', 'es', 'fr', 'de', 'it'];
 
 const localeLoaders: Record<string, () => Promise<{ [key: string]: any }>> = {
   zh: () => import('./locales/zh').then(m => m.zh),
@@ -11,20 +12,26 @@ const localeLoaders: Record<string, () => Promise<{ [key: string]: any }>> = {
   it: () => import('./locales/it').then(m => m.it),
 };
 
+// Detect language from URL path (e.g., /zh/products → zh)
+function detectLangFromUrl(): string {
+  const firstSegment = window.location.pathname.split('/')[1];
+  return SUPPORTED_LANGUAGES.includes(firstSegment) ? firstSegment : 'en';
+}
+
 i18n
-  .use(LanguageDetector)
   .use(initReactI18next)
   .init({
     resources: {
       en,
     },
+    lng: detectLangFromUrl(),
     fallbackLng: 'en',
     interpolation: {
       escapeValue: false
     }
   });
 
-// Load detected language bundle if not English
+// Lazy-load non-English language bundles
 const loadLanguage = async (lng: string) => {
   const code = lng.split('-')[0];
   if (code !== 'en' && localeLoaders[code] && !i18n.hasResourceBundle(code, 'translation')) {

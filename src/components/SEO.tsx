@@ -1,31 +1,31 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { useTranslation } from 'react-i18next';
+import { useCurrentLang, SUPPORTED_LANGUAGES } from '../hooks/useLocalizedPath';
 
 interface SEOProps {
   title?: string;
   description?: string;
-  canonicalUrl?: string;
+  /** Path without language prefix, e.g. "/products" or "/" */
+  path?: string;
   ogImage?: string;
   ogType?: string;
   schema?: any | any[];
   noindex?: boolean;
 }
 
+const SITE_URL = 'https://bolenmirror.com';
+
 export default function SEO({
   title = 'BOLEN Mirror | LED Mirror Manufacturer & OEM Smart Mirror Factory',
   description = 'BOLEN (Jiaxing Chengtai Mirror Co., Ltd.) is a leading LED mirror manufacturer specializing in OEM LED mirrors, smart mirrors, vanity mirrors, and bath mirrors for global brands.',
-  canonicalUrl = 'https://bolenmirror.com/',
+  path = '/',
   ogImage = 'https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-images/site-assets/1773994889396-9i4t1ap.jpg',
   ogType = 'website',
   schema,
   noindex = false
 }: SEOProps) {
-  const { i18n } = useTranslation();
-  const currentLang = i18n.language || 'en';
-  const languages = ['en', 'zh', 'es', 'fr', 'de', 'it'];
-
-  const baseUrl = canonicalUrl.split('?')[0];
+  const currentLang = useCurrentLang();
+  const canonicalUrl = `${SITE_URL}/${currentLang}${path === '/' ? '' : path}`;
 
   return (
     <Helmet>
@@ -35,18 +35,18 @@ export default function SEO({
       {noindex && <meta name="robots" content="noindex, nofollow" />}
       <link rel="canonical" href={canonicalUrl} />
 
-      {languages.map((lang) => (
+      {SUPPORTED_LANGUAGES.map((lang) => (
         <link
           key={lang}
           rel="alternate"
           hrefLang={lang}
-          href={`${baseUrl}?lng=${lang}`}
+          href={`${SITE_URL}/${lang}${path === '/' ? '' : path}`}
         />
       ))}
       <link
         rel="alternate"
         hrefLang="x-default"
-        href={baseUrl}
+        href={`${SITE_URL}/en${path === '/' ? '' : path}`}
       />
 
       {/* Open Graph / Facebook */}

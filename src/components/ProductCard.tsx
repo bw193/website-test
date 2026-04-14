@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowRight } from 'lucide-react';
 import { optimizeImage, imageSrcSet } from '../utils/optimizeImage';
+import { useLocalizedPath } from '../hooks/useLocalizedPath';
 
 interface ProductCardProps {
   id: string;
@@ -16,13 +17,14 @@ interface ProductCardProps {
 
 const ProductCard: React.FC<ProductCardProps> = ({ id, title, description, image, category, priceRange, msrp }) => {
   const { t } = useTranslation();
+  const { lp } = useLocalizedPath();
   const formatPrice = (val?: string) => {
     if (!val) return '';
     return val.startsWith('$') ? val : `$${val}`;
   };
 
   const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-  const productUrl = `/products/${slug}-${id}`;
+  const productUrl = lp(`/products/${slug}-${id}`);
 
   return (
     <Link to={productUrl} className="group block h-full">

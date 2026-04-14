@@ -7,6 +7,7 @@ import { supabase } from '../supabase';
 import ProductCard from '../components/ProductCard';
 import SEO from '../components/SEO';
 import { optimizeImage } from '../utils/optimizeImage';
+import { useLocalizedPath } from '../hooks/useLocalizedPath';
 
 const GlobalMap = lazy(() => import('../components/GlobalMap'));
 
@@ -27,6 +28,7 @@ const staggerContainer = {
 
 export default function Home() {
   const { t } = useTranslation();
+  const { lp } = useLocalizedPath();
   const [heroBgs, setHeroBgs] = useState<string[]>([
     "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-images/site-assets/1773994889396-9i4t1ap.jpg"
   ]);
@@ -317,7 +319,7 @@ export default function Home() {
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
             >
-              <Link to="/products" className="inline-flex items-center text-amber-600 hover:text-amber-700 font-medium transition-colors group">
+              <Link to={lp('/products')} className="inline-flex items-center text-amber-600 hover:text-amber-700 font-medium transition-colors group">
                 {t('home.collections.viewAll')} <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Link>
             </m.div>
@@ -403,7 +405,7 @@ export default function Home() {
                   viewport={{ once: true }}
                   className="md:col-span-2 md:row-span-2 relative rounded-3xl overflow-hidden group cursor-pointer"
                 >
-                  <Link to="/products" className="block w-full h-full">
+                  <Link to={lp('/products')} className="block w-full h-full">
                     <img src="https://picsum.photos/seed/smart-mirror/800/600" alt="Smart Mirrors" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" width="800" height="600" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-90 group-hover:opacity-100 transition-opacity duration-500" />
                     <div className="absolute bottom-0 left-0 p-8 md:p-12 w-full text-white">
@@ -426,7 +428,7 @@ export default function Home() {
                   transition={{ delay: 0.2 }}
                   className="relative rounded-3xl overflow-hidden group cursor-pointer"
                 >
-                  <Link to="/products" className="block w-full h-full">
+                  <Link to={lp('/products')} className="block w-full h-full">
                     <img src="https://picsum.photos/seed/vanity-mirror/400/400" alt="Vanity Mirrors" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" width="400" height="400" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-90 group-hover:opacity-100 transition-opacity duration-500" />
                     <div className="absolute bottom-0 left-0 p-8 w-full text-white">
@@ -448,7 +450,7 @@ export default function Home() {
                   transition={{ delay: 0.4 }}
                   className="relative rounded-3xl overflow-hidden group cursor-pointer bg-white p-8 flex flex-col justify-between border border-stone-200 hover:border-amber-500/50 hover:shadow-lg transition-all"
                 >
-                  <Link to="/products" className="block w-full h-full flex flex-col justify-between">
+                  <Link to={lp('/products')} className="block w-full h-full flex flex-col justify-between">
                     <div>
                       <div className="h-12 w-12 rounded-full bg-stone-100 flex items-center justify-center mb-6">
                         <Factory className="h-6 w-6 text-amber-600" />
@@ -640,10 +642,10 @@ export default function Home() {
             transition={{ delay: 0.2 }}
             className="flex flex-col sm:flex-row justify-center gap-4"
           >
-            <Link to="/products" className="inline-flex justify-center items-center px-8 py-4 border border-transparent text-base font-medium rounded-full text-stone-900 bg-amber-400 hover:bg-amber-500 transition-colors">
+            <Link to={lp('/products')} className="inline-flex justify-center items-center px-8 py-4 border border-transparent text-base font-medium rounded-full text-stone-900 bg-amber-400 hover:bg-amber-500 transition-colors">
               {t('home.cta.viewCatalog')}
             </Link>
-            <Link to="/rfq" className="inline-flex justify-center items-center px-8 py-4 border border-stone-300 text-base font-medium rounded-full text-white hover:bg-white/10 transition-colors">
+            <Link to={lp('/rfq')} className="inline-flex justify-center items-center px-8 py-4 border border-stone-300 text-base font-medium rounded-full text-white hover:bg-white/10 transition-colors">
               {t('home.cta.contactSales')}
             </Link>
           </m.div>

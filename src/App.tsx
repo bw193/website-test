@@ -4,11 +4,12 @@
  */
 
 import React, { Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ScrollToTop from './components/ScrollToTop';
+import LanguageLayout from './components/LanguageLayout';
 import { hasSupabaseConfig } from './supabase';
 import Home from './pages/Home';
 import { LazyMotion, domAnimation } from 'motion/react';
@@ -51,14 +52,20 @@ export default function App() {
           <main id="main-content" className="flex-1 flex flex-col">
             <Suspense fallback={<PageLoader />}>
               <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/our-story" element={<OurStory />} />
-                <Route path="/products" element={<Products />} />
-                <Route path="/products/:id" element={<ProductDetail />} />
-                <Route path="/rfq" element={<RFQ />} />
-                
+                {/* Redirect root to default language */}
+                <Route path="/" element={<Navigate to="/en" replace />} />
+
+                {/* Language-prefixed public routes */}
+                <Route path="/:lang" element={<LanguageLayout />}>
+                  <Route index element={<Home />} />
+                  <Route path="products" element={<Products />} />
+                  <Route path="products/:id" element={<ProductDetail />} />
+                  <Route path="our-story" element={<OurStory />} />
+                  <Route path="rfq" element={<RFQ />} />
+                </Route>
+
+                {/* Admin routes (no language prefix) */}
                 <Route path="/admin/login" element={<AdminLogin />} />
-                
                 <Route element={<AdminRoute />}>
                   <Route path="/admin" element={<AdminDashboard />} />
                   <Route path="/admin/products/new" element={<AdminProductForm />} />

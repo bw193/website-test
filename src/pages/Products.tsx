@@ -87,7 +87,7 @@ export default function Products() {
       <SEO
         title="LED Mirror Products Catalog | BOLEN Mirror Manufacturer"
         description="Explore our wide range of OEM LED mirrors, smart mirrors, vanity mirrors, and bath mirrors from a leading LED mirror manufacturer. High-quality manufacturing for global brands."
-        canonicalUrl="https://bolenmirror.com/products"
+        path="/products"
         schema={{
           "@context": "https://schema.org",
           "@type": "CollectionPage",

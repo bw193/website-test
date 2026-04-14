@@ -76,7 +76,7 @@ export default function RFQ() {
       <SEO 
         title="Request for Quote | BOLEN LED Mirror Manufacturer"
         description="Contact BOLEN, a leading LED mirror manufacturer, for OEM/ODM inquiries, custom mirror manufacturing, and bulk orders."
-        canonicalUrl="https://bolenmirror.com/rfq"
+        path="/rfq"
         schema={contactSchema}
       />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

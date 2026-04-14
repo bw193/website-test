@@ -2,8 +2,10 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Home, ArrowLeft } from 'lucide-react';
 import SEO from '../components/SEO';
+import { useLocalizedPath } from '../hooks/useLocalizedPath';
 
 export default function NotFound() {
+  const { lp } = useLocalizedPath();
   return (
     <div className="min-h-screen bg-stone-50 flex items-center justify-center px-4">
       <SEO title="Page Not Found | BOLEN Mirror" noindex={true} />
@@ -15,14 +17,14 @@ export default function NotFound() {
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Link
-            to="/"
+            to={lp('/')}
             className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-amber-500 text-white rounded-full font-medium hover:bg-amber-600 transition-colors"
           >
             <Home className="w-4 h-4" />
             Go Home
           </Link>
           <Link
-            to="/products"
+            to={lp('/products')}
             className="inline-flex items-center justify-center gap-2 px-6 py-3 border border-stone-300 text-stone-700 rounded-full font-medium hover:bg-stone-100 transition-colors"
           >
             Browse Products

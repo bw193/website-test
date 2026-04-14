@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
 import SEO from '../components/SEO';
 import { optimizeImage } from '../utils/optimizeImage';
+import { useLocalizedPath } from '../hooks/useLocalizedPath';
 
 interface Product {
   id: string;
@@ -29,6 +30,7 @@ interface RFQForm {
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
+  const { lang, lp } = useLocalizedPath();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -153,7 +155,8 @@ export default function ProductDetail() {
   };
 
   const slug = product ? product.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') : '';
-  const productUrl = product ? `https://bolenmirror.com/products/${slug}-${product.id}` : '';
+  const productPath = product ? `/products/${slug}-${product.id}` : '/products';
+  const productFullUrl = product ? `https://bolenmirror.com/${lang}${productPath}` : '';
 
   const productSchema = product ? [
     {
@@ -169,7 +172,7 @@ export default function ProductDetail() {
       },
       "offers": {
         "@type": "AggregateOffer",
-        "url": productUrl,
+        "url": productFullUrl,
         "priceCurrency": "USD",
         "lowPrice": product.price_range ? parseFloat(product.price_range.replace(/[^0-9.]/g, '').split('-')[0]) || 0 : 0,
         "highPrice": product.price_range && product.price_range.includes('-') ? parseFloat(product.price_range.replace(/[^0-9.-]/g, '').split('-')[1]) || 0 : (product.price_range ? parseFloat(product.price_range.replace(/[^0-9.]/g, '')) || 0 : 0),
@@ -180,9 +183,9 @@ export default function ProductDetail() {
       "@context": "https://schema.org",
       "@type": "BreadcrumbList",
       "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://bolenmirror.com/" },
-        { "@type": "ListItem", "position": 2, "name": "Products", "item": "https://bolenmirror.com/products" },
-        { "@type": "ListItem", "position": 3, "name": product.title, "item": productUrl }
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": `https://bolenmirror.com/${lang}` },
+        { "@type": "ListItem", "position": 2, "name": "Products", "item": `https://bolenmirror.com/${lang}/products` },
+        { "@type": "ListItem", "position": 3, "name": product.title, "item": productFullUrl }
       ]
     }
   ] : undefined;
@@ -192,7 +195,7 @@ export default function ProductDetail() {
       <SEO
         title={`${product.title} | BOLEN Mirror`}
         description={product.description || `View details for ${product.title}, a premium mirror from Jiaxing Chengtai Mirror Co., Ltd.`}
-        canonicalUrl={productUrl}
+        path={productPath}
         ogImage={product.images?.[0]}
         ogType="product"
         schema={productSchema}
@@ -204,9 +207,9 @@ export default function ProductDetail() {
           animate={{ opacity: 1, x: 0 }}
           className="mb-8 flex items-center text-sm font-medium text-stone-500"
         >
-          <Link to="/" className="hover:text-amber-600 transition-colors">Home</Link>
+          <Link to={lp('/')} className="hover:text-amber-600 transition-colors">Home</Link>
           <ChevronRight className="mx-2 h-4 w-4 text-stone-300" />
-          <Link to="/products" className="hover:text-amber-600 transition-colors">{t('productDetail.backToCatalog')}</Link>
+          <Link to={lp('/products')} className="hover:text-amber-600 transition-colors">{t('productDetail.backToCatalog')}</Link>
           <ChevronRight className="mx-2 h-4 w-4 text-stone-300" />
           <span className="text-stone-900 truncate max-w-[200px] sm:max-w-none">{product.title}</span>
         </m.div>

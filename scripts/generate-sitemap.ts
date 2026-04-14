@@ -17,10 +17,27 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 const DOMAIN = 'https://bolenmirror.com';
+const LANGUAGES = ['en', 'zh', 'es', 'fr', 'de', 'it'];
 const today = new Date().toISOString().split('T')[0];
 
 function toSlug(title: string): string {
   return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+}
+
+function buildUrlEntry(pagePath: string, lastmod: string, changefreq: string, priority: string, lang: string): string {
+  const hreflangs = LANGUAGES.map(
+    (l) => `    <xhtml:link rel="alternate" hreflang="${l}" href="${DOMAIN}/${l}${pagePath === '/' ? '' : pagePath}" />`
+  ).join('\n');
+  const xDefault = `    <xhtml:link rel="alternate" hreflang="x-default" href="${DOMAIN}/en${pagePath === '/' ? '' : pagePath}" />`;
+
+  return `  <url>
+    <loc>${DOMAIN}/${lang}${pagePath === '/' ? '' : pagePath}</loc>
+    <lastmod>${lastmod}</lastmod>
+    <changefreq>${changefreq}</changefreq>
+    <priority>${priority}</priority>
+${hreflangs}
+${xDefault}
+  </url>`;
 }
 
 async function generateSitemap() {
@@ -54,23 +71,18 @@ async function generateSitemap() {
     };
   });
 
-  const urls = [
-    ...staticPages.map((p) => `  <url>
-    <loc>${DOMAIN}${p.loc}</loc>
-    <lastmod>${today}</lastmod>
-    <changefreq>${p.changefreq}</changefreq>
-    <priority>${p.priority}</priority>
-  </url>`),
-    ...productPages.map((p) => `  <url>
-    <loc>${DOMAIN}${p.loc}</loc>
-    <lastmod>${p.lastmod}</lastmod>
-    <changefreq>${p.changefreq}</changefreq>
-    <priority>${p.priority}</priority>
-  </url>`),
+  const allPages = [
+    ...staticPages.map((p) => ({ ...p, lastmod: today })),
+    ...productPages,
   ];
 
+  // Generate a URL entry for each page × each language
+  const urls = LANGUAGES.flatMap((lang) =>
+    allPages.map((p) => buildUrlEntry(p.loc, p.lastmod, p.changefreq, p.priority, lang))
+  );
+
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
 ${urls.join('\n')}
 </urlset>
 `;

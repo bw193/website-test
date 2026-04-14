@@ -23,7 +23,7 @@ export default function OurStory() {
       <SEO
         title="Our Story | BOLEN LED Mirror Manufacturer"
         description="Learn about the history and manufacturing excellence of BOLEN (Jiaxing Chengtai Mirror Co., Ltd.), a leading LED mirror manufacturer since 1995 specializing in OEM smart mirrors."
-        canonicalUrl="https://bolenmirror.com/our-story"
+        path="/our-story"
         schema={{
           "@context": "https://schema.org",
           "@type": "AboutPage",

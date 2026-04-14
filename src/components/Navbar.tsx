@@ -1,15 +1,18 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Menu, X, Globe, Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useLocalizedPath, SUPPORTED_LANGUAGES } from '../hooks/useLocalizedPath';
 
 export default function Navbar() {
   const { user, isAdmin, logout } = useAuth();
   const [isOpen, setIsOpen] = React.useState(false);
   const [langMenuOpen, setLangMenuOpen] = React.useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { t, i18n } = useTranslation();
+  const { lang, lp } = useLocalizedPath();
 
   const languages = [
     { code: 'en', label: 'English', short: 'EN' },
@@ -20,10 +23,12 @@ export default function Navbar() {
     { code: 'it', label: 'Italiano', short: 'IT' }
   ];
 
-  const currentLang = languages.find(l => i18n.language.startsWith(l.code)) || languages[0];
+  const currentLang = languages.find(l => l.code === lang) || languages[0];
 
   const changeLanguage = (code: string) => {
-    i18n.changeLanguage(code);
+    // Replace current language prefix in URL with new language
+    const pathWithoutLang = location.pathname.replace(/^\/[a-z]{2}(?=\/|$)/, '');
+    navigate(`/${code}${pathWithoutLang || '/'}`);
     setLangMenuOpen(false);
   };
 
@@ -32,21 +37,21 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
-            <Link to="/" className="flex-shrink-0 flex items-center gap-2">
+            <Link to={lp('/')} className="flex-shrink-0 flex items-center gap-2">
               <Sparkles className="h-8 w-8 text-amber-600" />
               <span className="font-bold text-xl text-stone-900 tracking-wide">BOLEN</span>
             </Link>
             <div className="hidden sm:ml-10 sm:flex sm:items-center sm:space-x-8">
-              <Link to="/" className="text-stone-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-amber-600 text-sm font-medium">
+              <Link to={lp('/')} className="text-stone-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-amber-600 text-sm font-medium">
                 {t('navbar.home')}
               </Link>
-              <Link to="/products" className="text-stone-500 hover:text-stone-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-amber-600 text-sm font-medium">
+              <Link to={lp('/products')} className="text-stone-500 hover:text-stone-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-amber-600 text-sm font-medium">
                 {t('navbar.catalog')}
               </Link>
-              <Link to="/our-story" className="text-stone-500 hover:text-stone-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-amber-600 text-sm font-medium">
+              <Link to={lp('/our-story')} className="text-stone-500 hover:text-stone-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-amber-600 text-sm font-medium">
                 {t('navbar.ourStory')}
               </Link>
-              <Link to="/rfq" className="text-stone-500 hover:text-stone-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-amber-600 text-sm font-medium">
+              <Link to={lp('/rfq')} className="text-stone-500 hover:text-stone-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-amber-600 text-sm font-medium">
                 {t('productDetail.requestQuote')}
               </Link>
             </div>
@@ -59,7 +64,7 @@ export default function Navbar() {
               </Link>
             )}
             {user ? (
-              <button onClick={() => { logout(); navigate('/'); }} className="text-stone-500 hover:text-stone-900 text-sm font-medium">
+              <button onClick={() => { logout(); navigate(lp('/')); }} className="text-stone-500 hover:text-stone-900 text-sm font-medium">
                 {t('navbar.logout')}
               </button>
             ) : (
@@ -134,15 +139,15 @@ export default function Navbar() {
       {isOpen && (
         <div className="sm:hidden">
           <div className="pt-2 pb-3 space-y-1">
-            <Link to="/" onClick={() => setIsOpen(false)} className="bg-amber-50 border-amber-600 text-amber-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium">{t('navbar.home')}</Link>
-            <Link to="/products" onClick={() => setIsOpen(false)} className="border-transparent text-stone-500 hover:bg-stone-50 hover:border-stone-300 hover:text-stone-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium">{t('navbar.catalog')}</Link>
-            <Link to="/our-story" onClick={() => setIsOpen(false)} className="border-transparent text-stone-500 hover:bg-stone-50 hover:border-stone-300 hover:text-stone-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium">{t('navbar.ourStory')}</Link>
-            <Link to="/rfq" onClick={() => setIsOpen(false)} className="border-transparent text-stone-500 hover:bg-stone-50 hover:border-stone-300 hover:text-stone-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium">{t('productDetail.requestQuote')}</Link>
+            <Link to={lp('/')} onClick={() => setIsOpen(false)} className="bg-amber-50 border-amber-600 text-amber-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium">{t('navbar.home')}</Link>
+            <Link to={lp('/products')} onClick={() => setIsOpen(false)} className="border-transparent text-stone-500 hover:bg-stone-50 hover:border-stone-300 hover:text-stone-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium">{t('navbar.catalog')}</Link>
+            <Link to={lp('/our-story')} onClick={() => setIsOpen(false)} className="border-transparent text-stone-500 hover:bg-stone-50 hover:border-stone-300 hover:text-stone-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium">{t('navbar.ourStory')}</Link>
+            <Link to={lp('/rfq')} onClick={() => setIsOpen(false)} className="border-transparent text-stone-500 hover:bg-stone-50 hover:border-stone-300 hover:text-stone-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium">{t('productDetail.requestQuote')}</Link>
             {isAdmin && (
               <Link to="/admin" onClick={() => setIsOpen(false)} className="border-transparent text-amber-600 hover:bg-amber-50 hover:border-amber-300 block pl-3 pr-4 py-3 border-l-4 text-base font-medium">{t('navbar.adminDashboard')}</Link>
             )}
             {user ? (
-              <button onClick={() => { logout(); navigate('/'); setIsOpen(false); }} className="w-full text-left border-transparent text-stone-500 hover:bg-stone-50 hover:border-stone-300 hover:text-stone-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium">
+              <button onClick={() => { logout(); navigate(lp('/')); setIsOpen(false); }} className="w-full text-left border-transparent text-stone-500 hover:bg-stone-50 hover:border-stone-300 hover:text-stone-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium">
                 {t('navbar.logout')}
               </button>
             ) : (

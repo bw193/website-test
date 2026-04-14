@@ -12,7 +12,7 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 async function startServer() {
   const app = express();
-  const PORT = 3000;
+  const PORT = parseInt(process.env.PORT || '3000', 10);
 
   // Security headers
   app.use((req, res, next) => {
@@ -26,6 +26,24 @@ async function startServer() {
     next();
   });
 
+  const LANGUAGES = ['en', 'zh', 'es', 'fr', 'de', 'it'];
+  const DOMAIN = 'https://bolenmirror.com';
+
+  function buildUrlEntry(pagePath: string, lastmod: string, changefreq: string, priority: string, lang: string): string {
+    const hreflangs = LANGUAGES.map(
+      (l) => `    <xhtml:link rel="alternate" hreflang="${l}" href="${DOMAIN}/${l}${pagePath === '/' ? '' : pagePath}" />`
+    ).join('\n');
+    const xDefault = `    <xhtml:link rel="alternate" hreflang="x-default" href="${DOMAIN}/en${pagePath === '/' ? '' : pagePath}" />`;
+    return `  <url>
+    <loc>${DOMAIN}/${lang}${pagePath === '/' ? '' : pagePath}</loc>
+    <lastmod>${lastmod}</lastmod>
+    <changefreq>${changefreq}</changefreq>
+    <priority>${priority}</priority>
+${hreflangs}
+${xDefault}
+  </url>`;
+  }
+
   // Generate sitemap XML from live Supabase data
   async function generateSitemapXml(): Promise<string> {
     const today = new Date().toISOString().split('T')[0];
@@ -35,37 +53,28 @@ async function startServer() {
       .order('created_at', { ascending: false });
 
     const staticPages = [
-      { loc: '/', changefreq: 'weekly', priority: '1.0' },
-      { loc: '/products', changefreq: 'weekly', priority: '0.9' },
-      { loc: '/rfq', changefreq: 'monthly', priority: '0.8' },
-      { loc: '/our-story', changefreq: 'monthly', priority: '0.7' },
+      { loc: '/', changefreq: 'weekly', priority: '1.0', lastmod: today },
+      { loc: '/products', changefreq: 'weekly', priority: '0.9', lastmod: today },
+      { loc: '/rfq', changefreq: 'monthly', priority: '0.8', lastmod: today },
+      { loc: '/our-story', changefreq: 'monthly', priority: '0.7', lastmod: today },
     ];
 
     const toSlug = (title: string) => title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
 
-    let urls = staticPages.map(p => `  <url>
-    <loc>https://bolenmirror.com${p.loc}</loc>
-    <lastmod>${today}</lastmod>
-    <changefreq>${p.changefreq}</changefreq>
-    <priority>${p.priority}</priority>
-  </url>`).join('\n');
+    const productPages = (products || []).map(product => {
+      const slug = toSlug(product.title);
+      const lastmod = (product.updated_at || product.created_at || today).split('T')[0];
+      return { loc: `/products/${slug}-${product.id}`, changefreq: 'weekly', priority: '0.8', lastmod };
+    });
 
-    if (products) {
-      products.forEach(product => {
-        const slug = toSlug(product.title);
-        const lastmod = (product.updated_at || product.created_at || today).split('T')[0];
-        urls += `\n  <url>
-    <loc>https://bolenmirror.com/products/${slug}-${product.id}</loc>
-    <lastmod>${lastmod}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>`;
-      });
-    }
+    const allPages = [...staticPages, ...productPages];
+    const urls = LANGUAGES.flatMap((lang) =>
+      allPages.map((p) => buildUrlEntry(p.loc, p.lastmod, p.changefreq, p.priority, lang))
+    );
 
     return `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${urls}
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+${urls.join('\n')}
 </urlset>`;
   }
 
@@ -81,6 +90,14 @@ ${urls}
       res.status(500).end();
     }
   });
+
+  const SUPPORTED_LANGUAGES = ['en', 'zh', 'es', 'fr', 'de', 'it'];
+
+  // 301 redirects for old non-language-prefixed URLs → /en/...
+  app.get('/products', (req, res) => res.redirect(301, '/en/products'));
+  app.get('/products/*', (req, res) => res.redirect(301, `/en${req.path}`));
+  app.get('/our-story', (req, res) => res.redirect(301, '/en/our-story'));
+  app.get('/rfq', (req, res) => res.redirect(301, '/en/rfq'));
 
   // Vite middleware for development
   if (process.env.NODE_ENV !== 'production') {
@@ -100,6 +117,8 @@ ${urls}
         }
       }
     }));
+    // Redirect bare root to /en
+    app.get('/', (req, res) => res.redirect(302, '/en'));
     app.get('*', (req, res) => {
       res.sendFile(path.join(distPath, 'index.html'));
     });
