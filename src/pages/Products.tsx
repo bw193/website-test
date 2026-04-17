@@ -1,10 +1,12 @@
 import { m, AnimatePresence } from 'motion/react';
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { supabase } from '../supabase';
 import ProductCard from '../components/ProductCard';
-import { Loader2, Search, SlidersHorizontal, PackageX } from 'lucide-react';
+import { Loader2, Search, SlidersHorizontal, PackageX, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import SEO from '../components/SEO';
+import { useLocalizedPath } from '../hooks/useLocalizedPath';
 
 interface Product {
   id: string;
@@ -30,6 +32,7 @@ export default function Products() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const { t } = useTranslation();
+  const { lp, lang } = useLocalizedPath();
 
   const normalizeCategory = (cat: string | undefined | null) => {
     if (!cat) return '';
@@ -85,44 +88,62 @@ export default function Products() {
   return (
     <div className="bg-stone-50 min-h-screen pb-24">
       <SEO
-        title="LED Mirror Products Catalog | BOLEN Mirror Manufacturer"
-        description="Explore our wide range of OEM LED mirrors, smart mirrors, vanity mirrors, and bath mirrors from a leading LED mirror manufacturer. High-quality manufacturing for global brands."
+        title="LED Bathroom & Smart Mirrors — Wholesale Catalog | BOLEN"
+        description="Browse OEM LED bathroom mirrors, smart mirrors, vanity & full-length dressing mirrors. Wholesale pricing, global shipping. Request a quote today."
         path="/products"
-        schema={{
-          "@context": "https://schema.org",
-          "@type": "CollectionPage",
-          "name": "BOLEN LED Mirror Products Catalog",
-          "description": "Explore our wide range of OEM LED mirrors, smart mirrors, vanity mirrors, and bath mirrors from a leading LED mirror manufacturer.",
-          "url": "https://bolenmirror.com/products",
-          "isPartOf": {
-            "@type": "WebSite",
-            "name": "BOLEN Mirror",
-            "url": "https://bolenmirror.com"
+        schema={[
+          {
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            "name": "BOLEN LED Mirror Products Catalog",
+            "description": "OEM LED bathroom mirrors, smart mirrors, vanity & dressing mirrors from a leading manufacturer.",
+            "url": `https://bolenmirror.com/${lang}/products`,
+            "isPartOf": {
+              "@type": "WebSite",
+              "name": "BOLEN Mirror",
+              "url": "https://bolenmirror.com"
+            }
+          },
+          {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              { "@type": "ListItem", "position": 1, "name": "Home", "item": `https://bolenmirror.com/${lang}` },
+              { "@type": "ListItem", "position": 2, "name": "Products", "item": `https://bolenmirror.com/${lang}/products` }
+            ]
           }
-        }}
+        ]}
       />
       {/* Hero Section */}
       <div className="bg-stone-900 text-white py-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
         <div className="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1600566752355-35792bedcfea?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-center" />
         <div className="absolute inset-0 bg-gradient-to-b from-stone-900/50 to-stone-900" />
         
-        <div className="relative max-w-7xl mx-auto text-center">
-          <m.h1 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-4xl md:text-5xl font-extrabold tracking-tight mb-6"
-          >
-            {t('products.catalog')}
-          </m.h1>
-          <m.p 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-lg md:text-xl text-stone-300 max-w-2xl mx-auto font-light"
-          >
-            {t('products.desc')}
-          </m.p>
+        <div className="relative max-w-7xl mx-auto">
+          {/* Breadcrumb */}
+          <nav aria-label="breadcrumb" className="mb-6 flex items-center text-sm text-stone-300/90">
+            <Link to={lp('/')} className="hover:text-amber-300 transition-colors">Home</Link>
+            <ChevronRight className="mx-2 h-4 w-4 text-stone-500" />
+            <span className="text-white">{t('nav.products', 'Products')}</span>
+          </nav>
+          <div className="text-center">
+            <m.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-4xl md:text-5xl font-extrabold tracking-tight mb-6"
+            >
+              {t('products.catalog', 'LED Bathroom & Smart Mirrors — Wholesale Catalog')}
+            </m.h1>
+            <m.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="text-lg md:text-xl text-stone-300 max-w-2xl mx-auto font-light"
+            >
+              {t('products.desc')}
+            </m.p>
+          </div>
         </div>
       </div>
 
