@@ -1,6 +1,6 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { useCurrentLang } from '../hooks/useLocalizedPath';
+import { useCurrentLang, SUPPORTED_LANGUAGES } from '../hooks/useLocalizedPath';
 
 interface SEOProps {
   title?: string;
@@ -16,8 +16,8 @@ interface SEOProps {
 const SITE_URL = 'https://bolenmirror.com';
 
 export default function SEO({
-  title = 'LED Mirror Manufacturer & OEM Smart Mirror Factory | BOLEN',
-  description = 'BOLEN — OEM LED mirror manufacturer. Smart, vanity & bath mirrors for global brands. Request a wholesale quote today.',
+  title = 'BOLEN Mirror | LED Mirror Manufacturer & OEM Smart Mirror Factory',
+  description = 'BOLEN (Jiaxing Chengtai Mirror Co., Ltd.) is a leading LED mirror manufacturer specializing in OEM LED mirrors, smart mirrors, vanity mirrors, and bath mirrors for global brands.',
   path = '/',
   ogImage = 'https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-images/site-assets/1773994889396-9i4t1ap.jpg',
   ogType = 'website',
@@ -27,12 +27,6 @@ export default function SEO({
   const currentLang = useCurrentLang();
   const canonicalUrl = `${SITE_URL}/${currentLang}${path === '/' ? '' : path}`;
 
-  // react-helmet-async processes <Helmet> children via React.Children iteration but
-  // does NOT recurse into nested arrays/expressions reliably. To make every tag
-  // actually reach the DOM we must render each child as a direct, flat sibling —
-  // hence the explicit unrolled list below.
-  const schemaArray = schema ? (Array.isArray(schema) ? schema : [schema]) : [];
-
   return (
     <Helmet>
       <html lang={currentLang} />
@@ -41,14 +35,19 @@ export default function SEO({
       {noindex && <meta name="robots" content="noindex, nofollow" />}
       <link rel="canonical" href={canonicalUrl} />
 
-      {/* hreflang alternates — flat siblings so Helmet picks them up */}
-      <link rel="alternate" hrefLang="en" href={`${SITE_URL}/en${path === '/' ? '' : path}`} />
-      <link rel="alternate" hrefLang="zh" href={`${SITE_URL}/zh${path === '/' ? '' : path}`} />
-      <link rel="alternate" hrefLang="es" href={`${SITE_URL}/es${path === '/' ? '' : path}`} />
-      <link rel="alternate" hrefLang="fr" href={`${SITE_URL}/fr${path === '/' ? '' : path}`} />
-      <link rel="alternate" hrefLang="de" href={`${SITE_URL}/de${path === '/' ? '' : path}`} />
-      <link rel="alternate" hrefLang="it" href={`${SITE_URL}/it${path === '/' ? '' : path}`} />
-      <link rel="alternate" hrefLang="x-default" href={`${SITE_URL}/en${path === '/' ? '' : path}`} />
+      {SUPPORTED_LANGUAGES.map((lang) => (
+        <link
+          key={lang}
+          rel="alternate"
+          hrefLang={lang}
+          href={`${SITE_URL}/${lang}${path === '/' ? '' : path}`}
+        />
+      ))}
+      <link
+        rel="alternate"
+        hrefLang="x-default"
+        href={`${SITE_URL}/en${path === '/' ? '' : path}`}
+      />
 
       {/* Open Graph / Facebook */}
       <meta property="og:type" content={ogType} />
@@ -65,22 +64,11 @@ export default function SEO({
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={ogImage} />
 
-      {/* JSON-LD — up to 5 schemas as flat siblings (sufficient for current pages) */}
-      {schemaArray[0] && (
-        <script type="application/ld+json">{JSON.stringify(schemaArray[0])}</script>
-      )}
-      {schemaArray[1] && (
-        <script type="application/ld+json">{JSON.stringify(schemaArray[1])}</script>
-      )}
-      {schemaArray[2] && (
-        <script type="application/ld+json">{JSON.stringify(schemaArray[2])}</script>
-      )}
-      {schemaArray[3] && (
-        <script type="application/ld+json">{JSON.stringify(schemaArray[3])}</script>
-      )}
-      {schemaArray[4] && (
-        <script type="application/ld+json">{JSON.stringify(schemaArray[4])}</script>
-      )}
+      {schema && (Array.isArray(schema) ? schema : [schema]).map((s, i) => (
+        <script key={i} type="application/ld+json">
+          {JSON.stringify(s)}
+        </script>
+      ))}
     </Helmet>
   );
 }

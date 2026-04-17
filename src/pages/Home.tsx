@@ -166,8 +166,6 @@ export default function Home() {
             "addressRegion": "Zhejiang",
             "addressCountry": "CN"
           },
-          // Add real social/marketplace profile URLs here (LinkedIn, Alibaba storefront,
-          // Made-in-China page, etc.) to strengthen entity signals for Google Knowledge Graph.
           "sameAs": []
         },
         {
@@ -184,6 +182,7 @@ export default function Home() {
       ]} />
       {/* Hero Section */}
       <div className="relative bg-stone-900 min-h-[90vh] flex items-center justify-center overflow-hidden group">
+        <h1 className="sr-only">BOLEN — LED Mirror Manufacturer & OEM Smart Mirror Factory</h1>
         <div className="absolute inset-0">
           <AnimatePresence>
             {heroBgs.length > 0 && (
@@ -204,28 +203,9 @@ export default function Home() {
           </AnimatePresence>
         </div>
 
-        {/* Hero overlay + visible H1 for SEO and clarity */}
-        <div className="absolute inset-0 bg-gradient-to-b from-stone-900/40 via-transparent to-stone-900/70 pointer-events-none" />
-        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
-          <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl leading-tight drop-shadow-lg">
-            LED Mirror Manufacturer & <span className="italic text-amber-300">OEM Smart Mirror Factory</span>
-          </h1>
-          <p className="mt-5 text-base sm:text-lg text-stone-100/90 max-w-2xl mx-auto font-light drop-shadow">
-            {t('home.hero.subtitle', 'Premium smart, vanity & bath mirrors manufactured in Jiaxing, China — supplying global brands since 2008.')}
-          </p>
-          <div className="mt-8 flex flex-col sm:flex-row justify-center gap-3 pointer-events-auto">
-            <Link to={lp('/products')} className="inline-flex justify-center items-center px-7 py-3 rounded-full text-sm font-semibold text-stone-900 bg-amber-400 hover:bg-amber-500 transition-colors shadow-lg">
-              {t('home.cta.viewCatalog', 'View Catalog')} <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
-            <Link to={lp('/rfq')} className="inline-flex justify-center items-center px-7 py-3 rounded-full text-sm font-semibold text-white border border-white/40 hover:bg-white/10 transition-colors">
-              {t('home.cta.contactSales', 'Request a Quote')}
-            </Link>
-          </div>
-        </div>
-
         {heroBgs.length > 1 && (
           <>
-            <button
+            <button 
               onClick={prevBg}
               className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-black/20 text-white/70 hover:bg-black/40 hover:text-white transition-all backdrop-blur-sm opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
               aria-label="Previous image"

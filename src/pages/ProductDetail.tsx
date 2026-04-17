@@ -158,11 +158,6 @@ export default function ProductDetail() {
   const productPath = product ? `/products/${slug}-${product.id}` : '/products';
   const productFullUrl = product ? `https://bolenmirror.com/${lang}${productPath}` : '';
 
-  // priceValidUntil: 1 year from today (Google requires a future date for offer schema)
-  const priceValidUntil = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)
-    .toISOString()
-    .split('T')[0];
-
   const productSchema = product ? [
     {
       "@context": "https://schema.org/",
@@ -171,14 +166,9 @@ export default function ProductDetail() {
       "image": product.images,
       "description": product.description,
       "sku": product.id,
-      "mpn": product.id,
       "brand": {
         "@type": "Brand",
         "name": "BOLEN"
-      },
-      "manufacturer": {
-        "@type": "Organization",
-        "name": "Jiaxing Chengtai Mirror Co., Ltd."
       },
       "offers": {
         "@type": "AggregateOffer",
@@ -186,13 +176,7 @@ export default function ProductDetail() {
         "priceCurrency": "USD",
         "lowPrice": product.price_range ? parseFloat(product.price_range.replace(/[^0-9.]/g, '').split('-')[0]) || 0 : 0,
         "highPrice": product.price_range && product.price_range.includes('-') ? parseFloat(product.price_range.replace(/[^0-9.-]/g, '').split('-')[1]) || 0 : (product.price_range ? parseFloat(product.price_range.replace(/[^0-9.]/g, '')) || 0 : 0),
-        "offerCount": 1,
-        "availability": "https://schema.org/InStock",
-        "priceValidUntil": priceValidUntil,
-        "seller": {
-          "@type": "Organization",
-          "name": "BOLEN Mirror"
-        }
+        "offerCount": 1
       }
     },
     {
@@ -202,44 +186,6 @@ export default function ProductDetail() {
         { "@type": "ListItem", "position": 1, "name": "Home", "item": `https://bolenmirror.com/${lang}` },
         { "@type": "ListItem", "position": 2, "name": "Products", "item": `https://bolenmirror.com/${lang}/products` },
         { "@type": "ListItem", "position": 3, "name": product.title, "item": productFullUrl }
-      ]
-    },
-    {
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      "mainEntity": [
-        {
-          "@type": "Question",
-          "name": `What is the minimum order quantity (MOQ) for the ${product.title}?`,
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Our standard MOQ is 10 units, making it accessible for boutique retailers and trial orders. Contact our sales team via the inquiry form for a tailored quote."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "What is the typical lead time?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Production lead time is generally 25–35 days after order confirmation, depending on volume and customization. Sea freight adds an additional 20–40 days depending on destination."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Do you offer OEM/ODM customization?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Yes — BOLEN supports full OEM and ODM services, including custom dimensions, frame finishes, LED color temperature, anti-fog functions, touch sensors, Bluetooth audio, and packaging."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Which certifications do your LED mirrors hold?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Our products are certified to CE, UL, SAA, UKCA, IP44, and CCC standards, suitable for sale in the EU, UK, US, Australia, and global markets."
-          }
-        }
       ]
     }
   ] : undefined;

@@ -519,7 +519,7 @@ export default function AdminProductForm() {
                     <div key={field.id} className="flex items-center gap-3 bg-stone-50 p-2 rounded-xl border border-stone-200 group">
                       <div className="relative h-12 w-12 rounded-lg overflow-hidden bg-stone-200 shrink-0 border border-stone-300">
                         {control._formValues.images?.[index]?.url ? (
-                          <img src={control._formValues.images[index].url} alt={`Product image ${index + 1} preview`} className="h-full w-full object-cover" />
+                          <img src={control._formValues.images[index].url} alt="" className="h-full w-full object-cover" />
                         ) : (
                           <div className="h-full w-full flex items-center justify-center text-stone-400">
                             <ImageIcon className="h-5 w-5" />
