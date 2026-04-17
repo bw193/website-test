@@ -1,14 +1,10 @@
 import React from 'react';
 import { Mail, Phone, MapPin, Sparkles } from 'lucide-react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useLocalizedPath } from '../hooks/useLocalizedPath';
 
 export default function Footer() {
-  const location = useLocation();
   const { lp } = useLocalizedPath();
-  if (location.pathname.endsWith('/our-story')) {
-    return null;
-  }
 
   return (
     <footer className="bg-stone-900 text-white">
