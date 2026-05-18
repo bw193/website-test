@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx server.ts",
-    "build": "vite build && tsx scripts/prerender.ts && tsx scripts/generate-sitemap.ts",
+    "build": "playwright install chromium && vite build && tsx scripts/prerender.ts && tsx scripts/generate-sitemap.ts",
     "build:novite": "tsx scripts/prerender.ts && tsx scripts/generate-sitemap.ts",
     "prerender": "tsx scripts/prerender.ts",
     "generate-sitemap": "tsx scripts/generate-sitemap.ts",
