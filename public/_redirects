@@ -1,0 +1,9 @@
+# Legacy non-prefixed public URLs → /en/* (preserves any inbound links from before language routing)
+/products      /en/products            301
+/products/*    /en/products/:splat     301
+/our-story     /en/our-story           301
+/rfq           /en/rfq                 301
+
+# SPA fallback for routes that are not statically prerendered (admin pages, 404s, unknown paths).
+# Cloudflare Pages evaluates this last, so prerendered files like /en/products/index.html win first.
+/*    /index.html    200

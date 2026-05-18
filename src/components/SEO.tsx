@@ -1,6 +1,6 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { useCurrentLang, SUPPORTED_LANGUAGES } from '../hooks/useLocalizedPath';
+import { useCurrentLang } from '../hooks/useLocalizedPath';
 
 interface SEOProps {
   title?: string;
@@ -25,7 +25,13 @@ export default function SEO({
   noindex = false
 }: SEOProps) {
   const currentLang = useCurrentLang();
-  const canonicalUrl = `${SITE_URL}/${currentLang}${path === '/' ? '' : path}`;
+  const suffix = path === '/' ? '' : path;
+  const canonicalUrl = `${SITE_URL}/${currentLang}${suffix}`;
+
+  // react-helmet-async iterates <Helmet> children with React.Children but does NOT
+  // recurse into nested arrays/expressions, so every alternate link and JSON-LD
+  // script must appear as a direct, flat sibling of <Helmet>.
+  const schemaArray = schema ? (Array.isArray(schema) ? schema : [schema]) : [];
 
   return (
     <Helmet>
@@ -35,21 +41,14 @@ export default function SEO({
       {noindex && <meta name="robots" content="noindex, nofollow" />}
       <link rel="canonical" href={canonicalUrl} />
 
-      {SUPPORTED_LANGUAGES.map((lang) => (
-        <link
-          key={lang}
-          rel="alternate"
-          hrefLang={lang}
-          href={`${SITE_URL}/${lang}${path === '/' ? '' : path}`}
-        />
-      ))}
-      <link
-        rel="alternate"
-        hrefLang="x-default"
-        href={`${SITE_URL}/en${path === '/' ? '' : path}`}
-      />
+      <link rel="alternate" hrefLang="en" href={`${SITE_URL}/en${suffix}`} />
+      <link rel="alternate" hrefLang="zh" href={`${SITE_URL}/zh${suffix}`} />
+      <link rel="alternate" hrefLang="es" href={`${SITE_URL}/es${suffix}`} />
+      <link rel="alternate" hrefLang="fr" href={`${SITE_URL}/fr${suffix}`} />
+      <link rel="alternate" hrefLang="de" href={`${SITE_URL}/de${suffix}`} />
+      <link rel="alternate" hrefLang="it" href={`${SITE_URL}/it${suffix}`} />
+      <link rel="alternate" hrefLang="x-default" href={`${SITE_URL}/en${suffix}`} />
 
-      {/* Open Graph / Facebook */}
       <meta property="og:type" content={ogType} />
       <meta property="og:url" content={canonicalUrl} />
       <meta property="og:title" content={title} />
@@ -57,18 +56,27 @@ export default function SEO({
       <meta property="og:image" content={ogImage} />
       <meta property="og:site_name" content="BOLEN Mirror" />
 
-      {/* Twitter */}
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:url" content={canonicalUrl} />
       <meta name="twitter:title" content={title} />
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={ogImage} />
 
-      {schema && (Array.isArray(schema) ? schema : [schema]).map((s, i) => (
-        <script key={i} type="application/ld+json">
-          {JSON.stringify(s)}
-        </script>
-      ))}
+      {schemaArray[0] && (
+        <script type="application/ld+json">{JSON.stringify(schemaArray[0])}</script>
+      )}
+      {schemaArray[1] && (
+        <script type="application/ld+json">{JSON.stringify(schemaArray[1])}</script>
+      )}
+      {schemaArray[2] && (
+        <script type="application/ld+json">{JSON.stringify(schemaArray[2])}</script>
+      )}
+      {schemaArray[3] && (
+        <script type="application/ld+json">{JSON.stringify(schemaArray[3])}</script>
+      )}
+      {schemaArray[4] && (
+        <script type="application/ld+json">{JSON.stringify(schemaArray[4])}</script>
+      )}
     </Helmet>
   );
 }

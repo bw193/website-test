@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { CheckCircle2, Mail, Phone, MapPin } from 'lucide-react';
 import { supabase } from '../supabase';
 import SEO from '../components/SEO';
+import { useCurrentLang } from '../hooks/useLocalizedPath';
 
 interface RFQForm {
   customerName: string;
@@ -15,6 +16,7 @@ interface RFQForm {
 
 export default function RFQ() {
   const { t } = useTranslation();
+  const lang = useCurrentLang();
   const [rfqStatus, setRfqStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const { register, handleSubmit, reset, formState: { errors } } = useForm<RFQForm>();
 
@@ -49,7 +51,7 @@ export default function RFQ() {
     "@type": "ContactPage",
     "name": "Request for Quote (RFQ) | BOLEN Mirror",
     "description": "Contact Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) for OEM/ODM inquiries, custom mirror manufacturing, and bulk orders.",
-    "url": "https://bolenmirror.com/rfq",
+    "url": `https://bolenmirror.com/${lang}/rfq`,
     "mainEntity": {
       "@type": "Organization",
       "name": "Jiaxing Chengtai Mirror Co., Ltd. (BOLEN)",

@@ -5,6 +5,7 @@ import ProductCard from '../components/ProductCard';
 import { Loader2, Search, SlidersHorizontal, PackageX } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import SEO from '../components/SEO';
+import { useCurrentLang } from '../hooks/useLocalizedPath';
 
 interface Product {
   id: string;
@@ -30,6 +31,7 @@ export default function Products() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const { t } = useTranslation();
+  const lang = useCurrentLang();
 
   const normalizeCategory = (cat: string | undefined | null) => {
     if (!cat) return '';
@@ -93,7 +95,7 @@ export default function Products() {
           "@type": "CollectionPage",
           "name": "BOLEN LED Mirror Products Catalog",
           "description": "Explore our wide range of OEM LED mirrors, smart mirrors, vanity mirrors, and bath mirrors from a leading LED mirror manufacturer.",
-          "url": "https://bolenmirror.com/products",
+          "url": `https://bolenmirror.com/${lang}/products`,
           "isPartOf": {
             "@type": "WebSite",
             "name": "BOLEN Mirror",
