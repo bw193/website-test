@@ -31,7 +31,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ id, title, description, image
       <div className="bg-white rounded-2xl flex flex-col h-full overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 border border-stone-100 relative">
         
         {/* Image Container */}
-        <div className="relative aspect-[4/5] overflow-hidden bg-stone-100">
+        <div className="relative aspect-square overflow-hidden bg-stone-100">
           <img
             src={optimizeImage(image, { width: 400 }) || 'https://picsum.photos/seed/mirror/400/500'}
             srcSet={imageSrcSet(image, [300, 400, 600])}

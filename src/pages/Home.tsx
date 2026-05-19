@@ -361,7 +361,7 @@ export default function Home() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {[1, 2, 3, 4, 5, 6].map((i) => (
                 <div key={i} className="bg-white rounded-2xl flex flex-col h-full overflow-hidden shadow-sm border border-stone-100 relative animate-pulse">
-                  <div className="relative aspect-[4/5] overflow-hidden bg-stone-200"></div>
+                  <div className="relative aspect-square overflow-hidden bg-stone-200"></div>
                   <div className="p-5 flex flex-col flex-1">
                     <div className="mb-3 w-20 h-5 bg-stone-200 rounded-md"></div>
                     <div className="w-3/4 h-6 bg-stone-200 rounded mb-2"></div>
