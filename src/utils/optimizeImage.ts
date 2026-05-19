@@ -28,6 +28,10 @@ export function optimizeImage(
   if (width) params.set('width', String(width));
   if (height) params.set('height', String(height));
   if (quality !== 80) params.set('quality', String(quality));
+  // Supabase image transforms default to resize=cover, which crops square
+  // sources to a tall portrait when only width is specified. Force `contain`
+  // so the source aspect ratio is always preserved.
+  params.set('resize', 'contain');
 
   transformed += (transformed.includes('?') ? '&' : '?') + params.toString();
   return transformed;
