@@ -9,6 +9,7 @@ import ReactMarkdown from 'react-markdown';
 import SEO from '../components/SEO';
 import { optimizeImage } from '../utils/optimizeImage';
 import { useLocalizedPath } from '../hooks/useLocalizedPath';
+import { readInitialProduct } from '../utils/prerenderData';
 
 interface Product {
   id: string;
@@ -31,8 +32,10 @@ interface RFQForm {
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
   const { lang, lp } = useLocalizedPath();
-  const [product, setProduct] = useState<Product | null>(null);
-  const [loading, setLoading] = useState(true);
+  const actualId = id ? (id.length > 36 ? id.slice(-36) : id) : '';
+  const initialProduct = readInitialProduct<Product>(actualId);
+  const [product, setProduct] = useState<Product | null>(initialProduct);
+  const [loading, setLoading] = useState(initialProduct === null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [rfqStatus, setRfqStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const { t } = useTranslation();
@@ -41,11 +44,7 @@ export default function ProductDetail() {
 
   useEffect(() => {
     const fetchProduct = async () => {
-      if (!id) return;
-      
-      // Extract UUID from slug-id format (UUID is 36 chars)
-      const actualId = id.length > 36 ? id.slice(-36) : id;
-      
+      if (!actualId) return;
       try {
         const { data, error } = await supabase
           .from('products')
@@ -64,7 +63,7 @@ export default function ProductDetail() {
       }
     };
     fetchProduct();
-  }, [id]);
+  }, [actualId]);
 
   const onSubmitRFQ = async (data: RFQForm) => {
     if (!product) return;
@@ -156,7 +155,10 @@ export default function ProductDetail() {
 
   const slug = product ? product.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') : '';
   const productPath = product ? `/products/${slug}-${product.id}` : '/products';
-  const productFullUrl = product ? `https://bolenmirror.com/${lang}${productPath}` : '';
+  // Trailing slash to match Cloudflare Pages directory-style URLs and the
+  // canonical/sitemap; prerender-static.ts uses the same shape so Helmet
+  // adopts the existing JSON-LD tag instead of appending a duplicate.
+  const productFullUrl = product ? `https://bolenmirror.com/${lang}${productPath}/` : '';
 
   const parsePriceRange = (range?: string): { low: number; high: number } => {
     const nums = range?.match(/\d+(?:\.\d+)?/g)?.map(Number) ?? [];
@@ -201,8 +203,8 @@ export default function ProductDetail() {
       "@context": "https://schema.org",
       "@type": "BreadcrumbList",
       "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "Home", "item": `https://bolenmirror.com/${lang}` },
-        { "@type": "ListItem", "position": 2, "name": "Products", "item": `https://bolenmirror.com/${lang}/products` },
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": `https://bolenmirror.com/${lang}/` },
+        { "@type": "ListItem", "position": 2, "name": "Products", "item": `https://bolenmirror.com/${lang}/products/` },
         { "@type": "ListItem", "position": 3, "name": product.title, "item": productFullUrl }
       ]
     }

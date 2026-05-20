@@ -44,6 +44,8 @@ interface Product {
   category?: string;
   price_range?: string;
   msrp?: string;
+  details?: string;
+  specifications?: unknown;
 }
 
 // Per-language copy. Kept in this file (not src/locales) so the prerender
@@ -302,11 +304,23 @@ function toSlug(title: string): string {
 const RH = 'data-rh="true"';
 
 function hreflangBlock(routePath: string): string {
+  // Trailing slash matches Cloudflare Pages directory-style URLs (it serves
+  // dist/en/products/index.html as /en/products/). Keeping canonical and
+  // hreflang URLs aligned with the served URL avoids Google picking a
+  // different canonical and dropping URLs from the index.
   const suffix = routePath === '/' ? '' : routePath;
   return [
-    ...LANGUAGES.map((l) => `<link ${RH} rel="alternate" hreflang="${l}" href="${SITE_URL}/${l}${suffix}" />`),
-    `<link ${RH} rel="alternate" hreflang="x-default" href="${SITE_URL}/en${suffix}" />`,
+    ...LANGUAGES.map((l) => `<link ${RH} rel="alternate" hreflang="${l}" href="${SITE_URL}/${l}${suffix}/" />`),
+    `<link ${RH} rel="alternate" hreflang="x-default" href="${SITE_URL}/en${suffix}/" />`,
   ].join('\n    ');
+}
+
+// Injected as a non-executing JSON island that Products / ProductDetail
+// pick up on first render. Lets the rendered DOM contain product cards /
+// detail content immediately, before the Supabase refresh fetch completes.
+function prerenderDataScript(payload: unknown): string {
+  const json = JSON.stringify(payload).replace(/</g, '\\u003c');
+  return `<script id="__BOLEN_PRERENDER_DATA__" type="application/json">${json}</script>`;
 }
 
 function ogTwitterBlock(
@@ -560,7 +574,7 @@ function catalogSchema(lang: Lang): any[] {
       name: 'BOLEN LED Mirror Products Catalog',
       description:
         'Explore our wide range of OEM LED mirrors, smart mirrors, vanity mirrors, and bath mirrors from a leading LED mirror manufacturer.',
-      url: `https://bolenmirror.com/${lang}/products`,
+      url: `https://bolenmirror.com/${lang}/products/`,
       isPartOf: {
         '@type': 'WebSite',
         name: 'BOLEN Mirror',
@@ -593,7 +607,7 @@ function productSeoTitle(product: Product): string {
 
 function productDetailSchema(lang: Lang, product: Product): any[] {
   const slug = toSlug(product.title);
-  const productFullUrl = `https://bolenmirror.com/${lang}/products/${slug}-${product.id}`;
+  const productFullUrl = `https://bolenmirror.com/${lang}/products/${slug}-${product.id}/`;
   const { low: lowPrice, high: highPrice } = parsePriceRange(product.price_range);
   return [
     {
@@ -620,8 +634,8 @@ function productDetailSchema(lang: Lang, product: Product): any[] {
       '@context': 'https://schema.org',
       '@type': 'BreadcrumbList',
       itemListElement: [
-        { '@type': 'ListItem', position: 1, name: 'Home', item: `https://bolenmirror.com/${lang}` },
-        { '@type': 'ListItem', position: 2, name: 'Products', item: `https://bolenmirror.com/${lang}/products` },
+        { '@type': 'ListItem', position: 1, name: 'Home', item: `https://bolenmirror.com/${lang}/` },
+        { '@type': 'ListItem', position: 2, name: 'Products', item: `https://bolenmirror.com/${lang}/products/` },
         { '@type': 'ListItem', position: 3, name: product.title, item: productFullUrl },
       ],
     },
@@ -636,7 +650,7 @@ function storySchema(lang: Lang): any[] {
       name: 'Our Story — BOLEN LED Mirror Manufacturer',
       description:
         'Learn about the history and manufacturing excellence of BOLEN, a leading LED mirror manufacturer since 1995.',
-      url: `https://bolenmirror.com/${lang}/our-story`,
+      url: `https://bolenmirror.com/${lang}/our-story/`,
       mainEntity: {
         '@type': 'Organization',
         name: 'Jiaxing Chengtai Mirror Co., Ltd. (BOLEN)',
@@ -657,7 +671,7 @@ function rfqSchema(lang: Lang): any[] {
       name: 'Request for Quote (RFQ) | BOLEN Mirror',
       description:
         'Contact Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) for OEM/ODM inquiries, custom mirror manufacturing, and bulk orders.',
-      url: `https://bolenmirror.com/${lang}/rfq`,
+      url: `https://bolenmirror.com/${lang}/rfq/`,
       mainEntity: {
         '@type': 'Organization',
         name: 'Jiaxing Chengtai Mirror Co., Ltd. (BOLEN)',
@@ -699,7 +713,7 @@ async function fetchAllProducts(): Promise<Product[]> {
   const supabase = createClient(supabaseUrl, supabaseKey);
   const { data, error } = await supabase
     .from('products')
-    .select('id, title, description, images, category, price_range, msrp')
+    .select('id, title, description, images, category, price_range, msrp, details, specifications')
     .order('created_at', { ascending: false });
   if (error) {
     console.warn(`[prerender-static] Could not fetch products: ${error.message}`);
@@ -722,7 +736,7 @@ async function main(): Promise<void> {
 
     // Home
     {
-      const canonical = `${SITE_URL}/${lang}`;
+      const canonical = `${SITE_URL}/${lang}/`;
       const headExtras = buildHead({
         lang,
         title: c.homeTitle,
@@ -744,8 +758,12 @@ async function main(): Promise<void> {
 
     // Catalog
     {
-      const canonical = `${SITE_URL}/${lang}/products`;
-      const headExtras = buildHead({
+      const canonical = `${SITE_URL}/${lang}/products/`;
+      // ProductCard only reads id/title/description/images/category/price_range/msrp;
+      // strip the heavy details/specifications fields out of the catalog payload.
+      const catalogProducts = products.map(({ details, specifications, ...rest }) => rest);
+      const dataScript = prerenderDataScript({ route: 'catalog', lang, products: catalogProducts });
+      const headExtras = `${buildHead({
         lang,
         title: c.catalogTitle,
         description: c.catalogDesc,
@@ -754,7 +772,7 @@ async function main(): Promise<void> {
         ogType: 'website',
         routePath: '/products',
         schema: catalogSchema(lang),
-      });
+      })}\n    ${dataScript}`;
       const html = injectIntoTemplate(template, {
         lang,
         headExtras,
@@ -766,7 +784,7 @@ async function main(): Promise<void> {
 
     // Our Story
     {
-      const canonical = `${SITE_URL}/${lang}/our-story`;
+      const canonical = `${SITE_URL}/${lang}/our-story/`;
       const headExtras = buildHead({
         lang,
         title: c.storyTitle,
@@ -788,7 +806,7 @@ async function main(): Promise<void> {
 
     // RFQ
     {
-      const canonical = `${SITE_URL}/${lang}/rfq`;
+      const canonical = `${SITE_URL}/${lang}/rfq/`;
       const headExtras = buildHead({
         lang,
         title: c.rfqTitle,
@@ -814,10 +832,11 @@ async function main(): Promise<void> {
       if (!product.id || !product.title) continue;
       const slug = toSlug(product.title);
       const path = `/products/${slug}-${product.id}`;
-      const canonical = `${SITE_URL}/${lang}${path}`;
+      const canonical = `${SITE_URL}/${lang}${path}/`;
       const title = productSeoTitle(product);
       const description = richProductDescription(product);
-      const headExtras = buildHead({
+      const dataScript = prerenderDataScript({ route: 'productDetail', lang, product });
+      const headExtras = `${buildHead({
         lang,
         title,
         description,
@@ -826,7 +845,7 @@ async function main(): Promise<void> {
         ogType: 'product',
         routePath: path,
         schema: productDetailSchema(lang, product),
-      });
+      })}\n    ${dataScript}`;
       const html = injectIntoTemplate(template, {
         lang,
         headExtras,

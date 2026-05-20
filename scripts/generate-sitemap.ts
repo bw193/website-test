@@ -25,13 +25,17 @@ function toSlug(title: string): string {
 }
 
 function buildUrlEntry(pagePath: string, lastmod: string, changefreq: string, priority: string, lang: string): string {
+  // Trailing slash matches Cloudflare Pages directory-style serving and the
+  // canonical/hreflang URLs the prerender emits, so sitemap URLs resolve
+  // 200 directly without a slash-redirect hop.
+  const slug = pagePath === '/' ? '' : pagePath;
   const hreflangs = LANGUAGES.map(
-    (l) => `    <xhtml:link rel="alternate" hreflang="${l}" href="${DOMAIN}/${l}${pagePath === '/' ? '' : pagePath}" />`
+    (l) => `    <xhtml:link rel="alternate" hreflang="${l}" href="${DOMAIN}/${l}${slug}/" />`
   ).join('\n');
-  const xDefault = `    <xhtml:link rel="alternate" hreflang="x-default" href="${DOMAIN}/en${pagePath === '/' ? '' : pagePath}" />`;
+  const xDefault = `    <xhtml:link rel="alternate" hreflang="x-default" href="${DOMAIN}/en${slug}/" />`;
 
   return `  <url>
-    <loc>${DOMAIN}/${lang}${pagePath === '/' ? '' : pagePath}</loc>
+    <loc>${DOMAIN}/${lang}${slug}/</loc>
     <lastmod>${lastmod}</lastmod>
     <changefreq>${changefreq}</changefreq>
     <priority>${priority}</priority>

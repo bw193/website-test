@@ -1,11 +1,13 @@
 # Bare root → default language so crawlers see a 301, not a thin SPA shell.
 /              /en/                    301
 
-# Legacy non-prefixed public URLs → /en/* (preserves any inbound links from before language routing)
-/products      /en/products            301
-/products/*    /en/products/:splat     301
-/our-story     /en/our-story           301
-/rfq           /en/rfq                 301
+# Legacy non-prefixed public URLs → /en/*/ (preserves any inbound links from
+# before language routing; trailing slash matches Cloudflare Pages directory
+# serving so there's no second redirect hop).
+/products      /en/products/           301
+/products/*    /en/products/:splat/    301
+/our-story     /en/our-story/          301
+/rfq           /en/rfq/                301
 
 # SPA fallback is handled by wrangler.jsonc's `not_found_handling: "single-page-application"`
 # — do NOT add `/* /index.html 200` here; Cloudflare Workers Static Assets flags it as

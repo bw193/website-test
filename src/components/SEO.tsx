@@ -25,8 +25,12 @@ export default function SEO({
   noindex = false
 }: SEOProps) {
   const currentLang = useCurrentLang();
+  // Cloudflare Pages serves directory-style URLs with a trailing slash
+  // (dist/en/products/index.html -> /en/products/). Canonical, hreflang,
+  // OG/Twitter URLs, and JSON-LD URLs all use trailing slash so they match
+  // the final URL and Google doesn't pick a different canonical.
   const suffix = path === '/' ? '' : path;
-  const canonicalUrl = `${SITE_URL}/${currentLang}${suffix}`;
+  const canonicalUrl = `${SITE_URL}/${currentLang}${suffix}/`;
 
   // react-helmet-async iterates <Helmet> children with React.Children but does NOT
   // recurse into nested arrays/expressions, so every alternate link and JSON-LD
@@ -41,13 +45,13 @@ export default function SEO({
       {noindex && <meta name="robots" content="noindex, nofollow" />}
       <link rel="canonical" href={canonicalUrl} />
 
-      <link rel="alternate" hrefLang="en" href={`${SITE_URL}/en${suffix}`} />
-      <link rel="alternate" hrefLang="zh" href={`${SITE_URL}/zh${suffix}`} />
-      <link rel="alternate" hrefLang="es" href={`${SITE_URL}/es${suffix}`} />
-      <link rel="alternate" hrefLang="fr" href={`${SITE_URL}/fr${suffix}`} />
-      <link rel="alternate" hrefLang="de" href={`${SITE_URL}/de${suffix}`} />
-      <link rel="alternate" hrefLang="it" href={`${SITE_URL}/it${suffix}`} />
-      <link rel="alternate" hrefLang="x-default" href={`${SITE_URL}/en${suffix}`} />
+      <link rel="alternate" hrefLang="en" href={`${SITE_URL}/en${suffix}/`} />
+      <link rel="alternate" hrefLang="zh" href={`${SITE_URL}/zh${suffix}/`} />
+      <link rel="alternate" hrefLang="es" href={`${SITE_URL}/es${suffix}/`} />
+      <link rel="alternate" hrefLang="fr" href={`${SITE_URL}/fr${suffix}/`} />
+      <link rel="alternate" hrefLang="de" href={`${SITE_URL}/de${suffix}/`} />
+      <link rel="alternate" hrefLang="it" href={`${SITE_URL}/it${suffix}/`} />
+      <link rel="alternate" hrefLang="x-default" href={`${SITE_URL}/en${suffix}/`} />
 
       <meta property="og:type" content={ogType} />
       <meta property="og:url" content={canonicalUrl} />

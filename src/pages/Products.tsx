@@ -6,6 +6,7 @@ import { Loader2, Search, SlidersHorizontal, PackageX } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import SEO from '../components/SEO';
 import { useCurrentLang } from '../hooks/useLocalizedPath';
+import { readInitialProducts } from '../utils/prerenderData';
 
 interface Product {
   id: string;
@@ -18,7 +19,8 @@ interface Product {
 }
 
 export default function Products() {
-  const [products, setProducts] = useState<Product[]>([]);
+  const initialProducts = readInitialProducts<Product>();
+  const [products, setProducts] = useState<Product[]>(initialProducts ?? []);
   const [categories, setCategories] = useState<string[]>([
     "New Arrival",
     "Hot Sale",
@@ -27,7 +29,7 @@ export default function Products() {
     "Full Length Dressing Mirror",
     "Irregular Mirror"
   ]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(initialProducts === null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const { t } = useTranslation();
@@ -95,7 +97,7 @@ export default function Products() {
           "@type": "CollectionPage",
           "name": "BOLEN LED Mirror Products Catalog",
           "description": "Explore our wide range of OEM LED mirrors, smart mirrors, vanity mirrors, and bath mirrors from a leading LED mirror manufacturer.",
-          "url": `https://bolenmirror.com/${lang}/products`,
+          "url": `https://bolenmirror.com/${lang}/products/`,
           "isPartOf": {
             "@type": "WebSite",
             "name": "BOLEN Mirror",
