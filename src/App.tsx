@@ -12,14 +12,15 @@ import ScrollToTop from './components/ScrollToTop';
 import LanguageLayout from './components/LanguageLayout';
 import { hasSupabaseConfig } from './supabase';
 import Home from './pages/Home';
+import Products from './pages/Products';
+import OurStory from './pages/OurStory';
+import ProductDetail from './pages/ProductDetail';
+import RFQ from './pages/RFQ';
 import { LazyMotion, domAnimation } from 'motion/react';
 
 
-// Lazy load pages for better performance
-const Products = lazy(() => import('./pages/Products'));
-const OurStory = lazy(() => import('./pages/OurStory'));
-const ProductDetail = lazy(() => import('./pages/ProductDetail'));
-const RFQ = lazy(() => import('./pages/RFQ'));
+// Lazy-load admin pages only; top public pages render synchronously so SEO
+// crawlers (and audits) don't capture the Suspense spinner instead of content.
 const AdminLogin = lazy(() => import('./pages/AdminLogin'));
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 const AdminProductForm = lazy(() => import('./pages/AdminProductForm'));

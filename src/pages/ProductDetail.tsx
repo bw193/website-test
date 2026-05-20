@@ -158,13 +158,31 @@ export default function ProductDetail() {
   const productPath = product ? `/products/${slug}-${product.id}` : '/products';
   const productFullUrl = product ? `https://bolenmirror.com/${lang}${productPath}` : '';
 
+  const parsePriceRange = (range?: string): { low: number; high: number } => {
+    const nums = range?.match(/\d+(?:\.\d+)?/g)?.map(Number) ?? [];
+    if (nums.length === 0) return { low: 0, high: 0 };
+    if (nums.length === 1) return { low: nums[0], high: nums[0] };
+    return { low: Math.min(...nums), high: Math.max(...nums) };
+  };
+  const { low: lowPrice, high: highPrice } = parsePriceRange(product?.price_range);
+
+  const richDescription = product
+    ? (product.description && product.description.trim().length >= 30
+      ? product.description
+      : `Premium ${product.title} by BOLEN Mirror (Jiaxing Chengtai Mirror Co., Ltd.) — OEM/ODM LED, smart, vanity, and bath mirrors. Request a quote for bulk pricing.`)
+    : '';
+
+  const seoTitle = product
+    ? (product.title.length > 55 ? product.title : `${product.title} | BOLEN Mirror`)
+    : '';
+
   const productSchema = product ? [
     {
       "@context": "https://schema.org/",
       "@type": "Product",
       "name": product.title,
       "image": product.images,
-      "description": product.description,
+      "description": richDescription,
       "sku": product.id,
       "brand": {
         "@type": "Brand",
@@ -174,8 +192,8 @@ export default function ProductDetail() {
         "@type": "AggregateOffer",
         "url": productFullUrl,
         "priceCurrency": "USD",
-        "lowPrice": product.price_range ? parseFloat(product.price_range.replace(/[^0-9.]/g, '').split('-')[0]) || 0 : 0,
-        "highPrice": product.price_range && product.price_range.includes('-') ? parseFloat(product.price_range.replace(/[^0-9.-]/g, '').split('-')[1]) || 0 : (product.price_range ? parseFloat(product.price_range.replace(/[^0-9.]/g, '')) || 0 : 0),
+        "lowPrice": lowPrice,
+        "highPrice": highPrice,
         "offerCount": 1
       }
     },
@@ -193,8 +211,8 @@ export default function ProductDetail() {
   return (
     <div className="bg-[#FAF9F6] min-h-screen py-12">
       <SEO
-        title={`${product.title} | BOLEN Mirror`}
-        description={product.description || `View details for ${product.title}, a premium mirror from Jiaxing Chengtai Mirror Co., Ltd.`}
+        title={seoTitle}
+        description={richDescription}
         path={productPath}
         ogImage={product.images?.[0]}
         ogType="product"

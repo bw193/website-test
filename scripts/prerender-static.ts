@@ -570,28 +570,38 @@ function catalogSchema(lang: Lang): any[] {
   ];
 }
 
+// Mirrors src/pages/ProductDetail.tsx's parsePriceRange. Keep both in lockstep
+// so the prerendered JSON-LD matches Helmet's render and avoids duplicates.
+function parsePriceRange(range?: string): { low: number; high: number } {
+  const nums = range?.match(/\d+(?:\.\d+)?/g)?.map(Number) ?? [];
+  if (nums.length === 0) return { low: 0, high: 0 };
+  if (nums.length === 1) return { low: nums[0], high: nums[0] };
+  return { low: Math.min(...nums), high: Math.max(...nums) };
+}
+
+// Mirrors src/pages/ProductDetail.tsx's richDescription / seoTitle helpers.
+function richProductDescription(product: Product): string {
+  if (product.description && product.description.trim().length >= 30) {
+    return product.description;
+  }
+  return `Premium ${product.title} by BOLEN Mirror (Jiaxing Chengtai Mirror Co., Ltd.) — OEM/ODM LED, smart, vanity, and bath mirrors. Request a quote for bulk pricing.`;
+}
+
+function productSeoTitle(product: Product): string {
+  return product.title.length > 55 ? product.title : `${product.title} | BOLEN Mirror`;
+}
+
 function productDetailSchema(lang: Lang, product: Product): any[] {
   const slug = toSlug(product.title);
   const productFullUrl = `https://bolenmirror.com/${lang}/products/${slug}-${product.id}`;
-  // ProductDetail.tsx computes lowPrice/highPrice with these exact expressions,
-  // including the quirk where lowPrice strips dashes (so "25-40" → 2540). Keep
-  // the same arithmetic so JSON.stringify produces the same bytes; if the
-  // arithmetic is updated in the React component, update here in lockstep.
-  const lowPrice = product.price_range
-    ? parseFloat(product.price_range.replace(/[^0-9.]/g, '').split('-')[0]) || 0
-    : 0;
-  const highPrice = product.price_range && product.price_range.includes('-')
-    ? parseFloat(product.price_range.replace(/[^0-9.-]/g, '').split('-')[1]) || 0
-    : product.price_range
-      ? parseFloat(product.price_range.replace(/[^0-9.]/g, '')) || 0
-      : 0;
+  const { low: lowPrice, high: highPrice } = parsePriceRange(product.price_range);
   return [
     {
       '@context': 'https://schema.org/',
       '@type': 'Product',
       name: product.title,
       image: product.images || [],
-      description: product.description,
+      description: richProductDescription(product),
       sku: product.id,
       brand: {
         '@type': 'Brand',
@@ -805,10 +815,8 @@ async function main(): Promise<void> {
       const slug = toSlug(product.title);
       const path = `/products/${slug}-${product.id}`;
       const canonical = `${SITE_URL}/${lang}${path}`;
-      const title = `${product.title} | BOLEN Mirror`;
-      const description =
-        product.description ||
-        `View details for ${product.title}, a premium mirror from Jiaxing Chengtai Mirror Co., Ltd.`;
+      const title = productSeoTitle(product);
+      const description = richProductDescription(product);
       const headExtras = buildHead({
         lang,
         title,

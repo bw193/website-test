@@ -1,3 +1,6 @@
+# Bare root → default language so crawlers see a 301, not a thin SPA shell.
+/              /en/                    301
+
 # Legacy non-prefixed public URLs → /en/* (preserves any inbound links from before language routing)
 /products      /en/products            301
 /products/*    /en/products/:splat     301
