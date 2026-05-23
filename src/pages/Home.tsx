@@ -181,10 +181,11 @@ export default function Home() {
         }
       ]} />
       {/* Hero Section */}
-      <div className="relative bg-stone-900 min-h-[90vh] flex items-center justify-center overflow-hidden group">
+      <div className="relative bg-stone-900 overflow-hidden group">
         <h1 className="sr-only">BOLEN — LED Mirror Manufacturer & OEM Smart Mirror Factory</h1>
-        <div className="absolute inset-0">
-          <AnimatePresence>
+        {/* Image in natural flow to preserve aspect ratio */}
+        <div className="relative w-full">
+          <AnimatePresence mode="wait">
             {heroBgs.length > 0 && (
               <m.img
                 key={currentBgIndex}
@@ -192,7 +193,7 @@ export default function Home() {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 1.5, ease: "easeInOut" }}
-                className="absolute inset-0 w-full h-full object-cover"
+                className="w-full h-auto block"
                 src={optimizeImage(heroBgs[currentBgIndex], { width: 1920, quality: 85 })}
                 alt="BOLEN LED bathroom mirror manufacturing showcase"
                 referrerPolicy="no-referrer"
@@ -219,7 +220,7 @@ export default function Home() {
             >
               <ChevronRight className="w-8 h-8" />
             </button>
-            <div className="absolute bottom-24 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+            <div className="absolute bottom-8 sm:bottom-20 left-1/2 -translate-x-1/2 z-20 flex gap-2">
               {heroBgs.map((_, idx) => (
                 <button
                   key={idx}
@@ -234,13 +235,13 @@ export default function Home() {
       </div>
 
       {/* Stats Section */}
-      <div className="relative -mt-16 z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="relative -mt-8 sm:-mt-16 z-10 max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <m.div 
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
           variants={staggerContainer}
-          className="bg-white rounded-2xl shadow-xl border border-stone-100 p-8 lg:p-12 grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12"
+          className="bg-white rounded-xl sm:rounded-2xl shadow-xl border border-stone-100 py-3 px-2 sm:p-8 lg:p-12 flex overflow-x-auto sm:grid sm:grid-cols-4 sm:overflow-visible gap-0 sm:gap-8 lg:gap-12"
         >
           {[
             { icon: Factory, value: "50k+", label: t('home.stats.sqMeters') },
@@ -248,12 +249,12 @@ export default function Home() {
             { icon: Lightbulb, value: "200+", label: t('home.stats.styles') },
             { icon: Globe, value: "Global", label: t('home.stats.global') }
           ].map((stat, idx) => (
-            <m.div key={idx} variants={fadeIn} className="flex flex-col items-center text-center group">
-              <div className="h-14 w-14 rounded-full bg-stone-50 group-hover:bg-amber-50 flex items-center justify-center mb-4 transition-colors duration-300">
+            <m.div key={idx} variants={fadeIn} className="flex-1 min-w-0 flex flex-col items-center text-center group">
+              <div className="hidden sm:flex h-14 w-14 rounded-full bg-stone-50 group-hover:bg-amber-50 items-center justify-center mb-4 transition-colors duration-300">
                 <stat.icon className="h-7 w-7 text-amber-600" />
               </div>
-              <p className="text-3xl font-bold text-stone-900 mb-1 font-serif">{stat.value}</p>
-              <p className="text-xs text-stone-500 uppercase tracking-widest font-semibold">{stat.label}</p>
+              <p className="text-base sm:text-3xl font-bold text-stone-900 mb-0.5 sm:mb-1 font-serif whitespace-nowrap">{stat.value}</p>
+              <p className="text-[8px] sm:text-xs text-stone-500 uppercase tracking-wide sm:tracking-widest font-semibold leading-tight whitespace-nowrap">{stat.label}</p>
             </m.div>
           ))}
         </m.div>
