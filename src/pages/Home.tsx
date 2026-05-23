@@ -235,13 +235,13 @@ export default function Home() {
       </div>
 
       {/* Stats Section */}
-      <div className="relative -mt-8 sm:-mt-16 z-10 max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-        <m.div 
+      <div className="relative -mt-8 sm:-mt-10 z-10 max-w-5xl mx-auto px-3 sm:px-6 lg:px-8">
+        <m.div
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
           variants={staggerContainer}
-          className="bg-white rounded-xl sm:rounded-2xl shadow-xl border border-stone-100 py-3 px-2 sm:p-8 lg:p-12 flex overflow-x-auto sm:grid sm:grid-cols-4 sm:overflow-visible gap-0 sm:gap-8 lg:gap-12"
+          className="bg-white rounded-xl sm:rounded-2xl shadow-xl border border-stone-100 py-3 px-2 sm:py-5 sm:px-6 lg:py-6 lg:px-8 flex overflow-x-auto sm:grid sm:grid-cols-4 sm:overflow-visible gap-0 sm:gap-4 lg:gap-6"
         >
           {[
             { icon: Factory, value: "50k+", label: t('home.stats.sqMeters') },
@@ -250,11 +250,11 @@ export default function Home() {
             { icon: Globe, value: "Global", label: t('home.stats.global') }
           ].map((stat, idx) => (
             <m.div key={idx} variants={fadeIn} className="flex-1 min-w-0 flex flex-col items-center text-center group">
-              <div className="hidden sm:flex h-14 w-14 rounded-full bg-stone-50 group-hover:bg-amber-50 items-center justify-center mb-4 transition-colors duration-300">
-                <stat.icon className="h-7 w-7 text-amber-600" />
+              <div className="hidden sm:flex h-10 w-10 rounded-full bg-stone-50 group-hover:bg-amber-50 items-center justify-center mb-2 transition-colors duration-300">
+                <stat.icon className="h-5 w-5 text-amber-600" />
               </div>
-              <p className="text-base sm:text-3xl font-bold text-stone-900 mb-0.5 sm:mb-1 font-serif whitespace-nowrap">{stat.value}</p>
-              <p className="text-[8px] sm:text-xs text-stone-500 uppercase tracking-wide sm:tracking-widest font-semibold leading-tight whitespace-nowrap">{stat.label}</p>
+              <p className="text-base sm:text-2xl font-bold text-stone-900 mb-0.5 font-serif whitespace-nowrap">{stat.value}</p>
+              <p className="text-[8px] sm:text-[11px] text-stone-500 uppercase tracking-wide sm:tracking-wider font-semibold leading-tight whitespace-nowrap">{stat.label}</p>
             </m.div>
           ))}
         </m.div>
