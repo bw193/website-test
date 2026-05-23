@@ -8,6 +8,7 @@ import ProductCard from '../components/ProductCard';
 import SEO from '../components/SEO';
 import { optimizeImage } from '../utils/optimizeImage';
 import { useLocalizedPath } from '../hooks/useLocalizedPath';
+import { readInitialHomeData } from '../utils/prerenderData';
 
 const GlobalMap = lazy(() => import('../components/GlobalMap'));
 
@@ -26,23 +27,40 @@ const staggerContainer = {
   }
 };
 
+const DEFAULT_HERO_BGS = [
+  "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-images/site-assets/1773994889396-9i4t1ap.jpg",
+];
+const DEFAULT_CATEGORIES = [
+  "New Arrival",
+  "Hot Sale",
+  "Led Lighted Mirror",
+  "Bathroom Mirror without led",
+  "Full Length Dressing Mirror",
+  "Irregular Mirror",
+];
+
+const CERTS = [
+  { url: "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/au.png", alt: "SAA Australia certification" },
+  { url: "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/CE(1)(1).jpg", alt: "CE European conformity certification" },
+  { url: "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/IP44.jpg", alt: "IP44 water and dust resistance rating" },
+  { url: "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/UKCA.jpg", alt: "UKCA United Kingdom conformity certification" },
+  { url: "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/UL2.jpg", alt: "UL safety certification" },
+  { url: "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/ctce.png", alt: "CCC China compulsory certification" },
+];
+
 export default function Home() {
   const { t } = useTranslation();
   const { lp } = useLocalizedPath();
-  const [heroBgs, setHeroBgs] = useState<string[]>([
-    "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-images/site-assets/1773994889396-9i4t1ap.jpg"
-  ]);
+  const initialData = readInitialHomeData<any>();
+  const [heroBgs, setHeroBgs] = useState<string[]>(
+    initialData?.heroBgs && initialData.heroBgs.length > 0 ? initialData.heroBgs : DEFAULT_HERO_BGS
+  );
   const [currentBgIndex, setCurrentBgIndex] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
-  const [allProducts, setAllProducts] = useState<any[]>([]);
-  const [categories, setCategories] = useState<string[]>([
-    "New Arrival",
-    "Hot Sale",
-    "Led Lighted Mirror",
-    "Bathroom Mirror without led",
-    "Full Length Dressing Mirror",
-    "Irregular Mirror"
-  ]);
+  const [isLoading, setIsLoading] = useState(initialData === null);
+  const [allProducts, setAllProducts] = useState<any[]>(initialData?.products ?? []);
+  const [categories, setCategories] = useState<string[]>(
+    initialData?.categories && initialData.categories.length > 0 ? initialData.categories : DEFAULT_CATEGORIES
+  );
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const normalizeCategory = (cat: string | undefined | null) => {
@@ -51,6 +69,10 @@ export default function Home() {
   };
 
   useEffect(() => {
+    // Prerender data island already seeded state synchronously — skip the
+    // Supabase round-trip on production builds.
+    if (initialData) return;
+
     const fetchSettings = async () => {
       try {
         // Fetch hero background settings
@@ -185,7 +207,7 @@ export default function Home() {
         <h1 className="sr-only">BOLEN — LED Mirror Manufacturer & OEM Smart Mirror Factory</h1>
         {/* Image in natural flow to preserve aspect ratio */}
         <div className="relative w-full">
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="wait" initial={false}>
             {heroBgs.length > 0 && (
               <m.img
                 key={currentBgIndex}
@@ -397,78 +419,7 @@ export default function Home() {
                 </m.div>
               ))}
             </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[300px]">
-              <>
-                <m.div 
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  className="md:col-span-2 md:row-span-2 relative rounded-3xl overflow-hidden group cursor-pointer"
-                >
-                  <Link to={lp('/products')} className="block w-full h-full">
-                    <img src="https://picsum.photos/seed/smart-mirror/800/600" alt="Smart Mirrors" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" width="800" height="600" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-90 group-hover:opacity-100 transition-opacity duration-500" />
-                    <div className="absolute bottom-0 left-0 p-8 md:p-12 w-full text-white">
-                      <span className="inline-block px-3 py-1 bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-full text-xs font-semibold tracking-wider uppercase mb-4 backdrop-blur-sm shadow-sm">{t('home.collections.smart.tag')}</span>
-                      <h3 className="text-3xl md:text-4xl font-serif mb-3 drop-shadow-md">{t('home.collections.smart.title')}</h3>
-                      <p className="text-stone-200 max-w-md font-light mb-6 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 drop-shadow-sm">
-                        {t('home.collections.smart.desc')}
-                      </p>
-                      <span className="inline-flex items-center text-white font-medium drop-shadow-sm">
-                        {t('home.collections.smart.explore')} <ChevronRight className="ml-1 h-5 w-5" />
-                      </span>
-                    </div>
-                  </Link>
-                </m.div>
-
-                <m.div 
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.2 }}
-                  className="relative rounded-3xl overflow-hidden group cursor-pointer"
-                >
-                  <Link to={lp('/products')} className="block w-full h-full">
-                    <img src="https://picsum.photos/seed/vanity-mirror/400/400" alt="Vanity Mirrors" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" width="400" height="400" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-90 group-hover:opacity-100 transition-opacity duration-500" />
-                    <div className="absolute bottom-0 left-0 p-8 w-full text-white">
-                      <h3 className="text-2xl font-serif mb-2 drop-shadow-md">{t('home.collections.vanity.title')}</h3>
-                      <p className="text-stone-200 text-sm font-light mb-4 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 drop-shadow-sm">
-                        {t('home.collections.vanity.desc')}
-                      </p>
-                      <span className="inline-flex items-center text-white font-medium text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500 drop-shadow-sm">
-                        {t('home.collections.vanity.explore')} <ChevronRight className="ml-1 h-4 w-4" />
-                      </span>
-                    </div>
-                  </Link>
-                </m.div>
-
-                <m.div 
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.4 }}
-                  className="relative rounded-3xl overflow-hidden group cursor-pointer bg-white p-8 flex flex-col justify-between border border-stone-200 hover:border-amber-500/50 hover:shadow-lg transition-all"
-                >
-                  <Link to={lp('/products')} className="block w-full h-full flex flex-col justify-between">
-                    <div>
-                      <div className="h-12 w-12 rounded-full bg-stone-100 flex items-center justify-center mb-6">
-                        <Factory className="h-6 w-6 text-amber-600" />
-                      </div>
-                      <h3 className="text-2xl font-serif mb-3 text-stone-900">{t('home.collections.oem.title')}</h3>
-                      <p className="text-stone-600 text-sm font-light leading-relaxed">
-                        {t('home.collections.oem.desc')}
-                      </p>
-                    </div>
-                    <span className="inline-flex items-center text-amber-600 font-medium mt-6">
-                      {t('home.collections.oem.partner')} <ArrowRight className="ml-2 h-4 w-4" />
-                    </span>
-                  </Link>
-                </m.div>
-              </>
-            </div>
-          )}
+          ) : null}
         </div>
       </div>
 
@@ -583,27 +534,13 @@ export default function Home() {
           
           <div className="flex animate-marquee whitespace-nowrap w-max">
             {/* First set of images */}
-            {[
-              { url: "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/au.png", alt: "SAA Australia certification" },
-              { url: "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/CE(1)(1).jpg", alt: "CE European conformity certification" },
-              { url: "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/IP44.jpg", alt: "IP44 water and dust resistance rating" },
-              { url: "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/UKCA.jpg", alt: "UKCA United Kingdom conformity certification" },
-              { url: "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/UL2.jpg", alt: "UL safety certification" },
-              { url: "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/ctce.png", alt: "CCC China compulsory certification" }
-            ].map((cert, idx) => (
+            {CERTS.map((cert, idx) => (
               <div key={`cert-1-${idx}`} className="mx-8 flex-none w-48 h-32 flex items-center justify-center grayscale hover:grayscale-0 transition-all duration-300">
                 <img src={cert.url} alt={cert.alt} className="max-w-full max-h-full object-contain" width="192" height="128" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
               </div>
             ))}
             {/* Duplicate set for seamless scrolling */}
-            {[
-              { url: "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/au.png", alt: "SAA Australia certification" },
-              { url: "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/CE(1)(1).jpg", alt: "CE European conformity certification" },
-              { url: "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/IP44.jpg", alt: "IP44 water and dust resistance rating" },
-              { url: "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/UKCA.jpg", alt: "UKCA United Kingdom conformity certification" },
-              { url: "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/UL2.jpg", alt: "UL safety certification" },
-              { url: "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/ctce.png", alt: "CCC China compulsory certification" }
-            ].map((cert, idx) => (
+            {CERTS.map((cert, idx) => (
               <div key={`cert-2-${idx}`} className="mx-8 flex-none w-48 h-32 flex items-center justify-center grayscale hover:grayscale-0 transition-all duration-300">
                 <img src={cert.url} alt={cert.alt} className="max-w-full max-h-full object-contain" width="192" height="128" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
               </div>

@@ -7,10 +7,12 @@
 const SCRIPT_ID = '__BOLEN_PRERENDER_DATA__';
 
 interface PrerenderPayload {
-  route?: 'catalog' | 'productDetail';
+  route?: 'home' | 'catalog' | 'productDetail';
   lang?: string;
   products?: unknown[];
   product?: { id?: string } & Record<string, unknown>;
+  heroBgs?: string[];
+  categories?: string[];
 }
 
 let cache: PrerenderPayload | null | undefined;
@@ -48,4 +50,18 @@ export function readInitialProduct<T>(productId: string): T | null {
     return data.product as T;
   }
   return null;
+}
+
+export function readInitialHomeData<T>(): {
+  products: T[];
+  heroBgs: string[];
+  categories: string[];
+} | null {
+  const data = getPrerenderData();
+  if (data?.route !== 'home' || !Array.isArray(data.products)) return null;
+  return {
+    products: data.products as T[],
+    heroBgs: Array.isArray(data.heroBgs) ? data.heroBgs : [],
+    categories: Array.isArray(data.categories) ? data.categories : [],
+  };
 }

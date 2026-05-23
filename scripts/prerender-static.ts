@@ -722,6 +722,79 @@ async function fetchAllProducts(): Promise<Product[]> {
   return (data || []) as Product[];
 }
 
+// Defaults mirror Home.tsx so the home data island always has a populated payload
+// even when site_settings is empty or unreachable.
+const DEFAULT_HERO_BGS = [
+  'https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-images/site-assets/1773994889396-9i4t1ap.jpg',
+];
+const DEFAULT_CATEGORIES = [
+  'New Arrival',
+  'Hot Sale',
+  'Led Lighted Mirror',
+  'Bathroom Mirror without led',
+  'Full Length Dressing Mirror',
+  'Irregular Mirror',
+];
+
+async function fetchSiteSettings(): Promise<{ heroBgs: string[]; categories: string[] }> {
+  const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || '';
+  const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || '';
+
+  if (!supabaseUrl || !supabaseKey) {
+    return { heroBgs: DEFAULT_HERO_BGS, categories: DEFAULT_CATEGORIES };
+  }
+
+  const supabase = createClient(supabaseUrl, supabaseKey);
+
+  let heroBgs: string[] = DEFAULT_HERO_BGS;
+  let categories: string[] = DEFAULT_CATEGORIES;
+
+  try {
+    const { data: heroData } = await supabase
+      .from('site_settings')
+      .select('value')
+      .eq('key', 'hero_bg')
+      .single();
+    if (heroData && heroData.value) {
+      try {
+        const parsed = JSON.parse(heroData.value);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          const filtered = parsed.filter((url: string) => !url.includes('building.jpg'));
+          if (filtered.length > 0) heroBgs = filtered;
+        } else if (typeof heroData.value === 'string' && heroData.value.length > 0 && !heroData.value.startsWith('[')) {
+          if (!heroData.value.includes('building.jpg')) heroBgs = [heroData.value];
+        }
+      } catch {
+        if (typeof heroData.value === 'string' && heroData.value.length > 0 && !heroData.value.includes('building.jpg')) {
+          heroBgs = [heroData.value];
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('[prerender-static] hero_bg fetch failed; using default.', err);
+  }
+
+  try {
+    const { data: catData } = await supabase
+      .from('site_settings')
+      .select('value')
+      .eq('key', 'categories')
+      .single();
+    if (catData && catData.value) {
+      try {
+        const parsed = JSON.parse(catData.value);
+        if (Array.isArray(parsed) && parsed.length > 0) categories = parsed;
+      } catch {
+        // ignore — fall back to defaults
+      }
+    }
+  } catch (err) {
+    console.warn('[prerender-static] categories fetch failed; using default.', err);
+  }
+
+  return { heroBgs, categories };
+}
+
 async function main(): Promise<void> {
   console.log('[prerender-static] Reading dist/index.html...');
   const template = await readFile(resolve(DIST, 'index.html'), 'utf-8');
@@ -730,6 +803,13 @@ async function main(): Promise<void> {
   const products = await fetchAllProducts();
   console.log(`[prerender-static] ${products.length} products loaded.`);
 
+  console.log('[prerender-static] Fetching site settings (hero, categories)...');
+  const { heroBgs, categories } = await fetchSiteSettings();
+
+  // ProductCard only reads id/title/description/images/category/price_range/msrp;
+  // strip the heavy details/specifications fields out of the shared product payload.
+  const lightProducts = products.map(({ details, specifications, ...rest }) => rest);
+
   let routeCount = 0;
   for (const lang of LANGUAGES) {
     const c = COPY[lang];
@@ -737,7 +817,14 @@ async function main(): Promise<void> {
     // Home
     {
       const canonical = `${SITE_URL}/${lang}/`;
-      const headExtras = buildHead({
+      const dataScript = prerenderDataScript({
+        route: 'home',
+        lang,
+        products: lightProducts,
+        heroBgs,
+        categories,
+      });
+      const headExtras = `${buildHead({
         lang,
         title: c.homeTitle,
         description: c.homeDesc,
@@ -746,7 +833,7 @@ async function main(): Promise<void> {
         ogType: 'website',
         routePath: '/',
         schema: homeSchema(),
-      });
+      })}\n    ${dataScript}`;
       const html = injectIntoTemplate(template, {
         lang,
         headExtras,
@@ -759,9 +846,7 @@ async function main(): Promise<void> {
     // Catalog
     {
       const canonical = `${SITE_URL}/${lang}/products/`;
-      // ProductCard only reads id/title/description/images/category/price_range/msrp;
-      // strip the heavy details/specifications fields out of the catalog payload.
-      const catalogProducts = products.map(({ details, specifications, ...rest }) => rest);
+      const catalogProducts = lightProducts;
       const dataScript = prerenderDataScript({ route: 'catalog', lang, products: catalogProducts });
       const headExtras = `${buildHead({
         lang,

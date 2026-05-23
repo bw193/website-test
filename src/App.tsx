@@ -13,14 +13,17 @@ import LanguageLayout from './components/LanguageLayout';
 import { hasSupabaseConfig } from './supabase';
 import Home from './pages/Home';
 import Products from './pages/Products';
-import OurStory from './pages/OurStory';
-import ProductDetail from './pages/ProductDetail';
-import RFQ from './pages/RFQ';
 import { LazyMotion, domAnimation } from 'motion/react';
 
 
-// Lazy-load admin pages only; top public pages render synchronously so SEO
-// crawlers (and audits) don't capture the Suspense spinner instead of content.
+// Home and Products render synchronously — they are the most common landing
+// targets from search and ads, so their bundles must be in the initial chunk.
+// ProductDetail, OurStory, RFQ are lazy-loaded: deep-link visits still see the
+// prerendered body content (baked into each route's index.html) while the
+// chunk downloads, and most homepage visitors never navigate to them.
+const ProductDetail = lazy(() => import('./pages/ProductDetail'));
+const OurStory = lazy(() => import('./pages/OurStory'));
+const RFQ = lazy(() => import('./pages/RFQ'));
 const AdminLogin = lazy(() => import('./pages/AdminLogin'));
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 const AdminProductForm = lazy(() => import('./pages/AdminProductForm'));
