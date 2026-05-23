@@ -299,7 +299,7 @@ export default function ProductDetail() {
                         : 'border border-stone-200 hover:border-amber-300 hover:shadow-md'
                     }`}
                   >
-                    <img src={optimizeImage(img, { width: 160, height: 160 })} alt={`Thumbnail ${idx}`} className="w-full h-full object-cover" width="160" height="160" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
+                    <img src={img} alt={`Thumbnail ${idx}`} className="w-full h-full object-cover" width="160" height="160" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
                   </button>
                 ))}
               </m.div>
