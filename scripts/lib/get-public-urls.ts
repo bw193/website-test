@@ -46,7 +46,7 @@ export async function getPublicPages(): Promise<PublicPage[]> {
   }
 
   const productPages: PublicPage[] = (products || []).map((p) => ({
-    path: `/products/${toSlug(p.title)}-${p.id}`,
+    path: `/products/${toSlug(p.title)}`,
     changefreq: 'weekly',
     priority: '0.8',
     lastmod: (p.updated_at || p.created_at || today).split('T')[0],

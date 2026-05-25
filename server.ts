@@ -64,7 +64,7 @@ ${xDefault}
     const productPages = (products || []).map(product => {
       const slug = toSlug(product.title);
       const lastmod = (product.updated_at || product.created_at || today).split('T')[0];
-      return { loc: `/products/${slug}-${product.id}`, changefreq: 'weekly', priority: '0.8', lastmod };
+      return { loc: `/products/${slug}`, changefreq: 'weekly', priority: '0.8', lastmod };
     });
 
     const allPages = [...staticPages, ...productPages];

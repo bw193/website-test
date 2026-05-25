@@ -68,7 +68,7 @@ async function generateSitemap() {
     const slug = toSlug(p.title);
     const lastmod = (p.updated_at || p.created_at || today).split('T')[0];
     return {
-      loc: `/products/${slug}-${p.id}`,
+      loc: `/products/${slug}`,
       changefreq: 'weekly',
       priority: '0.8',
       lastmod,

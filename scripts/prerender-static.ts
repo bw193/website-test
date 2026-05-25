@@ -442,7 +442,7 @@ function catalogContent(lang: Lang, products: Product[]): string {
   const items = products
     .map((p) => {
       const slug = toSlug(p.title || '');
-      const href = `/${lang}/products/${slug}-${p.id}`;
+      const href = `/${lang}/products/${slug}`;
       const img = p.images?.[0];
       const imgTag = img
         ? `<img src="${escapeAttr(img)}" alt="${escapeAttr(p.title)}" width="400" height="400" loading="lazy" />`
@@ -464,7 +464,7 @@ function catalogContent(lang: Lang, products: Product[]): string {
 function productDetailContent(lang: Lang, product: Product): string {
   const c = COPY[lang];
   const slug = toSlug(product.title || '');
-  const href = `/${lang}/products/${slug}-${product.id}`;
+  const href = `/${lang}/products/${slug}`;
   const img = product.images?.[0];
   const imgTag = img
     ? `<img src="${escapeAttr(img)}" alt="${escapeAttr(product.title)}" width="600" height="600" />`
@@ -607,7 +607,7 @@ function productSeoTitle(product: Product): string {
 
 function productDetailSchema(lang: Lang, product: Product): any[] {
   const slug = toSlug(product.title);
-  const productFullUrl = `https://bolenmirror.com/${lang}/products/${slug}-${product.id}/`;
+  const productFullUrl = `https://bolenmirror.com/${lang}/products/${slug}/`;
   const { low: lowPrice, high: highPrice } = parsePriceRange(product.price_range);
   return [
     {
@@ -811,6 +811,9 @@ async function main(): Promise<void> {
   const lightProducts = products.map(({ details, specifications, ...rest }) => rest);
 
   let routeCount = 0;
+  // Slugs no longer carry the row UUID, so two products with the same title
+  // would map to the same file. Guard against silently overwriting one.
+  const seenProductSlugs = new Set<string>();
   for (const lang of LANGUAGES) {
     const c = COPY[lang];
 
@@ -916,7 +919,15 @@ async function main(): Promise<void> {
     for (const product of products) {
       if (!product.id || !product.title) continue;
       const slug = toSlug(product.title);
-      const path = `/products/${slug}-${product.id}`;
+      const slugKey = `${lang}/${slug}`;
+      if (seenProductSlugs.has(slugKey)) {
+        console.warn(
+          `[prerender-static] Duplicate product slug "${slug}" (${product.id}); skipping to avoid overwriting the earlier product.`
+        );
+        continue;
+      }
+      seenProductSlugs.add(slugKey);
+      const path = `/products/${slug}`;
       const canonical = `${SITE_URL}/${lang}${path}/`;
       const title = productSeoTitle(product);
       const description = richProductDescription(product);

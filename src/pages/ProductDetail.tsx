@@ -10,6 +10,7 @@ import SEO from '../components/SEO';
 import { optimizeImage } from '../utils/optimizeImage';
 import { useLocalizedPath } from '../hooks/useLocalizedPath';
 import { readInitialProduct } from '../utils/prerenderData';
+import { toSlug, parseProductParam } from '../utils/slug';
 
 interface Product {
   id: string;
@@ -30,10 +31,11 @@ interface RFQForm {
 }
 
 export default function ProductDetail() {
-  const { id } = useParams<{ id: string }>();
+  const { id: routeParam } = useParams<{ id: string }>();
   const { lang, lp } = useLocalizedPath();
-  const actualId = id ? (id.length > 36 ? id.slice(-36) : id) : '';
-  const initialProduct = readInitialProduct<Product>(actualId);
+  // URLs are now "/products/<slug>"; "<slug>-<uuid>" (and bare uuid) still resolve.
+  const { slug: routeSlug, legacyId } = parseProductParam(routeParam);
+  const initialProduct = readInitialProduct<Product>({ slug: routeSlug, id: legacyId });
   const [product, setProduct] = useState<Product | null>(initialProduct);
   const [loading, setLoading] = useState(initialProduct === null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -43,27 +45,40 @@ export default function ProductDetail() {
   const { register, handleSubmit, reset, formState: { errors } } = useForm<RFQForm>();
 
   useEffect(() => {
+    let cancelled = false;
     const fetchProduct = async () => {
-      if (!actualId) return;
+      if (!routeSlug && !legacyId) return;
       try {
-        const { data, error } = await supabase
-          .from('products')
-          .select('*')
-          .eq('id', actualId)
-          .single();
-
-        if (error) throw error;
-        if (data) {
-          setProduct(data as Product);
+        // Fast path: a legacy URL gives the id outright, and a prerendered
+        // direct visit already knows it from the data island. Otherwise the
+        // slug must be matched against title-derived slugs (no slug column).
+        const knownId = legacyId || initialProduct?.id;
+        let resolved: Product | null = null;
+        if (knownId) {
+          const { data, error } = await supabase
+            .from('products')
+            .select('*')
+            .eq('id', knownId)
+            .single();
+          if (error) throw error;
+          resolved = (data as Product) ?? null;
+        } else {
+          const { data, error } = await supabase.from('products').select('*');
+          if (error) throw error;
+          resolved = (data as Product[] | null)?.find((p) => toSlug(p.title) === routeSlug) ?? null;
         }
+        if (!cancelled && resolved) setProduct(resolved);
       } catch (error) {
         console.error("Error fetching product", error);
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     };
     fetchProduct();
-  }, [actualId]);
+    return () => {
+      cancelled = true;
+    };
+  }, [routeSlug, legacyId]);
 
   const onSubmitRFQ = async (data: RFQForm) => {
     if (!product) return;
@@ -153,8 +168,7 @@ export default function ProductDetail() {
     }
   };
 
-  const slug = product ? product.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') : '';
-  const productPath = product ? `/products/${slug}-${product.id}` : '/products';
+  const productPath = product ? `/products/${toSlug(product.title)}` : '/products';
   // Trailing slash to match Cloudflare Pages directory-style URLs and the
   // canonical/sitemap; prerender-static.ts uses the same shape so Helmet
   // adopts the existing JSON-LD tag instead of appending a duplicate.

@@ -4,13 +4,15 @@
 // rendered DOM contains products before the Supabase fetch completes —
 // crawlers and slow-network users see content instead of a loading skeleton.
 
+import { toSlug } from './slug';
+
 const SCRIPT_ID = '__BOLEN_PRERENDER_DATA__';
 
 interface PrerenderPayload {
   route?: 'home' | 'catalog' | 'productDetail';
   lang?: string;
   products?: unknown[];
-  product?: { id?: string } & Record<string, unknown>;
+  product?: { id?: string; title?: string } & Record<string, unknown>;
   heroBgs?: string[];
   categories?: string[];
 }
@@ -44,12 +46,13 @@ export function readInitialProducts<T>(): T[] | null {
   return null;
 }
 
-export function readInitialProduct<T>(productId: string): T | null {
+export function readInitialProduct<T>(match: { slug: string; id?: string }): T | null {
   const data = getPrerenderData();
-  if (data?.route === 'productDetail' && data.product?.id === productId) {
-    return data.product as T;
-  }
-  return null;
+  if (data?.route !== 'productDetail' || !data.product) return null;
+  const p = data.product;
+  const matchesSlug = !!match.slug && typeof p.title === 'string' && toSlug(p.title) === match.slug;
+  const matchesId = !!match.id && p.id === match.id;
+  return matchesSlug || matchesId ? (data.product as T) : null;
 }
 
 export function readInitialHomeData<T>(): {

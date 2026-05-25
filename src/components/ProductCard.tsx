@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { ArrowRight } from 'lucide-react';
 import { optimizeImage, imageSrcSet } from '../utils/optimizeImage';
 import { useLocalizedPath } from '../hooks/useLocalizedPath';
+import { toSlug } from '../utils/slug';
 
 interface ProductCardProps {
   id: string;
@@ -23,8 +24,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ id, title, description, image
     return val.startsWith('$') ? val : `$${val}`;
   };
 
-  const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-  const productUrl = lp(`/products/${slug}-${id}`);
+  const productUrl = lp(`/products/${toSlug(title)}`);
 
   return (
     <Link to={productUrl} className="group block h-full">
