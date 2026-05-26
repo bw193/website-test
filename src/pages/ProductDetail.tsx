@@ -11,6 +11,7 @@ import { optimizeImage } from '../utils/optimizeImage';
 import { useLocalizedPath } from '../hooks/useLocalizedPath';
 import { readInitialProduct } from '../utils/prerenderData';
 import { toSlug, parseProductParam } from '../utils/slug';
+import { useProductTranslator } from '../utils/productI18n';
 
 interface Product {
   id: string;
@@ -41,6 +42,7 @@ export default function ProductDetail() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [rfqStatus, setRfqStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const { t } = useTranslation();
+  const translate = useProductTranslator(lang);
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<RFQForm>();
 
@@ -147,6 +149,10 @@ export default function ProductDetail() {
     );
   }
 
+  // Localized copy for display + SEO. `product` (English) still drives the
+  // slug/canonical/lookup so URLs stay identical across languages.
+  const display = translate(product);
+
   const nextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % product.images.length);
   };
@@ -182,21 +188,17 @@ export default function ProductDetail() {
   };
   const { low: lowPrice, high: highPrice } = parsePriceRange(product?.price_range);
 
-  const richDescription = product
-    ? (product.description && product.description.trim().length >= 30
-      ? product.description
-      : `Premium ${product.title} by BOLEN Mirror (Jiaxing Chengtai Mirror Co., Ltd.) — OEM/ODM LED, smart, vanity, and bath mirrors. Request a quote for bulk pricing.`)
-    : '';
+  const richDescription = display.description && display.description.trim().length >= 30
+    ? display.description
+    : `Premium ${display.title} by BOLEN Mirror (Jiaxing Chengtai Mirror Co., Ltd.) — OEM/ODM LED, smart, vanity, and bath mirrors. Request a quote for bulk pricing.`;
 
-  const seoTitle = product
-    ? (product.title.length > 55 ? product.title : `${product.title} | BOLEN Mirror`)
-    : '';
+  const seoTitle = display.title.length > 55 ? display.title : `${display.title} | BOLEN Mirror`;
 
   const productSchema = product ? [
     {
       "@context": "https://schema.org/",
       "@type": "Product",
-      "name": product.title,
+      "name": display.title,
       "image": product.images,
       "description": richDescription,
       "sku": product.id,
@@ -219,7 +221,7 @@ export default function ProductDetail() {
       "itemListElement": [
         { "@type": "ListItem", "position": 1, "name": "Home", "item": `https://bolenmirror.com/${lang}/` },
         { "@type": "ListItem", "position": 2, "name": "Products", "item": `https://bolenmirror.com/${lang}/products/` },
-        { "@type": "ListItem", "position": 3, "name": product.title, "item": productFullUrl }
+        { "@type": "ListItem", "position": 3, "name": display.title, "item": productFullUrl }
       ]
     }
   ] : undefined;
@@ -245,7 +247,7 @@ export default function ProductDetail() {
           <ChevronRight className="mx-2 h-4 w-4 text-stone-300" />
           <Link to={lp('/products')} className="hover:text-amber-600 transition-colors">{t('productDetail.backToCatalog')}</Link>
           <ChevronRight className="mx-2 h-4 w-4 text-stone-300" />
-          <span className="text-stone-900 truncate max-w-[200px] sm:max-w-none">{product.title}</span>
+          <span className="text-stone-900 truncate max-w-[200px] sm:max-w-none">{display.title}</span>
         </m.div>
 
         <div className="lg:grid lg:grid-cols-2 lg:gap-x-12 xl:gap-x-16">
@@ -265,7 +267,7 @@ export default function ProductDetail() {
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.3 }}
                   src={optimizeImage(product.images[currentImageIndex], { width: 800 }) || 'https://picsum.photos/seed/mirror/800/800'}
-                  alt={product.title}
+                  alt={display.title}
                   className="w-full h-full object-center object-cover"
                   width="800"
                   height="800"
@@ -329,11 +331,11 @@ export default function ProductDetail() {
           >
             {product.category && (
               <m.p variants={fadeInUp} className="text-sm font-bold text-amber-600 uppercase tracking-widest mb-2">
-                {product.category}
+                {t(`products.categories.${product.category}`, product.category)}
               </m.p>
             )}
             <m.h1 variants={fadeInUp} className="text-3xl font-extrabold tracking-tight text-stone-900 sm:text-4xl lg:text-5xl leading-tight">
-              {product.title}
+              {display.title}
             </m.h1>
             
             {(product.price_range || product.msrp) && (
@@ -345,7 +347,7 @@ export default function ProductDetail() {
 
             <m.div variants={fadeInUp} className="mt-8">
               <h3 className="sr-only">Description</h3>
-              <p className="text-lg text-stone-600 leading-relaxed font-light">{product.description}</p>
+              <p className="text-lg text-stone-600 leading-relaxed font-light">{display.description}</p>
             </m.div>
 
             {/* Value Props */}
@@ -368,7 +370,7 @@ export default function ProductDetail() {
               </div>
             </m.div>
 
-            {product.specifications && (Array.isArray(product.specifications) ? product.specifications.length > 0 : Object.keys(product.specifications).length > 0) && (
+            {display.specifications && (Array.isArray(display.specifications) ? display.specifications.length > 0 : Object.keys(display.specifications).length > 0) && (
               <m.div variants={fadeInUp} className="mt-10">
                 <h3 className="text-xl font-bold text-stone-900 mb-6 flex items-center gap-2">
                   <span className="w-1.5 h-6 bg-amber-600 rounded-full"></span>
@@ -376,9 +378,9 @@ export default function ProductDetail() {
                 </h3>
                 <div className="bg-white rounded-2xl border border-stone-200 overflow-hidden shadow-sm">
                   <ul className="divide-y divide-stone-100">
-                    {(Array.isArray(product.specifications)
-                      ? product.specifications
-                      : Object.entries(product.specifications).map(([key, value]) => ({ key, value }))
+                    {(Array.isArray(display.specifications)
+                      ? display.specifications
+                      : Object.entries(display.specifications).map(([key, value]) => ({ key, value }))
                     ).map((spec, idx) => (
                       <li key={spec.key} className={`flex px-6 py-4 ${idx % 2 === 0 ? 'bg-stone-50/50' : 'bg-white'}`}>
                         <span className="w-1/3 font-medium text-stone-900">{spec.key}</span>
@@ -390,14 +392,14 @@ export default function ProductDetail() {
               </m.div>
             )}
 
-            {product.details && (
+            {display.details && (
               <m.div variants={fadeInUp} className="mt-10">
                 <h3 className="text-xl font-bold text-stone-900 mb-6 flex items-center gap-2">
                   <span className="w-1.5 h-6 bg-amber-600 rounded-full"></span>
                   {t('productDetail.productDetails')}
                 </h3>
                 <div className="prose prose-amber prose-stone max-w-none text-stone-600 leading-relaxed bg-white p-6 rounded-2xl border border-stone-200 shadow-sm">
-                  <ReactMarkdown>{product.details}</ReactMarkdown>
+                  <ReactMarkdown>{display.details}</ReactMarkdown>
                 </div>
               </m.div>
             )}
@@ -455,7 +457,7 @@ export default function ProductDetail() {
                     <textarea
                       id="message"
                       rows={4}
-                      placeholder={`I'm interested in ordering ${product.title}. Please provide pricing for 100 units...`}
+                      placeholder={`I'm interested in ordering ${display.title}. Please provide pricing for 100 units...`}
                       {...register('message', { required: 'Message is required' })}
                       className="block w-full rounded-xl border-stone-200 bg-stone-50 focus:bg-white shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm p-3 transition-colors resize-none"
                     />

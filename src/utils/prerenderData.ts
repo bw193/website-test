@@ -5,6 +5,7 @@
 // crawlers and slow-network users see content instead of a loading skeleton.
 
 import { toSlug } from './slug';
+import { primeProductTranslations, type ProductFields } from './productI18n';
 
 const SCRIPT_ID = '__BOLEN_PRERENDER_DATA__';
 
@@ -15,6 +16,10 @@ interface PrerenderPayload {
   product?: { id?: string; title?: string } & Record<string, unknown>;
   heroBgs?: string[];
   categories?: string[];
+  // Localized product copy embedded per page so the SPA can overlay
+  // translations synchronously on first render. Home/catalog carry the full
+  // map for the language; product pages carry just that product's entry.
+  productTranslations?: Record<string, ProductFields>;
 }
 
 let cache: PrerenderPayload | null | undefined;
@@ -32,6 +37,9 @@ function getPrerenderData(): PrerenderPayload | null {
   }
   try {
     cache = JSON.parse(el.textContent) as PrerenderPayload;
+    // A home/catalog island holds every product's translation for the lang;
+    // a product island holds only one, so don't mark the lang fully loaded.
+    primeProductTranslations(cache.lang, cache.productTranslations, cache.route !== 'productDetail');
   } catch {
     cache = null;
   }

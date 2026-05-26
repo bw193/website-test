@@ -296,6 +296,46 @@ function toSlug(title: string): string {
     .replace(/(^-|-$)+/g, '');
 }
 
+interface ProductFields {
+  title?: string;
+  description?: string;
+  details?: string;
+  specifications?: unknown;
+}
+type LangTranslations = Record<string, ProductFields>;
+
+// Reads the per-language product copy produced by scripts/translate-products.ts.
+// Missing files (translations not generated yet) fall back to English — the
+// build never fails just because a language hasn't been translated.
+async function loadProductTranslations(): Promise<Record<Lang, LangTranslations>> {
+  const out = {} as Record<Lang, LangTranslations>;
+  for (const lang of LANGUAGES) {
+    out[lang] = {};
+    if (lang === 'en' || lang === 'zh') continue; // en is source; zh stays English
+    try {
+      const raw = await readFile(resolve(PROJECT_ROOT, 'public', 'i18n', `products.${lang}.json`), 'utf-8');
+      out[lang] = JSON.parse(raw) as LangTranslations;
+    } catch {
+      // no translation file for this language yet
+    }
+  }
+  return out;
+}
+
+// Overlay localized copy onto an (English) product. Never touches the title
+// used for slugs/URLs — callers always derive those from the original product.
+function localizeProduct(product: Product, tr: LangTranslations | undefined): Product {
+  const fields = tr?.[product.id];
+  if (!fields) return product;
+  return {
+    ...product,
+    title: fields.title || product.title,
+    description: (fields.description as string) || product.description,
+    details: (fields.details as string) || product.details,
+    specifications: fields.specifications ?? product.specifications,
+  };
+}
+
 // react-helmet-async uses `data-rh="true"` to identify the tags it manages.
 // On client mount it diffs existing data-rh tags against what it wants to
 // render and only inserts/removes the difference. Without this marker
@@ -437,17 +477,18 @@ function homeContent(lang: Lang): string {
   `.trim();
 }
 
-function catalogContent(lang: Lang, products: Product[]): string {
+function catalogContent(lang: Lang, products: Product[], tr: LangTranslations): string {
   const c = COPY[lang];
   const items = products
     .map((p) => {
-      const slug = toSlug(p.title || '');
+      const slug = toSlug(p.title || ''); // slug from English title
       const href = `/${lang}/products/${slug}`;
+      const title = tr[p.id]?.title || p.title;
       const img = p.images?.[0];
       const imgTag = img
-        ? `<img src="${escapeAttr(img)}" alt="${escapeAttr(p.title)}" width="400" height="400" loading="lazy" />`
+        ? `<img src="${escapeAttr(img)}" alt="${escapeAttr(title)}" width="400" height="400" loading="lazy" />`
         : '';
-      return `<li><a href="${escapeAttr(href)}">${imgTag}<span>${escapeHtml(p.title)}</span></a></li>`;
+      return `<li><a href="${escapeAttr(href)}">${imgTag}<span>${escapeHtml(title)}</span></a></li>`;
     })
     .join('\n        ');
   return `
@@ -461,15 +502,14 @@ function catalogContent(lang: Lang, products: Product[]): string {
   `.trim();
 }
 
-function productDetailContent(lang: Lang, product: Product): string {
+function productDetailContent(lang: Lang, product: Product, tr: LangTranslations): string {
   const c = COPY[lang];
-  const slug = toSlug(product.title || '');
-  const href = `/${lang}/products/${slug}`;
+  const localized = localizeProduct(product, tr);
   const img = product.images?.[0];
   const imgTag = img
-    ? `<img src="${escapeAttr(img)}" alt="${escapeAttr(product.title)}" width="600" height="600" />`
+    ? `<img src="${escapeAttr(img)}" alt="${escapeAttr(localized.title)}" width="600" height="600" />`
     : '';
-  const desc = product.description ? `<p>${escapeHtml(product.description.slice(0, 600))}</p>` : '';
+  const desc = localized.description ? `<p>${escapeHtml(localized.description.slice(0, 600))}</p>` : '';
   const price = product.price_range
     ? `<p><strong>${escapeHtml(product.price_range.startsWith('$') ? product.price_range : `$${product.price_range}`)}</strong></p>`
     : '';
@@ -480,9 +520,9 @@ function productDetailContent(lang: Lang, product: Product): string {
         &raquo;
         <a href="/${lang}/products">${escapeHtml(c.breadcrumbCatalog)}</a>
         &raquo;
-        <span>${escapeHtml(product.title)}</span>
+        <span>${escapeHtml(localized.title)}</span>
       </nav>
-      <h1>${escapeHtml(product.title)}</h1>
+      <h1>${escapeHtml(localized.title)}</h1>
       ${imgTag}
       ${desc}
       ${price}
@@ -605,17 +645,17 @@ function productSeoTitle(product: Product): string {
   return product.title.length > 55 ? product.title : `${product.title} | BOLEN Mirror`;
 }
 
-function productDetailSchema(lang: Lang, product: Product): any[] {
-  const slug = toSlug(product.title);
+function productDetailSchema(lang: Lang, product: Product, display: Product): any[] {
+  const slug = toSlug(product.title); // slug/URL from English title
   const productFullUrl = `https://bolenmirror.com/${lang}/products/${slug}/`;
   const { low: lowPrice, high: highPrice } = parsePriceRange(product.price_range);
   return [
     {
       '@context': 'https://schema.org/',
       '@type': 'Product',
-      name: product.title,
+      name: display.title,
       image: product.images || [],
-      description: richProductDescription(product),
+      description: richProductDescription(display),
       sku: product.id,
       brand: {
         '@type': 'Brand',
@@ -636,7 +676,7 @@ function productDetailSchema(lang: Lang, product: Product): any[] {
       itemListElement: [
         { '@type': 'ListItem', position: 1, name: 'Home', item: `https://bolenmirror.com/${lang}/` },
         { '@type': 'ListItem', position: 2, name: 'Products', item: `https://bolenmirror.com/${lang}/products/` },
-        { '@type': 'ListItem', position: 3, name: product.title, item: productFullUrl },
+        { '@type': 'ListItem', position: 3, name: display.title, item: productFullUrl },
       ],
     },
   ];
@@ -810,6 +850,13 @@ async function main(): Promise<void> {
   // strip the heavy details/specifications fields out of the shared product payload.
   const lightProducts = products.map(({ details, specifications, ...rest }) => rest);
 
+  console.log('[prerender-static] Loading product translations (public/i18n)...');
+  const translations = await loadProductTranslations();
+  for (const lang of LANGUAGES) {
+    const n = Object.keys(translations[lang]).length;
+    if (n > 0) console.log(`[prerender-static]   ${lang}: ${n} translated products`);
+  }
+
   let routeCount = 0;
   // Slugs no longer carry the row UUID, so two products with the same title
   // would map to the same file. Guard against silently overwriting one.
@@ -826,6 +873,7 @@ async function main(): Promise<void> {
         products: lightProducts,
         heroBgs,
         categories,
+        productTranslations: translations[lang],
       });
       const headExtras = `${buildHead({
         lang,
@@ -850,7 +898,7 @@ async function main(): Promise<void> {
     {
       const canonical = `${SITE_URL}/${lang}/products/`;
       const catalogProducts = lightProducts;
-      const dataScript = prerenderDataScript({ route: 'catalog', lang, products: catalogProducts });
+      const dataScript = prerenderDataScript({ route: 'catalog', lang, products: catalogProducts, productTranslations: translations[lang] });
       const headExtras = `${buildHead({
         lang,
         title: c.catalogTitle,
@@ -864,7 +912,7 @@ async function main(): Promise<void> {
       const html = injectIntoTemplate(template, {
         lang,
         headExtras,
-        bodyContent: catalogContent(lang, products),
+        bodyContent: catalogContent(lang, products, translations[lang]),
       });
       await writeRoute(`${lang}/products`, html);
       routeCount++;
@@ -927,11 +975,18 @@ async function main(): Promise<void> {
         continue;
       }
       seenProductSlugs.add(slugKey);
-      const path = `/products/${slug}`;
+      const path = `/products/${slug}`; // slug from English title
       const canonical = `${SITE_URL}/${lang}${path}/`;
-      const title = productSeoTitle(product);
-      const description = richProductDescription(product);
-      const dataScript = prerenderDataScript({ route: 'productDetail', lang, product });
+      const display = localizeProduct(product, translations[lang]);
+      const title = productSeoTitle(display);
+      const description = richProductDescription(display);
+      const productFields = translations[lang][product.id];
+      const dataScript = prerenderDataScript({
+        route: 'productDetail',
+        lang,
+        product,
+        productTranslations: productFields ? { [product.id]: productFields } : undefined,
+      });
       const headExtras = `${buildHead({
         lang,
         title,
@@ -940,12 +995,12 @@ async function main(): Promise<void> {
         ogImage: product.images?.[0] || DEFAULT_OG_IMAGE,
         ogType: 'product',
         routePath: path,
-        schema: productDetailSchema(lang, product),
+        schema: productDetailSchema(lang, product, display),
       })}\n    ${dataScript}`;
       const html = injectIntoTemplate(template, {
         lang,
         headExtras,
-        bodyContent: productDetailContent(lang, product),
+        bodyContent: productDetailContent(lang, product, translations[lang]),
       });
       await writeRoute(`${lang}${path}`, html);
       routeCount++;

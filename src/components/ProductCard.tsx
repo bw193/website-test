@@ -5,6 +5,7 @@ import { ArrowRight } from 'lucide-react';
 import { optimizeImage, imageSrcSet } from '../utils/optimizeImage';
 import { useLocalizedPath } from '../hooks/useLocalizedPath';
 import { toSlug } from '../utils/slug';
+import { useProductTranslator } from '../utils/productI18n';
 
 interface ProductCardProps {
   id: string;
@@ -18,13 +19,18 @@ interface ProductCardProps {
 
 const ProductCard: React.FC<ProductCardProps> = ({ id, title, description, image, category, priceRange, msrp }) => {
   const { t } = useTranslation();
-  const { lp } = useLocalizedPath();
+  const { lp, lang } = useLocalizedPath();
+  const translate = useProductTranslator(lang);
   const formatPrice = (val?: string) => {
     if (!val) return '';
     return val.startsWith('$') ? val : `$${val}`;
   };
 
+  // Slug stays derived from the English title (prop); only display is localized.
   const productUrl = lp(`/products/${toSlug(title)}`);
+  const d = translate({ id, title, description });
+  const displayTitle = d.title ?? title;
+  const displayDescription = d.description ?? description;
 
   return (
     <Link to={productUrl} className="group block h-full">
@@ -35,7 +41,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ id, title, description, image
           <img
             src={optimizeImage(image, { width: 400 }) || 'https://picsum.photos/seed/mirror/400/500'}
             srcSet={imageSrcSet(image, [300, 400, 600])}
-            alt={title}
+            alt={displayTitle}
             className="w-full h-full object-center object-contain transition-transform duration-700 group-hover:scale-105"
             width="400"
             height="500"
@@ -65,11 +71,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ id, title, description, image
           </div>
           
           <h3 className="text-lg font-bold text-stone-900 leading-tight mb-2 group-hover:text-amber-600 transition-colors line-clamp-2">
-            {title}
+            {displayTitle}
           </h3>
-          
+
           <p className="text-sm text-stone-500 line-clamp-2 mb-4 flex-1">
-            {description}
+            {displayDescription}
           </p>
           
           {(priceRange || msrp) && (

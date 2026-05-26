@@ -3,9 +3,20 @@ export const es = {
     navbar: {
       home: "Inicio",
       catalog: "Catálogo",
+      ourStory: "Nuestra Historia",
       adminDashboard: "Panel de Administración",
       logout: "Cerrar sesión",
       employeeLogin: "Acceso Empleados"
+    },
+    ourStoryPage: {
+      title: "Nuestra Historia",
+      subtitle: "Jiaxing Chengtai Mirror Co., Ltd.",
+      paragraphs: [
+        "Con más de 20 años de experiencia dedicada a la fabricación de espejos (con orígenes que se remontan a 1995), Jiaxing Chengtai Mirror Co., Ltd. ha construido una reputación que va mucho más allá de cualquier canal de venta individual. Nuestro complejo de producción de más de 50.000 metros cuadrados, dos fábricas independientes y un equipo de más de 200 trabajadores cualificados nos brindan la capacidad y la flexibilidad para gestionar pedidos de prácticamente cualquier escala, desde proyectos boutique de diseño de interiores hasta grandes desarrollos hoteleros e inmobiliarios.",
+        "Somos propietarios de todo el proceso de producción de forma interna. Desde el procesamiento del vidrio en bruto y la integración de LED hasta la fabricación de marcos y el ensamblaje de funciones inteligentes, cada etapa de la fabricación se gestiona bajo un mismo techo y es supervisada por inspectores de QA/QC dedicados. Esta integración vertical significa que controlamos la calidad en cada paso, eliminamos los retrasos de terceros y mantenemos plazos de entrega competitivos.",
+        "Nuestros más de 200 estilos de productos en múltiples series principales no son plantillas estándar: representan años de iteración de diseño fundamentados tanto en las tendencias estéticas europeas como en los comentarios reales de los compradores. Para los clientes que necesitan algo único, nuestras capacidades OEM y ODM permiten la personalización completa de tamaño, forma, iluminación, funciones inteligentes, materiales y marca.",
+        "Respaldados por certificaciones internacionales que incluyen CE, RoHS e impermeabilización IP66, nuestros productos cumplen con los requisitos de conformidad de los mercados de Europa, Norteamérica, Oriente Medio y más allá. No solo fabricamos espejos: construimos asociaciones a largo plazo con importadores, distribuidores, diseñadores de interiores y promotores que exigen consistencia, precisión y un proveedor en el que puedan confiar año tras año."
+      ]
     },
     home: {
       companyName: "Jiaxing Chengtai Mirror Co., Ltd.",
@@ -52,6 +63,10 @@ export const es = {
           partner: "Asóciese con Nosotros"
         }
       },
+      certificates: {
+        subtitle: "Nuestras Cualificaciones",
+        title: "Certificaciones Globales"
+      },
       process: {
         subtitle: "Excelencia en Cada Paso",
         title: "El Proceso de Fabricación",
@@ -66,21 +81,18 @@ export const es = {
       whyUs: {
         title1: "¿Por qué Asociarse con",
         title2: "Chengtai?",
-        desc: "No solo fabricamos espejos; construimos asociaciones a largo plazo basadas en la confianza, la calidad y la confiabilidad.",
-        points: [
-          "Derechos de propiedad intelectual y patentes completos",
-          "Tiempo de respuesta promedio inferior a 8 horas",
-          "Tasa de entrega a tiempo del 85.7%",
-          "Más de $270,000 USD en pedidos de plataforma verificados"
+        features: [
+          { title: "Gran Capacidad y Experiencia" },
+          { title: "Integración Vertical" },
+          { title: "Personalización OEM y ODM" },
+          { title: "Calidad Global Certificada" }
         ],
-        cert: {
-          title: "Excelencia Certificada",
-          desc: "Todos los productos superan rigurosas certificaciones internacionales de seguridad y calidad, incluidos los estándares de impermeabilización CE, RoHS e IP66."
-        },
-        logistics: {
-          title: "Logística Global",
-          desc: "Soporte de extremo a extremo, desde la consulta del producto hasta el servicio posventa. Envío disponible por mensajería urgente, flete aéreo, marítimo y terrestre."
-        }
+        paragraphs: [
+          "Con más de 20 años de experiencia dedicada a la fabricación de espejos (con orígenes que se remontan a 1995), Jiaxing Chengtai Mirror Co., Ltd. ha construido una reputación que va mucho más allá de cualquier canal de venta individual. Nuestro complejo de producción de más de 50.000 metros cuadrados, dos fábricas independientes y un equipo de más de 200 trabajadores cualificados nos brindan la capacidad y la flexibilidad para gestionar pedidos de prácticamente cualquier escala, desde proyectos boutique de diseño de interiores hasta grandes desarrollos hoteleros e inmobiliarios.",
+          "Somos propietarios de todo el proceso de producción de forma interna. Desde el procesamiento del vidrio en bruto y la integración de LED hasta la fabricación de marcos y el ensamblaje de funciones inteligentes, cada etapa de la fabricación se gestiona bajo un mismo techo y es supervisada por inspectores de QA/QC dedicados. Esta integración vertical significa que controlamos la calidad en cada paso, eliminamos los retrasos de terceros y mantenemos plazos de entrega competitivos.",
+          "Nuestros más de 200 estilos de productos en múltiples series principales no son plantillas estándar: representan años de iteración de diseño fundamentados tanto en las tendencias estéticas europeas como en los comentarios reales de los compradores. Para los clientes que necesitan algo único, nuestras capacidades OEM y ODM permiten la personalización completa de tamaño, forma, iluminación, funciones inteligentes, materiales y marca.",
+          "Respaldados por certificaciones internacionales que incluyen CE, RoHS e impermeabilización IP66, nuestros productos cumplen con los requisitos de conformidad de los mercados de Europa, Norteamérica, Oriente Medio y más allá. No solo fabricamos espejos: construimos asociaciones a largo plazo con importadores, distribuidores, diseñadores de interiores y promotores que exigen consistencia, precisión y un proveedor en el que puedan confiar año tras año."
+        ]
       },
       cta: {
         title: "¿Listo para Elevar su Espacio?",
@@ -93,7 +105,18 @@ export const es = {
       catalog: "Catálogo de Productos",
       desc: "Explore nuestra extensa colección de espejos premium, con tecnología LED inteligente, elegantes diseños de tocador y opciones personalizables.",
       noProducts: "No se encontraron productos que coincidan con sus criterios.",
-      viewDetails: "Ver Detalles"
+      viewDetails: "Ver Detalles",
+      allCategories: "Todas las Categorías",
+      categories: {
+        "New Arrival": "Novedades",
+        "Hot Sale": "En Oferta",
+        "Led Lighted Mirror": "Espejo con Luz LED",
+        "Bathroom Mirror without led": "Espejo de Baño sin LED",
+        "Full Length Dressing Mirror": "Espejo de Cuerpo Entero",
+        "Irregular Mirror": "Espejo Irregular"
+      },
+      priceRange: "Rango de Precios",
+      msrp: "Precio de Venta Sugerido"
     },
     productDetail: {
       backToCatalog: "Volver al Catálogo",
@@ -107,6 +130,114 @@ export const es = {
       submitting: "Enviando...",
       rfqSuccess: "¡RFQ enviado con éxito! Nos pondremos en contacto con usted pronto.",
       rfqError: "Error al enviar RFQ. Por favor, inténtelo de nuevo."
+    },
+    admin: {
+      dashboard: {
+        title: "Panel de Administración",
+        addProduct: "Añadir Producto",
+        tabs: {
+          products: "Productos",
+          rfqs: "Solicitudes (RFQ)",
+          employees: "Empleados",
+          settings: "Configuración"
+        },
+        products: {
+          uncategorized: "Sin categoría",
+          noProducts: "No se encontraron productos.",
+          deleteConfirm: "¿Está seguro de que desea eliminar este producto?",
+          deleteError: "Error al eliminar el producto."
+        },
+        rfqs: {
+          new: "Nuevo",
+          replyEmail: "Responder por Correo Electrónico",
+          noRfqs: "Aún no se han recibido solicitudes (RFQ)."
+        },
+        employees: {
+          status: "Estado:",
+          approve: "Aprobar",
+          reject: "Rechazar",
+          noEmployees: "No se encontraron cuentas de empleados.",
+          updateError: "Error al actualizar el estado del empleado.",
+          roles: {
+            admin: "ADMIN",
+            pending: "PENDIENTE",
+            rejected: "RECHAZADO"
+          }
+        },
+        settings: {
+          title: "Configuración del Sitio",
+          heroBgLabel: "Imágenes Promocionales de la Página de Inicio",
+          heroBgPlaceholder: "https://example.com/image.jpg",
+          heroBgHelp: "Añada URLs de imágenes o suba imágenes. La primera imagen será la predeterminada si no se proporciona ninguna.",
+          preview: "Vista previa:",
+          save: "Guardar Configuración",
+          saving: "Guardando...",
+          saveSuccess: "¡Configuración guardada con éxito!",
+          setupRequired: "Configuración de Base de Datos Requerida",
+          setupDesc: "Para habilitar la configuración del sitio, ejecute el siguiente comando SQL en su Editor SQL de Supabase:",
+          setupBtn: "He ejecutado el comando SQL",
+          addImage: "Añadir Imagen",
+          removeImage: "Eliminar"
+        }
+      },
+      login: {
+        title: "Portal de Empleados",
+        subtitleRegister: "Cree una cuenta de empleado para solicitar acceso.",
+        subtitleLogin: "Inicie sesión para gestionar el catálogo de productos y ver las solicitudes (RFQ).",
+        pendingTitle: "¡Pendiente de Aprobación!",
+        pendingDesc: "Su cuenta ({{email}}) está esperando la aprobación del administrador principal.",
+        deniedTitle: "¡Acceso Denegado!",
+        deniedDesc: "Su cuenta ({{email}}) no tiene privilegios de administrador.",
+        email: "Dirección de correo electrónico",
+        password: "Contraseña",
+        registerBtn: "Registrar Cuenta",
+        signInBtn: "Iniciar Sesión",
+        quickLogin: "Acceso Rápido (Administrador Principal)",
+        orContinueWith: "O continúe con",
+        googleLogin: "Google (Administrador Principal)",
+        alreadyHaveAccount: "¿Ya tiene una cuenta? Inicie sesión",
+        needAccount: "¿Necesita una cuenta de empleado? Regístrese",
+        errors: {
+          loginFailed: "Ocurrió un error durante el inicio de sesión.",
+          generalError: "Ocurrió un error."
+        }
+      },
+      productForm: {
+        backToDashboard: "Volver al Panel",
+        supabaseSetupTitle: "Configuración de Supabase Requerida",
+        supabaseSetupDesc: "Para habilitar la carga de imágenes, añada VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY a sus Variables de Entorno (o Secretos de AI Studio) y reconstruya la aplicación.",
+        editProduct: "Editar Producto",
+        addProduct: "Añadir Nuevo Producto",
+        productTitle: "Título del Producto",
+        category: "Categoría",
+        priceRange: "Rango de Precios",
+        msrp: "PVPR",
+        shortDesc: "Descripción Corta",
+        longDetails: "Detalles Largos (Texto Enriquecido / HTML permitido)",
+        images: "Imágenes",
+        uploading: "Subiendo...",
+        uploadImages: "Subir Imágenes",
+        addUrl: "Añadir URL",
+        specifications: "Especificaciones",
+        addSpec: "Añadir Especificación",
+        cancel: "Cancelar",
+        saveProduct: "Guardar Producto",
+        errors: {
+          titleRequired: "El título es obligatorio",
+          descRequired: "La descripción es obligatoria",
+          urlRequired: "La URL es obligatoria"
+        },
+        placeholders: {
+          specKey: "p. ej., Dimensiones",
+          specValue: "p. ej., 24x36 pulgadas"
+        },
+        alerts: {
+          supabaseNotConfigured: "Supabase no está configurado. Añada VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY a sus Variables de Entorno y reconstruya.",
+          bucketNotFound: "No se encontró el bucket de almacenamiento \"product-images\". Créelo en su panel de Supabase y configúrelo como Público.",
+          uploadFailed: "Error al subir imágenes: {{message}}",
+          saveFailed: "Error al guardar el producto. Consulte la consola para más detalles."
+        }
+      }
     }
   }
 };
