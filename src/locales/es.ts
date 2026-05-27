@@ -4,6 +4,7 @@ export const es = {
       home: "Inicio",
       catalog: "Catálogo",
       ourStory: "Nuestra Historia",
+      blog: "Blog",
       adminDashboard: "Panel de Administración",
       logout: "Cerrar sesión",
       employeeLogin: "Acceso Empleados"
@@ -130,6 +131,28 @@ export const es = {
       submitting: "Enviando...",
       rfqSuccess: "¡RFQ enviado con éxito! Nos pondremos en contacto con usted pronto.",
       rfqError: "Error al enviar RFQ. Por favor, inténtelo de nuevo."
+    },
+    blog: {
+      metaTitle: "The BOLEN Journal | Perspectivas sobre Espejos LED e Inteligentes",
+      metaDescription: "Guías de compra, explicaciones técnicas e información sobre fabricación de espejos LED, espejos inteligentes y producción OEM/ODM de BOLEN.",
+      kicker: "Notas desde la planta de producción",
+      titleLead: "The BOLEN",
+      titleAccent: "Journal",
+      intro: "Guías, tecnología y conocimientos de fabricación sobre espejos LED e inteligentes, escritos por el equipo que los construye.",
+      featured: "Destacado",
+      readArticle: "Leer artículo",
+      allPosts: "Todos",
+      empty: "Aún no hay artículos publicados. Vuelva pronto.",
+      readingTime: "{{minutes}} min de lectura",
+      ctaTitle: "¿Busca un espejo fabricado a su medida?",
+      ctaDesc: "BOLEN fabrica espejos LED, inteligentes, de tocador y de baño para marcas globales: OEM y ODM, desde una fábrica verticalmente integrada.",
+      ctaCatalog: "Explorar el catálogo",
+      ctaQuote: "Solicitar presupuesto",
+      related: "Más del Journal",
+      viewAll: "Ver todo",
+      notFound: "Artículo no encontrado",
+      backToJournal: "Volver al Journal",
+      relatedProducts: "Productos de este artículo"
     },
     admin: {
       dashboard: {

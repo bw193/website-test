@@ -37,6 +37,7 @@ export default function Footer() {
             <ul className="space-y-2 text-stone-400 text-sm">
               <li><Link to={lp('/products')} className="hover:text-white transition-colors">Product Catalog</Link></li>
               <li><Link to={lp('/our-story')} className="hover:text-white transition-colors">Our Story</Link></li>
+              <li><Link to={lp('/blog')} className="hover:text-white transition-colors">Journal</Link></li>
               <li><Link to={lp('/rfq')} className="hover:text-white transition-colors">Request a Quote</Link></li>
             </ul>
           </div>

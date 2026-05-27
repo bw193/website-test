@@ -51,6 +51,9 @@ export default function Navbar() {
               <Link to={lp('/our-story')} className="text-stone-500 hover:text-stone-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-amber-600 text-sm font-medium">
                 {t('navbar.ourStory')}
               </Link>
+              <Link to={lp('/blog')} className="text-stone-500 hover:text-stone-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-amber-600 text-sm font-medium">
+                {t('navbar.blog')}
+              </Link>
               <Link to={lp('/rfq')} className="text-stone-500 hover:text-stone-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-amber-600 text-sm font-medium">
                 {t('productDetail.requestQuote')}
               </Link>
@@ -142,6 +145,7 @@ export default function Navbar() {
             <Link to={lp('/')} onClick={() => setIsOpen(false)} className="bg-amber-50 border-amber-600 text-amber-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium">{t('navbar.home')}</Link>
             <Link to={lp('/products')} onClick={() => setIsOpen(false)} className="border-transparent text-stone-500 hover:bg-stone-50 hover:border-stone-300 hover:text-stone-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium">{t('navbar.catalog')}</Link>
             <Link to={lp('/our-story')} onClick={() => setIsOpen(false)} className="border-transparent text-stone-500 hover:bg-stone-50 hover:border-stone-300 hover:text-stone-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium">{t('navbar.ourStory')}</Link>
+            <Link to={lp('/blog')} onClick={() => setIsOpen(false)} className="border-transparent text-stone-500 hover:bg-stone-50 hover:border-stone-300 hover:text-stone-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium">{t('navbar.blog')}</Link>
             <Link to={lp('/rfq')} onClick={() => setIsOpen(false)} className="border-transparent text-stone-500 hover:bg-stone-50 hover:border-stone-300 hover:text-stone-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium">{t('productDetail.requestQuote')}</Link>
             {isAdmin && (
               <Link to="/admin" onClick={() => setIsOpen(false)} className="border-transparent text-amber-600 hover:bg-amber-50 hover:border-amber-300 block pl-3 pr-4 py-3 border-l-4 text-base font-medium">{t('navbar.adminDashboard')}</Link>

@@ -29,6 +29,9 @@ const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 const AdminProductForm = lazy(() => import('./pages/AdminProductForm'));
 const AdminRoute = lazy(() => import('./components/AdminRoute'));
 const NotFound = lazy(() => import('./pages/NotFound'));
+const Blog = lazy(() => import('./pages/Blog'));
+const BlogPost = lazy(() => import('./pages/BlogPost'));
+const AdminBlogForm = lazy(() => import('./pages/AdminBlogForm'));
 
 // Loading fallback
 const PageLoader = () => (
@@ -65,6 +68,8 @@ export default function App() {
                   <Route path="products" element={<Products />} />
                   <Route path="products/:id" element={<ProductDetail />} />
                   <Route path="our-story" element={<OurStory />} />
+                  <Route path="blog" element={<Blog />} />
+                  <Route path="blog/:slug" element={<BlogPost />} />
                   <Route path="rfq" element={<RFQ />} />
                 </Route>
 
@@ -74,6 +79,8 @@ export default function App() {
                   <Route path="/admin" element={<AdminDashboard />} />
                   <Route path="/admin/products/new" element={<AdminProductForm />} />
                   <Route path="/admin/products/:id" element={<AdminProductForm />} />
+                  <Route path="/admin/blog/new" element={<AdminBlogForm />} />
+                  <Route path="/admin/blog/:id" element={<AdminBlogForm />} />
                 </Route>
 
                 <Route path="*" element={<NotFound />} />

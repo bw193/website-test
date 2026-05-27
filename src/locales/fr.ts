@@ -4,6 +4,7 @@ export const fr = {
       home: "Accueil",
       catalog: "Catalogue",
       ourStory: "Notre Histoire",
+      blog: "Journal",
       adminDashboard: "Tableau de Bord",
       logout: "Déconnexion",
       employeeLogin: "Connexion Employé"
@@ -130,6 +131,28 @@ export const fr = {
       submitting: "Soumission...",
       rfqSuccess: "RFQ soumis avec succès ! Nous vous contacterons bientôt.",
       rfqError: "Échec de la soumission du RFQ. Veuillez réessayer."
+    },
+    blog: {
+      metaTitle: "The BOLEN Journal | Perspectives sur les Miroirs LED et Intelligents",
+      metaDescription: "Guides d'achat, explications techniques et aperçus de fabrication sur les miroirs LED, les miroirs intelligents et la production OEM/ODM de BOLEN.",
+      kicker: "Notes prises sur le terrain de l'usine",
+      titleLead: "The BOLEN",
+      titleAccent: "Journal",
+      intro: "Guides, technologie et savoir-faire de fabrication sur les miroirs LED et intelligents — rédigés par l'équipe qui les fabrique.",
+      featured: "À la une",
+      readArticle: "Lire l'article",
+      allPosts: "Tous",
+      empty: "Aucun article publié pour le moment. Revenez bientôt.",
+      readingTime: "{{minutes}} min de lecture",
+      ctaTitle: "Vous cherchez un miroir fabriqué selon vos spécifications ?",
+      ctaDesc: "BOLEN fabrique des miroirs LED, intelligents, de toilette et de salle de bain pour les marques mondiales — OEM et ODM, depuis une usine verticalement intégrée.",
+      ctaCatalog: "Parcourir le catalogue",
+      ctaQuote: "Demander un devis",
+      related: "Plus d'articles du Journal",
+      viewAll: "Voir tout",
+      notFound: "Article introuvable",
+      backToJournal: "Retour au Journal",
+      relatedProducts: "Produits de cet article"
     },
     admin: {
       dashboard: {

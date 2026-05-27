@@ -6,11 +6,12 @@
 
 import { toSlug } from './slug';
 import { primeProductTranslations, type ProductFields } from './productI18n';
+import type { BlogListItem, LocalizedBlogPost } from '../types/blog';
 
 const SCRIPT_ID = '__BOLEN_PRERENDER_DATA__';
 
 interface PrerenderPayload {
-  route?: 'home' | 'catalog' | 'productDetail';
+  route?: 'home' | 'catalog' | 'productDetail' | 'blog' | 'blogPost';
   lang?: string;
   products?: unknown[];
   product?: { id?: string; title?: string } & Record<string, unknown>;
@@ -20,6 +21,11 @@ interface PrerenderPayload {
   // translations synchronously on first render. Home/catalog carry the full
   // map for the language; product pages carry just that product's entry.
   productTranslations?: Record<string, ProductFields>;
+  // Journal (blog) payloads. The index carries a light list of cards; an
+  // article page carries one post, both pre-localized for `lang` so the SPA
+  // renders synchronously with no Supabase fetch on the critical path.
+  blogPosts?: BlogListItem[];
+  blogPost?: LocalizedBlogPost;
 }
 
 let cache: PrerenderPayload | null | undefined;
@@ -75,4 +81,18 @@ export function readInitialHomeData<T>(): {
     heroBgs: Array.isArray(data.heroBgs) ? data.heroBgs : [],
     categories: Array.isArray(data.categories) ? data.categories : [],
   };
+}
+
+export function readInitialBlogList(): BlogListItem[] | null {
+  const data = getPrerenderData();
+  if (data?.route === 'blog' && Array.isArray(data.blogPosts)) {
+    return data.blogPosts as BlogListItem[];
+  }
+  return null;
+}
+
+export function readInitialBlogPost(slug: string): LocalizedBlogPost | null {
+  const data = getPrerenderData();
+  if (data?.route !== 'blogPost' || !data.blogPost) return null;
+  return data.blogPost.slug === slug ? data.blogPost : null;
 }

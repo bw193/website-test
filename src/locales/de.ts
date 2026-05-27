@@ -4,6 +4,7 @@ export const de = {
       home: "Startseite",
       catalog: "Katalog",
       ourStory: "Unsere Geschichte",
+      blog: "Journal",
       adminDashboard: "Admin-Dashboard",
       logout: "Abmelden",
       employeeLogin: "Mitarbeiter-Login"
@@ -130,6 +131,28 @@ export const de = {
       submitting: "Wird gesendet...",
       rfqSuccess: "RFQ erfolgreich gesendet! Wir werden uns in Kürze bei Ihnen melden.",
       rfqError: "Senden der RFQ fehlgeschlagen. Bitte versuchen Sie es erneut."
+    },
+    blog: {
+      metaTitle: "The BOLEN Journal | Einblicke zu LED- und Smart-Spiegeln",
+      metaDescription: "Kaufratgeber, Technologie-Erklärungen und Fertigungseinblicke zu LED-Spiegeln, Smart-Spiegeln und OEM/ODM-Produktion von BOLEN.",
+      kicker: "Notizen aus der Fertigung",
+      titleLead: "The BOLEN",
+      titleAccent: "Journal",
+      intro: "Ratgeber, Technologie und Fertigungs-Know-how zu LED- und Smart-Spiegeln — geschrieben vom Team, das sie baut.",
+      featured: "Empfohlen",
+      readArticle: "Artikel lesen",
+      allPosts: "Alle",
+      empty: "Noch keine Artikel veröffentlicht. Schauen Sie bald wieder vorbei.",
+      readingTime: "{{minutes}} Min. Lesezeit",
+      ctaTitle: "Suchen Sie einen Spiegel nach Ihren Spezifikationen?",
+      ctaDesc: "BOLEN fertigt LED-, Smart-, Schmink- und Badspiegel für globale Marken — OEM und ODM, aus einer vertikal integrierten Fabrik.",
+      ctaCatalog: "Katalog durchsuchen",
+      ctaQuote: "Angebot anfordern",
+      related: "Mehr aus dem Journal",
+      viewAll: "Alle ansehen",
+      notFound: "Artikel nicht gefunden",
+      backToJournal: "Zurück zum Journal",
+      relatedProducts: "Im Artikel vorgestellt"
     },
     admin: {
       dashboard: {

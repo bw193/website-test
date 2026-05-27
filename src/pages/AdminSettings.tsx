@@ -17,6 +17,12 @@ export default function AdminSettings() {
     "Full Length Dressing Mirror",
     "Irregular Mirror"
   ]);
+  const [blogCategories, setBlogCategories] = useState<string[]>([
+    "Buying Guide",
+    "Technology",
+    "Manufacturing",
+    "Design"
+  ]);
   const [error, setError] = useState<string | null>(null);
   const [needsSetup, setNeedsSetup] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -31,7 +37,7 @@ export default function AdminSettings() {
       const { data, error } = await supabase
         .from('site_settings')
         .select('key, value')
-        .in('key', ['hero_bg', 'categories']);
+        .in('key', ['hero_bg', 'categories', 'blog_categories']);
 
       if (error) {
         if (error.code === '42P01' || error.code === 'PGRST205') { // relation does not exist or not in schema cache
@@ -67,6 +73,18 @@ export default function AdminSettings() {
             console.error("Error parsing categories", e);
           }
         }
+
+        const blogCategoriesData = data.find(d => d.key === 'blog_categories');
+        if (blogCategoriesData && blogCategoriesData.value) {
+          try {
+            const parsed = JSON.parse(blogCategoriesData.value);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              setBlogCategories(parsed);
+            }
+          } catch (e) {
+            console.error("Error parsing blog categories", e);
+          }
+        }
       }
     } catch (err: any) {
       console.error("Error fetching settings:", err);
@@ -82,12 +100,14 @@ export default function AdminSettings() {
     try {
       const validBgs = heroBgs.filter(bg => bg.trim() !== '');
       const validCategories = categories.filter(cat => cat.trim() !== '');
+      const validBlogCategories = blogCategories.filter(cat => cat.trim() !== '');
       
       const { error } = await supabase
         .from('site_settings')
         .upsert([
           { key: 'hero_bg', value: JSON.stringify(validBgs) },
-          { key: 'categories', value: JSON.stringify(validCategories) }
+          { key: 'categories', value: JSON.stringify(validCategories) },
+          { key: 'blog_categories', value: JSON.stringify(validBlogCategories) }
         ]);
 
       if (error) throw error;
@@ -175,6 +195,25 @@ export default function AdminSettings() {
     const newCats = [...categories];
     newCats[index] = value;
     setCategories(newCats);
+  };
+
+  const handleAddBlogCategory = () => {
+    setBlogCategories([...blogCategories, '']);
+  };
+
+  const handleRemoveBlogCategory = (index: number) => {
+    const newCats = [...blogCategories];
+    newCats.splice(index, 1);
+    if (newCats.length === 0) {
+      newCats.push('');
+    }
+    setBlogCategories(newCats);
+  };
+
+  const handleBlogCategoryChange = (index: number, value: string) => {
+    const newCats = [...blogCategories];
+    newCats[index] = value;
+    setBlogCategories(newCats);
   };
 
   if (loading) {
@@ -348,6 +387,51 @@ NOTIFY pgrst, 'reload schema';`}
                 <button
                   type="button"
                   onClick={() => handleRemoveCategory(index)}
+                  className="p-1.5 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors shrink-0"
+                  title="Remove Category"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Journal Categories */}
+      <div className="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden">
+        <div className="px-6 py-5 border-b border-stone-100 bg-stone-50/50 flex items-center justify-between">
+          <h3 className="text-base font-semibold text-stone-900 flex items-center gap-2">
+            <Tags className="h-5 w-5 text-stone-400" />
+            Journal Categories
+          </h3>
+          <button
+            type="button"
+            onClick={handleAddBlogCategory}
+            className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg text-stone-700 bg-stone-100 hover:bg-stone-200 transition-colors"
+          >
+            <Plus className="h-3.5 w-3.5 mr-1" />
+            Add Category
+          </button>
+        </div>
+        <div className="p-6">
+          <p className="text-sm text-stone-500 mb-6">
+            Manage the categories available when writing Journal articles.
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {blogCategories.map((cat, index) => (
+              <div key={index} className="flex items-center gap-2 bg-stone-50 p-2 rounded-xl border border-stone-200">
+                <input
+                  type="text"
+                  value={cat}
+                  onChange={(e) => handleBlogCategoryChange(index, e.target.value)}
+                  placeholder="Category Name"
+                  className="block w-full rounded-lg border-transparent py-1.5 px-3 text-sm focus:border-stone-900 focus:ring-1 focus:ring-stone-900 bg-white shadow-sm"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleRemoveBlogCategory(index)}
                   className="p-1.5 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors shrink-0"
                   title="Remove Category"
                 >

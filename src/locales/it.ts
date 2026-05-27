@@ -4,6 +4,7 @@ export const it = {
       home: "Home",
       catalog: "Catalogo",
       ourStory: "La Nostra Storia",
+      blog: "Blog",
       adminDashboard: "Pannello di Controllo",
       logout: "Esci",
       employeeLogin: "Accesso Dipendenti"
@@ -130,6 +131,28 @@ export const it = {
       submitting: "Invio in corso...",
       rfqSuccess: "RFQ inviata con successo! Ti contatteremo presto.",
       rfqError: "Impossibile inviare la RFQ. Riprova."
+    },
+    blog: {
+      metaTitle: "The BOLEN Journal | Approfondimenti su Specchi LED e Smart",
+      metaDescription: "Guide all'acquisto, spiegazioni tecniche e approfondimenti sulla produzione di specchi LED, specchi smart e produzione OEM/ODM di BOLEN.",
+      kicker: "Appunti dalla fabbrica",
+      titleLead: "The BOLEN",
+      titleAccent: "Journal",
+      intro: "Guide, tecnologia e know-how produttivo su specchi LED e smart — scritti dal team che li costruisce.",
+      featured: "In evidenza",
+      readArticle: "Leggi l'articolo",
+      allPosts: "Tutti",
+      empty: "Nessun articolo pubblicato ancora. Torna presto.",
+      readingTime: "{{minutes}} min di lettura",
+      ctaTitle: "Cerchi uno specchio costruito su tue specifiche?",
+      ctaDesc: "BOLEN produce specchi LED, smart, da toeletta e da bagno per marchi globali — OEM e ODM, da una fabbrica verticalmente integrata.",
+      ctaCatalog: "Sfoglia il catalogo",
+      ctaQuote: "Richiedi un preventivo",
+      related: "Altro dal Journal",
+      viewAll: "Vedi tutto",
+      notFound: "Articolo non trovato",
+      backToJournal: "Torna al Journal",
+      relatedProducts: "Prodotti dell'articolo"
     },
     admin: {
       dashboard: {

@@ -51,6 +51,7 @@ async function generateSitemap() {
     { loc: '/products', changefreq: 'weekly', priority: '0.9' },
     { loc: '/rfq', changefreq: 'monthly', priority: '0.8' },
     { loc: '/our-story', changefreq: 'monthly', priority: '0.7' },
+    { loc: '/blog', changefreq: 'weekly', priority: '0.7' },
   ];
 
   // Fetch products for dynamic pages
@@ -75,9 +76,32 @@ async function generateSitemap() {
     };
   });
 
+  // Published Journal (blog) posts. The table may not exist yet (SQL not run),
+  // so a failure here just omits blog URLs instead of breaking the sitemap.
+  const { data: blogPosts, error: blogError } = await supabase
+    .from('blog_posts')
+    .select('slug, updated_at, published_at, created_at')
+    .eq('status', 'published')
+    .order('published_at', { ascending: false });
+
+  if (blogError) {
+    console.warn('Could not fetch blog posts for sitemap:', blogError.message);
+  }
+
+  const blogPostPages = (blogPosts || []).map((p) => {
+    const lastmod = (p.updated_at || p.published_at || p.created_at || today).split('T')[0];
+    return {
+      loc: `/blog/${p.slug}`,
+      changefreq: 'monthly',
+      priority: '0.7',
+      lastmod,
+    };
+  });
+
   const allPages = [
     ...staticPages.map((p) => ({ ...p, lastmod: today })),
     ...productPages,
+    ...blogPostPages,
   ];
 
   // Generate a URL entry for each page × each language
@@ -105,7 +129,7 @@ ${urls.join('\n')}
     // dist/ may not exist yet during pre-build
   }
 
-  console.log(`Generated sitemap with ${staticPages.length + productPages.length} URLs`);
+  console.log(`Generated sitemap with ${staticPages.length + productPages.length + blogPostPages.length} URLs`);
 }
 
 generateSitemap();

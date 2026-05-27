@@ -4,6 +4,7 @@ export const zh = {
       home: "首页",
       catalog: "产品目录",
       ourStory: "我们的故事",
+      blog: "博客",
       adminDashboard: "管理后台",
       logout: "退出登录",
       employeeLogin: "员工登录"
@@ -130,6 +131,28 @@ export const zh = {
       submitting: "提交中...",
       rfqSuccess: "RFQ 提交成功！我们将尽快与您联系。",
       rfqError: "提交 RFQ 失败。请重试。"
+    },
+    blog: {
+      metaTitle: "BOLEN 博客 | LED 与智能镜行业洞察",
+      metaDescription: "来自 BOLEN 的 LED 镜、智能镜及 OEM/ODM 生产的选购指南、技术解析与制造洞察。",
+      kicker: "来自工厂一线的笔记",
+      titleLead: "The BOLEN",
+      titleAccent: "博客",
+      intro: "关于 LED 镜与智能镜的指南、技术与制造知识——由亲手打造它们的团队撰写。",
+      featured: "精选",
+      readArticle: "阅读文章",
+      allPosts: "全部",
+      empty: "暂无已发布的文章，敬请期待。",
+      readingTime: "{{minutes}} 分钟阅读",
+      ctaTitle: "需要按您的规格定制镜子吗？",
+      ctaDesc: "BOLEN 为全球品牌制造 LED 镜、智能镜、化妆镜和浴室镜——OEM 与 ODM，源自一家垂直整合的工厂。",
+      ctaCatalog: "浏览产品目录",
+      ctaQuote: "请求报价",
+      related: "更多博客文章",
+      viewAll: "查看全部",
+      notFound: "未找到文章",
+      backToJournal: "返回博客",
+      relatedProducts: "本文相关产品"
     },
     admin: {
       dashboard: {

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../supabase';
-import { Plus, Edit, Trash2, Loader2, Package, Inbox, Users, Check, X, Settings, LogOut, Search, ChevronRight, Archive } from 'lucide-react';
+import { Plus, Edit, Trash2, Loader2, Package, Inbox, Users, Check, X, Settings, LogOut, Search, ChevronRight, Archive, BookOpen } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 import SEO from '../components/SEO';
@@ -28,6 +28,14 @@ interface Employee {
   role: 'admin' | 'employee' | 'pending' | 'rejected';
 }
 
+interface BlogPostRow {
+  id: string;
+  slug: string;
+  status: string;
+  category?: string | null;
+  title?: Record<string, string> | null;
+}
+
 export default function AdminDashboard() {
   const { isMasterAdmin, role, logout } = useAuth();
   const { t } = useTranslation();
@@ -35,9 +43,10 @@ export default function AdminDashboard() {
   const [products, setProducts] = useState<Product[]>([]);
   const [rfqs, setRfqs] = useState<RFQ[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
+  const [blogPosts, setBlogPosts] = useState<BlogPostRow[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'products' | 'rfqs' | 'employees' | 'settings'>('products');
+  const [activeTab, setActiveTab] = useState<'products' | 'blog' | 'rfqs' | 'employees' | 'settings'>('products');
   const [rfqStatusFilter, setRfqStatusFilter] = useState<'active' | 'new' | 'read' | 'archived' | 'all'>('active');
   const [rfqStartDate, setRfqStartDate] = useState<string>('');
   const [rfqEndDate, setRfqEndDate] = useState<string>('');
@@ -95,6 +104,13 @@ export default function AdminDashboard() {
           .order('created_at', { ascending: false });
         if (error) throw error;
         setEmployees(data || []);
+      } else if (activeTab === 'blog') {
+        const { data, error } = await supabase
+          .from('blog_posts')
+          .select('id, slug, status, category, title')
+          .order('created_at', { ascending: false });
+        if (error) throw error;
+        setBlogPosts(data || []);
       }
     } catch (error) {
       console.error("Error fetching admin data", error);
@@ -113,6 +129,19 @@ export default function AdminDashboard() {
       } catch (error) {
         console.error("Error deleting product", error);
         alert(t('admin.dashboard.products.deleteError'));
+      }
+    }
+  };
+
+  const handleDeleteBlog = async (id: string) => {
+    if (window.confirm(t('admin.blog.deleteConfirm'))) {
+      try {
+        const { error } = await supabase.from('blog_posts').delete().eq('id', id);
+        if (error) throw error;
+        setBlogPosts(blogPosts.filter(p => p.id !== id));
+      } catch (error) {
+        console.error("Error deleting article", error);
+        alert(t('admin.blog.deleteError'));
       }
     }
   };
@@ -260,6 +289,13 @@ export default function AdminDashboard() {
               {t('admin.dashboard.tabs.products')}
             </button>
             <button
+              onClick={() => setActiveTab('blog')}
+              className={`${activeTab === 'blog' ? 'bg-stone-100 text-stone-900 shadow-sm' : 'text-stone-500 hover:text-stone-700 hover:bg-stone-50'} px-4 py-2 rounded-lg font-medium text-sm flex items-center transition-all whitespace-nowrap`}
+            >
+              <BookOpen className="h-4 w-4 mr-2" />
+              {t('admin.blog.tab')}
+            </button>
+            <button
               onClick={() => setActiveTab('rfqs')}
               className={`${activeTab === 'rfqs' ? 'bg-stone-100 text-stone-900 shadow-sm' : 'text-stone-500 hover:text-stone-700 hover:bg-stone-50'} px-4 py-2 rounded-lg font-medium text-sm flex items-center transition-all whitespace-nowrap`}
             >
@@ -294,6 +330,12 @@ export default function AdminDashboard() {
             <Link to="/admin/products/new" className="inline-flex items-center justify-center px-5 py-2.5 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-stone-900 hover:bg-stone-800 transition-colors">
               <Plus className="h-4 w-4 mr-2" />
               {t('admin.dashboard.addProduct')}
+            </Link>
+          )}
+          {activeTab === 'blog' && (
+            <Link to="/admin/blog/new" className="inline-flex items-center justify-center px-5 py-2.5 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-stone-900 hover:bg-stone-800 transition-colors">
+              <Plus className="h-4 w-4 mr-2" />
+              {t('admin.blog.addPost')}
             </Link>
           )}
         </div>
@@ -369,6 +411,40 @@ export default function AdminDashboard() {
                 )}
               </ul>
             </div>
+          </div>
+        ) : activeTab === 'blog' ? (
+          <div className="bg-white shadow-sm border border-stone-200 rounded-2xl overflow-hidden">
+            <ul className="divide-y divide-stone-100">
+              {blogPosts.map((post) => (
+                <li key={post.id} className="hover:bg-stone-50 transition-colors">
+                  <div className="px-6 py-4 flex items-center justify-between">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-semibold text-stone-900 truncate">{post.title?.en || post.slug}</p>
+                      <p className="mt-1 flex items-center gap-2 text-sm text-stone-500">
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${post.status === 'published' ? 'bg-green-100 text-green-800' : 'bg-stone-100 text-stone-600'}`}>
+                          {post.status === 'published' ? t('admin.blog.published') : t('admin.blog.draft')}
+                        </span>
+                        {post.category && <span className="text-xs text-stone-400">{post.category}</span>}
+                      </p>
+                    </div>
+                    <div className="ml-5 flex-shrink-0 flex gap-2">
+                      <Link to={`/admin/blog/${post.id}`} className="p-2 text-stone-400 hover:text-stone-900 hover:bg-stone-100 rounded-lg transition-colors">
+                        <Edit className="h-4 w-4" />
+                      </Link>
+                      <button onClick={() => handleDeleteBlog(post.id)} className="p-2 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                </li>
+              ))}
+              {blogPosts.length === 0 && (
+                <li className="px-6 py-12 text-center">
+                  <BookOpen className="mx-auto h-12 w-12 text-stone-300 mb-3" />
+                  <p className="text-stone-500 font-medium">{t('admin.blog.noPosts')}</p>
+                </li>
+              )}
+            </ul>
           </div>
         ) : activeTab === 'rfqs' ? (
           <div className="space-y-6">

@@ -24,6 +24,14 @@ import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { createClient } from '@supabase/supabase-js';
 import 'dotenv/config';
+import { marked } from 'marked';
+import { localizePost, toListItem } from '../src/utils/blog';
+import {
+  buildBlogIndexSchema,
+  buildBlogPostingSchema,
+  buildBlogBreadcrumbSchema,
+} from '../src/utils/blogSchema';
+import type { BlogPost, BlogListItem, LocalizedBlogPost } from '../src/types/blog';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = resolve(__dirname, '..');
@@ -835,6 +843,178 @@ async function fetchSiteSettings(): Promise<{ heroBgs: string[]; categories: str
   return { heroBgs, categories };
 }
 
+// ---- Journal (blog) ---------------------------------------------------------
+// Self-contained per-language copy for the prerendered <head> and SEO body
+// fallback, mirroring the COPY pattern above. Article copy itself comes from
+// the DB (per-language JSONB), localized via src/utils/blog.
+
+const BLOG_COPY: Record<
+  Lang,
+  { metaTitle: string; metaDesc: string; h1: string; intro: string; journal: string }
+> = {
+  en: {
+    metaTitle: 'The BOLEN Journal | LED & Smart Mirror Insights',
+    metaDesc:
+      'Buying guides, technology explainers, and manufacturing insight on LED mirrors, smart mirrors, and OEM/ODM production from BOLEN.',
+    h1: 'The BOLEN Journal',
+    intro:
+      'Guides, technology, and manufacturing know-how on LED and smart mirrors — written by the team that builds them.',
+    journal: 'Journal',
+  },
+  zh: {
+    metaTitle: 'BOLEN 博客 | LED 与智能镜行业洞察',
+    metaDesc: '来自 BOLEN 的 LED 镜、智能镜及 OEM/ODM 生产的选购指南、技术解析与制造洞察。',
+    h1: 'BOLEN 博客',
+    intro: '关于 LED 镜与智能镜的指南、技术与制造知识——由亲手打造它们的团队撰写。',
+    journal: '博客',
+  },
+  es: {
+    metaTitle: 'The BOLEN Journal | Perspectivas sobre Espejos LED e Inteligentes',
+    metaDesc:
+      'Guías de compra, explicaciones técnicas e información sobre fabricación de espejos LED, espejos inteligentes y producción OEM/ODM de BOLEN.',
+    h1: 'The BOLEN Journal',
+    intro:
+      'Guías, tecnología y conocimientos de fabricación sobre espejos LED e inteligentes, escritos por el equipo que los construye.',
+    journal: 'Blog',
+  },
+  fr: {
+    metaTitle: 'The BOLEN Journal | Perspectives sur les Miroirs LED et Intelligents',
+    metaDesc:
+      "Guides d'achat, explications techniques et aperçus de fabrication sur les miroirs LED, les miroirs intelligents et la production OEM/ODM de BOLEN.",
+    h1: 'The BOLEN Journal',
+    intro:
+      "Guides, technologie et savoir-faire de fabrication sur les miroirs LED et intelligents — rédigés par l'équipe qui les fabrique.",
+    journal: 'Journal',
+  },
+  de: {
+    metaTitle: 'The BOLEN Journal | Einblicke zu LED- und Smart-Spiegeln',
+    metaDesc:
+      'Kaufratgeber, Technologie-Erklärungen und Fertigungseinblicke zu LED-Spiegeln, Smart-Spiegeln und OEM/ODM-Produktion von BOLEN.',
+    h1: 'The BOLEN Journal',
+    intro:
+      'Ratgeber, Technologie und Fertigungs-Know-how zu LED- und Smart-Spiegeln — geschrieben vom Team, das sie baut.',
+    journal: 'Journal',
+  },
+  it: {
+    metaTitle: 'The BOLEN Journal | Approfondimenti su Specchi LED e Smart',
+    metaDesc:
+      "Guide all'acquisto, spiegazioni tecniche e approfondimenti sulla produzione di specchi LED, specchi smart e produzione OEM/ODM di BOLEN.",
+    h1: 'The BOLEN Journal',
+    intro:
+      'Guide, tecnologia e know-how produttivo su specchi LED e smart — scritti dal team che li costruisce.',
+    journal: 'Journal',
+  },
+};
+
+const BLOG_RELATED_HEADING: Record<Lang, string> = {
+  en: 'Related products',
+  zh: '相关产品',
+  es: 'Productos relacionados',
+  fr: 'Produits associés',
+  de: 'Ähnliche Produkte',
+  it: 'Prodotti correlati',
+};
+
+async function fetchBlogPosts(): Promise<BlogPost[]> {
+  const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || '';
+  const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || '';
+  if (!supabaseUrl || !supabaseKey) {
+    console.warn('[prerender-static] Supabase credentials not set; prerendering without blog posts.');
+    return [];
+  }
+  const supabase = createClient(supabaseUrl, supabaseKey);
+  // select('*') (not an explicit column list) so a newly-typed column that has
+  // not been added to the DB yet — e.g. product_ids before the ALTER is run —
+  // never turns into a hard fetch error that drops every post.
+  const { data, error } = await supabase
+    .from('blog_posts')
+    .select('*')
+    .eq('status', 'published')
+    .order('published_at', { ascending: false });
+  if (error) {
+    // Table may not exist yet (SQL not run) — never fail the whole build for it.
+    console.warn(`[prerender-static] Could not fetch blog posts: ${error.message}`);
+    return [];
+  }
+  return (data || []) as BlogPost[];
+}
+
+function renderMarkdown(md: string): string {
+  if (!md) return '';
+  return marked.parse(md, { async: false }) as string;
+}
+
+function blogIndexContent(lang: Lang, items: BlogListItem[]): string {
+  const c = BLOG_COPY[lang];
+  const list = items
+    .map((p) => {
+      const href = `/${lang}/blog/${p.slug}`;
+      const img = p.cover_image
+        ? `<img src="${escapeAttr(p.cover_image)}" alt="${escapeAttr(p.title)}" width="600" height="400" loading="lazy" />`
+        : '';
+      return `<li><a href="${escapeAttr(href)}">${img}<h2>${escapeHtml(p.title)}</h2></a><p>${escapeHtml(
+        p.excerpt
+      )}</p></li>`;
+    })
+    .join('\n        ');
+  return `
+    <div data-prerender="blog">
+      <h1>${escapeHtml(c.h1)}</h1>
+      <p>${escapeHtml(c.intro)}</p>
+      <ul aria-label="Articles">
+        ${list}
+      </ul>
+    </div>
+  `.trim();
+}
+
+function blogPostContent(
+  lang: Lang,
+  post: LocalizedBlogPost,
+  related: { href: string; title: string; img?: string }[]
+): string {
+  const c = BLOG_COPY[lang];
+  const hc = COPY[lang];
+  const img = post.cover_image
+    ? `<img src="${escapeAttr(post.cover_image)}" alt="${escapeAttr(post.title)}" width="1200" height="675" />`
+    : '';
+  const relatedBlock = related.length
+    ? `<section aria-label="${escapeAttr(BLOG_RELATED_HEADING[lang])}">
+        <h2>${escapeHtml(BLOG_RELATED_HEADING[lang])}</h2>
+        <ul>
+          ${related
+            .map(
+              (r) =>
+                `<li><a href="${escapeAttr(r.href)}">${
+                  r.img
+                    ? `<img src="${escapeAttr(r.img)}" alt="${escapeAttr(r.title)}" width="200" height="200" loading="lazy" />`
+                    : ''
+                }${escapeHtml(r.title)}</a></li>`
+            )
+            .join('\n          ')}
+        </ul>
+      </section>`
+    : '';
+  return `
+    <div data-prerender="blogPost">
+      <nav aria-label="Breadcrumb">
+        <a href="/${lang}">${escapeHtml(hc.breadcrumbHome)}</a>
+        &raquo;
+        <a href="/${lang}/blog">${escapeHtml(c.journal)}</a>
+        &raquo;
+        <span>${escapeHtml(post.title)}</span>
+      </nav>
+      <h1>${escapeHtml(post.title)}</h1>
+      ${img}
+      <div>${renderMarkdown(post.body)}</div>
+      ${relatedBlock}
+      <p><a href="/${lang}/products">${escapeHtml(hc.navCatalog)}</a> &middot; <a href="/${lang}/rfq">${escapeHtml(
+        hc.navRfq
+      )}</a></p>
+    </div>
+  `.trim();
+}
+
 async function main(): Promise<void> {
   console.log('[prerender-static] Reading dist/index.html...');
   const template = await readFile(resolve(DIST, 'index.html'), 'utf-8');
@@ -852,6 +1032,11 @@ async function main(): Promise<void> {
 
   console.log('[prerender-static] Loading product translations (public/i18n)...');
   const translations = await loadProductTranslations();
+
+  console.log('[prerender-static] Fetching published blog posts...');
+  const blogPosts = await fetchBlogPosts();
+  console.log(`[prerender-static] ${blogPosts.length} blog posts loaded.`);
+  const productById = new Map(products.map((p) => [p.id, p]));
   for (const lang of LANGUAGES) {
     const n = Object.keys(translations[lang]).length;
     if (n > 0) console.log(`[prerender-static]   ${lang}: ${n} translated products`);
@@ -959,6 +1144,66 @@ async function main(): Promise<void> {
         bodyContent: rfqContent(lang),
       });
       await writeRoute(`${lang}/rfq`, html);
+      routeCount++;
+    }
+
+    // Journal index
+    {
+      const canonical = `${SITE_URL}/${lang}/blog/`;
+      const items = blogPosts.map((p) => toListItem(p, lang));
+      const bc = BLOG_COPY[lang];
+      const dataScript = prerenderDataScript({ route: 'blog', lang, blogPosts: items });
+      const headExtras = `${buildHead({
+        lang,
+        title: bc.metaTitle,
+        description: bc.metaDesc,
+        canonical,
+        ogImage: DEFAULT_OG_IMAGE,
+        ogType: 'website',
+        routePath: '/blog',
+        schema: buildBlogIndexSchema(lang) as any[],
+      })}\n    ${dataScript}`;
+      const html = injectIntoTemplate(template, {
+        lang,
+        headExtras,
+        bodyContent: blogIndexContent(lang, items),
+      });
+      await writeRoute(`${lang}/blog`, html);
+      routeCount++;
+    }
+
+    // Journal articles
+    for (const rawPost of blogPosts) {
+      if (!rawPost.slug) continue;
+      const localized = localizePost(rawPost, lang);
+      const related = localized.product_ids
+        .map((pid) => productById.get(pid))
+        .filter((p): p is Product => !!p)
+        .map((p) => {
+          const disp = localizeProduct(p, translations[lang]);
+          return { href: `/${lang}/products/${toSlug(p.title)}`, title: disp.title || p.title, img: p.images?.[0] };
+        });
+      const path = `/blog/${localized.slug}`;
+      const canonical = `${SITE_URL}/${lang}${path}/`;
+      const title = localized.seo_title || `${localized.title} | BOLEN Mirror`;
+      const description = localized.seo_description || localized.excerpt;
+      const dataScript = prerenderDataScript({ route: 'blogPost', lang, blogPost: localized });
+      const headExtras = `${buildHead({
+        lang,
+        title,
+        description,
+        canonical,
+        ogImage: localized.cover_image || DEFAULT_OG_IMAGE,
+        ogType: 'article',
+        routePath: path,
+        schema: [buildBlogPostingSchema(localized, lang), buildBlogBreadcrumbSchema(localized, lang)],
+      })}\n    ${dataScript}`;
+      const html = injectIntoTemplate(template, {
+        lang,
+        headExtras,
+        bodyContent: blogPostContent(lang, localized, related),
+      });
+      await writeRoute(`${lang}${path}`, html);
       routeCount++;
     }
 
