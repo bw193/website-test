@@ -60,6 +60,18 @@ export function readInitialProducts<T>(): T[] | null {
   return null;
 }
 
+export function readInitialCatalogData<T>(): {
+  products: T[];
+  categories: string[];
+} | null {
+  const data = getPrerenderData();
+  if (data?.route !== 'catalog' || !Array.isArray(data.products)) return null;
+  return {
+    products: data.products as T[],
+    categories: Array.isArray(data.categories) ? data.categories : [],
+  };
+}
+
 export function readInitialProduct<T>(match: { slug: string; id?: string }): T | null {
   const data = getPrerenderData();
   if (data?.route !== 'productDetail' || !data.product) return null;

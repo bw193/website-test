@@ -3,7 +3,6 @@ import React, { useEffect, useState, lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Globe, ShieldCheck, Truck, Factory, Lightbulb, Users, Clock, CheckCircle2, ChevronRight, ChevronLeft, Settings, Palette } from 'lucide-react';
 import { useTranslation, Trans } from 'react-i18next';
-import { supabase } from '../supabase';
 import ProductCard from '../components/ProductCard';
 import SEO from '../components/SEO';
 import { optimizeImage } from '../utils/optimizeImage';
@@ -75,6 +74,7 @@ export default function Home() {
 
     const fetchSettings = async () => {
       try {
+        const { supabase } = await import('../supabase');
         // Fetch hero background settings
         const { data, error } = await supabase
           .from('site_settings')

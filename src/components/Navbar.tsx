@@ -1,12 +1,10 @@
 import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
 import { Menu, X, Globe, Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useLocalizedPath, SUPPORTED_LANGUAGES } from '../hooks/useLocalizedPath';
 
 export default function Navbar() {
-  const { user, isAdmin, logout } = useAuth();
   const [isOpen, setIsOpen] = React.useState(false);
   const [langMenuOpen, setLangMenuOpen] = React.useState(false);
   const navigate = useNavigate();
@@ -61,20 +59,9 @@ export default function Navbar() {
           </div>
           
           <div className="hidden sm:flex sm:items-center sm:space-x-6">
-            {isAdmin && (
-              <Link to="/admin" className="text-amber-600 hover:text-amber-800 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-amber-600 text-sm font-medium">
-                {t('navbar.adminDashboard')}
-              </Link>
-            )}
-            {user ? (
-              <button onClick={() => { logout(); navigate(lp('/')); }} className="text-stone-500 hover:text-stone-900 text-sm font-medium">
-                {t('navbar.logout')}
-              </button>
-            ) : (
-              <Link to="/admin/login" className="text-stone-500 hover:text-stone-900 text-sm font-medium">
-                {t('navbar.employeeLogin')}
-              </Link>
-            )}
+            <Link to="/admin/login" className="text-stone-500 hover:text-stone-900 text-sm font-medium">
+              {t('navbar.employeeLogin')}
+            </Link>
             <div className="relative">
               <button
                 onClick={() => setLangMenuOpen(!langMenuOpen)}
@@ -147,18 +134,9 @@ export default function Navbar() {
             <Link to={lp('/our-story')} onClick={() => setIsOpen(false)} className="border-transparent text-stone-500 hover:bg-stone-50 hover:border-stone-300 hover:text-stone-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium">{t('navbar.ourStory')}</Link>
             <Link to={lp('/blog')} onClick={() => setIsOpen(false)} className="border-transparent text-stone-500 hover:bg-stone-50 hover:border-stone-300 hover:text-stone-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium">{t('navbar.blog')}</Link>
             <Link to={lp('/rfq')} onClick={() => setIsOpen(false)} className="border-transparent text-stone-500 hover:bg-stone-50 hover:border-stone-300 hover:text-stone-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium">{t('productDetail.requestQuote')}</Link>
-            {isAdmin && (
-              <Link to="/admin" onClick={() => setIsOpen(false)} className="border-transparent text-amber-600 hover:bg-amber-50 hover:border-amber-300 block pl-3 pr-4 py-3 border-l-4 text-base font-medium">{t('navbar.adminDashboard')}</Link>
-            )}
-            {user ? (
-              <button onClick={() => { logout(); navigate(lp('/')); setIsOpen(false); }} className="w-full text-left border-transparent text-stone-500 hover:bg-stone-50 hover:border-stone-300 hover:text-stone-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium">
-                {t('navbar.logout')}
-              </button>
-            ) : (
-              <Link to="/admin/login" onClick={() => setIsOpen(false)} className="border-transparent text-stone-500 hover:bg-stone-50 hover:border-stone-300 hover:text-stone-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium">
-                {t('navbar.employeeLogin')}
-              </Link>
-            )}
+            <Link to="/admin/login" onClick={() => setIsOpen(false)} className="border-transparent text-stone-500 hover:bg-stone-50 hover:border-stone-300 hover:text-stone-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium">
+              {t('navbar.employeeLogin')}
+            </Link>
           </div>
         </div>
       )}

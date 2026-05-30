@@ -449,13 +449,10 @@ function injectIntoTemplate(
   // Inject head extras immediately before </head>.
   html = html.replace('</head>', `    ${opts.headExtras}\n  </head>`);
 
-  // Inject the SEO body content alongside the loader inside #root. The loader
-  // is a fixed full-viewport overlay (see index.html inline CSS) so JS-enabled
-  // users see only the spinner during the brief window before
-  // createRoot.render() wipes both children. Crawlers and no-JS users still
-  // get the prerendered fallback (a <noscript> rule hides the loader for them).
-  const loader = '<div id="root-loader"><div class="spinner"></div></div>';
-  const rootBlock = `<div id="root">\n      ${opts.bodyContent}\n      ${loader}\n    </div>`;
+  // Put the SEO fallback content directly inside #root. React replaces this
+  // on mount, while crawlers, no-JS users, and slow-network visitors see real
+  // route content immediately instead of a full-screen loader.
+  const rootBlock = `<div id="root">\n      ${opts.bodyContent}\n    </div>`;
   let replaced = false;
   html = html.replace(
     /<div id="root">\s*<div id="root-loader">[\s\S]*?<\/div>\s*<\/div>\s*<\/div>/,
@@ -479,9 +476,9 @@ function homeContent(lang: Lang): string {
       <h1>${escapeHtml(c.homeH1)}</h1>
       <p>${escapeHtml(c.homeIntro)}</p>
       <nav aria-label="Site sections">
-        <a href="/${lang}/products">${escapeHtml(c.navCatalog)}</a>
-        <a href="/${lang}/our-story">${escapeHtml(c.navStory)}</a>
-        <a href="/${lang}/rfq">${escapeHtml(c.navRfq)}</a>
+        <a href="/${lang}/products/">${escapeHtml(c.navCatalog)}</a>
+        <a href="/${lang}/our-story/">${escapeHtml(c.navStory)}</a>
+        <a href="/${lang}/rfq/">${escapeHtml(c.navRfq)}</a>
       </nav>
     </div>
   `.trim();
@@ -492,7 +489,7 @@ function catalogContent(lang: Lang, products: Product[], tr: LangTranslations): 
   const items = products
     .map((p) => {
       const slug = toSlug(p.title || ''); // slug from English title
-      const href = `/${lang}/products/${slug}`;
+      const href = `/${lang}/products/${slug}/`;
       const title = tr[p.id]?.title || p.title;
       const img = p.images?.[0];
       const imgTag = img
@@ -526,9 +523,9 @@ function productDetailContent(lang: Lang, product: Product, tr: LangTranslations
   return `
     <div data-prerender="product">
       <nav aria-label="Breadcrumb">
-        <a href="/${lang}">${escapeHtml(c.breadcrumbHome)}</a>
+        <a href="/${lang}/">${escapeHtml(c.breadcrumbHome)}</a>
         &raquo;
-        <a href="/${lang}/products">${escapeHtml(c.breadcrumbCatalog)}</a>
+        <a href="/${lang}/products/">${escapeHtml(c.breadcrumbCatalog)}</a>
         &raquo;
         <span>${escapeHtml(localized.title)}</span>
       </nav>
@@ -536,7 +533,7 @@ function productDetailContent(lang: Lang, product: Product, tr: LangTranslations
       ${imgTag}
       ${desc}
       ${price}
-      <p><a href="/${lang}/rfq">${escapeHtml(c.navRfq)}</a></p>
+      <p><a href="/${lang}/rfq/">${escapeHtml(c.navRfq)}</a></p>
     </div>
   `.trim();
 }
@@ -950,7 +947,7 @@ function blogIndexContent(lang: Lang, items: BlogListItem[]): string {
   const c = BLOG_COPY[lang];
   const list = items
     .map((p) => {
-      const href = `/${lang}/blog/${p.slug}`;
+      const href = `/${lang}/blog/${p.slug}/`;
       const img = p.cover_image
         ? `<img src="${escapeAttr(p.cover_image)}" alt="${escapeAttr(p.title)}" width="600" height="400" loading="lazy" />`
         : '';
@@ -1000,9 +997,9 @@ function blogPostContent(
   return `
     <div data-prerender="blogPost">
       <nav aria-label="Breadcrumb">
-        <a href="/${lang}">${escapeHtml(hc.breadcrumbHome)}</a>
+        <a href="/${lang}/">${escapeHtml(hc.breadcrumbHome)}</a>
         &raquo;
-        <a href="/${lang}/blog">${escapeHtml(c.journal)}</a>
+        <a href="/${lang}/blog/">${escapeHtml(c.journal)}</a>
         &raquo;
         <span>${escapeHtml(post.title)}</span>
       </nav>
@@ -1010,7 +1007,7 @@ function blogPostContent(
       ${img}
       <div>${renderMarkdown(post.body)}</div>
       ${relatedBlock}
-      <p><a href="/${lang}/products">${escapeHtml(hc.navCatalog)}</a> &middot; <a href="/${lang}/rfq">${escapeHtml(
+      <p><a href="/${lang}/products/">${escapeHtml(hc.navCatalog)}</a> &middot; <a href="/${lang}/rfq/">${escapeHtml(
         hc.navRfq
       )}</a></p>
     </div>
@@ -1129,7 +1126,13 @@ async function main(): Promise<void> {
     {
       const canonical = `${SITE_URL}/${lang}/products/`;
       const catalogProducts = lightProducts;
-      const dataScript = prerenderDataScript({ route: 'catalog', lang, products: catalogProducts, productTranslations: translations[lang] });
+      const dataScript = prerenderDataScript({
+        route: 'catalog',
+        lang,
+        products: catalogProducts,
+        categories,
+        productTranslations: translations[lang],
+      });
       const headExtras = `${buildHead({
         lang,
         title: c.catalogTitle,
@@ -1227,7 +1230,7 @@ async function main(): Promise<void> {
         .filter((p): p is Product => !!p)
         .map((p) => {
           const disp = localizeProduct(p, translations[lang]);
-          return { href: `/${lang}/products/${toSlug(p.title)}`, title: disp.title || p.title, img: p.images?.[0] };
+          return { href: `/${lang}/products/${toSlug(p.title)}/`, title: disp.title || p.title, img: p.images?.[0] };
         });
       const path = `/blog/${localized.slug}`;
       const canonical = `${SITE_URL}/${lang}${path}/`;

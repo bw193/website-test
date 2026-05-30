@@ -15,7 +15,7 @@ export default function LanguageLayout() {
   }, [lang, i18n, isValidLang]);
 
   if (!isValidLang) {
-    return <Navigate to={`/${DEFAULT_LANGUAGE}`} replace />;
+    return <Navigate to={`/${DEFAULT_LANGUAGE}/`} replace />;
   }
 
   return <Outlet />;

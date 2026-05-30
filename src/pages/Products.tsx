@@ -1,12 +1,12 @@
 import { m, AnimatePresence } from 'motion/react';
 import React, { useEffect, useState } from 'react';
-import { supabase } from '../supabase';
 import ProductCard from '../components/ProductCard';
 import { Loader2, Search, SlidersHorizontal, PackageX } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import SEO from '../components/SEO';
 import { useCurrentLang } from '../hooks/useLocalizedPath';
-import { readInitialProducts } from '../utils/prerenderData';
+import { readInitialCatalogData } from '../utils/prerenderData';
+import { runWhenIdle } from '../utils/idle';
 
 interface Product {
   id: string;
@@ -18,18 +18,24 @@ interface Product {
   msrp?: string;
 }
 
+const DEFAULT_CATEGORIES = [
+  "New Arrival",
+  "Hot Sale",
+  "Led Lighted Mirror",
+  "Bathroom Mirror without led",
+  "Full Length Dressing Mirror",
+  "Irregular Mirror"
+];
+
 export default function Products() {
-  const initialProducts = readInitialProducts<Product>();
-  const [products, setProducts] = useState<Product[]>(initialProducts ?? []);
-  const [categories, setCategories] = useState<string[]>([
-    "New Arrival",
-    "Hot Sale",
-    "Led Lighted Mirror",
-    "Bathroom Mirror without led",
-    "Full Length Dressing Mirror",
-    "Irregular Mirror"
-  ]);
-  const [loading, setLoading] = useState(initialProducts === null);
+  const initialCatalog = readInitialCatalogData<Product>();
+  const [products, setProducts] = useState<Product[]>(initialCatalog?.products ?? []);
+  const [categories, setCategories] = useState<string[]>(
+    initialCatalog?.categories && initialCatalog.categories.length > 0
+      ? initialCatalog.categories
+      : DEFAULT_CATEGORIES
+  );
+  const [loading, setLoading] = useState(initialCatalog === null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const { t } = useTranslation();
@@ -41,8 +47,10 @@ export default function Products() {
   };
 
   useEffect(() => {
+    let active = true;
     const fetchData = async () => {
       try {
+        const { supabase } = await import('../supabase');
         // Fetch products
         const { data: productsData, error: productsError } = await supabase
           .from('products')
@@ -50,6 +58,7 @@ export default function Products() {
           .order('created_at', { ascending: false });
 
         if (productsError) throw productsError;
+        if (!active) return;
         setProducts(productsData || []);
 
         // Fetch categories
@@ -63,7 +72,7 @@ export default function Products() {
           try {
             const parsed = JSON.parse(settingsData.value);
             if (Array.isArray(parsed) && parsed.length > 0) {
-              setCategories(parsed);
+              if (active) setCategories(parsed);
             }
           } catch (e) {
             console.error("Error parsing categories", e);
@@ -72,11 +81,22 @@ export default function Products() {
       } catch (error) {
         console.error("Error fetching data", error);
       } finally {
-        setLoading(false);
+        if (active) setLoading(false);
       }
     };
 
+    if (initialCatalog) {
+      const cancel = runWhenIdle(fetchData, 2500);
+      return () => {
+        active = false;
+        cancel();
+      };
+    }
+
     fetchData();
+    return () => {
+      active = false;
+    };
   }, []);
 
   const filteredProducts = products.filter(p => {

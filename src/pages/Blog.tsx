@@ -3,7 +3,6 @@ import { m } from 'motion/react';
 import { Link } from 'react-router-dom';
 import { ArrowUpRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { supabase } from '../supabase';
 import SEO from '../components/SEO';
 import BlogCard from '../components/BlogCard';
 import { useLocalizedPath, useCurrentLang } from '../hooks/useLocalizedPath';
@@ -11,6 +10,7 @@ import { readInitialBlogList } from '../utils/prerenderData';
 import { toListItem, formatBlogDate } from '../utils/blog';
 import { buildBlogIndexSchema } from '../utils/blogSchema';
 import { optimizeImage, imageSrcSet } from '../utils/optimizeImage';
+import { runWhenIdle } from '../utils/idle';
 import type { BlogPost, BlogListItem } from '../types/blog';
 
 const GRAIN =
@@ -49,8 +49,9 @@ export default function Blog() {
   // prerendered island, so this only revalidates / catches newly published posts.
   useEffect(() => {
     let active = true;
-    (async () => {
+    const refreshPosts = async () => {
       try {
+        const { supabase } = await import('../supabase');
         const { data, error } = await supabase
           .from('blog_posts')
           .select(LIST_COLUMNS)
@@ -63,7 +64,17 @@ export default function Blog() {
       } finally {
         if (active) setLoading(false);
       }
-    })();
+    };
+
+    if (initial) {
+      const cancel = runWhenIdle(refreshPosts, 2500);
+      return () => {
+        active = false;
+        cancel();
+      };
+    }
+
+    refreshPosts();
     return () => {
       active = false;
     };

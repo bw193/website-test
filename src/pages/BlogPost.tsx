@@ -4,7 +4,6 @@ import { m, useScroll, useTransform } from 'motion/react';
 import ReactMarkdown from 'react-markdown';
 import { ArrowUpRight, Clock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { supabase } from '../supabase';
 import SEO from '../components/SEO';
 import BlogCard from '../components/BlogCard';
 import ProductCard from '../components/ProductCard';
@@ -13,6 +12,7 @@ import { readInitialBlogPost } from '../utils/prerenderData';
 import { localizePost, toListItem, formatBlogDate } from '../utils/blog';
 import { buildBlogPostingSchema, buildBlogBreadcrumbSchema } from '../utils/blogSchema';
 import { optimizeImage } from '../utils/optimizeImage';
+import { runWhenIdle } from '../utils/idle';
 import type { BlogPost as RawBlogPost, BlogListItem, LocalizedBlogPost } from '../types/blog';
 
 const FALLBACK_COVER =
@@ -55,9 +55,11 @@ export default function BlogPost() {
 
   useEffect(() => {
     let active = true;
-    setLoading(readInitialBlogPost(slug) === null);
-    (async () => {
+    const hasInitialPost = readInitialBlogPost(slug) !== null;
+    setLoading(!hasInitialPost);
+    const refreshPost = async () => {
       try {
+        const { supabase } = await import('../supabase');
         const { data } = await supabase
           .from('blog_posts')
           .select('*')
@@ -95,7 +97,17 @@ export default function BlogPost() {
       } finally {
         if (active) setLoading(false);
       }
-    })();
+    };
+
+    if (hasInitialPost) {
+      const cancel = runWhenIdle(refreshPost, 2500);
+      return () => {
+        active = false;
+        cancel();
+      };
+    }
+
+    refreshPost();
     return () => {
       active = false;
     };

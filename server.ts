@@ -30,12 +30,13 @@ async function startServer() {
   const DOMAIN = 'https://bolenmirror.com';
 
   function buildUrlEntry(pagePath: string, lastmod: string, changefreq: string, priority: string, lang: string): string {
+    const slug = pagePath === '/' ? '' : pagePath.replace(/\/+$/, '');
     const hreflangs = LANGUAGES.map(
-      (l) => `    <xhtml:link rel="alternate" hreflang="${l}" href="${DOMAIN}/${l}${pagePath === '/' ? '' : pagePath}" />`
+      (l) => `    <xhtml:link rel="alternate" hreflang="${l}" href="${DOMAIN}/${l}${slug}/" />`
     ).join('\n');
-    const xDefault = `    <xhtml:link rel="alternate" hreflang="x-default" href="${DOMAIN}/en${pagePath === '/' ? '' : pagePath}" />`;
+    const xDefault = `    <xhtml:link rel="alternate" hreflang="x-default" href="${DOMAIN}/en${slug}/" />`;
     return `  <url>
-    <loc>${DOMAIN}/${lang}${pagePath === '/' ? '' : pagePath}</loc>
+    <loc>${DOMAIN}/${lang}${slug}/</loc>
     <lastmod>${lastmod}</lastmod>
     <changefreq>${changefreq}</changefreq>
     <priority>${priority}</priority>
@@ -57,6 +58,7 @@ ${xDefault}
       { loc: '/products', changefreq: 'weekly', priority: '0.9', lastmod: today },
       { loc: '/rfq', changefreq: 'monthly', priority: '0.8', lastmod: today },
       { loc: '/our-story', changefreq: 'monthly', priority: '0.7', lastmod: today },
+      { loc: '/blog', changefreq: 'weekly', priority: '0.7', lastmod: today },
     ];
 
     const toSlug = (title: string) => title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
@@ -67,7 +69,18 @@ ${xDefault}
       return { loc: `/products/${slug}`, changefreq: 'weekly', priority: '0.8', lastmod };
     });
 
-    const allPages = [...staticPages, ...productPages];
+    const { data: blogPosts } = await supabase
+      .from('blog_posts')
+      .select('slug, updated_at, published_at, created_at')
+      .eq('status', 'published')
+      .order('published_at', { ascending: false });
+
+    const blogPostPages = (blogPosts || []).map((post) => {
+      const lastmod = (post.updated_at || post.published_at || post.created_at || today).split('T')[0];
+      return { loc: `/blog/${post.slug}`, changefreq: 'monthly', priority: '0.7', lastmod };
+    });
+
+    const allPages = [...staticPages, ...productPages, ...blogPostPages];
     const urls = LANGUAGES.flatMap((lang) =>
       allPages.map((p) => buildUrlEntry(p.loc, p.lastmod, p.changefreq, p.priority, lang))
     );
@@ -94,10 +107,10 @@ ${urls.join('\n')}
   const SUPPORTED_LANGUAGES = ['en', 'zh', 'es', 'fr', 'de', 'it'];
 
   // 301 redirects for old non-language-prefixed URLs → /en/...
-  app.get('/products', (req, res) => res.redirect(301, '/en/products'));
-  app.get('/products/*', (req, res) => res.redirect(301, `/en${req.path}`));
-  app.get('/our-story', (req, res) => res.redirect(301, '/en/our-story'));
-  app.get('/rfq', (req, res) => res.redirect(301, '/en/rfq'));
+  app.get('/products', (req, res) => res.redirect(301, '/en/products/'));
+  app.get('/products/*', (req, res) => res.redirect(301, `/en${req.path.replace(/\/+$/, '')}/`));
+  app.get('/our-story', (req, res) => res.redirect(301, '/en/our-story/'));
+  app.get('/rfq', (req, res) => res.redirect(301, '/en/rfq/'));
 
   // Vite middleware for development
   if (process.env.NODE_ENV !== 'production') {
@@ -118,7 +131,7 @@ ${urls.join('\n')}
       }
     }));
     // Redirect bare root to /en
-    app.get('/', (req, res) => res.redirect(302, '/en'));
+    app.get('/', (req, res) => res.redirect(302, '/en/'));
     app.get('*', (req, res) => {
       res.sendFile(path.join(distPath, 'index.html'));
     });

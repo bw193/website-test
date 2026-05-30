@@ -1,7 +1,6 @@
 import { m, AnimatePresence } from 'motion/react';
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { supabase } from '../supabase';
 import { useForm } from 'react-hook-form';
 import { Loader2, CheckCircle2, ChevronLeft, ChevronRight, ArrowLeft, Send, ShieldCheck, Truck, Clock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -50,7 +49,12 @@ export default function ProductDetail() {
     let cancelled = false;
     const fetchProduct = async () => {
       if (!routeSlug && !legacyId) return;
+      if (initialProduct) {
+        setLoading(false);
+        return;
+      }
       try {
+        const { supabase } = await import('../supabase');
         // Fast path: a legacy URL gives the id outright, and a prerendered
         // direct visit already knows it from the data island. Otherwise the
         // slug must be matched against title-derived slugs (no slug column).
@@ -86,6 +90,7 @@ export default function ProductDetail() {
     if (!product) return;
     setRfqStatus('submitting');
     try {
+      const { supabase } = await import('../supabase');
       const { error } = await supabase
         .from('rfqs')
         .insert({

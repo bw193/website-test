@@ -14,6 +14,10 @@ export function useCurrentLang(): SupportedLanguage {
 
 export function useLocalizedPath() {
   const lang = useCurrentLang();
-  const lp = (path: string) => `/${lang}${path.startsWith('/') ? path : '/' + path}`;
+  const lp = (path: string) => {
+    const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+    if (normalizedPath === '/') return `/${lang}/`;
+    return `/${lang}${normalizedPath.replace(/\/+$/, '')}/`;
+  };
   return { lang, lp };
 }
