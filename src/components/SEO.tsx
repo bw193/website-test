@@ -17,7 +17,7 @@ const SITE_URL = 'https://bolenmirror.com';
 
 export default function SEO({
   title = 'BOLEN Mirror | LED Mirror Manufacturer & OEM Smart Mirror Factory',
-  description = 'BOLEN (Jiaxing Chengtai Mirror Co., Ltd.) is a leading LED mirror manufacturer specializing in OEM LED mirrors, smart mirrors, vanity mirrors, and bath mirrors for global brands.',
+  description = 'BOLEN Mirror is a leading LED mirror manufacturer specializing in OEM LED mirrors, smart mirrors, vanity mirrors, and bath mirrors for global brands.',
   path = '/',
   ogImage = 'https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-images/site-assets/1773994889396-9i4t1ap.jpg',
   ogType = 'website',

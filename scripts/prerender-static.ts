@@ -90,7 +90,7 @@ const COPY: Record<
   en: {
     homeTitle: 'BOLEN Mirror | LED Mirror Manufacturer & OEM Smart Mirror Factory',
     homeDesc:
-      'BOLEN (Jiaxing Chengtai Mirror Co., Ltd.) is a leading LED mirror manufacturer specializing in OEM LED mirrors, smart mirrors, vanity mirrors, and bath mirrors for global brands.',
+      'BOLEN Mirror is a leading LED mirror manufacturer specializing in OEM LED mirrors, smart mirrors, vanity mirrors, and bath mirrors for global brands.',
     homeH1: 'BOLEN — LED Mirror Manufacturer & OEM Smart Mirror Factory',
     homeIntro:
       'Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) operates a 50,000+ sqm facility with 200+ skilled artisans, manufacturing premium LED mirrors, smart mirrors, vanity mirrors, and bathroom mirrors for global brands. Over 20 years of OEM/ODM manufacturing experience.',
@@ -123,7 +123,7 @@ const COPY: Record<
   zh: {
     homeTitle: 'BOLEN 镜业 | LED 智能镜制造商 & OEM 镜子工厂',
     homeDesc:
-      'BOLEN（嘉兴诚泰镜业有限公司）是领先的 LED 镜制造商，专业生产 OEM LED 镜、智能镜、化妆镜和浴室镜，服务全球品牌。',
+      'BOLEN Mirror 是领先的 LED 镜制造商，专业生产 OEM LED 镜、智能镜、化妆镜和浴室镜，服务全球品牌。',
     homeH1: 'BOLEN — LED 镜制造商 & OEM 智能镜工厂',
     homeIntro:
       '嘉兴诚泰镜业有限公司（BOLEN）拥有 50,000+ 平米厂房和 200+ 名熟练工匠，为全球品牌制造优质 LED 镜、智能镜、化妆镜和浴室镜。20 年以上 OEM/ODM 制造经验。',
@@ -153,7 +153,7 @@ const COPY: Record<
   es: {
     homeTitle: 'BOLEN Mirror | Fabricante de Espejos LED y Fábrica OEM de Espejos Inteligentes',
     homeDesc:
-      'BOLEN (Jiaxing Chengtai Mirror Co., Ltd.) es un fabricante líder de espejos LED especializado en espejos LED OEM, espejos inteligentes, espejos de tocador y espejos de baño para marcas globales.',
+      'BOLEN Mirror es un fabricante líder de espejos LED especializado en espejos LED OEM, espejos inteligentes, espejos de tocador y espejos de baño para marcas globales.',
     homeH1: 'BOLEN — Fabricante de Espejos LED y Fábrica OEM de Espejos Inteligentes',
     homeIntro:
       'Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) opera una instalación de 50,000+ m² con más de 200 artesanos calificados, fabricando espejos LED premium, espejos inteligentes, espejos de tocador y espejos de baño para marcas globales. Más de 20 años de experiencia en fabricación OEM/ODM.',
@@ -186,7 +186,7 @@ const COPY: Record<
   fr: {
     homeTitle: 'BOLEN Mirror | Fabricant de Miroirs LED et Usine OEM de Miroirs Intelligents',
     homeDesc:
-      "BOLEN (Jiaxing Chengtai Mirror Co., Ltd.) est un fabricant leader de miroirs LED spécialisé dans les miroirs LED OEM, les miroirs intelligents, les miroirs de toilette et les miroirs de salle de bain pour les marques mondiales.",
+      "BOLEN Mirror est un fabricant leader de miroirs LED spécialisé dans les miroirs LED OEM, les miroirs intelligents, les miroirs de toilette et les miroirs de salle de bain pour les marques mondiales.",
     homeH1: 'BOLEN — Fabricant de Miroirs LED et Usine OEM de Miroirs Intelligents',
     homeIntro:
       "Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) exploite une installation de 50 000+ m² avec plus de 200 artisans qualifiés, fabriquant des miroirs LED haut de gamme, des miroirs intelligents, des miroirs de toilette et des miroirs de salle de bain pour les marques mondiales. Plus de 20 ans d'expérience en fabrication OEM/ODM.",
@@ -219,7 +219,7 @@ const COPY: Record<
   de: {
     homeTitle: 'BOLEN Mirror | LED-Spiegelhersteller & OEM-Smart-Spiegel-Fabrik',
     homeDesc:
-      'BOLEN (Jiaxing Chengtai Mirror Co., Ltd.) ist ein führender LED-Spiegelhersteller, spezialisiert auf OEM-LED-Spiegel, Smart-Spiegel, Schminkspiegel und Badspiegel für globale Marken.',
+      'BOLEN Mirror ist ein führender LED-Spiegelhersteller, spezialisiert auf OEM-LED-Spiegel, Smart-Spiegel, Schminkspiegel und Badspiegel für globale Marken.',
     homeH1: 'BOLEN — LED-Spiegelhersteller & OEM-Smart-Spiegel-Fabrik',
     homeIntro:
       'Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) betreibt eine Anlage von über 50.000 m² mit mehr als 200 erfahrenen Handwerkern und fertigt hochwertige LED-Spiegel, Smart-Spiegel, Schminkspiegel und Badspiegel für globale Marken. Über 20 Jahre OEM/ODM-Fertigungserfahrung.',
@@ -252,7 +252,7 @@ const COPY: Record<
   it: {
     homeTitle: 'BOLEN Mirror | Produttore di Specchi LED e Fabbrica OEM di Specchi Smart',
     homeDesc:
-      'BOLEN (Jiaxing Chengtai Mirror Co., Ltd.) è un produttore leader di specchi LED specializzato in specchi LED OEM, specchi smart, specchi da toeletta e specchi da bagno per marchi globali.',
+      'BOLEN Mirror è un produttore leader di specchi LED specializzato in specchi LED OEM, specchi smart, specchi da toeletta e specchi da bagno per marchi globali.',
     homeH1: 'BOLEN — Produttore di Specchi LED e Fabbrica OEM di Specchi Smart',
     homeIntro:
       "Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) gestisce un impianto di oltre 50.000 m² con più di 200 artigiani qualificati, producendo specchi LED premium, specchi smart, specchi da toeletta e specchi da bagno per marchi globali. Oltre 20 anni di esperienza nella produzione OEM/ODM.",
@@ -1017,6 +1017,50 @@ function blogPostContent(
   `.trim();
 }
 
+async function writeUuidRedirects(products: Product[]): Promise<void> {
+  const redirectsPath = resolve(DIST, '_redirects');
+  let existing = '';
+  try {
+    existing = await readFile(redirectsPath, 'utf-8');
+  } catch {
+    // No existing _redirects (public/_redirects deleted?) — start clean.
+  }
+
+  const BEGIN = '# BEGIN auto-uuid-redirects';
+  const END = '# END auto-uuid-redirects';
+  const staticBody = existing
+    .replace(new RegExp(`${BEGIN}[\\s\\S]*?${END}\\n?`, 'g'), '')
+    .replace(/^\n+/, '');
+
+  const lines: string[] = [
+    BEGIN,
+    '# Generated by scripts/prerender-static.ts — 301s for legacy /<slug>-<uuid> product URLs.',
+  ];
+  let ruleCount = 0;
+  for (const product of products) {
+    if (!product.id || !product.title) continue;
+    const slug = toSlug(product.title);
+    if (!slug) continue;
+
+    const pairs: Array<[string, string]> = [];
+    pairs.push([`/products/${slug}-${product.id}`, `/en/products/${slug}/`]);
+    pairs.push([`/products/${slug}-${product.id}/`, `/en/products/${slug}/`]);
+    for (const lang of LANGUAGES) {
+      const dest = `/${lang}/products/${slug}/`;
+      pairs.push([`/${lang}/products/${slug}-${product.id}`, dest]);
+      pairs.push([`/${lang}/products/${slug}-${product.id}/`, dest]);
+    }
+    for (const [src, dst] of pairs) {
+      lines.push(`${src}  ${dst}  301`);
+      ruleCount++;
+    }
+  }
+  lines.push(END);
+
+  await writeFile(redirectsPath, `${lines.join('\n')}\n\n${staticBody}`, 'utf-8');
+  console.log(`[prerender-static] Wrote ${ruleCount} UUID redirect rules to dist/_redirects.`);
+}
+
 async function main(): Promise<void> {
   console.log('[prerender-static] Reading dist/index.html...');
   const template = await readFile(resolve(DIST, 'index.html'), 'utf-8');
@@ -1253,6 +1297,8 @@ async function main(): Promise<void> {
       routeCount++;
     }
   }
+
+  await writeUuidRedirects(products);
 
   console.log(`[prerender-static] Wrote ${routeCount} route files into dist/.`);
 }
