@@ -449,11 +449,13 @@ function injectIntoTemplate(
   // Inject head extras immediately before </head>.
   html = html.replace('</head>', `    ${opts.headExtras}\n  </head>`);
 
-  // Replace the loader inside #root with the SEO body content. After
-  // `vite build`, the entry script lives in <head> (modulepreloaded), so the
-  // body just has <div id="root">…</div> before </body>. Match the loader
-  // block specifically, fall back to a generic empty-root pattern.
-  const rootBlock = `<div id="root">\n      ${opts.bodyContent}\n    </div>`;
+  // Inject the SEO body content alongside the loader inside #root. The loader
+  // is a fixed full-viewport overlay (see index.html inline CSS) so JS-enabled
+  // users see only the spinner during the brief window before
+  // createRoot.render() wipes both children. Crawlers and no-JS users still
+  // get the prerendered fallback (a <noscript> rule hides the loader for them).
+  const loader = '<div id="root-loader"><div class="spinner"></div></div>';
+  const rootBlock = `<div id="root">\n      ${opts.bodyContent}\n      ${loader}\n    </div>`;
   let replaced = false;
   html = html.replace(
     /<div id="root">\s*<div id="root-loader">[\s\S]*?<\/div>\s*<\/div>\s*<\/div>/,

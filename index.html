@@ -27,12 +27,17 @@
     <link rel="icon" type="image/png" href="https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/logo.png" />
     <title>BOLEN Mirror | LED Mirror Manufacturer & OEM Smart Mirror Factory</title>
 
-    <!-- Inline critical CSS for loading shell -->
+    <!-- Inline critical CSS for loading shell. position:fixed + inset:0 + z-index
+         turns the loader into a full-viewport overlay so it covers the prerendered
+         SEO fallback markup until React's createRoot.render() wipes both. The
+         <noscript> rule hides the loader for users without JS so they still see
+         the fallback content underneath. -->
     <style>
-      #root-loader{display:flex;align-items:center;justify-content:center;min-height:100vh;background:#FAF9F6}
+      #root-loader{position:fixed;inset:0;z-index:2147483647;display:flex;align-items:center;justify-content:center;background:#FAF9F6}
       #root-loader .spinner{width:48px;height:48px;border:4px solid #e7e5e4;border-top-color:#d97706;border-radius:50%;animation:spin .8s linear infinite}
       @keyframes spin{to{transform:rotate(360deg)}}
     </style>
+    <noscript><style>#root-loader{display:none}</style></noscript>
 
     <!-- Defer Google Analytics until after page is interactive -->
     <script>
