@@ -6,11 +6,12 @@ import { Loader2, CheckCircle2, ChevronLeft, ChevronRight, ArrowLeft, Send, Shie
 import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
 import SEO from '../components/SEO';
-import { optimizeImage } from '../utils/optimizeImage';
+import { optimizeImage, isLikelyImageUrl } from '../utils/optimizeImage';
 import { useLocalizedPath } from '../hooks/useLocalizedPath';
 import { readInitialProduct } from '../utils/prerenderData';
 import { toSlug, parseProductParam } from '../utils/slug';
 import { useProductTranslator } from '../utils/productI18n';
+import { buildProductDescription } from '../utils/productContent';
 
 interface Product {
   id: string;
@@ -147,8 +148,10 @@ export default function ProductDetail() {
   }
 
   if (!product) {
+    const missingPath = routeSlug ? `/products/${routeSlug}` : '/products';
     return (
       <div className="text-center py-24 text-stone-500 text-xl">
+        <SEO title="Product Not Found | BOLEN Mirror" path={missingPath} noindex={true} />
         Product not found.
       </div>
     );
@@ -157,13 +160,15 @@ export default function ProductDetail() {
   // Localized copy for display + SEO. `product` (English) still drives the
   // slug/canonical/lookup so URLs stay identical across languages.
   const display = translate(product);
+  const productImages = (product.images || []).filter(isLikelyImageUrl);
+  const activeImage = productImages[currentImageIndex] || productImages[0] || '';
 
   const nextImage = () => {
-    setCurrentImageIndex((prev) => (prev + 1) % product.images.length);
+    setCurrentImageIndex((prev) => (productImages.length ? (prev + 1) % productImages.length : 0));
   };
 
   const prevImage = () => {
-    setCurrentImageIndex((prev) => (prev - 1 + product.images.length) % product.images.length);
+    setCurrentImageIndex((prev) => (productImages.length ? (prev - 1 + productImages.length) % productImages.length : 0));
   };
 
   const fadeInUp = {
@@ -193,9 +198,11 @@ export default function ProductDetail() {
   };
   const { low: lowPrice, high: highPrice } = parsePriceRange(product?.price_range);
 
-  const richDescription = display.description && display.description.trim().length >= 30
-    ? display.description
-    : `Premium ${display.title} by BOLEN Mirror (Jiaxing Chengtai Mirror Co., Ltd.) — OEM/ODM LED, smart, vanity, and bath mirrors. Request a quote for bulk pricing.`;
+  const richDescription = buildProductDescription({
+    title: display.title,
+    description: display.description,
+    category: product.category,
+  });
 
   const seoTitle = display.title.length > 55 ? display.title : `${display.title} | BOLEN Mirror`;
 
@@ -204,7 +211,7 @@ export default function ProductDetail() {
       "@context": "https://schema.org/",
       "@type": "Product",
       "name": display.title,
-      "image": product.images,
+      "image": productImages,
       "description": richDescription,
       "sku": product.id,
       "brand": {
@@ -237,7 +244,7 @@ export default function ProductDetail() {
         title={seoTitle}
         description={richDescription}
         path={productPath}
-        ogImage={product.images?.[0]}
+        ogImage={productImages[0]}
         ogType="product"
         schema={productSchema}
       />
@@ -271,7 +278,7 @@ export default function ProductDetail() {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.3 }}
-                  src={optimizeImage(product.images[currentImageIndex], { width: 800 }) || 'https://picsum.photos/seed/mirror/800/800'}
+                  src={optimizeImage(activeImage, { width: 800 }) || 'https://picsum.photos/seed/mirror/800/800'}
                   alt={display.title}
                   className="w-full h-full object-center object-cover"
                   width="800"
@@ -282,7 +289,7 @@ export default function ProductDetail() {
                 />
               </AnimatePresence>
               
-              {product.images.length > 1 && (
+              {productImages.length > 1 && (
                 <>
                   <button 
                     onClick={prevImage} 
@@ -303,14 +310,14 @@ export default function ProductDetail() {
             </m.div>
             
             {/* Thumbnails */}
-            {product.images.length > 1 && (
+            {productImages.length > 1 && (
               <m.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
                 className="mt-4 grid grid-cols-5 gap-3"
               >
-                {product.images.map((img, idx) => (
+                {productImages.map((img, idx) => (
                   <button
                     key={idx}
                     onClick={() => setCurrentImageIndex(idx)}
@@ -352,7 +359,7 @@ export default function ProductDetail() {
 
             <m.div variants={fadeInUp} className="mt-8">
               <h3 className="sr-only">Description</h3>
-              <p className="text-lg text-stone-600 leading-relaxed font-light">{display.description}</p>
+              <p className="text-lg text-stone-600 leading-relaxed font-light">{richDescription}</p>
             </m.div>
 
             {/* Value Props */}

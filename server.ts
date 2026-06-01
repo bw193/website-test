@@ -1,6 +1,7 @@
 import express from 'express';
 import { createServer as createViteServer } from 'vite';
 import path from 'path';
+import { existsSync } from 'fs';
 import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
 
@@ -13,6 +14,7 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 async function startServer() {
   const app = express();
   const PORT = parseInt(process.env.PORT || '3000', 10);
+  app.set('trust proxy', true);
 
   // Security headers
   app.use((req, res, next) => {
@@ -106,10 +108,38 @@ ${urls.join('\n')}
 
   const SUPPORTED_LANGUAGES = ['en', 'zh', 'es', 'fr', 'de', 'it'];
 
+  app.use((req, res, next) => {
+    if (process.env.NODE_ENV !== 'production') {
+      next();
+      return;
+    }
+
+    const host = req.get('host') || '';
+    const canonicalHost = 'bolenmirror.com';
+    const forwardedProto = req.get('x-forwarded-proto') || req.protocol;
+    const needsCanonicalHost = host.toLowerCase() === `www.${canonicalHost}`;
+    const needsHttps = forwardedProto !== 'https' && host.toLowerCase().endsWith(canonicalHost);
+
+    if (needsCanonicalHost || needsHttps) {
+      res.redirect(301, `https://${canonicalHost}${req.originalUrl}`);
+      return;
+    }
+
+    next();
+  });
+
+  app.get('/', (req, res) => res.redirect(301, '/en/'));
+
+  app.get(/^\/(en|zh|es|fr|de|it)(?:\/(?:products|our-story|blog|rfq)(?:\/[^/.]+)?)?$/, (req, res) => {
+    res.redirect(301, `${req.path}/`);
+  });
+
   // 301 redirects for old non-language-prefixed URLs → /en/...
   app.get('/products', (req, res) => res.redirect(301, '/en/products/'));
   app.get('/products/*', (req, res) => res.redirect(301, `/en${req.path.replace(/\/+$/, '')}/`));
   app.get('/our-story', (req, res) => res.redirect(301, '/en/our-story/'));
+  app.get('/blog', (req, res) => res.redirect(301, '/en/blog/'));
+  app.get('/blog/*', (req, res) => res.redirect(301, `/en${req.path.replace(/\/+$/, '')}/`));
   app.get('/rfq', (req, res) => res.redirect(301, '/en/rfq/'));
 
   // Vite middleware for development
@@ -130,9 +160,16 @@ ${urls.join('\n')}
         }
       }
     }));
-    // Redirect bare root to /en
-    app.get('/', (req, res) => res.redirect(302, '/en/'));
     app.get('*', (req, res) => {
+      const requestPath = decodeURIComponent(req.path).replace(/^\/+|\/+$/g, '');
+      const routeIndex = path.resolve(distPath, requestPath, 'index.html');
+      const isInsideDist = routeIndex.startsWith(distPath + path.sep);
+
+      if (requestPath && isInsideDist && existsSync(routeIndex)) {
+        res.sendFile(routeIndex);
+        return;
+      }
+
       res.sendFile(path.join(distPath, 'index.html'));
     });
   }

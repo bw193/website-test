@@ -31,6 +31,8 @@ import {
   buildBlogPostingSchema,
   buildBlogBreadcrumbSchema,
 } from '../src/utils/blogSchema';
+import { optimizeImage, isLikelyImageUrl } from '../src/utils/optimizeImage';
+import { buildProductDescription } from '../src/utils/productContent';
 import type { BlogPost, BlogListItem, LocalizedBlogPost } from '../src/types/blog';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -43,6 +45,10 @@ type Lang = (typeof LANGUAGES)[number];
 
 const DEFAULT_OG_IMAGE =
   'https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-images/site-assets/1773994889396-9i4t1ap.jpg';
+const CATALOG_HERO_IMAGE =
+  'https://images.unsplash.com/photo-1600566752355-35792bedcfea?q=80&w=2000&auto=format&fit=crop';
+const STORY_HERO_IMAGE =
+  'https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/building.jpg';
 
 interface Product {
   id: string;
@@ -344,6 +350,13 @@ function localizeProduct(product: Product, tr: LangTranslations | undefined): Pr
   };
 }
 
+function cleanProductImages(product: Product): Product {
+  return {
+    ...product,
+    images: (product.images || []).filter(isLikelyImageUrl),
+  };
+}
+
 // react-helmet-async uses `data-rh="true"` to identify the tags it manages.
 // On client mount it diffs existing data-rh tags against what it wants to
 // render and only inserts/removes the difference. Without this marker
@@ -406,6 +419,24 @@ function schemaBlock(schema: any[]): string {
     .join('\n    ');
 }
 
+interface PreloadImage {
+  url?: string | null;
+  width?: number;
+  height?: number;
+  quality?: number;
+}
+
+function imagePreloadBlock(images: PreloadImage[] = []): string {
+  return images
+    .map(({ url, width, height, quality }) => {
+      if (!url) return '';
+      const href = optimizeImage(url, { width, height, quality }) || url;
+      return `<link rel="preload" as="image" href="${escapeAttr(href)}" fetchpriority="high" referrerpolicy="no-referrer" />`;
+    })
+    .filter(Boolean)
+    .join('\n    ');
+}
+
 function buildHead(opts: {
   lang: Lang;
   title: string;
@@ -415,13 +446,26 @@ function buildHead(opts: {
   ogType?: string;
   routePath: string;
   schema?: any[];
+  preloadImages?: PreloadImage[];
 }): string {
-  const { lang, title, description, canonical, ogImage, ogType = 'website', routePath, schema = [] } = opts;
+  const {
+    lang,
+    title,
+    description,
+    canonical,
+    ogImage,
+    ogType = 'website',
+    routePath,
+    schema = [],
+    preloadImages = [],
+  } = opts;
   return [
     // <title> is updated by Helmet via document.title (not appended), so it
     // doesn't need a data-rh marker.
     `<title>${escapeHtml(title)}</title>`,
     `<meta ${RH} name="description" content="${escapeAttr(description)}" />`,
+    `<meta ${RH} name="robots" content="index, follow" />`,
+    imagePreloadBlock(preloadImages),
     `<link ${RH} rel="canonical" href="${escapeAttr(canonical)}" />`,
     hreflangBlock(routePath),
     ogTwitterBlock(canonical, title, description, ogImage, ogType),
@@ -469,8 +513,41 @@ function injectIntoTemplate(
 }
 
 // Markup helpers
-function homeContent(lang: Lang): string {
+function productListItem(lang: Lang, product: Product, tr: LangTranslations, imageWidth = 400): string {
+  const slug = toSlug(product.title || '');
+  const href = `/${lang}/products/${slug}/`;
+  const title = tr[product.id]?.title || product.title;
+  const description = buildProductDescription({
+    title,
+    description: (tr[product.id]?.description as string) || product.description,
+    category: product.category,
+  });
+  const img = product.images?.find(isLikelyImageUrl);
+  const imgTag = img
+    ? `<img src="${escapeAttr(optimizeImage(img, { width: imageWidth }) || img)}" alt="${escapeAttr(
+        title
+      )}" width="${imageWidth}" height="${imageWidth}" loading="lazy" decoding="async" referrerpolicy="no-referrer" />`
+    : '';
+  return `<li><a href="${escapeAttr(href)}">${imgTag}<span>${escapeHtml(title)}</span></a><p>${escapeHtml(
+    description
+  )}</p></li>`;
+}
+
+function homeContent(lang: Lang, products: Product[], tr: LangTranslations): string {
   const c = COPY[lang];
+  const featured = products
+    .slice(0, 6)
+    .map((p) => productListItem(lang, p, tr, 320))
+    .join('\n        ');
+  const productLinks = featured
+    ? `
+      <section aria-label="${escapeAttr(c.catalogH1)}">
+        <h2>${escapeHtml(c.catalogH1)}</h2>
+        <ul>
+        ${featured}
+        </ul>
+      </section>`
+    : '';
   return `
     <div data-prerender="home">
       <h1>${escapeHtml(c.homeH1)}</h1>
@@ -480,6 +557,7 @@ function homeContent(lang: Lang): string {
         <a href="/${lang}/our-story/">${escapeHtml(c.navStory)}</a>
         <a href="/${lang}/rfq/">${escapeHtml(c.navRfq)}</a>
       </nav>
+      ${productLinks}
     </div>
   `.trim();
 }
@@ -487,16 +565,7 @@ function homeContent(lang: Lang): string {
 function catalogContent(lang: Lang, products: Product[], tr: LangTranslations): string {
   const c = COPY[lang];
   const items = products
-    .map((p) => {
-      const slug = toSlug(p.title || ''); // slug from English title
-      const href = `/${lang}/products/${slug}/`;
-      const title = tr[p.id]?.title || p.title;
-      const img = p.images?.[0];
-      const imgTag = img
-        ? `<img src="${escapeAttr(img)}" alt="${escapeAttr(title)}" width="400" height="400" loading="lazy" />`
-        : '';
-      return `<li><a href="${escapeAttr(href)}">${imgTag}<span>${escapeHtml(title)}</span></a></li>`;
-    })
+    .map((p) => productListItem(lang, p, tr, 400))
     .join('\n        ');
   return `
     <div data-prerender="catalog">
@@ -512,11 +581,13 @@ function catalogContent(lang: Lang, products: Product[], tr: LangTranslations): 
 function productDetailContent(lang: Lang, product: Product, tr: LangTranslations): string {
   const c = COPY[lang];
   const localized = localizeProduct(product, tr);
-  const img = product.images?.[0];
+  const img = product.images?.find(isLikelyImageUrl);
   const imgTag = img
-    ? `<img src="${escapeAttr(img)}" alt="${escapeAttr(localized.title)}" width="600" height="600" />`
+    ? `<img src="${escapeAttr(optimizeImage(img, { width: 600 }) || img)}" alt="${escapeAttr(
+        localized.title
+      )}" width="600" height="600" decoding="async" referrerpolicy="no-referrer" />`
     : '';
-  const desc = localized.description ? `<p>${escapeHtml(localized.description.slice(0, 600))}</p>` : '';
+  const desc = `<p>${escapeHtml(richProductDescription(localized).slice(0, 600))}</p>`;
   const price = product.price_range
     ? `<p><strong>${escapeHtml(product.price_range.startsWith('$') ? product.price_range : `$${product.price_range}`)}</strong></p>`
     : '';
@@ -604,11 +675,6 @@ function homeSchema(): any[] {
       '@type': 'WebSite',
       name: 'BOLEN Mirror',
       url: 'https://bolenmirror.com',
-      potentialAction: {
-        '@type': 'SearchAction',
-        target: 'https://bolenmirror.com/products?q={search_term_string}',
-        'query-input': 'required name=search_term_string',
-      },
     },
   ];
 }
@@ -642,10 +708,7 @@ function parsePriceRange(range?: string): { low: number; high: number } {
 
 // Mirrors src/pages/ProductDetail.tsx's richDescription / seoTitle helpers.
 function richProductDescription(product: Product): string {
-  if (product.description && product.description.trim().length >= 30) {
-    return product.description;
-  }
-  return `Premium ${product.title} by BOLEN Mirror (Jiaxing Chengtai Mirror Co., Ltd.) — OEM/ODM LED, smart, vanity, and bath mirrors. Request a quote for bulk pricing.`;
+  return buildProductDescription(product);
 }
 
 function productSeoTitle(product: Product): string {
@@ -661,7 +724,7 @@ function productDetailSchema(lang: Lang, product: Product, display: Product): an
       '@context': 'https://schema.org/',
       '@type': 'Product',
       name: display.title,
-      image: product.images || [],
+      image: (product.images || []).filter(isLikelyImageUrl),
       description: richProductDescription(display),
       sku: product.id,
       brand: {
@@ -1069,9 +1132,11 @@ async function main(): Promise<void> {
   console.log('[prerender-static] Fetching site settings (hero, categories)...');
   const { heroBgs, categories } = await fetchSiteSettings();
 
+  const cleanProducts = products.map(cleanProductImages);
+
   // ProductCard only reads id/title/description/images/category/price_range/msrp;
   // strip the heavy details/specifications fields out of the shared product payload.
-  const lightProducts = products.map(({ details, specifications, ...rest }) => rest);
+  const lightProducts = cleanProducts.map(({ details, specifications, ...rest }) => rest);
 
   console.log('[prerender-static] Loading product translations (public/i18n)...');
   const translations = await loadProductTranslations();
@@ -1079,7 +1144,7 @@ async function main(): Promise<void> {
   console.log('[prerender-static] Fetching published blog posts...');
   const blogPosts = await fetchBlogPosts();
   console.log(`[prerender-static] ${blogPosts.length} blog posts loaded.`);
-  const productById = new Map(products.map((p) => [p.id, p]));
+  const productById = new Map(cleanProducts.map((p) => [p.id, p]));
   for (const lang of LANGUAGES) {
     const n = Object.keys(translations[lang]).length;
     if (n > 0) console.log(`[prerender-static]   ${lang}: ${n} translated products`);
@@ -1112,11 +1177,12 @@ async function main(): Promise<void> {
         ogType: 'website',
         routePath: '/',
         schema: homeSchema(),
+        preloadImages: [{ url: heroBgs[0], width: 1920, quality: 85 }],
       })}\n    ${dataScript}`;
       const html = injectIntoTemplate(template, {
         lang,
         headExtras,
-        bodyContent: homeContent(lang),
+        bodyContent: homeContent(lang, cleanProducts, translations[lang]),
       });
       await writeRoute(`${lang}`, html);
       routeCount++;
@@ -1142,11 +1208,12 @@ async function main(): Promise<void> {
         ogType: 'website',
         routePath: '/products',
         schema: catalogSchema(lang),
+        preloadImages: [{ url: CATALOG_HERO_IMAGE }],
       })}\n    ${dataScript}`;
       const html = injectIntoTemplate(template, {
         lang,
         headExtras,
-        bodyContent: catalogContent(lang, products, translations[lang]),
+        bodyContent: catalogContent(lang, cleanProducts, translations[lang]),
       });
       await writeRoute(`${lang}/products`, html);
       routeCount++;
@@ -1164,6 +1231,7 @@ async function main(): Promise<void> {
         ogType: 'website',
         routePath: '/our-story',
         schema: storySchema(lang),
+        preloadImages: [{ url: STORY_HERO_IMAGE, width: 1920, quality: 85 }],
       });
       const html = injectIntoTemplate(template, {
         lang,
@@ -1211,6 +1279,7 @@ async function main(): Promise<void> {
         ogType: 'website',
         routePath: '/blog',
         schema: buildBlogIndexSchema(lang) as any[],
+        preloadImages: [{ url: items[0]?.cover_image || DEFAULT_OG_IMAGE, width: 1200 }],
       })}\n    ${dataScript}`;
       const html = injectIntoTemplate(template, {
         lang,
@@ -1230,7 +1299,11 @@ async function main(): Promise<void> {
         .filter((p): p is Product => !!p)
         .map((p) => {
           const disp = localizeProduct(p, translations[lang]);
-          return { href: `/${lang}/products/${toSlug(p.title)}/`, title: disp.title || p.title, img: p.images?.[0] };
+          return {
+            href: `/${lang}/products/${toSlug(p.title)}/`,
+            title: disp.title || p.title,
+            img: p.images?.find(isLikelyImageUrl),
+          };
         });
       const path = `/blog/${localized.slug}`;
       const canonical = `${SITE_URL}/${lang}${path}/`;
@@ -1246,6 +1319,7 @@ async function main(): Promise<void> {
         ogType: 'article',
         routePath: path,
         schema: [buildBlogPostingSchema(localized, lang), buildBlogBreadcrumbSchema(localized, lang)],
+        preloadImages: [{ url: localized.cover_image || DEFAULT_OG_IMAGE, width: 1920, quality: 85 }],
       })}\n    ${dataScript}`;
       const html = injectIntoTemplate(template, {
         lang,
@@ -1258,7 +1332,7 @@ async function main(): Promise<void> {
 
     // Product detail pages — title/description shape mirrors ProductDetail.tsx
     // exactly so Helmet's isEqualNode adoption works on mount.
-    for (const product of products) {
+    for (const product of cleanProducts) {
       if (!product.id || !product.title) continue;
       const slug = toSlug(product.title);
       const slugKey = `${lang}/${slug}`;
@@ -1286,10 +1360,11 @@ async function main(): Promise<void> {
         title,
         description,
         canonical,
-        ogImage: product.images?.[0] || DEFAULT_OG_IMAGE,
+        ogImage: product.images?.find(isLikelyImageUrl) || DEFAULT_OG_IMAGE,
         ogType: 'product',
         routePath: path,
         schema: productDetailSchema(lang, product, display),
+        preloadImages: [{ url: product.images?.find(isLikelyImageUrl), width: 800 }],
       })}\n    ${dataScript}`;
       const html = injectIntoTemplate(template, {
         lang,

@@ -194,12 +194,7 @@ export default function Home() {
           "@context": "https://schema.org",
           "@type": "WebSite",
           "name": "BOLEN Mirror",
-          "url": "https://bolenmirror.com",
-          "potentialAction": {
-            "@type": "SearchAction",
-            "target": "https://bolenmirror.com/products?q={search_term_string}",
-            "query-input": "required name=search_term_string"
-          }
+          "url": "https://bolenmirror.com"
         }
       ]} />
       {/* Hero Section */}

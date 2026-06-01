@@ -124,6 +124,7 @@ export default function BlogPost() {
   if (!post) {
     return (
       <div className="min-h-screen bg-[#FAF9F6] flex flex-col items-center justify-center text-center px-4">
+        <SEO title="Article Not Found | BOLEN Mirror" path={`/blog/${slug}`} noindex={true} />
         <p className="font-serif text-3xl text-stone-900 mb-4">{t('blog.notFound', 'Article not found')}</p>
         <Link to={lp('/blog')} className="text-amber-700 font-medium hover:underline">
           {t('blog.backToJournal', 'Back to the Journal')}
