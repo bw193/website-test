@@ -52,14 +52,3 @@ export function imageSrcSet(
     .map(w => `${optimizeImage(url, { width: w })} ${w}w`)
     .join(', ');
 }
-
-export function isLikelyImageUrl(url: string | undefined | null): url is string {
-  if (!url) return false;
-  try {
-    const parsed = new URL(url);
-    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return false;
-    return /\.(?:avif|gif|jpe?g|png|webp)$/i.test(parsed.pathname);
-  } catch {
-    return false;
-  }
-}

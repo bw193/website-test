@@ -2,11 +2,10 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowRight } from 'lucide-react';
-import { optimizeImage, imageSrcSet, isLikelyImageUrl } from '../utils/optimizeImage';
+import { optimizeImage, imageSrcSet } from '../utils/optimizeImage';
 import { useLocalizedPath } from '../hooks/useLocalizedPath';
 import { toSlug } from '../utils/slug';
 import { useProductTranslator } from '../utils/productI18n';
-import { buildProductDescription } from '../utils/productContent';
 
 interface ProductCardProps {
   id: string;
@@ -31,12 +30,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ id, title, description, image
   const productUrl = lp(`/products/${toSlug(title)}`);
   const d = translate({ id, title, description });
   const displayTitle = d.title ?? title;
-  const displayDescription = buildProductDescription({
-    title: displayTitle,
-    description: d.description ?? description,
-    category,
-  });
-  const imageUrl = isLikelyImageUrl(image) ? image : '';
+  const displayDescription = d.description ?? description;
 
   return (
     <Link to={productUrl} className="group block h-full">
@@ -45,8 +39,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ id, title, description, image
         {/* Image Container */}
         <div className="relative aspect-square overflow-hidden bg-stone-100">
           <img
-            src={optimizeImage(imageUrl, { width: 400 }) || 'https://picsum.photos/seed/mirror/400/500'}
-            srcSet={imageSrcSet(imageUrl, [300, 400, 600])}
+            src={optimizeImage(image, { width: 400 }) || 'https://picsum.photos/seed/mirror/400/500'}
+            srcSet={imageSrcSet(image, [300, 400, 600])}
             alt={displayTitle}
             className="w-full h-full object-center object-contain transition-transform duration-700 group-hover:scale-105"
             width="400"

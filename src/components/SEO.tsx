@@ -42,7 +42,7 @@ export default function SEO({
       <html lang={currentLang} />
       <title>{title}</title>
       <meta name="description" content={description} />
-      <meta name="robots" content={noindex ? 'noindex, nofollow' : 'index, follow'} />
+      {noindex && <meta name="robots" content="noindex, nofollow" />}
       <link rel="canonical" href={canonicalUrl} />
 
       <link rel="alternate" hrefLang="en" href={`${SITE_URL}/en${suffix}/`} />

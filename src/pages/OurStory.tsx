@@ -31,7 +31,7 @@ export default function OurStory() {
           "@type": "AboutPage",
           "name": "Our Story — BOLEN LED Mirror Manufacturer",
           "description": "Learn about the history and manufacturing excellence of BOLEN, a leading LED mirror manufacturer since 1995.",
-          "url": `https://bolenmirror.com/${lang}/our-story/`,
+          "url": `https://bolenmirror.com/${lang}/our-story`,
           "mainEntity": {
             "@type": "Organization",
             "name": "Jiaxing Chengtai Mirror Co., Ltd. (BOLEN)",
