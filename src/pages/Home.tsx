@@ -29,6 +29,17 @@ const staggerContainer = {
 const DEFAULT_HERO_BGS = [
   "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-images/site-assets/1773994889396-9i4t1ap.jpg",
 ];
+
+// Responsive hero candidates — kept in lockstep with HERO_WIDTHS in
+// scripts/prerender-static.ts so the URLs match the prerendered <img>/preload
+// exactly and the browser reuses the already-downloaded hero from cache.
+const HERO_WIDTHS = [640, 960, 1280, 1920];
+const heroSrcSet = (url: string) =>
+  HERO_WIDTHS.map((w) => `${optimizeImage(url, { width: w })} ${w}w`).join(', ');
+// Fallback hero aspect ratio (1920×750 = 2.56) used until the build-time probe
+// supplies real dimensions; reserving the box prevents layout shift.
+const DEFAULT_HERO_W = 1920;
+const DEFAULT_HERO_H = 750;
 const DEFAULT_CATEGORIES = [
   "New Arrival",
   "Hot Sale",
@@ -55,6 +66,8 @@ export default function Home() {
     initialData?.heroBgs && initialData.heroBgs.length > 0 ? initialData.heroBgs : DEFAULT_HERO_BGS
   );
   const [currentBgIndex, setCurrentBgIndex] = useState(0);
+  const heroW = initialData?.heroW ?? DEFAULT_HERO_W;
+  const heroH = initialData?.heroH ?? DEFAULT_HERO_H;
   const [isLoading, setIsLoading] = useState(initialData === null);
   const [allProducts, setAllProducts] = useState<any[]>(initialData?.products ?? []);
   const [categories, setCategories] = useState<string[]>(
@@ -216,7 +229,11 @@ export default function Home() {
                 exit={{ opacity: 0 }}
                 transition={{ duration: 1.5, ease: "easeInOut" }}
                 className="w-full h-auto block"
-                src={optimizeImage(heroBgs[currentBgIndex], { width: 1920, quality: 85 })}
+                src={optimizeImage(heroBgs[currentBgIndex], { width: 1280 })}
+                srcSet={heroSrcSet(heroBgs[currentBgIndex])}
+                sizes="100vw"
+                width={heroW}
+                height={heroH}
                 alt="BOLEN LED bathroom mirror manufacturing showcase"
                 referrerPolicy="no-referrer"
                 fetchPriority="high"

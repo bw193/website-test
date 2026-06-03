@@ -16,6 +16,10 @@ interface PrerenderPayload {
   products?: unknown[];
   product?: { id?: string; title?: string } & Record<string, unknown>;
   heroBgs?: string[];
+  // Intrinsic pixel size of the primary hero, probed at build time so the SPA
+  // can reserve the hero's aspect-ratio box on first paint (no CLS).
+  heroW?: number;
+  heroH?: number;
   categories?: string[];
   // Localized product copy embedded per page so the SPA can overlay
   // translations synchronously on first render. Home/catalog carry the full
@@ -84,6 +88,8 @@ export function readInitialProduct<T>(match: { slug: string; id?: string }): T |
 export function readInitialHomeData<T>(): {
   products: T[];
   heroBgs: string[];
+  heroW?: number;
+  heroH?: number;
   categories: string[];
 } | null {
   const data = getPrerenderData();
@@ -91,6 +97,8 @@ export function readInitialHomeData<T>(): {
   return {
     products: data.products as T[],
     heroBgs: Array.isArray(data.heroBgs) ? data.heroBgs : [],
+    heroW: typeof data.heroW === 'number' ? data.heroW : undefined,
+    heroH: typeof data.heroH === 'number' ? data.heroH : undefined,
     categories: Array.isArray(data.categories) ? data.categories : [],
   };
 }

@@ -26,6 +26,7 @@ import { createClient } from '@supabase/supabase-js';
 import 'dotenv/config';
 import { marked } from 'marked';
 import { localizePost, toListItem } from '../src/utils/blog';
+import { optimizeImage } from '../src/utils/optimizeImage';
 import {
   buildBlogIndexSchema,
   buildBlogPostingSchema,
@@ -304,6 +305,70 @@ function toSlug(title: string): string {
     .replace(/(^-|-$)+/g, '');
 }
 
+// Responsive candidate widths for the LCP hero image. Kept in lockstep with
+// the same list in src/pages/Home.tsx so the prerendered <img>/preload URLs are
+// byte-identical to what React renders on mount — the browser then serves the
+// already-downloaded hero from cache instead of re-fetching (no flash, no
+// duplicate LCP candidate).
+const HERO_WIDTHS = [640, 960, 1280, 1920] as const;
+const HERO_DEFAULT_SIZE = { w: 1920, h: 750 };
+
+interface HeroImage {
+  src: string;
+  srcset: string;
+  width: number;
+  height: number;
+}
+
+function buildHeroSrcSet(url: string): string {
+  return HERO_WIDTHS.map((w) => `${optimizeImage(url, { width: w })} ${w}w`).join(', ');
+}
+
+// Reads the intrinsic dimensions of a remote image so the baked hero <img> can
+// reserve the correct aspect-ratio box (kills CLS) without shipping a layout
+// library. Pure-Node header parse for JPEG / PNG / WebP; any failure falls back
+// to the known hero aspect ratio so the build never breaks on a network blip.
+async function probeImageSize(url: string): Promise<{ w: number; h: number }> {
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return HERO_DEFAULT_SIZE;
+    const b = Buffer.from(await res.arrayBuffer());
+
+    // PNG: IHDR width/height at fixed offset.
+    if (b.length > 24 && b[0] === 0x89 && b[1] === 0x50) {
+      return { w: b.readUInt32BE(16), h: b.readUInt32BE(20) };
+    }
+    // WebP (RIFF....WEBP): VP8 / VP8L / VP8X variants.
+    if (b.length > 30 && b.toString('ascii', 0, 4) === 'RIFF' && b.toString('ascii', 8, 12) === 'WEBP') {
+      const fmt = b.toString('ascii', 12, 16);
+      if (fmt === 'VP8X') return { w: 1 + (b[24] | (b[25] << 8) | (b[26] << 16)), h: 1 + (b[27] | (b[28] << 8) | (b[29] << 16)) };
+      if (fmt === 'VP8 ') return { w: b.readUInt16LE(26) & 0x3fff, h: b.readUInt16LE(28) & 0x3fff };
+      if (fmt === 'VP8L') {
+        const bits = b[21] | (b[22] << 8) | (b[23] << 16) | (b[24] << 24);
+        return { w: (bits & 0x3fff) + 1, h: ((bits >> 14) & 0x3fff) + 1 };
+      }
+    }
+    // JPEG: scan for a Start-Of-Frame marker.
+    if (b.length > 4 && b[0] === 0xff && b[1] === 0xd8) {
+      let i = 2;
+      while (i < b.length - 9) {
+        if (b[i] !== 0xff) { i++; continue; }
+        let m = b[i + 1];
+        while (m === 0xff) { i++; m = b[i + 1]; }
+        if (m === 0xd8 || m === 0xd9 || (m >= 0xd0 && m <= 0xd7) || m === 0x01) { i += 2; continue; }
+        const len = b.readUInt16BE(i + 2);
+        if (m >= 0xc0 && m <= 0xcf && m !== 0xc4 && m !== 0xc8 && m !== 0xcc) {
+          return { w: b.readUInt16BE(i + 7), h: b.readUInt16BE(i + 5) };
+        }
+        i += 2 + len;
+      }
+    }
+  } catch {
+    // fall through to default
+  }
+  return HERO_DEFAULT_SIZE;
+}
+
 interface ProductFields {
   title?: string;
   description?: string;
@@ -469,11 +534,20 @@ function injectIntoTemplate(
 }
 
 // Markup helpers
-function homeContent(lang: Lang): string {
+function homeContent(lang: Lang, hero?: HeroImage): string {
   const c = COPY[lang];
+  // Bake the LCP hero straight into the static HTML so the browser discovers
+  // and fetches it during HTML parse — before any JS runs. React renders a
+  // byte-identical <img> on mount, so the painted pixels never change.
+  const heroBlock = hero
+    ? `<div class="relative bg-stone-900 overflow-hidden">
+        <img src="${escapeAttr(hero.src)}" srcset="${escapeAttr(hero.srcset)}" sizes="100vw" width="${hero.width}" height="${hero.height}" alt="BOLEN LED bathroom mirror manufacturing showcase" class="w-full h-auto block" fetchpriority="high" decoding="async" referrerpolicy="no-referrer" />
+      </div>
+      `
+    : '';
   return `
     <div data-prerender="home">
-      <h1>${escapeHtml(c.homeH1)}</h1>
+      ${heroBlock}<h1>${escapeHtml(c.homeH1)}</h1>
       <p>${escapeHtml(c.homeIntro)}</p>
       <nav aria-label="Site sections">
         <a href="/${lang}/products/">${escapeHtml(c.navCatalog)}</a>
@@ -1069,6 +1143,19 @@ async function main(): Promise<void> {
   console.log('[prerender-static] Fetching site settings (hero, categories)...');
   const { heroBgs, categories } = await fetchSiteSettings();
 
+  // Probe the primary (LCP) hero's intrinsic size once, then derive the
+  // responsive src/srcset baked into the home HTML, the <head> preload, and the
+  // data island consumed by Home.tsx.
+  const heroPrimary = heroBgs[0];
+  const heroSize = heroPrimary ? await probeImageSize(heroPrimary) : HERO_DEFAULT_SIZE;
+  const hero: HeroImage | undefined = heroPrimary
+    ? { src: optimizeImage(heroPrimary, { width: 1280 }), srcset: buildHeroSrcSet(heroPrimary), width: heroSize.w, height: heroSize.h }
+    : undefined;
+  const heroPreload = hero
+    ? `<link rel="preload" as="image" imagesrcset="${escapeAttr(hero.srcset)}" imagesizes="100vw" fetchpriority="high" referrerpolicy="no-referrer" />`
+    : '';
+  console.log(`[prerender-static] Hero ${heroPrimary ? `${heroSize.w}x${heroSize.h}` : '(none)'} baked into home.`);
+
   // ProductCard only reads id/title/description/images/category/price_range/msrp;
   // strip the heavy details/specifications fields out of the shared product payload.
   const lightProducts = products.map(({ details, specifications, ...rest }) => rest);
@@ -1100,6 +1187,8 @@ async function main(): Promise<void> {
         lang,
         products: lightProducts,
         heroBgs,
+        heroW: heroSize.w,
+        heroH: heroSize.h,
         categories,
         productTranslations: translations[lang],
       });
@@ -1112,11 +1201,11 @@ async function main(): Promise<void> {
         ogType: 'website',
         routePath: '/',
         schema: homeSchema(),
-      })}\n    ${dataScript}`;
+      })}\n    ${heroPreload}\n    ${dataScript}`;
       const html = injectIntoTemplate(template, {
         lang,
         headExtras,
-        bodyContent: homeContent(lang),
+        bodyContent: homeContent(lang, hero),
       });
       await writeRoute(`${lang}`, html);
       routeCount++;
