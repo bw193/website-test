@@ -20,6 +20,9 @@ interface PrerenderPayload {
   // can reserve the hero's aspect-ratio box on first paint (no CLS).
   heroW?: number;
   heroH?: number;
+  // Self-hosted (Cloudflare-CDN) responsive set for the LCP hero slide, baked
+  // into dist/hero/ at build time. Absent if the build-time fetch failed.
+  heroLcp?: { src: string; srcset: string };
   categories?: string[];
   // Localized product copy embedded per page so the SPA can overlay
   // translations synchronously on first render. Home/catalog carry the full
@@ -90,6 +93,7 @@ export function readInitialHomeData<T>(): {
   heroBgs: string[];
   heroW?: number;
   heroH?: number;
+  heroLcp?: { src: string; srcset: string };
   categories: string[];
 } | null {
   const data = getPrerenderData();
@@ -99,6 +103,7 @@ export function readInitialHomeData<T>(): {
     heroBgs: Array.isArray(data.heroBgs) ? data.heroBgs : [],
     heroW: typeof data.heroW === 'number' ? data.heroW : undefined,
     heroH: typeof data.heroH === 'number' ? data.heroH : undefined,
+    heroLcp: data.heroLcp && typeof data.heroLcp.src === 'string' ? data.heroLcp : undefined,
     categories: Array.isArray(data.categories) ? data.categories : [],
   };
 }

@@ -1,30 +1,18 @@
-import { m, AnimatePresence } from 'motion/react';
 import React, { useEffect, useState, lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Globe, ShieldCheck, Truck, Factory, Lightbulb, Users, Clock, CheckCircle2, ChevronRight, ChevronLeft, Settings, Palette } from 'lucide-react';
 import { useTranslation, Trans } from 'react-i18next';
 import ProductCard from '../components/ProductCard';
 import SEO from '../components/SEO';
+import Reveal from '../components/Reveal';
 import { optimizeImage } from '../utils/optimizeImage';
 import { useLocalizedPath } from '../hooks/useLocalizedPath';
 import { readInitialHomeData } from '../utils/prerenderData';
 
 const GlobalMap = lazy(() => import('../components/GlobalMap'));
-
-const fadeIn = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
-};
-
-const staggerContainer = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.2
-    }
-  }
-};
+// Lazy so `motion` (used by GlobalMap's animated markers) stays off the home
+// critical path — it loads with the map, below the fold, after LCP.
+const MotionProvider = lazy(() => import('../components/MotionProvider'));
 
 const DEFAULT_HERO_BGS = [
   "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-images/site-assets/1773994889396-9i4t1ap.jpg",
@@ -66,8 +54,18 @@ export default function Home() {
     initialData?.heroBgs && initialData.heroBgs.length > 0 ? initialData.heroBgs : DEFAULT_HERO_BGS
   );
   const [currentBgIndex, setCurrentBgIndex] = useState(0);
+  // Only crossfade once the carousel actually advances — the first (LCP) slide
+  // must paint with no entrance animation so it isn't delayed.
+  const [animateSlides, setAnimateSlides] = useState(false);
   const heroW = initialData?.heroW ?? DEFAULT_HERO_W;
   const heroH = initialData?.heroH ?? DEFAULT_HERO_H;
+  // Self-hosted (Cloudflare-CDN) responsive set for the LCP slide, baked at
+  // build time. Falls back to the Supabase transform endpoint if unavailable.
+  const heroLcp = initialData?.heroLcp;
+  const heroImgSrc = (idx: number) =>
+    idx === 0 && heroLcp ? heroLcp.src : optimizeImage(heroBgs[idx], { width: 1280 });
+  const heroImgSrcSet = (idx: number) =>
+    idx === 0 && heroLcp ? heroLcp.srcset : heroSrcSet(heroBgs[idx]);
   const [isLoading, setIsLoading] = useState(initialData === null);
   const [allProducts, setAllProducts] = useState<any[]>(initialData?.products ?? []);
   const [categories, setCategories] = useState<string[]>(
@@ -94,7 +92,7 @@ export default function Home() {
           .select('value')
           .eq('key', 'hero_bg')
           .single();
-        
+
         if (data && data.value) {
           try {
             const parsed = JSON.parse(data.value);
@@ -140,7 +138,7 @@ export default function Home() {
           .from('products')
           .select('*')
           .order('created_at', { ascending: false });
-          
+
         if (!productsError && productsData) {
           setAllProducts(productsData);
         }
@@ -160,19 +158,22 @@ export default function Home() {
 
   useEffect(() => {
     if (heroBgs.length <= 1) return;
-    
+
     const interval = setInterval(() => {
+      setAnimateSlides(true);
       setCurrentBgIndex((prev) => (prev + 1) % heroBgs.length);
     }, 5000); // Change image every 5 seconds
-    
+
     return () => clearInterval(interval);
   }, [heroBgs.length, currentBgIndex]);
 
   const nextBg = () => {
+    setAnimateSlides(true);
     setCurrentBgIndex((prev) => (prev + 1) % heroBgs.length);
   };
 
   const prevBg = () => {
+    setAnimateSlides(true);
     setCurrentBgIndex((prev) => (prev - 1 + heroBgs.length) % heroBgs.length);
   };
 
@@ -220,39 +221,33 @@ export default function Home() {
         <h1 className="sr-only">BOLEN — LED Mirror Manufacturer & OEM Smart Mirror Factory</h1>
         {/* Image in natural flow to preserve aspect ratio */}
         <div className="relative w-full">
-          <AnimatePresence mode="wait" initial={false}>
-            {heroBgs.length > 0 && (
-              <m.img
-                key={currentBgIndex}
-                initial={{ opacity: 0, scale: 1.05 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 1.5, ease: "easeInOut" }}
-                className="w-full h-auto block"
-                src={optimizeImage(heroBgs[currentBgIndex], { width: 1280 })}
-                srcSet={heroSrcSet(heroBgs[currentBgIndex])}
-                sizes="100vw"
-                width={heroW}
-                height={heroH}
-                alt="BOLEN LED bathroom mirror manufacturing showcase"
-                referrerPolicy="no-referrer"
-                fetchPriority="high"
-                decoding="async"
-              />
-            )}
-          </AnimatePresence>
+          {heroBgs.length > 0 && (
+            <img
+              key={currentBgIndex}
+              className={`w-full h-auto block ${animateSlides ? 'hero-fade' : ''}`}
+              src={heroImgSrc(currentBgIndex)}
+              srcSet={heroImgSrcSet(currentBgIndex)}
+              sizes="100vw"
+              width={heroW}
+              height={heroH}
+              alt="BOLEN LED bathroom mirror manufacturing showcase"
+              referrerPolicy="no-referrer"
+              fetchPriority="high"
+              decoding="async"
+            />
+          )}
         </div>
 
         {heroBgs.length > 1 && (
           <>
-            <button 
+            <button
               onClick={prevBg}
               className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-black/20 text-white/70 hover:bg-black/40 hover:text-white transition-all backdrop-blur-sm opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
               aria-label="Previous image"
             >
               <ChevronLeft className="w-8 h-8" />
             </button>
-            <button 
+            <button
               onClick={nextBg}
               className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-black/20 text-white/70 hover:bg-black/40 hover:text-white transition-all backdrop-blur-sm opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
               aria-label="Next image"
@@ -263,7 +258,7 @@ export default function Home() {
               {heroBgs.map((_, idx) => (
                 <button
                   key={idx}
-                  onClick={() => setCurrentBgIndex(idx)}
+                  onClick={() => { setAnimateSlides(true); setCurrentBgIndex(idx); }}
                   className="p-3"
                   aria-label={`Go to image ${idx + 1}`}
                 ><span className={`block w-2.5 h-2.5 rounded-full transition-all ${idx === currentBgIndex ? 'bg-amber-400 w-8' : 'bg-white/50 hover:bg-white/80'}`} /></button>
@@ -275,11 +270,7 @@ export default function Home() {
 
       {/* Stats Section */}
       <div className="relative -mt-8 sm:-mt-10 z-10 max-w-5xl mx-auto px-3 sm:px-6 lg:px-8">
-        <m.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-          variants={staggerContainer}
+        <div
           className="bg-white rounded-xl sm:rounded-2xl shadow-xl border border-stone-100 py-3 px-2 sm:py-5 sm:px-6 lg:py-6 lg:px-8 flex overflow-x-auto sm:grid sm:grid-cols-4 sm:overflow-visible gap-0 sm:gap-4 lg:gap-6"
         >
           {[
@@ -288,52 +279,42 @@ export default function Home() {
             { icon: Lightbulb, value: "200+", label: t('home.stats.styles') },
             { icon: Globe, value: "Global", label: t('home.stats.global') }
           ].map((stat, idx) => (
-            <m.div key={idx} variants={fadeIn} className="flex-1 min-w-0 flex flex-col items-center text-center group">
+            <Reveal key={idx} delay={idx * 100} className="flex-1 min-w-0 flex flex-col items-center text-center group">
               <div className="hidden sm:flex h-10 w-10 rounded-full bg-stone-50 group-hover:bg-amber-50 items-center justify-center mb-2 transition-colors duration-300">
                 <stat.icon className="h-5 w-5 text-amber-600" />
               </div>
               <p className="text-base sm:text-2xl font-bold text-stone-900 mb-0.5 font-serif whitespace-nowrap">{stat.value}</p>
               <p className="text-[8px] sm:text-[11px] text-stone-500 uppercase tracking-wide sm:tracking-wider font-semibold leading-tight whitespace-nowrap">{stat.label}</p>
-            </m.div>
+            </Reveal>
           ))}
-        </m.div>
+        </div>
       </div>
 
       {/* About Section */}
       <div id="about" className="py-24 overflow-hidden bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <m.div 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-12 max-w-4xl mx-auto"
-          >
+          <Reveal className="text-center mb-12 max-w-4xl mx-auto">
             <h2 className="text-4xl font-serif text-stone-900 sm:text-5xl leading-tight mb-6">
               Global Reach: <span className="italic text-amber-700">From Shanghai to the World</span>
             </h2>
             <p className="text-lg text-stone-600 font-light leading-relaxed">
               Headquartered in Jiaxing, Zhejiang, China—just 60 kilometers from Shanghai—Chengtai has grown into a fully integrated enterprise specializing in the research, development, manufacturing, and global export of premium mirror products.
             </p>
-          </m.div>
-          
-          <m.div 
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="relative w-full"
-          >
+          </Reveal>
+
+          <Reveal delay={150} className="relative w-full">
             <div className="aspect-[16/9] lg:aspect-[21/9] rounded-3xl overflow-hidden shadow-xl relative border border-stone-200">
               <Suspense fallback={<div className="w-full h-full bg-stone-200 animate-pulse rounded-3xl" />}>
-                <GlobalMap />
+                <MotionProvider>
+                  <GlobalMap />
+                </MotionProvider>
               </Suspense>
             </div>
-            
+
             {/* Decorative element */}
             <div className="absolute -top-6 -right-6 w-32 h-32 bg-amber-100 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-pulse" />
             <div className="absolute -bottom-6 -left-6 w-40 h-40 bg-stone-200 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-pulse" style={{ animationDelay: '2s' }} />
-          </m.div>
+          </Reveal>
         </div>
       </div>
 
@@ -341,37 +322,22 @@ export default function Home() {
       <div className="py-24 bg-stone-50 text-stone-900 border-t border-stone-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-6">
-            <m.div 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="max-w-2xl"
-            >
+            <Reveal className="max-w-2xl">
               <span className="text-amber-600 font-semibold tracking-wider uppercase text-sm mb-2 block">{t('home.collections.subtitle')}</span>
               <h2 className="text-4xl font-serif sm:text-5xl mb-4">{t('home.collections.title')}</h2>
               <p className="text-lg text-stone-600 font-light">
                 {t('home.collections.desc')}
               </p>
-            </m.div>
-            <m.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-            >
+            </Reveal>
+            <Reveal delay={150}>
               <Link to={lp('/products')} className="inline-flex items-center text-amber-600 hover:text-amber-700 font-medium transition-colors group">
                 {t('home.collections.viewAll')} <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Link>
-            </m.div>
+            </Reveal>
           </div>
 
           {/* Category Filter */}
-          <m.div 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="flex flex-wrap gap-2 mb-12"
-          >
+          <Reveal className="flex flex-wrap gap-2 mb-12">
             <button
               onClick={() => setSelectedCategory(null)}
               className={`px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 whitespace-nowrap ${
@@ -395,7 +361,7 @@ export default function Home() {
                 {category}
               </button>
             ))}
-          </m.div>
+          </Reveal>
 
           {isLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -417,13 +383,7 @@ export default function Home() {
           ) : featuredProducts.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {featuredProducts.map((product, idx) => (
-                <m.div 
-                  key={product.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: idx * 0.1 }}
-                >
+                <Reveal key={product.id} delay={idx * 80}>
                   <ProductCard
                     id={product.id}
                     title={product.title}
@@ -433,7 +393,7 @@ export default function Home() {
                     priceRange={product.price_range}
                     msrp={product.msrp}
                   />
-                </m.div>
+                </Reveal>
               ))}
             </div>
           ) : null}
@@ -458,14 +418,7 @@ export default function Home() {
               { step: "03", title: t('home.process.steps.s3.title'), desc: t('home.process.steps.s3.desc') },
               { step: "04", title: t('home.process.steps.s4.title'), desc: t('home.process.steps.s4.desc') }
             ].map((item, idx) => (
-              <m.div 
-                key={idx}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.15 }}
-                className="relative"
-              >
+              <Reveal key={idx} delay={idx * 100} className="relative">
                 {idx !== 3 && (
                   <div className="hidden md:block absolute top-8 left-1/2 w-full h-[1px] bg-stone-300" />
                 )}
@@ -476,7 +429,7 @@ export default function Home() {
                   <h3 className="text-xl font-bold text-stone-900 mb-2">{item.title}</h3>
                   <p className="text-stone-600 text-sm font-light leading-relaxed">{item.desc}</p>
                 </div>
-              </m.div>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -485,16 +438,11 @@ export default function Home() {
       {/* Why Choose Us */}
       <div className="py-24 bg-stone-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <m.div 
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
+          <Reveal className="text-center mb-16">
             <h2 className="text-4xl font-serif text-stone-900 sm:text-5xl leading-tight">
               {t('home.whyUs.title1')} <span className="italic text-amber-700">{t('home.whyUs.title2')}</span>
             </h2>
-          </m.div>
+          </Reveal>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
@@ -503,12 +451,9 @@ export default function Home() {
               { icon: <Palette className="w-8 h-8" />, idx: 2 },
               { icon: <ShieldCheck className="w-8 h-8" />, idx: 3 }
             ].map((item, i) => (
-              <m.div
+              <Reveal
                 key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
+                delay={i * 80}
                 className="bg-white p-8 rounded-2xl shadow-sm border border-stone-100 hover:shadow-md transition-shadow group"
               >
                 <div className="w-14 h-14 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
@@ -520,7 +465,7 @@ export default function Home() {
                 <p className="text-stone-600 leading-relaxed text-sm">
                   {(t('home.whyUs.paragraphs', { returnObjects: true }) as string[])[item.idx]}
                 </p>
-              </m.div>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -532,7 +477,7 @@ export default function Home() {
           <span className="text-amber-600 font-semibold tracking-wider uppercase text-sm mb-2 block">{t('home.certificates.subtitle')}</span>
           <h2 className="text-3xl font-serif text-stone-900">{t('home.certificates.title')}</h2>
         </div>
-        
+
         <div className="relative w-full overflow-hidden flex group">
           <style>
             {`
@@ -548,7 +493,7 @@ export default function Home() {
               }
             `}
           </style>
-          
+
           <div className="flex animate-marquee whitespace-nowrap w-max">
             {/* First set of images */}
             {CERTS.map((cert, idx) => (
@@ -573,40 +518,22 @@ export default function Home() {
           <div className="absolute inset-0 bg-stone-900/80" />
         </div>
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <m.h2 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-4xl font-serif text-white sm:text-5xl mb-6"
-          >
+          <Reveal as="h2" className="text-4xl font-serif text-white sm:text-5xl mb-6">
             {t('home.cta.title')}
-          </m.h2>
-          <m.p 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-            className="text-xl text-stone-300 font-light mb-10"
-          >
+          </Reveal>
+          <Reveal as="p" delay={100} className="text-xl text-stone-300 font-light mb-10">
             {t('home.cta.desc')}
-          </m.p>
-          <m.div 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-            className="flex flex-col sm:flex-row justify-center gap-4"
-          >
+          </Reveal>
+          <Reveal delay={150} className="flex flex-col sm:flex-row justify-center gap-4">
             <Link to={lp('/products')} className="inline-flex justify-center items-center px-8 py-4 border border-transparent text-base font-medium rounded-full text-stone-900 bg-amber-400 hover:bg-amber-500 transition-colors">
               {t('home.cta.viewCatalog')}
             </Link>
             <Link to={lp('/rfq')} className="inline-flex justify-center items-center px-8 py-4 border border-stone-300 text-base font-medium rounded-full text-white hover:bg-white/10 transition-colors">
               {t('home.cta.contactSales')}
             </Link>
-          </m.div>
+          </Reveal>
         </div>
       </div>
     </div>
   );
 }
-

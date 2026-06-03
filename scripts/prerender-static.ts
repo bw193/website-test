@@ -1148,9 +1148,41 @@ async function main(): Promise<void> {
   // data island consumed by Home.tsx.
   const heroPrimary = heroBgs[0];
   const heroSize = heroPrimary ? await probeImageSize(heroPrimary) : HERO_DEFAULT_SIZE;
-  const hero: HeroImage | undefined = heroPrimary
+  const supabaseHero: HeroImage | undefined = heroPrimary
     ? { src: optimizeImage(heroPrimary, { width: 1280 }), srcset: buildHeroSrcSet(heroPrimary), width: heroSize.w, height: heroSize.h }
     : undefined;
+
+  // Self-host the LCP hero: download each responsive width from Supabase's
+  // transform endpoint at build time and write them into dist/hero/. Cloudflare
+  // Pages then serves them from its CDN with fast TTFB, instead of the live
+  // Supabase /render/image/ endpoint which can take ~2s on a cold transform —
+  // that cold TTFB was the dominant remaining mobile-LCP cost. Falls back to the
+  // Supabase URLs if the build-time fetch fails, so the build never breaks.
+  let heroLcp: { src: string; srcset: string } | undefined;
+  if (heroPrimary) {
+    try {
+      const heroDir = resolve(DIST, 'hero');
+      await mkdir(heroDir, { recursive: true });
+      const srcsetParts = await Promise.all(
+        HERO_WIDTHS.map(async (w) => {
+          const res = await fetch(optimizeImage(heroPrimary, { width: w }), { headers: { Accept: 'image/webp' } });
+          if (!res.ok) throw new Error(`hero ${w}w -> HTTP ${res.status}`);
+          await writeFile(resolve(heroDir, `lcp-${w}.webp`), Buffer.from(await res.arrayBuffer()));
+          return `/hero/lcp-${w}.webp ${w}w`;
+        })
+      );
+      heroLcp = { src: '/hero/lcp-1280.webp', srcset: srcsetParts.join(', ') };
+      console.log('[prerender-static] Self-hosted hero derivatives written to dist/hero/.');
+    } catch (err) {
+      console.warn('[prerender-static] Hero self-host failed; using Supabase transform URLs.', err);
+    }
+  }
+
+  // Prefer the self-hosted set for the baked <img>, the <head> preload, and the
+  // data island; fall back to the Supabase transform set.
+  const hero: HeroImage | undefined = heroLcp
+    ? { ...heroLcp, width: heroSize.w, height: heroSize.h }
+    : supabaseHero;
   const heroPreload = hero
     ? `<link rel="preload" as="image" imagesrcset="${escapeAttr(hero.srcset)}" imagesizes="100vw" fetchpriority="high" referrerpolicy="no-referrer" />`
     : '';
@@ -1189,6 +1221,7 @@ async function main(): Promise<void> {
         heroBgs,
         heroW: heroSize.w,
         heroH: heroSize.h,
+        heroLcp,
         categories,
         productTranslations: translations[lang],
       });

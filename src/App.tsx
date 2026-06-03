@@ -11,15 +11,18 @@ import ScrollToTop from './components/ScrollToTop';
 import LanguageLayout from './components/LanguageLayout';
 import { hasSupabaseConfig } from './supabaseConfig';
 import Home from './pages/Home';
-import Products from './pages/Products';
-import { LazyMotion, domAnimation } from 'motion/react';
 
-
-// Home and Products render synchronously — they are the most common landing
-// targets from search and ads, so their bundles must be in the initial chunk.
-// ProductDetail, OurStory, RFQ are lazy-loaded: deep-link visits still see the
-// prerendered body content (baked into each route's index.html) while the
-// chunk downloads, and most homepage visitors never navigate to them.
+// Home renders synchronously — it's the most common landing target and the LCP
+// route, so it must be in the initial chunk. Everything else is lazy: deep-link
+// visits still see the prerendered body content (baked into each route's
+// index.html) while the chunk downloads. Products was previously eager too, but
+// it pulled `motion` onto the home critical path — lazy-loading it keeps the
+// homepage bundle free of the motion runtime.
+const Products = lazy(() => import('./pages/Products'));
+// MotionProvider supplies motion's features to the lazy routes that still use
+// `m` components. Lazy so `motion` never lands in the homepage bundle.
+const MotionProvider = lazy(() => import('./components/MotionProvider'));
+const withMotion = (el: React.ReactNode) => <MotionProvider>{el}</MotionProvider>;
 const ProductDetail = lazy(() => import('./pages/ProductDetail'));
 const OurStory = lazy(() => import('./pages/OurStory'));
 const RFQ = lazy(() => import('./pages/RFQ'));
@@ -42,7 +45,6 @@ const PageLoader = () => (
 
 export default function App() {
   return (
-    <LazyMotion features={domAnimation}>
       <Router>
         <ScrollToTop />
         <div className="min-h-screen flex flex-col font-sans text-gray-900 bg-gray-50">
@@ -64,12 +66,12 @@ export default function App() {
                 {/* Language-prefixed public routes */}
                 <Route path="/:lang" element={<LanguageLayout />}>
                   <Route index element={<Home />} />
-                  <Route path="products" element={<Products />} />
-                  <Route path="products/:id" element={<ProductDetail />} />
-                  <Route path="our-story" element={<OurStory />} />
-                  <Route path="blog" element={<Blog />} />
-                  <Route path="blog/:slug" element={<BlogPost />} />
-                  <Route path="rfq" element={<RFQ />} />
+                  <Route path="products" element={withMotion(<Products />)} />
+                  <Route path="products/:id" element={withMotion(<ProductDetail />)} />
+                  <Route path="our-story" element={withMotion(<OurStory />)} />
+                  <Route path="blog" element={withMotion(<Blog />)} />
+                  <Route path="blog/:slug" element={withMotion(<BlogPost />)} />
+                  <Route path="rfq" element={withMotion(<RFQ />)} />
                 </Route>
 
                 {/* Admin routes (no language prefix) */}
@@ -92,6 +94,5 @@ export default function App() {
           <Footer />
         </div>
       </Router>
-    </LazyMotion>
   );
 }
