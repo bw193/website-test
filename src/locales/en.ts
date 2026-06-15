@@ -34,9 +34,9 @@ export const en = {
       },
       about: {
         heritage: "Our Heritage",
-        title1: "Crafting Reflections of",
-        title2: "Quality",
-        desc1: "Headquartered in Jiaxing, Zhejiang, China—just 60 kilometers from Shanghai—Chengtai has grown into a fully integrated enterprise specializing in the research, development, manufacturing, and global export of premium mirror products.",
+        title1: "Global Reach:",
+        title2: "From Shanghai to the World",
+        desc1: "Headquartered in Jiaxing, Zhejiang, China—just 60 kilometers from Shanghai—we have established a strong global presence, with main markets spanning Europe (Spain, the Netherlands, Norway, Denmark, the UK, and Romania), North America, and Australia.",
         desc2: "We operate two enterprise headquarters and two state-of-the-art production plants. Our dedicated workforce manages multiple LED and fitting mirror production lines, alongside specialized customized workshops, all in strict compliance with ISO 9001 quality management standards.",
         backedBy: "Backed by 200+ dedicated professionals",
         quote: "\"Quality First, Customers First\"",
@@ -45,7 +45,7 @@ export const en = {
       collections: {
         subtitle: "Collections",
         title: "Versatile & Custom",
-        desc: "Our catalog spans multiple series designed for residential, commercial, hotel, and luxury project applications.",
+        desc: "We manufacture LED mirrors, bathroom mirrors, dressing mirrors, and mirror cabinets, offering thousands of styles and fully tailored solutions.",
         viewAll: "View All Products",
         smart: {
           tag: "Flagship",
@@ -68,31 +68,49 @@ export const en = {
         subtitle: "Our Qualifications",
         title: "Global Certifications"
       },
-      process: {
-        subtitle: "Excellence in Every Step",
-        title: "The Manufacturing Process",
-        desc: "From raw materials to global delivery, we maintain strict control over every phase of production.",
+      factoryShowcase: {
+        subtitle: "Inside the Factory",
+        title: "Where Every Mirror Is Made",
+        desc: "A look inside our 50,000 m² Jiaxing facility — vertically integrated LED, smart, vanity, and bath mirror production from raw glass to packed pallet.",
+        empty: "Factory photos coming soon."
+      },
+      advantage: {
+        subtitle: "The BOLEN Edge",
+        title: "Manufacturing Advantage",
+        desc: "Twenty-one years of vertically integrated production, a 46,800 sqm facility, and a logistics-first location near Shanghai and Ningbo ports.",
+        features: {
+          f1: { title: "Proven Manufacturing Power", desc: "Established 21 years ago, our 46,800 sqm facility is staffed by over 200 skilled workers, guaranteeing a stable supply chain and reliable lead times." },
+          f2: { title: "Strategic Location", desc: "Located near Shanghai and Ningbo ports, we enjoy a prime location that ensures convenient and efficient logistics." },
+          f3: { title: "Factory Direct & Cost-Effective", desc: "As a direct factory, we eliminate middleman costs to offer highly competitive prices without compromising on quality, ensuring the best value for your business." }
+        }
+      },
+      manufacturingProcess: {
+        subtitle: "From Brief to Pallet",
+        title: "Manufacturing Process",
+        desc: "Six tightly controlled stages take every order from spec to shipment.",
         steps: {
-          s1: { title: "R&D Design", desc: "Customize size, material, function, logo, and packaging based on customer needs." },
-          s2: { title: "Precision Craft", desc: "Automated cutting, edging, and assembly in our 50k sqm facility." },
-          s3: { title: "Quality Assurance", desc: "Rigorous testing for IP66 waterproofing, CE, and RoHS compliance." },
-          s4: { title: "Global Export", desc: "Secure packaging and logistics to over 50 countries worldwide." }
+          s1: { title: "Requirement Analysis", desc: "Tailored solutions based on your specific vision and market needs." },
+          s2: { title: "Custom Design", desc: "Confirm every detail before production, ensuring the final product meets your expectations." },
+          s3: { title: "Precision Manufacturing", desc: "Integrating automated lines with manual precision for optimal quality and efficiency." },
+          s4: { title: "100% Quality Inspection", desc: "Strict quality checks on the mirror's appearance, function, and craftsmanship." },
+          s5: { title: "Custom Packaging", desc: "Fully customizable branding to boost your market competitiveness." },
+          s6: { title: "Stable Lead Time", desc: "Reliable scheduling and efficient logistics to guarantee on-time delivery." }
         }
       },
       whyUs: {
         title1: "Why Partner With",
-        title2: "Chengtai?",
+        title2: "Bolen?",
         features: [
-          { title: "Massive Capacity & Experience" },
-          { title: "Vertical Integration" },
-          { title: "OEM & ODM Customization" },
-          { title: "Certified Global Quality" }
+          { title: "Global Market Access & Certified Quality" },
+          { title: "Factory Direct & Cost-Effective" },
+          { title: "Rigorous Quality Control & Warranty" },
+          { title: "Comprehensive Customization" }
         ],
         paragraphs: [
-          "With over 20 years of dedicated experience in mirror manufacturing (tracing its roots back to 1995), Jiaxing Chengtai Mirror Co., Ltd. has built a reputation that goes far beyond any single sales channel. Our 50,000+ square meter production complex, two independent factories, and a team of over 200 skilled workers give us the capacity and flexibility to handle orders of virtually any scale — from boutique interior design projects to large-scale hotel and real estate developments.",
-          "We own the entire production process in-house. From raw glass processing and LED integration to frame fabrication and smart feature assembly, every stage of manufacturing is handled under one roof and overseen by dedicated QA/QC inspectors. This vertical integration means we control quality at every step, eliminate third-party delays, and keep lead times competitive.",
-          "Our 200+ product styles across multiple core series are not off-the-shelf templates — they represent years of design iteration informed by both European aesthetic trends and real-world buyer feedback. For clients who need something unique, our OEM and ODM capabilities allow full customization of size, shape, lighting, smart features, materials, and branding.",
-          "Backed by international certifications including CE, RoHS, and IP66 waterproofing, our products meet the compliance requirements of markets across Europe, North America, the Middle East, and beyond. We don't just manufacture mirrors — we build long-term partnerships with importers, distributors, interior designers, and developers who demand consistency, precision, and a supplier they can rely on year after year."
+          "We have established deep partnerships across Europe (NL, RO, UK, ES, NO, DK), the Middle East, North America, Australia, and South America. Our products are fully compliant with international standards, holding CE, CB, RoHS, IP44, and SAA certifications and so on.",
+          "As a direct manufacturer, we offer highly competitive pricing. We are committed to delivering premium quality that perfectly aligns with your budget requirements.",
+          "Our quality assurance system matches our after-sales commitment. Every product undergoes 100% pre-shipment inspection, backed by a comprehensive 2-year warranty on electronic components.",
+          "From mirror glass to packaging, we provide end-to-end OEM/ODM customization services tailored to help you expand your market reach and build your brand."
         ]
       },
       cta: {

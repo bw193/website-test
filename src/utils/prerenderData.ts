@@ -10,6 +10,12 @@ import type { BlogListItem, LocalizedBlogPost } from '../types/blog';
 
 const SCRIPT_ID = '__BOLEN_PRERENDER_DATA__';
 
+export interface FactoryGalleryItem {
+  url: string;
+  alt: string;
+  caption?: string;
+}
+
 interface PrerenderPayload {
   route?: 'home' | 'catalog' | 'productDetail' | 'blog' | 'blogPost';
   lang?: string;
@@ -24,6 +30,9 @@ interface PrerenderPayload {
   // into dist/hero/ at build time. Absent if the build-time fetch failed.
   heroLcp?: { src: string; srcset: string };
   categories?: string[];
+  // Editor-managed factory/company photo strip, baked into the home HTML so
+  // crawlers see <figure>/<figcaption>/alt and the SPA mounts byte-identically.
+  factoryGallery?: FactoryGalleryItem[];
   // Localized product copy embedded per page so the SPA can overlay
   // translations synchronously on first render. Home/catalog carry the full
   // map for the language; product pages carry just that product's entry.
@@ -95,6 +104,7 @@ export function readInitialHomeData<T>(): {
   heroH?: number;
   heroLcp?: { src: string; srcset: string };
   categories: string[];
+  factoryGallery: FactoryGalleryItem[];
 } | null {
   const data = getPrerenderData();
   if (data?.route !== 'home' || !Array.isArray(data.products)) return null;
@@ -105,6 +115,7 @@ export function readInitialHomeData<T>(): {
     heroH: typeof data.heroH === 'number' ? data.heroH : undefined,
     heroLcp: data.heroLcp && typeof data.heroLcp.src === 'string' ? data.heroLcp : undefined,
     categories: Array.isArray(data.categories) ? data.categories : [],
+    factoryGallery: Array.isArray(data.factoryGallery) ? data.factoryGallery : [],
   };
 }
 

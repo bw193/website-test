@@ -34,9 +34,9 @@ export const de = {
       },
       about: {
         heritage: "Unser Erbe",
-        title1: "Spiegelbilder der",
-        title2: "Qualität",
-        desc1: "Mit Hauptsitz in Jiaxing, Zhejiang, China – nur 60 Kilometer von Shanghai entfernt – hat sich Chengtai zu einem voll integrierten Unternehmen entwickelt, das sich auf Forschung, Entwicklung, Herstellung und den weltweiten Export von Premium-Spiegelprodukten spezialisiert hat.",
+        title1: "Globale Reichweite:",
+        title2: "Von Shanghai in die Welt",
+        desc1: "Mit Hauptsitz in Jiaxing, Zhejiang, China – nur 60 Kilometer von Shanghai entfernt – haben wir eine starke globale Präsenz aufgebaut, mit Hauptmärkten in Europa (Spanien, Niederlande, Norwegen, Dänemark, Vereinigtes Königreich und Rumänien), Nordamerika und Australien.",
         desc2: "Wir betreiben zwei Unternehmenszentralen und zwei hochmoderne Produktionsstätten. Unsere engagierte Belegschaft verwaltet mehrere LED- und Spiegelproduktionslinien sowie spezialisierte Werkstätten für Sonderanfertigungen, alles in strikter Übereinstimmung mit den Qualitätsmanagementstandards ISO 9001.",
         backedBy: "Unterstützt von über 200 engagierten Fachleuten",
         quote: "\"Qualität zuerst, Kunden zuerst\"",
@@ -45,7 +45,7 @@ export const de = {
       collections: {
         subtitle: "Kollektionen",
         title: "Vielseitig & Maßgeschneidert",
-        desc: "Unser Katalog umfasst mehrere Serien, die für Wohn-, Gewerbe-, Hotel- und Luxusprojektanwendungen konzipiert sind.",
+        desc: "Wir fertigen LED-Spiegel, Badspiegel, Ankleidespiegel und Spiegelschränke und bieten tausende Stile sowie vollständig maßgeschneiderte Lösungen.",
         viewAll: "Alle Produkte ansehen",
         smart: {
           tag: "Flaggschiff",
@@ -68,31 +68,49 @@ export const de = {
         subtitle: "Unsere Qualifikationen",
         title: "Globale Zertifizierungen"
       },
-      process: {
-        subtitle: "Exzellenz in jedem Schritt",
-        title: "Der Herstellungsprozess",
-        desc: "Vom Rohmaterial bis zur weltweiten Lieferung behalten wir die strenge Kontrolle über jede Produktionsphase.",
+      factoryShowcase: {
+        subtitle: "Einblick in die Fabrik",
+        title: "Wo jeder Spiegel entsteht",
+        desc: "Ein Blick in unsere 50.000 m² große Produktionsstätte in Jiaxing — vertikal integrierte Fertigung von LED-, Smart-, Schmink- und Badspiegeln, vom Rohglas bis zur versandfertigen Palette.",
+        empty: "Fabrikfotos folgen in Kürze."
+      },
+      advantage: {
+        subtitle: "Der BOLEN-Vorteil",
+        title: "Fertigungs-Vorteil",
+        desc: "21 Jahre vertikal integrierte Produktion, eine Anlage mit 46.800 m² und ein logistisch optimaler Standort in der Nähe der Häfen von Shanghai und Ningbo.",
+        features: {
+          f1: { title: "Bewährte Fertigungsleistung", desc: "Seit 21 Jahren etabliert, unsere 46.800 m² große Anlage beschäftigt über 200 erfahrene Mitarbeiter und garantiert eine stabile Lieferkette sowie zuverlässige Lieferzeiten." },
+          f2: { title: "Strategischer Standort", desc: "Nahe den Häfen von Shanghai und Ningbo gelegen, genießen wir eine erstklassige Lage, die eine bequeme und effiziente Logistik gewährleistet." },
+          f3: { title: "Werksdirekt & Kosteneffizient", desc: "Als Direkthersteller eliminieren wir Zwischenhändlerkosten und bieten hochkompetitive Preise ohne Qualitätsabstriche – für den besten Wert für Ihr Geschäft." }
+        }
+      },
+      manufacturingProcess: {
+        subtitle: "Vom Briefing bis zur Palette",
+        title: "Fertigungsprozess",
+        desc: "Sechs streng kontrollierte Stufen bringen jeden Auftrag von der Spezifikation bis zum Versand.",
         steps: {
-          s1: { title: "F&E Design", desc: "Passen Sie Größe, Material, Funktion, Logo und Verpackung an die Kundenbedürfnisse an." },
-          s2: { title: "Präzisionshandwerk", desc: "Automatisches Schneiden, Kanten und Montieren in unserer 50.000 qm großen Anlage." },
-          s3: { title: "Qualitätssicherung", desc: "Strenge Tests auf IP66-Wasserdichtigkeit, CE- und RoHS-Konformität." },
-          s4: { title: "Weltweiter Export", desc: "Sichere Verpackung und Logistik in über 50 Länder weltweit." }
+          s1: { title: "Anforderungsanalyse", desc: "Maßgeschneiderte Lösungen, basierend auf Ihrer spezifischen Vision und den Marktanforderungen." },
+          s2: { title: "Individuelles Design", desc: "Bestätigung jedes Details vor der Produktion, damit das Endprodukt Ihren Erwartungen entspricht." },
+          s3: { title: "Präzisionsfertigung", desc: "Integration automatisierter Linien mit manueller Präzision für optimale Qualität und Effizienz." },
+          s4: { title: "100% Qualitätsprüfung", desc: "Strenge Qualitätskontrollen zu Aussehen, Funktion und Verarbeitung des Spiegels." },
+          s5: { title: "Individuelle Verpackung", desc: "Vollständig anpassbares Branding zur Steigerung Ihrer Wettbewerbsfähigkeit am Markt." },
+          s6: { title: "Stabile Lieferzeiten", desc: "Zuverlässige Planung und effiziente Logistik garantieren die pünktliche Lieferung." }
         }
       },
       whyUs: {
         title1: "Warum eine Partnerschaft mit",
-        title2: "Chengtai?",
+        title2: "Bolen?",
         features: [
-          { title: "Enorme Kapazität & Erfahrung" },
-          { title: "Vertikale Integration" },
-          { title: "OEM & ODM Anpassung" },
-          { title: "Zertifizierte globale Qualität" }
+          { title: "Globaler Marktzugang & zertifizierte Qualität" },
+          { title: "Werksdirekt & kosteneffizient" },
+          { title: "Strenge Qualitätskontrolle & Garantie" },
+          { title: "Umfassende Anpassung" }
         ],
         paragraphs: [
-          "Mit über 20 Jahren engagierter Erfahrung in der Spiegelherstellung (deren Wurzeln bis ins Jahr 1995 zurückreichen) hat sich Jiaxing Chengtai Mirror Co., Ltd. einen Ruf aufgebaut, der weit über einen einzelnen Vertriebskanal hinausgeht. Unser Produktionskomplex von über 50.000 Quadratmetern, zwei unabhängige Fabriken und ein Team von über 200 qualifizierten Mitarbeitern geben uns die Kapazität und Flexibilität, Aufträge praktisch jeder Größenordnung zu bewältigen – von Boutique-Innenarchitekturprojekten bis hin zu großen Hotel- und Immobilienentwicklungen.",
-          "Wir beherrschen den gesamten Produktionsprozess im eigenen Haus. Von der Rohglasverarbeitung und LED-Integration bis zur Rahmenfertigung und Montage intelligenter Funktionen wird jede Fertigungsphase unter einem Dach abgewickelt und von engagierten QA/QC-Inspektoren überwacht. Diese vertikale Integration bedeutet, dass wir die Qualität in jedem Schritt kontrollieren, Verzögerungen durch Dritte vermeiden und wettbewerbsfähige Lieferzeiten einhalten.",
-          "Unsere über 200 Produktstile in mehreren Kernserien sind keine Standardvorlagen – sie sind das Ergebnis jahrelanger Designiteration, die sowohl von europäischen ästhetischen Trends als auch von realem Käuferfeedback geprägt ist. Für Kunden, die etwas Einzigartiges benötigen, ermöglichen unsere OEM- und ODM-Fähigkeiten eine vollständige Anpassung von Größe, Form, Beleuchtung, intelligenten Funktionen, Materialien und Branding.",
-          "Gestützt auf internationale Zertifizierungen wie CE, RoHS und IP66-Wasserdichtigkeit erfüllen unsere Produkte die Compliance-Anforderungen der Märkte in Europa, Nordamerika, dem Nahen Osten und darüber hinaus. Wir stellen nicht nur Spiegel her – wir bauen langfristige Partnerschaften mit Importeuren, Distributoren, Innenarchitekten und Entwicklern auf, die Beständigkeit, Präzision und einen Lieferanten verlangen, auf den sie sich Jahr für Jahr verlassen können."
+          "Wir haben enge Partnerschaften in Europa (NL, RO, UK, ES, NO, DK), im Nahen Osten, in Nordamerika, Australien und Südamerika aufgebaut. Unsere Produkte entsprechen vollständig den internationalen Standards und verfügen über CE-, CB-, RoHS-, IP44-, SAA- und weitere Zertifizierungen.",
+          "Als Direkthersteller bieten wir hochkompetitive Preise. Wir verpflichten uns zu Premium-Qualität, die perfekt zu Ihren Budget-Anforderungen passt.",
+          "Unser Qualitätssicherungssystem entspricht unserem After-Sales-Versprechen. Jedes Produkt wird vor dem Versand zu 100% geprüft, mit einer umfassenden 2-Jahres-Garantie auf elektronische Komponenten.",
+          "Vom Spiegelglas bis zur Verpackung bieten wir End-to-End-OEM/ODM-Anpassungsservices, die Ihnen helfen, Ihre Marktreichweite zu erweitern und Ihre Marke aufzubauen."
         ]
       },
       cta: {

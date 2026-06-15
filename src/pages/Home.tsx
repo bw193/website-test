@@ -1,13 +1,13 @@
 import React, { useEffect, useState, lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Globe, ShieldCheck, Truck, Factory, Lightbulb, Users, Clock, CheckCircle2, ChevronRight, ChevronLeft, Settings, Palette } from 'lucide-react';
+import { ArrowRight, Globe, ShieldCheck, Truck, Factory, Lightbulb, Users, Clock, CheckCircle2, ChevronRight, ChevronLeft, Settings, Palette, DollarSign } from 'lucide-react';
 import { useTranslation, Trans } from 'react-i18next';
 import ProductCard from '../components/ProductCard';
 import SEO from '../components/SEO';
 import Reveal from '../components/Reveal';
 import { optimizeImage } from '../utils/optimizeImage';
 import { useLocalizedPath } from '../hooks/useLocalizedPath';
-import { readInitialHomeData } from '../utils/prerenderData';
+import { readInitialHomeData, type FactoryGalleryItem } from '../utils/prerenderData';
 
 const GlobalMap = lazy(() => import('../components/GlobalMap'));
 // Lazy so `motion` (used by GlobalMap's animated markers) stays off the home
@@ -70,6 +70,9 @@ export default function Home() {
   const [allProducts, setAllProducts] = useState<any[]>(initialData?.products ?? []);
   const [categories, setCategories] = useState<string[]>(
     initialData?.categories && initialData.categories.length > 0 ? initialData.categories : DEFAULT_CATEGORIES
+  );
+  const [factoryGallery, setFactoryGallery] = useState<FactoryGalleryItem[]>(
+    initialData?.factoryGallery ?? []
   );
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
@@ -152,6 +155,37 @@ export default function Home() {
     fetchSettings();
   }, []);
 
+  // Factory gallery is editor-managed and expected to update without a rebuild,
+  // so it always runs — even when the prerender data island has seeded the
+  // other home state. Cheap (one row, cached by Cloudflare) and below the fold.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const { supabase } = await import('../supabase');
+        const { data, error } = await supabase
+          .from('site_settings')
+          .select('value')
+          .eq('key', 'factory_gallery')
+          .single();
+        if (cancelled || error || !data?.value) return;
+        const parsed = JSON.parse(data.value);
+        if (!Array.isArray(parsed)) return;
+        const cleaned: FactoryGalleryItem[] = parsed
+          .filter((it: any) => it && typeof it.url === 'string' && it.url.trim() !== '')
+          .map((it: any) => ({
+            url: it.url,
+            alt: typeof it.alt === 'string' && it.alt.trim() !== '' ? it.alt : 'BOLEN mirror factory production line',
+            caption: typeof it.caption === 'string' ? it.caption : undefined,
+          }));
+        if (!cancelled) setFactoryGallery(cleaned);
+      } catch (e) {
+        console.error('Could not fetch factory_gallery:', e);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
   const featuredProducts = allProducts
     .filter(p => selectedCategory ? normalizeCategory(p.category) === normalizeCategory(selectedCategory) : true)
     .slice(0, 6);
@@ -214,7 +248,21 @@ export default function Home() {
             "target": "https://bolenmirror.com/products?q={search_term_string}",
             "query-input": "required name=search_term_string"
           }
-        }
+        },
+        ...(factoryGallery.length > 0 ? [{
+          "@context": "https://schema.org",
+          "@type": "ImageGallery",
+          "name": "Inside the BOLEN Mirror Factory",
+          "description": "Editor-managed photo set of the Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) production facility — LED, smart, vanity, and bath mirror manufacturing.",
+          "url": "https://bolenmirror.com/#factory-showcase",
+          "image": factoryGallery.map((it) => ({
+            "@type": "ImageObject",
+            "contentUrl": it.url,
+            "url": it.url,
+            "description": it.alt,
+            ...(it.caption ? { "caption": it.caption } : {}),
+          })),
+        }] : [])
       ]} />
       {/* Hero Section */}
       <div className="relative bg-stone-900 overflow-hidden group">
@@ -290,35 +338,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* About Section */}
-      <div id="about" className="py-24 overflow-hidden bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Reveal className="text-center mb-12 max-w-4xl mx-auto">
-            <h2 className="text-4xl font-serif text-stone-900 sm:text-5xl leading-tight mb-6">
-              Global Reach: <span className="italic text-amber-700">From Shanghai to the World</span>
-            </h2>
-            <p className="text-lg text-stone-600 font-light leading-relaxed">
-              Headquartered in Jiaxing, Zhejiang, China—just 60 kilometers from Shanghai—Chengtai has grown into a fully integrated enterprise specializing in the research, development, manufacturing, and global export of premium mirror products.
-            </p>
-          </Reveal>
-
-          <Reveal delay={150} className="relative w-full">
-            <div className="aspect-[16/9] lg:aspect-[21/9] rounded-3xl overflow-hidden shadow-xl relative border border-stone-200">
-              <Suspense fallback={<div className="w-full h-full bg-stone-200 animate-pulse rounded-3xl" />}>
-                <MotionProvider>
-                  <GlobalMap />
-                </MotionProvider>
-              </Suspense>
-            </div>
-
-            {/* Decorative element */}
-            <div className="absolute -top-6 -right-6 w-32 h-32 bg-amber-100 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-pulse" />
-            <div className="absolute -bottom-6 -left-6 w-40 h-40 bg-stone-200 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-pulse" style={{ animationDelay: '2s' }} />
-          </Reveal>
-        </div>
-      </div>
-
-      {/* Featured Collections (Bento Grid) */}
+      {/* Featured Collections (Versatile & Custom — products) */}
       <div className="py-24 bg-stone-50 text-stone-900 border-t border-stone-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-6">
@@ -400,34 +420,112 @@ export default function Home() {
         </div>
       </div>
 
-      {/* The BOLEN Process */}
+      {/* Manufacturing Advantage — 3 bullets (replaces former 4-step Process) */}
+      <div className="py-24 bg-white border-t border-stone-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Reveal className="text-center max-w-3xl mx-auto mb-16">
+            <span className="text-amber-600 font-semibold tracking-wider uppercase text-sm mb-2 block">{t('home.advantage.subtitle')}</span>
+            <h2 className="text-4xl font-serif text-stone-900 sm:text-5xl mb-4">{t('home.advantage.title')}</h2>
+            <p className="text-lg text-stone-600 font-light leading-relaxed">{t('home.advantage.desc')}</p>
+          </Reveal>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              { icon: <Factory className="w-7 h-7" />, key: 'f1' },
+              { icon: <Truck className="w-7 h-7" />, key: 'f2' },
+              { icon: <DollarSign className="w-7 h-7" />, key: 'f3' }
+            ].map((item, i) => (
+              <Reveal
+                key={item.key}
+                delay={i * 100}
+                className="bg-stone-50 p-8 rounded-2xl border border-stone-200 hover:shadow-md transition-shadow group"
+              >
+                <div className="w-14 h-14 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                  {item.icon}
+                </div>
+                <h3 className="text-xl font-semibold text-stone-900 mb-3">{t(`home.advantage.features.${item.key}.title`)}</h3>
+                <p className="text-stone-600 leading-relaxed text-sm">{t(`home.advantage.features.${item.key}.desc`)}</p>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Factory Showcase — editor-managed gallery (site_settings.factory_gallery).
+          Lazy/responsive imgs, explicit dims => no LCP/CLS hit. */}
+      {factoryGallery.length > 0 && (
+        <section
+          id="factory-showcase"
+          aria-labelledby="factory-showcase-title"
+          className="py-24 bg-stone-50 border-t border-stone-100"
+        >
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <Reveal className="text-center max-w-3xl mx-auto mb-12">
+              <span className="text-amber-600 font-semibold tracking-wider uppercase text-sm mb-2 block">
+                {t('home.factoryShowcase.subtitle')}
+              </span>
+              <h2 id="factory-showcase-title" className="text-4xl font-serif text-stone-900 sm:text-5xl mb-4">
+                {t('home.factoryShowcase.title')}
+              </h2>
+              <p className="text-lg text-stone-600 font-light leading-relaxed">
+                {t('home.factoryShowcase.desc')}
+              </p>
+            </Reveal>
+
+            <ul
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+              aria-label={t('home.factoryShowcase.title') as string}
+            >
+              {factoryGallery.map((item, idx) => (
+                <Reveal as="li" key={`${item.url}-${idx}`} delay={(idx % 3) * 80}>
+                  <figure className="group relative bg-white rounded-2xl overflow-hidden shadow-sm border border-stone-200 hover:shadow-md transition-shadow">
+                    <div className="relative w-full aspect-[4/3] overflow-hidden bg-stone-200">
+                      <img
+                        src={optimizeImage(item.url, { width: 800 })}
+                        srcSet={[400, 800, 1200].map((w) => `${optimizeImage(item.url, { width: w })} ${w}w`).join(', ')}
+                        sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                        width={800}
+                        height={600}
+                        alt={item.alt}
+                        loading="lazy"
+                        decoding="async"
+                        referrerPolicy="no-referrer"
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      />
+                    </div>
+                    {item.caption && (
+                      <figcaption className="px-5 py-4 text-sm text-stone-700 font-medium leading-snug border-t border-stone-100">
+                        {item.caption}
+                      </figcaption>
+                    )}
+                  </figure>
+                </Reveal>
+              ))}
+            </ul>
+          </div>
+        </section>
+      )}
+
+      {/* Manufacturing Process — new 6-step block */}
       <div className="py-24 bg-stone-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="text-amber-600 font-semibold tracking-wider uppercase text-sm mb-2 block">{t('home.process.subtitle')}</span>
-            <h2 className="text-4xl font-serif text-stone-900 sm:text-5xl mb-4">{t('home.process.title')}</h2>
-            <p className="text-lg text-stone-600 font-light">
-              {t('home.process.desc')}
-            </p>
-          </div>
+          <Reveal className="text-center max-w-3xl mx-auto mb-16">
+            <span className="text-amber-600 font-semibold tracking-wider uppercase text-sm mb-2 block">{t('home.manufacturingProcess.subtitle')}</span>
+            <h2 className="text-4xl font-serif text-stone-900 sm:text-5xl mb-4">{t('home.manufacturingProcess.title')}</h2>
+            <p className="text-lg text-stone-600 font-light">{t('home.manufacturingProcess.desc')}</p>
+          </Reveal>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {[
-              { step: "01", title: t('home.process.steps.s1.title'), desc: t('home.process.steps.s1.desc') },
-              { step: "02", title: t('home.process.steps.s2.title'), desc: t('home.process.steps.s2.desc') },
-              { step: "03", title: t('home.process.steps.s3.title'), desc: t('home.process.steps.s3.desc') },
-              { step: "04", title: t('home.process.steps.s4.title'), desc: t('home.process.steps.s4.desc') }
-            ].map((item, idx) => (
-              <Reveal key={idx} delay={idx * 100} className="relative">
-                {idx !== 3 && (
-                  <div className="hidden md:block absolute top-8 left-1/2 w-full h-[1px] bg-stone-300" />
-                )}
-                <div className="relative z-10 bg-white w-16 h-16 rounded-full border-4 border-stone-100 flex items-center justify-center mx-auto mb-6 shadow-sm">
-                  <span className="text-xl font-serif font-bold text-amber-600">{item.step}</span>
-                </div>
-                <div className="text-center">
-                  <h3 className="text-xl font-bold text-stone-900 mb-2">{item.title}</h3>
-                  <p className="text-stone-600 text-sm font-light leading-relaxed">{item.desc}</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {(['s1','s2','s3','s4','s5','s6'] as const).map((key, idx) => (
+              <Reveal key={key} delay={(idx % 3) * 100} className="bg-white p-8 rounded-2xl border border-stone-200 shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex items-start gap-4">
+                  <div className="shrink-0 w-12 h-12 rounded-full bg-amber-50 border-2 border-amber-200 flex items-center justify-center">
+                    <span className="text-base font-serif font-bold text-amber-700">{String(idx + 1).padStart(2, '0')}</span>
+                  </div>
+                  <div className="min-w-0">
+                    <h3 className="text-lg font-bold text-stone-900 mb-2">{t(`home.manufacturingProcess.steps.${key}.title`)}</h3>
+                    <p className="text-stone-600 text-sm font-light leading-relaxed">{t(`home.manufacturingProcess.steps.${key}.desc`)}</p>
+                  </div>
                 </div>
               </Reveal>
             ))}
@@ -435,7 +533,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Why Choose Us */}
+      {/* Why Partner With Bolen */}
       <div className="py-24 bg-stone-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Reveal className="text-center mb-16">
@@ -446,10 +544,10 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
-              { icon: <Factory className="w-8 h-8" />, idx: 0 },
-              { icon: <Settings className="w-8 h-8" />, idx: 1 },
-              { icon: <Palette className="w-8 h-8" />, idx: 2 },
-              { icon: <ShieldCheck className="w-8 h-8" />, idx: 3 }
+              { icon: <Globe className="w-8 h-8" />, idx: 0 },
+              { icon: <DollarSign className="w-8 h-8" />, idx: 1 },
+              { icon: <ShieldCheck className="w-8 h-8" />, idx: 2 },
+              { icon: <Palette className="w-8 h-8" />, idx: 3 }
             ].map((item, i) => (
               <Reveal
                 key={i}
@@ -468,6 +566,34 @@ export default function Home() {
               </Reveal>
             ))}
           </div>
+        </div>
+      </div>
+
+      {/* Global Reach (About) */}
+      <div id="about" className="py-24 overflow-hidden bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Reveal className="text-center mb-12 max-w-4xl mx-auto">
+            <h2 className="text-4xl font-serif text-stone-900 sm:text-5xl leading-tight mb-6">
+              {t('home.about.title1')} <span className="italic text-amber-700">{t('home.about.title2')}</span>
+            </h2>
+            <p className="text-lg text-stone-600 font-light leading-relaxed">
+              {t('home.about.desc1')}
+            </p>
+          </Reveal>
+
+          <Reveal delay={150} className="relative w-full">
+            <div className="aspect-[16/9] lg:aspect-[21/9] rounded-3xl overflow-hidden shadow-xl relative border border-stone-200">
+              <Suspense fallback={<div className="w-full h-full bg-stone-200 animate-pulse rounded-3xl" />}>
+                <MotionProvider>
+                  <GlobalMap />
+                </MotionProvider>
+              </Suspense>
+            </div>
+
+            {/* Decorative element */}
+            <div className="absolute -top-6 -right-6 w-32 h-32 bg-amber-100 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-pulse" />
+            <div className="absolute -bottom-6 -left-6 w-40 h-40 bg-stone-200 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-pulse" style={{ animationDelay: '2s' }} />
+          </Reveal>
         </div>
       </div>
 

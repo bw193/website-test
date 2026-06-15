@@ -533,8 +533,67 @@ function injectIntoTemplate(
   return html;
 }
 
+interface FactoryGalleryItem {
+  url: string;
+  alt: string;
+  caption?: string;
+}
+
+const FACTORY_COPY: Record<Lang, { heading: string; intro: string }> = {
+  en: {
+    heading: 'Inside Our Factory',
+    intro: 'A look inside our 50,000 m² Jiaxing facility — vertically integrated LED, smart, vanity, and bath mirror production from raw glass to packed pallet.',
+  },
+  zh: {
+    heading: '走进我们的工厂',
+    intro: '走进我们位于嘉兴的 50,000 平方米生产基地——从原片玻璃到打包出货，垂直整合制造 LED 镜、智能镜、化妆镜与浴室镜。',
+  },
+  es: {
+    heading: 'Dentro de Nuestra Fábrica',
+    intro: 'Un recorrido por nuestra planta de 50.000 m² en Jiaxing: producción verticalmente integrada de espejos LED, inteligentes, de tocador y de baño, desde el vidrio crudo hasta el palé listo para enviar.',
+  },
+  fr: {
+    heading: 'À l\'Intérieur de Notre Usine',
+    intro: 'Visite de notre site de 50 000 m² à Jiaxing — production verticalement intégrée de miroirs LED, intelligents, de toilette et de salle de bain, du verre brut à la palette prête à expédier.',
+  },
+  de: {
+    heading: 'Einblick in unsere Fabrik',
+    intro: 'Ein Blick in unsere 50.000 m² große Produktionsstätte in Jiaxing — vertikal integrierte Fertigung von LED-, Smart-, Schmink- und Badspiegeln, vom Rohglas bis zur versandfertigen Palette.',
+  },
+  it: {
+    heading: 'Dentro la Nostra Fabbrica',
+    intro: 'Uno sguardo dentro il nostro stabilimento di 50.000 m² a Jiaxing — produzione verticalmente integrata di specchi LED, smart, da toeletta e da bagno, dal vetro grezzo al pallet pronto per la spedizione.',
+  },
+};
+
+function factoryGalleryBlock(lang: Lang, gallery: FactoryGalleryItem[]): string {
+  if (!gallery.length) return '';
+  const fc = FACTORY_COPY[lang];
+  const widths = [400, 800, 1200];
+  const items = gallery
+    .map((it) => {
+      const srcset = widths
+        .map((w) => `${optimizeImage(it.url, { width: w })} ${w}w`)
+        .join(', ');
+      const figcaption = it.caption
+        ? `<figcaption>${escapeHtml(it.caption)}</figcaption>`
+        : '';
+      return `<li><figure><img src="${escapeAttr(optimizeImage(it.url, { width: 800 }))}" srcset="${escapeAttr(srcset)}" sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" width="800" height="600" alt="${escapeAttr(it.alt)}" loading="lazy" decoding="async" referrerpolicy="no-referrer" />${figcaption}</figure></li>`;
+    })
+    .join('\n        ');
+  return `
+    <section id="factory-showcase" aria-labelledby="factory-showcase-title">
+      <h2 id="factory-showcase-title">${escapeHtml(fc.heading)}</h2>
+      <p>${escapeHtml(fc.intro)}</p>
+      <ul aria-label="${escapeAttr(fc.heading)}">
+        ${items}
+      </ul>
+    </section>
+  `.trim();
+}
+
 // Markup helpers
-function homeContent(lang: Lang, hero?: HeroImage): string {
+function homeContent(lang: Lang, hero?: HeroImage, gallery: FactoryGalleryItem[] = []): string {
   const c = COPY[lang];
   // Bake the LCP hero straight into the static HTML so the browser discovers
   // and fetches it during HTML parse — before any JS runs. React renders a
@@ -554,6 +613,7 @@ function homeContent(lang: Lang, hero?: HeroImage): string {
         <a href="/${lang}/our-story/">${escapeHtml(c.navStory)}</a>
         <a href="/${lang}/rfq/">${escapeHtml(c.navRfq)}</a>
       </nav>
+      ${factoryGalleryBlock(lang, gallery)}
     </div>
   `.trim();
 }
@@ -646,8 +706,8 @@ function rfqContent(lang: Lang): string {
 // Key order matters: JSON.stringify follows insertion order, and `isEqualNode`
 // compares serialized script contents.
 
-function homeSchema(): any[] {
-  return [
+function homeSchema(gallery: FactoryGalleryItem[] = []): any[] {
+  const base: any[] = [
     {
       '@context': 'https://schema.org',
       '@type': 'Organization',
@@ -685,6 +745,24 @@ function homeSchema(): any[] {
       },
     },
   ];
+  if (gallery.length > 0) {
+    base.push({
+      '@context': 'https://schema.org',
+      '@type': 'ImageGallery',
+      name: 'Inside the BOLEN Mirror Factory',
+      description:
+        'Editor-managed photo set of the Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) production facility — LED, smart, vanity, and bath mirror manufacturing.',
+      url: 'https://bolenmirror.com/#factory-showcase',
+      image: gallery.map((it) => ({
+        '@type': 'ImageObject',
+        contentUrl: it.url,
+        url: it.url,
+        description: it.alt,
+        ...(it.caption ? { caption: it.caption } : {}),
+      })),
+    });
+  }
+  return base;
 }
 
 function catalogSchema(lang: Lang): any[] {
@@ -857,18 +935,19 @@ const DEFAULT_CATEGORIES = [
   'Irregular Mirror',
 ];
 
-async function fetchSiteSettings(): Promise<{ heroBgs: string[]; categories: string[] }> {
+async function fetchSiteSettings(): Promise<{ heroBgs: string[]; categories: string[]; factoryGallery: FactoryGalleryItem[] }> {
   const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || '';
   const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || '';
 
   if (!supabaseUrl || !supabaseKey) {
-    return { heroBgs: DEFAULT_HERO_BGS, categories: DEFAULT_CATEGORIES };
+    return { heroBgs: DEFAULT_HERO_BGS, categories: DEFAULT_CATEGORIES, factoryGallery: [] };
   }
 
   const supabase = createClient(supabaseUrl, supabaseKey);
 
   let heroBgs: string[] = DEFAULT_HERO_BGS;
   let categories: string[] = DEFAULT_CATEGORIES;
+  let factoryGallery: FactoryGalleryItem[] = [];
 
   try {
     const { data: heroData } = await supabase
@@ -913,7 +992,33 @@ async function fetchSiteSettings(): Promise<{ heroBgs: string[]; categories: str
     console.warn('[prerender-static] categories fetch failed; using default.', err);
   }
 
-  return { heroBgs, categories };
+  try {
+    const { data: galleryData } = await supabase
+      .from('site_settings')
+      .select('value')
+      .eq('key', 'factory_gallery')
+      .single();
+    if (galleryData && galleryData.value) {
+      try {
+        const parsed = JSON.parse(galleryData.value);
+        if (Array.isArray(parsed)) {
+          factoryGallery = parsed
+            .filter((it: any) => it && typeof it.url === 'string' && it.url.trim() !== '')
+            .map((it: any) => ({
+              url: it.url,
+              alt: typeof it.alt === 'string' && it.alt.trim() !== '' ? it.alt : 'BOLEN mirror factory production line',
+              caption: typeof it.caption === 'string' && it.caption.trim() !== '' ? it.caption : undefined,
+            }));
+        }
+      } catch {
+        // ignore — empty gallery is fine, section just hides
+      }
+    }
+  } catch (err) {
+    console.warn('[prerender-static] factory_gallery fetch failed; section will be empty.', err);
+  }
+
+  return { heroBgs, categories, factoryGallery };
 }
 
 // ---- Journal (blog) ---------------------------------------------------------
@@ -1140,8 +1245,9 @@ async function main(): Promise<void> {
   const products = await fetchAllProducts();
   console.log(`[prerender-static] ${products.length} products loaded.`);
 
-  console.log('[prerender-static] Fetching site settings (hero, categories)...');
-  const { heroBgs, categories } = await fetchSiteSettings();
+  console.log('[prerender-static] Fetching site settings (hero, categories, factory gallery)...');
+  const { heroBgs, categories, factoryGallery } = await fetchSiteSettings();
+  console.log(`[prerender-static] Factory gallery: ${factoryGallery.length} photo(s).`);
 
   // Probe the primary (LCP) hero's intrinsic size once, then derive the
   // responsive src/srcset baked into the home HTML, the <head> preload, and the
@@ -1223,6 +1329,7 @@ async function main(): Promise<void> {
         heroH: heroSize.h,
         heroLcp,
         categories,
+        factoryGallery,
         productTranslations: translations[lang],
       });
       const headExtras = `${buildHead({
@@ -1233,12 +1340,12 @@ async function main(): Promise<void> {
         ogImage: DEFAULT_OG_IMAGE,
         ogType: 'website',
         routePath: '/',
-        schema: homeSchema(),
+        schema: homeSchema(factoryGallery),
       })}\n    ${heroPreload}\n    ${dataScript}`;
       const html = injectIntoTemplate(template, {
         lang,
         headExtras,
-        bodyContent: homeContent(lang, hero),
+        bodyContent: homeContent(lang, hero, factoryGallery),
       });
       await writeRoute(`${lang}`, html);
       routeCount++;

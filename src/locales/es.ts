@@ -34,9 +34,9 @@ export const es = {
       },
       about: {
         heritage: "Nuestra Herencia",
-        title1: "Creando Reflejos de",
-        title2: "Calidad",
-        desc1: "Con sede en Jiaxing, Zhejiang, China, a solo 60 kilómetros de Shanghái, Chengtai se ha convertido en una empresa totalmente integrada que se especializa en la investigación, desarrollo, fabricación y exportación global de productos de espejos premium.",
+        title1: "Alcance Global:",
+        title2: "De Shanghái al Mundo",
+        desc1: "Con sede en Jiaxing, Zhejiang, China —a solo 60 kilómetros de Shanghái—, hemos consolidado una sólida presencia global, con mercados principales en Europa (España, los Países Bajos, Noruega, Dinamarca, el Reino Unido y Rumanía), Norteamérica y Australia.",
         desc2: "Operamos dos sedes empresariales y dos plantas de producción de última generación. Nuestra dedicada fuerza laboral gestiona múltiples líneas de producción de espejos LED y de prueba, junto con talleres especializados personalizados, todo en estricto cumplimiento de las normas de gestión de calidad ISO 9001.",
         backedBy: "Respaldado por más de 200 profesionales",
         quote: "\"La Calidad Primero, Los Clientes Primero\"",
@@ -45,7 +45,7 @@ export const es = {
       collections: {
         subtitle: "Colecciones",
         title: "Versátil y Personalizado",
-        desc: "Nuestro catálogo abarca múltiples series diseñadas para aplicaciones residenciales, comerciales, hoteleras y proyectos de lujo.",
+        desc: "Fabricamos espejos LED, espejos de baño, espejos de vestidor y armarios con espejo, ofreciendo miles de estilos y soluciones totalmente a medida.",
         viewAll: "Ver Todos los Productos",
         smart: {
           tag: "Insignia",
@@ -68,31 +68,49 @@ export const es = {
         subtitle: "Nuestras Cualificaciones",
         title: "Certificaciones Globales"
       },
-      process: {
-        subtitle: "Excelencia en Cada Paso",
-        title: "El Proceso de Fabricación",
-        desc: "Desde las materias primas hasta la entrega global, mantenemos un estricto control sobre cada fase de producción.",
+      factoryShowcase: {
+        subtitle: "Dentro de la Fábrica",
+        title: "Donde Nace Cada Espejo",
+        desc: "Un recorrido por nuestra planta de 50.000 m² en Jiaxing: producción verticalmente integrada de espejos LED, inteligentes, de tocador y de baño, desde el vidrio crudo hasta el palé listo para enviar.",
+        empty: "Fotos de la fábrica próximamente."
+      },
+      advantage: {
+        subtitle: "La Ventaja BOLEN",
+        title: "Ventaja de Fabricación",
+        desc: "Veintiún años de producción verticalmente integrada, una planta de 46.800 m² y una ubicación logísticamente privilegiada cerca de los puertos de Shanghái y Ningbo.",
+        features: {
+          f1: { title: "Capacidad de Fabricación Demostrada", desc: "Con 21 años de trayectoria, nuestra planta de 46.800 m² cuenta con más de 200 trabajadores cualificados, garantizando una cadena de suministro estable y plazos de entrega fiables." },
+          f2: { title: "Ubicación Estratégica", desc: "Situados cerca de los puertos de Shanghái y Ningbo, disfrutamos de una ubicación privilegiada que asegura una logística cómoda y eficiente." },
+          f3: { title: "Fábrica Directa y Rentable", desc: "Como fábrica directa, eliminamos los costes de intermediarios para ofrecer precios altamente competitivos sin comprometer la calidad, asegurando el mejor valor para su negocio." }
+        }
+      },
+      manufacturingProcess: {
+        subtitle: "Del Brief al Palé",
+        title: "Proceso de Fabricación",
+        desc: "Seis fases estrechamente controladas llevan cada pedido de la especificación al envío.",
         steps: {
-          s1: { title: "Diseño I+D", desc: "Personalice tamaño, material, función, logotipo y embalaje según las necesidades del cliente." },
-          s2: { title: "Artesanía de Precisión", desc: "Corte, canteado y ensamblaje automatizados en nuestras instalaciones de 50k metros cuadrados." },
-          s3: { title: "Garantía de Calidad", desc: "Pruebas rigurosas para impermeabilización IP66, cumplimiento CE y RoHS." },
-          s4: { title: "Exportación Global", desc: "Embalaje y logística seguros a más de 50 países en todo el mundo." }
+          s1: { title: "Análisis de Requisitos", desc: "Soluciones a medida según su visión específica y las necesidades del mercado." },
+          s2: { title: "Diseño Personalizado", desc: "Confirmamos cada detalle antes de la producción, asegurando que el producto final cumpla sus expectativas." },
+          s3: { title: "Fabricación de Precisión", desc: "Integramos líneas automatizadas con precisión manual para una calidad y eficiencia óptimas." },
+          s4: { title: "Inspección de Calidad al 100%", desc: "Controles de calidad estrictos sobre la apariencia, función y artesanía del espejo." },
+          s5: { title: "Embalaje Personalizado", desc: "Marca totalmente personalizable para impulsar su competitividad en el mercado." },
+          s6: { title: "Plazo Estable", desc: "Planificación fiable y logística eficiente para garantizar la entrega a tiempo." }
         }
       },
       whyUs: {
         title1: "¿Por qué Asociarse con",
-        title2: "Chengtai?",
+        title2: "Bolen?",
         features: [
-          { title: "Gran Capacidad y Experiencia" },
-          { title: "Integración Vertical" },
-          { title: "Personalización OEM y ODM" },
-          { title: "Calidad Global Certificada" }
+          { title: "Acceso Global y Calidad Certificada" },
+          { title: "Fábrica Directa y Rentable" },
+          { title: "Control de Calidad Riguroso y Garantía" },
+          { title: "Personalización Integral" }
         ],
         paragraphs: [
-          "Con más de 20 años de experiencia dedicada a la fabricación de espejos (con orígenes que se remontan a 1995), Jiaxing Chengtai Mirror Co., Ltd. ha construido una reputación que va mucho más allá de cualquier canal de venta individual. Nuestro complejo de producción de más de 50.000 metros cuadrados, dos fábricas independientes y un equipo de más de 200 trabajadores cualificados nos brindan la capacidad y la flexibilidad para gestionar pedidos de prácticamente cualquier escala, desde proyectos boutique de diseño de interiores hasta grandes desarrollos hoteleros e inmobiliarios.",
-          "Somos propietarios de todo el proceso de producción de forma interna. Desde el procesamiento del vidrio en bruto y la integración de LED hasta la fabricación de marcos y el ensamblaje de funciones inteligentes, cada etapa de la fabricación se gestiona bajo un mismo techo y es supervisada por inspectores de QA/QC dedicados. Esta integración vertical significa que controlamos la calidad en cada paso, eliminamos los retrasos de terceros y mantenemos plazos de entrega competitivos.",
-          "Nuestros más de 200 estilos de productos en múltiples series principales no son plantillas estándar: representan años de iteración de diseño fundamentados tanto en las tendencias estéticas europeas como en los comentarios reales de los compradores. Para los clientes que necesitan algo único, nuestras capacidades OEM y ODM permiten la personalización completa de tamaño, forma, iluminación, funciones inteligentes, materiales y marca.",
-          "Respaldados por certificaciones internacionales que incluyen CE, RoHS e impermeabilización IP66, nuestros productos cumplen con los requisitos de conformidad de los mercados de Europa, Norteamérica, Oriente Medio y más allá. No solo fabricamos espejos: construimos asociaciones a largo plazo con importadores, distribuidores, diseñadores de interiores y promotores que exigen consistencia, precisión y un proveedor en el que puedan confiar año tras año."
+          "Hemos establecido alianzas profundas en Europa (NL, RO, UK, ES, NO, DK), Oriente Medio, Norteamérica, Australia y Sudamérica. Nuestros productos cumplen plenamente con los estándares internacionales, contando con certificaciones CE, CB, RoHS, IP44, SAA, entre otras.",
+          "Como fabricante directo, ofrecemos precios altamente competitivos. Nos comprometemos a entregar una calidad premium que se ajuste perfectamente a sus requisitos de presupuesto.",
+          "Nuestro sistema de aseguramiento de la calidad está a la altura de nuestro compromiso postventa. Cada producto pasa por una inspección al 100% antes del envío, respaldada por una garantía integral de 2 años en componentes electrónicos.",
+          "Desde el cristal del espejo hasta el embalaje, ofrecemos servicios integrales de personalización OEM/ODM diseñados para ayudarle a ampliar su alcance de mercado y construir su marca."
         ]
       },
       cta: {

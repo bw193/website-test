@@ -46,14 +46,14 @@ export default function Navbar() {
               <Link to={lp('/products')} className="text-stone-500 hover:text-stone-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-amber-600 text-sm font-medium">
                 {t('navbar.catalog')}
               </Link>
-              <Link to={lp('/our-story')} className="text-stone-500 hover:text-stone-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-amber-600 text-sm font-medium">
-                {t('navbar.ourStory')}
+              <Link to={lp('/rfq')} className="text-stone-500 hover:text-stone-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-amber-600 text-sm font-medium">
+                {t('productDetail.requestQuote')}
               </Link>
               <Link to={lp('/blog')} className="text-stone-500 hover:text-stone-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-amber-600 text-sm font-medium">
                 {t('navbar.blog')}
               </Link>
-              <Link to={lp('/rfq')} className="text-stone-500 hover:text-stone-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-amber-600 text-sm font-medium">
-                {t('productDetail.requestQuote')}
+              <Link to={lp('/our-story')} className="text-stone-500 hover:text-stone-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-amber-600 text-sm font-medium">
+                {t('navbar.ourStory')}
               </Link>
             </div>
           </div>
@@ -131,9 +131,9 @@ export default function Navbar() {
           <div className="pt-2 pb-3 space-y-1">
             <Link to={lp('/')} onClick={() => setIsOpen(false)} className="bg-amber-50 border-amber-600 text-amber-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium">{t('navbar.home')}</Link>
             <Link to={lp('/products')} onClick={() => setIsOpen(false)} className="border-transparent text-stone-500 hover:bg-stone-50 hover:border-stone-300 hover:text-stone-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium">{t('navbar.catalog')}</Link>
-            <Link to={lp('/our-story')} onClick={() => setIsOpen(false)} className="border-transparent text-stone-500 hover:bg-stone-50 hover:border-stone-300 hover:text-stone-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium">{t('navbar.ourStory')}</Link>
-            <Link to={lp('/blog')} onClick={() => setIsOpen(false)} className="border-transparent text-stone-500 hover:bg-stone-50 hover:border-stone-300 hover:text-stone-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium">{t('navbar.blog')}</Link>
             <Link to={lp('/rfq')} onClick={() => setIsOpen(false)} className="border-transparent text-stone-500 hover:bg-stone-50 hover:border-stone-300 hover:text-stone-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium">{t('productDetail.requestQuote')}</Link>
+            <Link to={lp('/blog')} onClick={() => setIsOpen(false)} className="border-transparent text-stone-500 hover:bg-stone-50 hover:border-stone-300 hover:text-stone-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium">{t('navbar.blog')}</Link>
+            <Link to={lp('/our-story')} onClick={() => setIsOpen(false)} className="border-transparent text-stone-500 hover:bg-stone-50 hover:border-stone-300 hover:text-stone-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium">{t('navbar.ourStory')}</Link>
             <Link to="/admin/login" onClick={() => setIsOpen(false)} className="border-transparent text-stone-500 hover:bg-stone-50 hover:border-stone-300 hover:text-stone-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium">
               {t('navbar.employeeLogin')}
             </Link>

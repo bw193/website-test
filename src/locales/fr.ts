@@ -34,9 +34,9 @@ export const fr = {
       },
       about: {
         heritage: "Notre Héritage",
-        title1: "Créer des Reflets de",
-        title2: "Qualité",
-        desc1: "Basée à Jiaxing, Zhejiang, en Chine — à seulement 60 kilomètres de Shanghai — Chengtai est devenue une entreprise entièrement intégrée spécialisée dans la recherche, le développement, la fabrication et l'exportation mondiale de miroirs haut de gamme.",
+        title1: "Portée Mondiale :",
+        title2: "De Shanghai au Monde Entier",
+        desc1: "Basés à Jiaxing, Zhejiang, en Chine — à seulement 60 kilomètres de Shanghai — nous avons établi une forte présence mondiale, avec des marchés principaux couvrant l'Europe (Espagne, Pays-Bas, Norvège, Danemark, Royaume-Uni et Roumanie), l'Amérique du Nord et l'Australie.",
         desc2: "Nous exploitons deux sièges sociaux et deux usines de production de pointe. Notre main-d'œuvre dévouée gère plusieurs lignes de production de miroirs LED et d'essayage, ainsi que des ateliers spécialisés sur mesure, le tout en stricte conformité avec les normes de gestion de la qualité ISO 9001.",
         backedBy: "Soutenu par plus de 200 professionnels",
         quote: "\"La Qualité d'Abord, Les Clients d'Abord\"",
@@ -45,7 +45,7 @@ export const fr = {
       collections: {
         subtitle: "Collections",
         title: "Polyvalent et Sur Mesure",
-        desc: "Notre catalogue comprend plusieurs séries conçues pour des applications résidentielles, commerciales, hôtelières et de projets de luxe.",
+        desc: "Nous fabriquons des miroirs LED, des miroirs de salle de bain, des miroirs de toilette et des armoires à miroir, proposant des milliers de styles et des solutions entièrement sur mesure.",
         viewAll: "Voir Tous les Produits",
         smart: {
           tag: "Phare",
@@ -68,31 +68,49 @@ export const fr = {
         subtitle: "Nos Qualifications",
         title: "Certifications Mondiales"
       },
-      process: {
-        subtitle: "L'Excellence à Chaque Étape",
-        title: "Le Processus de Fabrication",
-        desc: "Des matières premières à la livraison mondiale, nous maintenons un contrôle strict sur chaque phase de production.",
+      factoryShowcase: {
+        subtitle: "À l'Intérieur de l'Usine",
+        title: "Là Où Naît Chaque Miroir",
+        desc: "Visite de notre site de 50 000 m² à Jiaxing — production verticalement intégrée de miroirs LED, intelligents, de toilette et de salle de bain, du verre brut à la palette prête à expédier.",
+        empty: "Photos de l'usine bientôt disponibles."
+      },
+      advantage: {
+        subtitle: "L'Atout BOLEN",
+        title: "Atout de Fabrication",
+        desc: "Vingt et un ans de production verticalement intégrée, une usine de 46 800 m² et un emplacement logistique privilégié à proximité des ports de Shanghai et Ningbo.",
+        features: {
+          f1: { title: "Capacité de Fabrication Éprouvée", desc: "Établie il y a 21 ans, notre installation de 46 800 m² emploie plus de 200 ouvriers qualifiés, garantissant une chaîne d'approvisionnement stable et des délais de livraison fiables." },
+          f2: { title: "Emplacement Stratégique", desc: "Situés à proximité des ports de Shanghai et Ningbo, nous bénéficions d'un emplacement de choix qui assure une logistique pratique et efficace." },
+          f3: { title: "Usine Directe et Rentable", desc: "En tant qu'usine directe, nous éliminons les coûts d'intermédiaires pour offrir des prix très compétitifs sans compromettre la qualité, garantissant la meilleure valeur pour votre entreprise." }
+        }
+      },
+      manufacturingProcess: {
+        subtitle: "Du Brief à la Palette",
+        title: "Processus de Fabrication",
+        desc: "Six étapes rigoureusement contrôlées mènent chaque commande de la spécification à l'expédition.",
         steps: {
-          s1: { title: "Conception R&D", desc: "Personnalisez la taille, le matériau, la fonction, le logo et l'emballage en fonction des besoins du client." },
-          s2: { title: "Artisanat de Précision", desc: "Découpe, bordage et assemblage automatisés dans notre installation de 50k m²." },
-          s3: { title: "Assurance Qualité", desc: "Tests rigoureux pour l'étanchéité IP66, la conformité CE et RoHS." },
-          s4: { title: "Exportation Mondiale", desc: "Emballage et logistique sécurisés vers plus de 50 pays dans le monde." }
+          s1: { title: "Analyse des Besoins", desc: "Solutions sur mesure basées sur votre vision spécifique et les besoins du marché." },
+          s2: { title: "Conception Personnalisée", desc: "Confirmation de chaque détail avant la production pour garantir que le produit final répond à vos attentes." },
+          s3: { title: "Fabrication de Précision", desc: "Intégration des lignes automatisées et de la précision manuelle pour une qualité et une efficacité optimales." },
+          s4: { title: "Inspection Qualité 100%", desc: "Contrôles qualité stricts sur l'apparence, la fonction et la fabrication du miroir." },
+          s5: { title: "Emballage Personnalisé", desc: "Image de marque entièrement personnalisable pour renforcer votre compétitivité sur le marché." },
+          s6: { title: "Délai Stable", desc: "Planification fiable et logistique efficace pour garantir une livraison à temps." }
         }
       },
       whyUs: {
         title1: "Pourquoi Choisir",
-        title2: "Chengtai ?",
+        title2: "Bolen ?",
         features: [
-          { title: "Capacité et Expérience Massives" },
-          { title: "Intégration Verticale" },
-          { title: "Personnalisation OEM et ODM" },
-          { title: "Qualité Mondiale Certifiée" }
+          { title: "Accès au Marché Mondial et Qualité Certifiée" },
+          { title: "Usine Directe et Rentable" },
+          { title: "Contrôle Qualité Rigoureux et Garantie" },
+          { title: "Personnalisation Complète" }
         ],
         paragraphs: [
-          "Avec plus de 20 ans d'expérience dédiée à la fabrication de miroirs (dont les origines remontent à 1995), Jiaxing Chengtai Mirror Co., Ltd. s'est forgé une réputation qui dépasse largement tout canal de vente unique. Notre complexe de production de plus de 50 000 mètres carrés, deux usines indépendantes et une équipe de plus de 200 ouvriers qualifiés nous donnent la capacité et la flexibilité de gérer des commandes de pratiquement toute envergure, des projets de design d'intérieur de boutique aux grands développements hôteliers et immobiliers.",
-          "Nous maîtrisons l'intégralité du processus de production en interne. Du traitement du verre brut et de l'intégration des LED à la fabrication des cadres et à l'assemblage des fonctions intelligentes, chaque étape de la fabrication est gérée sous un même toit et supervisée par des inspecteurs QA/QC dédiés. Cette intégration verticale signifie que nous contrôlons la qualité à chaque étape, éliminons les retards liés aux tiers et maintenons des délais de livraison compétitifs.",
-          "Nos plus de 200 styles de produits répartis sur plusieurs séries principales ne sont pas des modèles standards : ils représentent des années d'itération de conception nourries à la fois par les tendances esthétiques européennes et par les retours réels des acheteurs. Pour les clients qui ont besoin de quelque chose d'unique, nos capacités OEM et ODM permettent une personnalisation complète de la taille, de la forme, de l'éclairage, des fonctions intelligentes, des matériaux et de la marque.",
-          "Soutenus par des certifications internationales telles que CE, RoHS et l'étanchéité IP66, nos produits répondent aux exigences de conformité des marchés d'Europe, d'Amérique du Nord, du Moyen-Orient et au-delà. Nous ne fabriquons pas seulement des miroirs : nous construisons des partenariats à long terme avec des importateurs, des distributeurs, des architectes d'intérieur et des promoteurs qui exigent constance, précision et un fournisseur sur lequel ils peuvent compter année après année."
+          "Nous avons établi des partenariats solides en Europe (NL, RO, UK, ES, NO, DK), au Moyen-Orient, en Amérique du Nord, en Australie et en Amérique du Sud. Nos produits sont entièrement conformes aux normes internationales et possèdent les certifications CE, CB, RoHS, IP44, SAA, entre autres.",
+          "En tant que fabricant direct, nous offrons des prix très compétitifs. Nous nous engageons à livrer une qualité premium parfaitement adaptée à vos exigences budgétaires.",
+          "Notre système d'assurance qualité est à la hauteur de notre engagement après-vente. Chaque produit subit une inspection à 100% avant expédition, soutenue par une garantie complète de 2 ans sur les composants électroniques.",
+          "Du verre des miroirs à l'emballage, nous offrons des services de personnalisation OEM/ODM de bout en bout, conçus pour vous aider à étendre votre portée et à construire votre marque."
         ]
       },
       cta: {

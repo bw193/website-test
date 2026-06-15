@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../supabase';
-import { Loader2, Save, Image as ImageIcon, Upload, Plus, Trash2, Settings as SettingsIcon, LayoutTemplate, Tags } from 'lucide-react';
+import { Loader2, Save, Image as ImageIcon, Upload, Plus, Trash2, Settings as SettingsIcon, LayoutTemplate, Tags, Factory, ArrowUp, ArrowDown } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+
+type FactoryGalleryItem = { url: string; alt: string; caption: string };
 
 export default function AdminSettings() {
   const { t } = useTranslation();
@@ -23,6 +25,8 @@ export default function AdminSettings() {
     "Manufacturing",
     "Design"
   ]);
+  const [factoryGallery, setFactoryGallery] = useState<FactoryGalleryItem[]>([]);
+  const [galleryUploading, setGalleryUploading] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [needsSetup, setNeedsSetup] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -37,7 +41,7 @@ export default function AdminSettings() {
       const { data, error } = await supabase
         .from('site_settings')
         .select('key, value')
-        .in('key', ['hero_bg', 'categories', 'blog_categories']);
+        .in('key', ['hero_bg', 'categories', 'blog_categories', 'factory_gallery']);
 
       if (error) {
         if (error.code === '42P01' || error.code === 'PGRST205') { // relation does not exist or not in schema cache
@@ -85,6 +89,26 @@ export default function AdminSettings() {
             console.error("Error parsing blog categories", e);
           }
         }
+
+        const galleryRow = data.find(d => d.key === 'factory_gallery');
+        if (galleryRow && galleryRow.value) {
+          try {
+            const parsed = JSON.parse(galleryRow.value);
+            if (Array.isArray(parsed)) {
+              setFactoryGallery(
+                parsed
+                  .filter((it: any) => it && typeof it.url === 'string')
+                  .map((it: any) => ({
+                    url: it.url || '',
+                    alt: typeof it.alt === 'string' ? it.alt : '',
+                    caption: typeof it.caption === 'string' ? it.caption : '',
+                  }))
+              );
+            }
+          } catch (e) {
+            console.error("Error parsing factory_gallery", e);
+          }
+        }
       }
     } catch (err: any) {
       console.error("Error fetching settings:", err);
@@ -102,12 +126,23 @@ export default function AdminSettings() {
       const validCategories = categories.filter(cat => cat.trim() !== '');
       const validBlogCategories = blogCategories.filter(cat => cat.trim() !== '');
       
+      const validGallery = factoryGallery
+        .filter(it => it.url.trim() !== '')
+        .map(it => ({
+          url: it.url.trim(),
+          // Default alt is non-empty even if the editor left it blank: SEO + a11y
+          // require it, and an empty alt would silently regress page audits.
+          alt: it.alt.trim() || 'BOLEN mirror factory production line',
+          caption: it.caption.trim(),
+        }));
+
       const { error } = await supabase
         .from('site_settings')
         .upsert([
           { key: 'hero_bg', value: JSON.stringify(validBgs) },
           { key: 'categories', value: JSON.stringify(validCategories) },
-          { key: 'blog_categories', value: JSON.stringify(validBlogCategories) }
+          { key: 'blog_categories', value: JSON.stringify(validBlogCategories) },
+          { key: 'factory_gallery', value: JSON.stringify(validGallery) }
         ]);
 
       if (error) throw error;
@@ -157,6 +192,62 @@ export default function AdminSettings() {
         fileInputRef.current.value = '';
       }
     }
+  };
+
+  const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setGalleryUploading(index);
+    setError(null);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
+      const filePath = `site-assets/factory/${fileName}`;
+      const { error: uploadError } = await supabase.storage
+        .from('product-images')
+        .upload(filePath, file, { cacheControl: '31536000', upsert: true });
+      if (uploadError) throw uploadError;
+      const { data: { publicUrl } } = supabase.storage
+        .from('product-images')
+        .getPublicUrl(filePath);
+      setFactoryGallery(prev => {
+        const next = [...prev];
+        next[index] = { ...next[index], url: publicUrl };
+        return next;
+      });
+    } catch (err: any) {
+      console.error("Error uploading factory image:", err);
+      setError(err.message);
+    } finally {
+      setGalleryUploading(null);
+      e.target.value = '';
+    }
+  };
+
+  const handleGalleryAdd = () => {
+    setFactoryGallery([...factoryGallery, { url: '', alt: '', caption: '' }]);
+  };
+
+  const handleGalleryRemove = (index: number) => {
+    setFactoryGallery(factoryGallery.filter((_, i) => i !== index));
+  };
+
+  const handleGalleryField = (index: number, field: keyof FactoryGalleryItem, value: string) => {
+    setFactoryGallery(prev => {
+      const next = [...prev];
+      next[index] = { ...next[index], [field]: value };
+      return next;
+    });
+  };
+
+  const handleGalleryMove = (index: number, dir: -1 | 1) => {
+    const target = index + dir;
+    if (target < 0 || target >= factoryGallery.length) return;
+    setFactoryGallery(prev => {
+      const next = [...prev];
+      [next[index], next[target]] = [next[target], next[index]];
+      return next;
+    });
   };
 
   const handleAddBg = () => {
@@ -349,6 +440,137 @@ NOTIFY pgrst, 'reload schema';`}
                 ))}
               </div>
             </div>
+          )}
+        </div>
+      </div>
+
+      {/* Factory Gallery — homepage company image showcase */}
+      <div className="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden">
+        <div className="px-6 py-5 border-b border-stone-100 bg-stone-50/50 flex items-center justify-between">
+          <h3 className="text-base font-semibold text-stone-900 flex items-center gap-2">
+            <Factory className="h-5 w-5 text-stone-400" />
+            Factory Showcase Gallery
+          </h3>
+          <button
+            type="button"
+            onClick={handleGalleryAdd}
+            className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg text-stone-700 bg-stone-100 hover:bg-stone-200 transition-colors"
+          >
+            <Plus className="h-3.5 w-3.5 mr-1" />
+            Add Photo
+          </button>
+        </div>
+        <div className="p-6">
+          <p className="text-sm text-stone-500 mb-6">
+            Photos shown in the homepage "Inside the Factory" section. Each photo needs descriptive alt text
+            (used by Google Image Search and screen readers) — keep it specific to what the image actually shows.
+          </p>
+
+          {factoryGallery.length === 0 ? (
+            <div className="text-center py-10 border-2 border-dashed border-stone-200 rounded-xl text-sm text-stone-500">
+              No factory photos yet. Click <span className="font-medium text-stone-700">Add Photo</span> to upload your first image.
+            </div>
+          ) : (
+            <ul className="space-y-4">
+              {factoryGallery.map((item, index) => (
+                <li key={index} className="p-4 bg-stone-50 rounded-xl border border-stone-200">
+                  <div className="grid grid-cols-1 md:grid-cols-[140px,1fr,auto] gap-4 items-start">
+                    <div className="relative w-full md:w-[140px] aspect-[4/3] rounded-lg overflow-hidden bg-stone-200 border border-stone-200">
+                      {item.url ? (
+                        <img
+                          src={item.url}
+                          alt={item.alt || `Factory photo ${index + 1} preview`}
+                          className="w-full h-full object-cover"
+                          referrerPolicy="no-referrer"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-stone-400">
+                          <ImageIcon className="h-6 w-6" />
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <ImageIcon className="h-4 w-4 text-stone-400" />
+                        </div>
+                        <input
+                          type="text"
+                          value={item.url}
+                          onChange={(e) => handleGalleryField(index, 'url', e.target.value)}
+                          placeholder="Image URL"
+                          className="block w-full pl-10 rounded-xl border-stone-200 py-2 text-sm focus:border-stone-900 focus:ring-1 focus:ring-stone-900 bg-white"
+                        />
+                      </div>
+                      <input
+                        type="text"
+                        value={item.alt}
+                        onChange={(e) => handleGalleryField(index, 'alt', e.target.value)}
+                        placeholder="Alt text (e.g. 'BOLEN LED mirror assembly line in Jiaxing factory') — required for SEO"
+                        className="block w-full rounded-xl border-stone-200 py-2 px-3 text-sm focus:border-stone-900 focus:ring-1 focus:ring-stone-900 bg-white"
+                      />
+                      <input
+                        type="text"
+                        value={item.caption}
+                        onChange={(e) => handleGalleryField(index, 'caption', e.target.value)}
+                        placeholder="Caption (optional, shown under the photo)"
+                        className="block w-full rounded-xl border-stone-200 py-2 px-3 text-sm focus:border-stone-900 focus:ring-1 focus:ring-stone-900 bg-white"
+                      />
+                    </div>
+
+                    <div className="flex md:flex-col gap-2 md:items-end">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        id={`factory-upload-${index}`}
+                        onChange={(e) => handleGalleryUpload(e, index)}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => document.getElementById(`factory-upload-${index}`)?.click()}
+                        disabled={galleryUploading === index}
+                        className="inline-flex items-center px-3 py-2 border border-stone-200 rounded-xl text-xs font-medium text-stone-700 bg-white hover:bg-stone-50 transition-colors disabled:opacity-50"
+                      >
+                        {galleryUploading === index
+                          ? <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
+                          : <Upload className="h-3.5 w-3.5 mr-1.5 text-stone-400" />}
+                        Upload
+                      </button>
+                      <div className="flex gap-1">
+                        <button
+                          type="button"
+                          onClick={() => handleGalleryMove(index, -1)}
+                          disabled={index === 0}
+                          className="p-2 text-stone-400 hover:text-stone-700 hover:bg-stone-100 rounded-lg transition-colors disabled:opacity-30 disabled:hover:bg-transparent"
+                          title="Move up"
+                        >
+                          <ArrowUp className="h-4 w-4" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleGalleryMove(index, 1)}
+                          disabled={index === factoryGallery.length - 1}
+                          className="p-2 text-stone-400 hover:text-stone-700 hover:bg-stone-100 rounded-lg transition-colors disabled:opacity-30 disabled:hover:bg-transparent"
+                          title="Move down"
+                        >
+                          <ArrowDown className="h-4 w-4" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleGalleryRemove(index)}
+                          className="p-2 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          title="Remove photo"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
           )}
         </div>
       </div>
