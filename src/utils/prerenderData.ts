@@ -7,6 +7,7 @@
 import { toSlug } from './slug';
 import { primeProductTranslations, type ProductFields } from './productI18n';
 import type { BlogListItem, LocalizedBlogPost } from '../types/blog';
+import type { LocalizedVideoPost, VideoListItem } from '../types/video';
 
 const SCRIPT_ID = '__BOLEN_PRERENDER_DATA__';
 
@@ -17,7 +18,7 @@ export interface FactoryGalleryItem {
 }
 
 interface PrerenderPayload {
-  route?: 'home' | 'catalog' | 'productDetail' | 'blog' | 'blogPost';
+  route?: 'home' | 'catalog' | 'productDetail' | 'blog' | 'blogPost' | 'videos' | 'videoPost';
   lang?: string;
   products?: unknown[];
   product?: { id?: string; title?: string } & Record<string, unknown>;
@@ -42,6 +43,8 @@ interface PrerenderPayload {
   // renders synchronously with no Supabase fetch on the critical path.
   blogPosts?: BlogListItem[];
   blogPost?: LocalizedBlogPost;
+  videoPosts?: VideoListItem[];
+  videoPost?: LocalizedVideoPost;
 }
 
 let cache: PrerenderPayload | null | undefined;
@@ -131,4 +134,18 @@ export function readInitialBlogPost(slug: string): LocalizedBlogPost | null {
   const data = getPrerenderData();
   if (data?.route !== 'blogPost' || !data.blogPost) return null;
   return data.blogPost.slug === slug ? data.blogPost : null;
+}
+
+export function readInitialVideoList(): VideoListItem[] | null {
+  const data = getPrerenderData();
+  if (data?.route === 'videos' && Array.isArray(data.videoPosts)) {
+    return data.videoPosts as VideoListItem[];
+  }
+  return null;
+}
+
+export function readInitialVideoPost(slug: string): LocalizedVideoPost | null {
+  const data = getPrerenderData();
+  if (data?.route !== 'videoPost' || !data.videoPost) return null;
+  return data.videoPost.slug === slug ? data.videoPost : null;
 }

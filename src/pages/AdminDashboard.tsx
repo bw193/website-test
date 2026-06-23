@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../supabase';
-import { Plus, Edit, Trash2, Loader2, Package, Inbox, Users, Check, X, Settings, LogOut, Search, ChevronRight, Archive, BookOpen } from 'lucide-react';
+import { Plus, Edit, Trash2, Loader2, Package, Inbox, Users, Check, X, Settings, LogOut, Search, ChevronRight, Archive, BookOpen, Clapperboard } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 import SEO from '../components/SEO';
@@ -36,6 +36,15 @@ interface BlogPostRow {
   title?: Record<string, string> | null;
 }
 
+interface VideoPostRow {
+  id: string;
+  slug: string;
+  status: string;
+  source_type?: string | null;
+  category?: string | null;
+  title?: Record<string, string> | null;
+}
+
 export default function AdminDashboard() {
   const { isMasterAdmin, role, logout } = useAuth();
   const { t } = useTranslation();
@@ -44,9 +53,10 @@ export default function AdminDashboard() {
   const [rfqs, setRfqs] = useState<RFQ[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [blogPosts, setBlogPosts] = useState<BlogPostRow[]>([]);
+  const [videoPosts, setVideoPosts] = useState<VideoPostRow[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'products' | 'blog' | 'rfqs' | 'employees' | 'settings'>('products');
+  const [activeTab, setActiveTab] = useState<'products' | 'blog' | 'videos' | 'rfqs' | 'employees' | 'settings'>('products');
   const [rfqStatusFilter, setRfqStatusFilter] = useState<'active' | 'new' | 'read' | 'archived' | 'all'>('active');
   const [rfqStartDate, setRfqStartDate] = useState<string>('');
   const [rfqEndDate, setRfqEndDate] = useState<string>('');
@@ -111,6 +121,13 @@ export default function AdminDashboard() {
           .order('created_at', { ascending: false });
         if (error) throw error;
         setBlogPosts(data || []);
+      } else if (activeTab === 'videos') {
+        const { data, error } = await supabase
+          .from('videos')
+          .select('id, slug, status, source_type, category, title')
+          .order('created_at', { ascending: false });
+        if (error) throw error;
+        setVideoPosts(data || []);
       }
     } catch (error) {
       console.error("Error fetching admin data", error);
@@ -142,6 +159,19 @@ export default function AdminDashboard() {
       } catch (error) {
         console.error("Error deleting article", error);
         alert(t('admin.blog.deleteError'));
+      }
+    }
+  };
+
+  const handleDeleteVideo = async (id: string) => {
+    if (window.confirm(t('admin.videos.deleteConfirm', 'Are you sure you want to delete this video?'))) {
+      try {
+        const { error } = await supabase.from('videos').delete().eq('id', id);
+        if (error) throw error;
+        setVideoPosts(videoPosts.filter(p => p.id !== id));
+      } catch (error) {
+        console.error("Error deleting video", error);
+        alert(t('admin.videos.deleteError', 'Failed to delete video.'));
       }
     }
   };
@@ -296,6 +326,13 @@ export default function AdminDashboard() {
               {t('admin.blog.tab')}
             </button>
             <button
+              onClick={() => setActiveTab('videos')}
+              className={`${activeTab === 'videos' ? 'bg-stone-100 text-stone-900 shadow-sm' : 'text-stone-500 hover:text-stone-700 hover:bg-stone-50'} px-4 py-2 rounded-lg font-medium text-sm flex items-center transition-all whitespace-nowrap`}
+            >
+              <Clapperboard className="h-4 w-4 mr-2" />
+              {t('admin.videos.tab', 'Videos')}
+            </button>
+            <button
               onClick={() => setActiveTab('rfqs')}
               className={`${activeTab === 'rfqs' ? 'bg-stone-100 text-stone-900 shadow-sm' : 'text-stone-500 hover:text-stone-700 hover:bg-stone-50'} px-4 py-2 rounded-lg font-medium text-sm flex items-center transition-all whitespace-nowrap`}
             >
@@ -336,6 +373,12 @@ export default function AdminDashboard() {
             <Link to="/admin/blog/new" className="inline-flex items-center justify-center px-5 py-2.5 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-stone-900 hover:bg-stone-800 transition-colors">
               <Plus className="h-4 w-4 mr-2" />
               {t('admin.blog.addPost')}
+            </Link>
+          )}
+          {activeTab === 'videos' && (
+            <Link to="/admin/videos/new" className="inline-flex items-center justify-center px-5 py-2.5 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-stone-900 hover:bg-stone-800 transition-colors">
+              <Plus className="h-4 w-4 mr-2" />
+              {t('admin.videos.addVideo', 'Add Video')}
             </Link>
           )}
         </div>
@@ -442,6 +485,41 @@ export default function AdminDashboard() {
                 <li className="px-6 py-12 text-center">
                   <BookOpen className="mx-auto h-12 w-12 text-stone-300 mb-3" />
                   <p className="text-stone-500 font-medium">{t('admin.blog.noPosts')}</p>
+                </li>
+              )}
+            </ul>
+          </div>
+        ) : activeTab === 'videos' ? (
+          <div className="bg-white shadow-sm border border-stone-200 rounded-2xl overflow-hidden">
+            <ul className="divide-y divide-stone-100">
+              {videoPosts.map((post) => (
+                <li key={post.id} className="hover:bg-stone-50 transition-colors">
+                  <div className="px-6 py-4 flex items-center justify-between">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-semibold text-stone-900 truncate">{post.title?.en || post.slug}</p>
+                      <p className="mt-1 flex items-center gap-2 text-sm text-stone-500">
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${post.status === 'published' ? 'bg-green-100 text-green-800' : 'bg-stone-100 text-stone-600'}`}>
+                          {post.status === 'published' ? t('admin.blog.published') : t('admin.blog.draft')}
+                        </span>
+                        {post.source_type && <span className="text-xs text-stone-400 uppercase">{post.source_type}</span>}
+                        {post.category && <span className="text-xs text-stone-400">{post.category}</span>}
+                      </p>
+                    </div>
+                    <div className="ml-5 flex-shrink-0 flex gap-2">
+                      <Link to={`/admin/videos/${post.id}`} className="p-2 text-stone-400 hover:text-stone-900 hover:bg-stone-100 rounded-lg transition-colors">
+                        <Edit className="h-4 w-4" />
+                      </Link>
+                      <button onClick={() => handleDeleteVideo(post.id)} className="p-2 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                </li>
+              ))}
+              {videoPosts.length === 0 && (
+                <li className="px-6 py-12 text-center">
+                  <Clapperboard className="mx-auto h-12 w-12 text-stone-300 mb-3" />
+                  <p className="text-stone-500 font-medium">{t('admin.videos.noVideos', 'No videos yet. Create your first one.')}</p>
                 </li>
               )}
             </ul>

@@ -26,13 +26,20 @@ import { createClient } from '@supabase/supabase-js';
 import 'dotenv/config';
 import { marked } from 'marked';
 import { localizePost, toListItem } from '../src/utils/blog';
+import { localizeVideo, recommendProductsForVideo, toVideoListItem } from '../src/utils/video';
 import { optimizeImage } from '../src/utils/optimizeImage';
 import {
   buildBlogIndexSchema,
   buildBlogPostingSchema,
   buildBlogBreadcrumbSchema,
 } from '../src/utils/blogSchema';
+import {
+  buildVideoBreadcrumbSchema,
+  buildVideoIndexSchema,
+  buildVideoObjectSchema,
+} from '../src/utils/videoSchema';
 import type { BlogPost, BlogListItem, LocalizedBlogPost } from '../src/types/blog';
+import type { LocalizedVideoPost, VideoListItem, VideoPost } from '../src/types/video';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = resolve(__dirname, '..');
@@ -1193,6 +1200,166 @@ function blogPostContent(
   `.trim();
 }
 
+// ---- Videos -----------------------------------------------------------------
+
+const VIDEO_COPY: Record<
+  Lang,
+  { metaTitle: string; metaDesc: string; h1: string; intro: string; videos: string; relatedProducts: string }
+> = {
+  en: {
+    metaTitle: 'BOLEN Mirror Videos | Product Demos & Factory Walkthroughs',
+    metaDesc:
+      'Watch BOLEN mirror product demos, factory walkthroughs, installation clips, and LED smart mirror feature videos.',
+    h1: 'BOLEN Videos',
+    intro:
+      'See LED mirrors, smart features, factory processes, and installation details before you specify a product.',
+    videos: 'Videos',
+    relatedProducts: 'Related products',
+  },
+  zh: {
+    metaTitle: 'BOLEN Mirror Videos | Product Demos & Factory Walkthroughs',
+    metaDesc:
+      'Watch BOLEN mirror product demos, factory walkthroughs, installation clips, and LED smart mirror feature videos.',
+    h1: 'BOLEN Videos',
+    intro:
+      'See LED mirrors, smart features, factory processes, and installation details before you specify a product.',
+    videos: 'Videos',
+    relatedProducts: 'Related products',
+  },
+  es: {
+    metaTitle: 'BOLEN Mirror Videos | Product Demos & Factory Walkthroughs',
+    metaDesc:
+      'Watch BOLEN mirror product demos, factory walkthroughs, installation clips, and LED smart mirror feature videos.',
+    h1: 'BOLEN Videos',
+    intro:
+      'See LED mirrors, smart features, factory processes, and installation details before you specify a product.',
+    videos: 'Videos',
+    relatedProducts: 'Related products',
+  },
+  fr: {
+    metaTitle: 'BOLEN Mirror Videos | Product Demos & Factory Walkthroughs',
+    metaDesc:
+      'Watch BOLEN mirror product demos, factory walkthroughs, installation clips, and LED smart mirror feature videos.',
+    h1: 'BOLEN Videos',
+    intro:
+      'See LED mirrors, smart features, factory processes, and installation details before you specify a product.',
+    videos: 'Videos',
+    relatedProducts: 'Related products',
+  },
+  de: {
+    metaTitle: 'BOLEN Mirror Videos | Product Demos & Factory Walkthroughs',
+    metaDesc:
+      'Watch BOLEN mirror product demos, factory walkthroughs, installation clips, and LED smart mirror feature videos.',
+    h1: 'BOLEN Videos',
+    intro:
+      'See LED mirrors, smart features, factory processes, and installation details before you specify a product.',
+    videos: 'Videos',
+    relatedProducts: 'Related products',
+  },
+  it: {
+    metaTitle: 'BOLEN Mirror Videos | Product Demos & Factory Walkthroughs',
+    metaDesc:
+      'Watch BOLEN mirror product demos, factory walkthroughs, installation clips, and LED smart mirror feature videos.',
+    h1: 'BOLEN Videos',
+    intro:
+      'See LED mirrors, smart features, factory processes, and installation details before you specify a product.',
+    videos: 'Videos',
+    relatedProducts: 'Related products',
+  },
+};
+
+async function fetchVideos(): Promise<VideoPost[]> {
+  const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || '';
+  const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || '';
+  if (!supabaseUrl || !supabaseKey) {
+    console.warn('[prerender-static] Supabase credentials not set; prerendering without videos.');
+    return [];
+  }
+  const supabase = createClient(supabaseUrl, supabaseKey);
+  const { data, error } = await supabase
+    .from('videos')
+    .select('*')
+    .eq('status', 'published')
+    .order('published_at', { ascending: false });
+  if (error) {
+    console.warn(`[prerender-static] Could not fetch videos: ${error.message}`);
+    return [];
+  }
+  return (data || []) as VideoPost[];
+}
+
+function videoIndexContent(lang: Lang, items: VideoListItem[]): string {
+  const c = VIDEO_COPY[lang];
+  const list = items
+    .map((video) => {
+      const href = `/${lang}/videos/${video.slug}/`;
+      const img = video.thumbnail_url
+        ? `<img src="${escapeAttr(video.thumbnail_url)}" alt="${escapeAttr(video.title)}" width="640" height="360" loading="lazy" />`
+        : '';
+      return `<li><a href="${escapeAttr(href)}">${img}<h2>${escapeHtml(video.title)}</h2></a><p>${escapeHtml(
+        video.excerpt
+      )}</p></li>`;
+    })
+    .join('\n        ');
+  return `
+    <div data-prerender="videos">
+      <h1>${escapeHtml(c.h1)}</h1>
+      <p>${escapeHtml(c.intro)}</p>
+      <ul aria-label="Videos">
+        ${list}
+      </ul>
+    </div>
+  `.trim();
+}
+
+function videoPostContent(
+  lang: Lang,
+  video: LocalizedVideoPost,
+  related: { href: string; title: string; img?: string }[]
+): string {
+  const c = VIDEO_COPY[lang];
+  const hc = COPY[lang];
+  const media = video.thumbnail_url
+    ? `<img src="${escapeAttr(video.thumbnail_url)}" alt="${escapeAttr(video.title)}" width="1200" height="675" />`
+    : '';
+  const relatedBlock = related.length
+    ? `<section aria-label="${escapeAttr(c.relatedProducts)}">
+        <h2>${escapeHtml(c.relatedProducts)}</h2>
+        <ul>
+          ${related
+            .map(
+              (r) =>
+                `<li><a href="${escapeAttr(r.href)}">${
+                  r.img
+                    ? `<img src="${escapeAttr(r.img)}" alt="${escapeAttr(r.title)}" width="200" height="200" loading="lazy" />`
+                    : ''
+                }${escapeHtml(r.title)}</a></li>`
+            )
+            .join('\n          ')}
+        </ul>
+      </section>`
+    : '';
+  return `
+    <div data-prerender="videoPost">
+      <nav aria-label="Breadcrumb">
+        <a href="/${lang}/">${escapeHtml(hc.breadcrumbHome)}</a>
+        &raquo;
+        <a href="/${lang}/videos/">${escapeHtml(c.videos)}</a>
+        &raquo;
+        <span>${escapeHtml(video.title)}</span>
+      </nav>
+      <h1>${escapeHtml(video.title)}</h1>
+      ${media}
+      <p>${escapeHtml(video.excerpt)}</p>
+      <div>${renderMarkdown(video.body)}</div>
+      ${relatedBlock}
+      <p><a href="/${lang}/products/">${escapeHtml(hc.navCatalog)}</a> &middot; <a href="/${lang}/rfq/">${escapeHtml(
+        hc.navRfq
+      )}</a></p>
+    </div>
+  `.trim();
+}
+
 async function writeUuidRedirects(products: Product[]): Promise<void> {
   const redirectsPath = resolve(DIST, '_redirects');
   let existing = '';
@@ -1304,6 +1471,9 @@ async function main(): Promise<void> {
   console.log('[prerender-static] Fetching published blog posts...');
   const blogPosts = await fetchBlogPosts();
   console.log(`[prerender-static] ${blogPosts.length} blog posts loaded.`);
+  console.log('[prerender-static] Fetching published videos...');
+  const videos = await fetchVideos();
+  console.log(`[prerender-static] ${videos.length} videos loaded.`);
   const productById = new Map(products.map((p) => [p.id, p]));
   for (const lang of LANGUAGES) {
     const n = Object.keys(translations[lang]).length;
@@ -1450,6 +1620,31 @@ async function main(): Promise<void> {
       routeCount++;
     }
 
+    // Videos index
+    {
+      const canonical = `${SITE_URL}/${lang}/videos/`;
+      const items = videos.map((video) => toVideoListItem(video, lang));
+      const vc = VIDEO_COPY[lang];
+      const dataScript = prerenderDataScript({ route: 'videos', lang, videoPosts: items });
+      const headExtras = `${buildHead({
+        lang,
+        title: vc.metaTitle,
+        description: vc.metaDesc,
+        canonical,
+        ogImage: DEFAULT_OG_IMAGE,
+        ogType: 'website',
+        routePath: '/videos',
+        schema: buildVideoIndexSchema(lang) as any[],
+      })}\n    ${dataScript}`;
+      const html = injectIntoTemplate(template, {
+        lang,
+        headExtras,
+        bodyContent: videoIndexContent(lang, items),
+      });
+      await writeRoute(`${lang}/videos`, html);
+      routeCount++;
+    }
+
     // Journal articles
     for (const rawPost of blogPosts) {
       if (!rawPost.slug) continue;
@@ -1487,6 +1682,38 @@ async function main(): Promise<void> {
 
     // Product detail pages — title/description shape mirrors ProductDetail.tsx
     // exactly so Helmet's isEqualNode adoption works on mount.
+    // Video details
+    for (const rawVideo of videos) {
+      if (!rawVideo.slug) continue;
+      const localized = localizeVideo(rawVideo, lang);
+      const related = recommendProductsForVideo(localized, products, 4).map((p) => {
+        const disp = localizeProduct(p, translations[lang]);
+        return { href: `/${lang}/products/${toSlug(p.title)}/`, title: disp.title || p.title, img: p.images?.[0] };
+      });
+      const path = `/videos/${localized.slug}`;
+      const canonical = `${SITE_URL}/${lang}${path}/`;
+      const title = localized.seo_title || `${localized.title} | BOLEN Mirror Videos`;
+      const description = localized.seo_description || localized.excerpt;
+      const dataScript = prerenderDataScript({ route: 'videoPost', lang, videoPost: localized });
+      const headExtras = `${buildHead({
+        lang,
+        title,
+        description,
+        canonical,
+        ogImage: localized.thumbnail_url || DEFAULT_OG_IMAGE,
+        ogType: 'video.other',
+        routePath: path,
+        schema: [buildVideoObjectSchema(localized, lang), buildVideoBreadcrumbSchema(localized, lang)],
+      })}\n    ${dataScript}`;
+      const html = injectIntoTemplate(template, {
+        lang,
+        headExtras,
+        bodyContent: videoPostContent(lang, localized, related),
+      });
+      await writeRoute(`${lang}${path}`, html);
+      routeCount++;
+    }
+
     for (const product of products) {
       if (!product.id || !product.title) continue;
       const slug = toSlug(product.title);

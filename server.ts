@@ -59,6 +59,7 @@ ${xDefault}
       { loc: '/rfq', changefreq: 'monthly', priority: '0.8', lastmod: today },
       { loc: '/our-story', changefreq: 'monthly', priority: '0.7', lastmod: today },
       { loc: '/blog', changefreq: 'weekly', priority: '0.7', lastmod: today },
+      { loc: '/videos', changefreq: 'weekly', priority: '0.7', lastmod: today },
     ];
 
     const toSlug = (title: string) => title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
@@ -80,7 +81,22 @@ ${xDefault}
       return { loc: `/blog/${post.slug}`, changefreq: 'monthly', priority: '0.7', lastmod };
     });
 
-    const allPages = [...staticPages, ...productPages, ...blogPostPages];
+    const { data: videoPosts, error: videoError } = await supabase
+      .from('videos')
+      .select('slug, updated_at, published_at, created_at')
+      .eq('status', 'published')
+      .order('published_at', { ascending: false });
+
+    if (videoError) {
+      console.warn('Could not fetch videos for sitemap:', videoError.message);
+    }
+
+    const videoPostPages = (videoPosts || []).map((post) => {
+      const lastmod = (post.updated_at || post.published_at || post.created_at || today).split('T')[0];
+      return { loc: `/videos/${post.slug}`, changefreq: 'monthly', priority: '0.7', lastmod };
+    });
+
+    const allPages = [...staticPages, ...productPages, ...blogPostPages, ...videoPostPages];
     const urls = LANGUAGES.flatMap((lang) =>
       allPages.map((p) => buildUrlEntry(p.loc, p.lastmod, p.changefreq, p.priority, lang))
     );
@@ -111,6 +127,8 @@ ${urls.join('\n')}
   app.get('/products/*', (req, res) => res.redirect(301, `/en${req.path.replace(/\/+$/, '')}/`));
   app.get('/our-story', (req, res) => res.redirect(301, '/en/our-story/'));
   app.get('/rfq', (req, res) => res.redirect(301, '/en/rfq/'));
+  app.get('/videos', (req, res) => res.redirect(301, '/en/videos/'));
+  app.get('/videos/*', (req, res) => res.redirect(301, `/en${req.path.replace(/\/+$/, '')}/`));
 
   // Vite middleware for development
   if (process.env.NODE_ENV !== 'production') {

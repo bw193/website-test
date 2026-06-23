@@ -6,11 +6,14 @@ import { Loader2, CheckCircle2, ChevronLeft, ChevronRight, ArrowLeft, Send, Shie
 import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
 import SEO from '../components/SEO';
+import VideoCard from '../components/VideoCard';
 import { optimizeImage } from '../utils/optimizeImage';
 import { useLocalizedPath } from '../hooks/useLocalizedPath';
 import { readInitialProduct } from '../utils/prerenderData';
 import { toSlug, parseProductParam } from '../utils/slug';
 import { useProductTranslator } from '../utils/productI18n';
+import { recommendVideosForProduct, toVideoListItem } from '../utils/video';
+import type { VideoListItem, VideoPost } from '../types/video';
 
 interface Product {
   id: string;
@@ -30,6 +33,9 @@ interface RFQForm {
   message: string;
 }
 
+const VIDEO_LIST_COLUMNS =
+  'id, slug, source_type, video_url, embed_url, thumbnail_url, category, tags, duration_seconds, published_at, title, excerpt';
+
 export default function ProductDetail() {
   const { id: routeParam } = useParams<{ id: string }>();
   const { lang, lp } = useLocalizedPath();
@@ -40,6 +46,7 @@ export default function ProductDetail() {
   const [loading, setLoading] = useState(initialProduct === null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [rfqStatus, setRfqStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+  const [relatedVideos, setRelatedVideos] = useState<VideoListItem[]>([]);
   const { t } = useTranslation();
   const translate = useProductTranslator(lang);
 
@@ -85,6 +92,33 @@ export default function ProductDetail() {
       cancelled = true;
     };
   }, [routeSlug, legacyId]);
+
+  useEffect(() => {
+    if (!product) return;
+    let active = true;
+    const fetchRelatedVideos = async () => {
+      try {
+        const { supabase } = await import('../supabase');
+        const { data, error } = await supabase
+          .from('videos')
+          .select(VIDEO_LIST_COLUMNS)
+          .eq('status', 'published')
+          .order('published_at', { ascending: false })
+          .limit(24);
+        if (error) throw error;
+        if (active && data) {
+          const videos = (data as VideoPost[]).map((video) => toVideoListItem(video, lang));
+          setRelatedVideos(recommendVideosForProduct(product, videos, 3));
+        }
+      } catch (error) {
+        console.error('Error fetching related videos', error);
+      }
+    };
+    fetchRelatedVideos();
+    return () => {
+      active = false;
+    };
+  }, [product?.id, lang]);
 
   const onSubmitRFQ = async (data: RFQForm) => {
     if (!product) return;
@@ -265,21 +299,24 @@ export default function ProductDetail() {
               className="relative aspect-w-4 aspect-h-5 sm:aspect-w-1 sm:aspect-h-1 w-full rounded-2xl overflow-hidden bg-white shadow-sm border border-stone-200 group"
             >
               <AnimatePresence mode="wait">
-                <m.img
+                <m.div
                   key={currentImageIndex}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.3 }}
-                  src={optimizeImage(product.images[currentImageIndex], { width: 800 }) || 'https://picsum.photos/seed/mirror/800/800'}
-                  alt={display.title}
-                  className="w-full h-full object-center object-cover"
-                  width="800"
-                  height="800"
-                  referrerPolicy="no-referrer"
-                  fetchPriority="high"
-                  decoding="async"
-                />
+                  className="h-full w-full"
+                >
+                  <img
+                    src={optimizeImage(product.images[currentImageIndex], { width: 800 }) || 'https://picsum.photos/seed/mirror/800/800'}
+                    alt={display.title}
+                    className="h-full w-full object-cover object-center"
+                    width="800"
+                    height="800"
+                    referrerPolicy="no-referrer"
+                    decoding="async"
+                  />
+                </m.div>
               </AnimatePresence>
               
               {product.images.length > 1 && (
@@ -405,6 +442,25 @@ export default function ProductDetail() {
                 </h3>
                 <div className="prose prose-amber prose-stone max-w-none text-stone-600 leading-relaxed bg-white p-6 rounded-2xl border border-stone-200 shadow-sm">
                   <ReactMarkdown>{display.details}</ReactMarkdown>
+                </div>
+              </m.div>
+            )}
+
+            {relatedVideos.length > 0 && (
+              <m.div variants={fadeInUp} className="mt-10">
+                <div className="mb-6 flex items-end justify-between gap-4">
+                  <h3 className="text-xl font-bold text-stone-900 flex items-center gap-2">
+                    <span className="w-1.5 h-6 bg-amber-600 rounded-full"></span>
+                    {t('productDetail.relatedVideos', 'Related videos')}
+                  </h3>
+                  <Link to={lp('/videos')} className="text-sm font-semibold text-amber-700 hover:text-amber-800">
+                    {t('videos.viewAll', 'View all')}
+                  </Link>
+                </div>
+                <div className="grid grid-cols-1 gap-5">
+                  {relatedVideos.map((video, index) => (
+                    <VideoCard key={video.id} video={video} index={index + 4} />
+                  ))}
                 </div>
               </m.div>
             )}

@@ -35,6 +35,9 @@ const NotFound = lazy(() => import('./pages/NotFound'));
 const Blog = lazy(() => import('./pages/Blog'));
 const BlogPost = lazy(() => import('./pages/BlogPost'));
 const AdminBlogForm = lazy(() => import('./pages/AdminBlogForm'));
+const Videos = lazy(() => import('./pages/Videos'));
+const VideoDetail = lazy(() => import('./pages/VideoDetail'));
+const AdminVideoForm = lazy(() => import('./pages/AdminVideoForm'));
 
 // Loading fallback
 const PageLoader = () => (
@@ -71,6 +74,8 @@ export default function App() {
                   <Route path="our-story" element={withMotion(<OurStory />)} />
                   <Route path="blog" element={withMotion(<Blog />)} />
                   <Route path="blog/:slug" element={withMotion(<BlogPost />)} />
+                  <Route path="videos" element={withMotion(<Videos />)} />
+                  <Route path="videos/:slug" element={withMotion(<VideoDetail />)} />
                   <Route path="rfq" element={withMotion(<RFQ />)} />
                 </Route>
 
@@ -85,6 +90,8 @@ export default function App() {
                   <Route path="/admin/products/:id" element={<AdminProductForm />} />
                   <Route path="/admin/blog/new" element={<AdminBlogForm />} />
                   <Route path="/admin/blog/:id" element={<AdminBlogForm />} />
+                  <Route path="/admin/videos/new" element={<AdminVideoForm />} />
+                  <Route path="/admin/videos/:id" element={<AdminVideoForm />} />
                 </Route>
 
                 <Route path="*" element={<NotFound />} />

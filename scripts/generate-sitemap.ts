@@ -52,6 +52,7 @@ async function generateSitemap() {
     { loc: '/rfq', changefreq: 'monthly', priority: '0.8' },
     { loc: '/our-story', changefreq: 'monthly', priority: '0.7' },
     { loc: '/blog', changefreq: 'weekly', priority: '0.7' },
+    { loc: '/videos', changefreq: 'weekly', priority: '0.7' },
   ];
 
   // Fetch products for dynamic pages
@@ -98,10 +99,33 @@ async function generateSitemap() {
     };
   });
 
+  // Published videos. The table may not exist yet, so a failure omits video
+  // URLs instead of breaking the sitemap before scripts/videos.sql is run.
+  const { data: videoPosts, error: videoError } = await supabase
+    .from('videos')
+    .select('slug, updated_at, published_at, created_at')
+    .eq('status', 'published')
+    .order('published_at', { ascending: false });
+
+  if (videoError) {
+    console.warn('Could not fetch videos for sitemap:', videoError.message);
+  }
+
+  const videoPostPages = (videoPosts || []).map((p) => {
+    const lastmod = (p.updated_at || p.published_at || p.created_at || today).split('T')[0];
+    return {
+      loc: `/videos/${p.slug}`,
+      changefreq: 'monthly',
+      priority: '0.7',
+      lastmod,
+    };
+  });
+
   const allPages = [
     ...staticPages.map((p) => ({ ...p, lastmod: today })),
     ...productPages,
     ...blogPostPages,
+    ...videoPostPages,
   ];
 
   // Generate a URL entry for each page × each language
@@ -129,7 +153,7 @@ ${urls.join('\n')}
     // dist/ may not exist yet during pre-build
   }
 
-  console.log(`Generated sitemap with ${staticPages.length + productPages.length + blogPostPages.length} URLs`);
+  console.log(`Generated sitemap with ${staticPages.length + productPages.length + blogPostPages.length + videoPostPages.length} URLs`);
 }
 
 generateSitemap();
