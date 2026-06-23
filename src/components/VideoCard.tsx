@@ -16,6 +16,9 @@ export default function VideoCard({ video, index = 0 }: { video: VideoListItem; 
   const { t } = useTranslation();
   const thumb = video.thumbnail_url || FALLBACK_THUMB;
   const duration = formatVideoDuration(video.duration_seconds);
+  const categoryLabel = video.category
+    ? t(`videos.categories.${video.category}`, video.category)
+    : t('videos.cardLabel', 'Video');
 
   return (
     <Link to={lp(`/videos/${video.slug}`)} className="group block h-full">
@@ -36,7 +39,7 @@ export default function VideoCard({ video, index = 0 }: { video: VideoListItem; 
           <div className="absolute inset-0 bg-gradient-to-t from-stone-950/75 via-stone-950/10 to-transparent" />
           <span className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-stone-900 backdrop-blur">
             <Video className="h-3.5 w-3.5 text-amber-600" />
-            {video.category || t('videos.cardLabel', 'Video')}
+            {categoryLabel}
           </span>
           {duration && (
             <span className="absolute bottom-4 right-4 rounded-md bg-stone-950/80 px-2 py-1 text-xs font-semibold text-white">

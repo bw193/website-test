@@ -66,7 +66,7 @@ export default function Videos() {
     const matchesCat = activeCat ? video.category === activeCat : true;
     const q = query.trim().toLowerCase();
     const matchesQuery = q
-      ? `${video.title} ${video.excerpt} ${video.category || ''} ${(video.tags || []).join(' ')}`
+      ? `${video.title} ${video.excerpt} ${video.category || ''} ${(video.tags || []).join(' ')} ${video.search_text || ''}`
           .toLowerCase()
           .includes(q)
       : true;
@@ -148,7 +148,7 @@ export default function Videos() {
                       activeCat === cat ? 'bg-stone-900 text-white' : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
                     }`}
                   >
-                    {cat}
+                    {t(`videos.categories.${cat}`, cat)}
                   </button>
                 ))}
               </div>

@@ -94,6 +94,7 @@ export function localizeVideo(post: VideoPost, lang: string): LocalizedVideoPost
     body: pickLocalized(post.body, lang),
     seo_title: pickLocalized(post.seo_title, lang) || undefined,
     seo_description: pickLocalized(post.seo_description, lang) || undefined,
+    search_text: rawVideoSearchText(post),
   };
 }
 
@@ -111,6 +112,7 @@ export function toVideoListItem(post: VideoPost, lang: string): VideoListItem {
     published_at: post.published_at ?? null,
     title: pickLocalized(post.title, lang),
     excerpt: pickLocalized(post.excerpt, lang),
+    search_text: rawVideoSearchText(post),
   };
 }
 
@@ -157,7 +159,7 @@ function overlapScore(a: Set<string>, b: Set<string>): number {
 }
 
 function scoreProductForVideo(video: LocalizedVideoPost | VideoListItem, product: ProductRecommendationInput): number {
-  const videoTokens = tokenize(video.title, video.excerpt, video.category || '', ...(video.tags || []));
+  const videoTokens = tokenize(video.title, video.excerpt, video.category || '', video.search_text || '', ...(video.tags || []));
   const productTokens = tokenize(product.title, product.description || '', product.category || '');
   let score = overlapScore(videoTokens, productTokens);
   if (video.category && product.category && video.category.toLowerCase() === product.category.toLowerCase()) {

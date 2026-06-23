@@ -37,6 +37,9 @@ const loadLanguage = async (lng: string) => {
   if (code !== 'en' && localeLoaders[code] && !i18n.hasResourceBundle(code, 'translation')) {
     const resources = await localeLoaders[code]();
     i18n.addResourceBundle(code, 'translation', resources.translation, true, true);
+    if (i18n.language.split('-')[0] === code) {
+      await i18n.changeLanguage(code);
+    }
   }
 };
 

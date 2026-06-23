@@ -5,9 +5,19 @@ export const it = {
       catalog: "Catalogo",
       ourStory: "La Nostra Storia",
       blog: "Blog",
+      videos: "Video",
       adminDashboard: "Pannello di Controllo",
       logout: "Esci",
       employeeLogin: "Accesso Dipendenti"
+    },
+    footer: {
+      description: "Produttore ed esportatore di specchi premium. Forniamo specchi da toeletta moderni e di alta qualità ad aziende in tutto il mondo.",
+      contact: "Contatti",
+      quickLinks: "Link rapidi",
+      rights: "Tutti i diritti riservati."
+    },
+    accessibility: {
+      skipToContent: "Vai al contenuto"
     },
     ourStoryPage: {
       title: "La Nostra Storia",
@@ -148,7 +158,8 @@ export const it = {
       submitRfq: "Invia RFQ",
       submitting: "Invio in corso...",
       rfqSuccess: "RFQ inviata con successo! Ti contatteremo presto.",
-      rfqError: "Impossibile inviare la RFQ. Riprova."
+      rfqError: "Impossibile inviare la RFQ. Riprova.",
+      relatedVideos: "Video correlati"
     },
     blog: {
       metaTitle: "The BOLEN Journal | Approfondimenti su Specchi LED e Smart",
@@ -171,6 +182,34 @@ export const it = {
       notFound: "Articolo non trovato",
       backToJournal: "Torna al Journal",
       relatedProducts: "Prodotti dell'articolo"
+    },
+    videos: {
+      metaTitle: "Video BOLEN Mirror | Demo prodotto e tour della fabbrica",
+      metaDescription: "Guarda demo dei prodotti BOLEN, tour della fabbrica, clip di installazione e video sulle funzioni degli specchi LED smart.",
+      kicker: "La prova del prodotto in movimento",
+      titleLead: "Video",
+      titleAccent: "BOLEN",
+      intro: "Scopri specchi LED, funzioni smart, processi di fabbrica e dettagli di installazione prima di specificare un prodotto.",
+      search: "Cerca video...",
+      allVideos: "Tutti i video",
+      empty: "Nessun video pubblicato ancora. Torna presto.",
+      cardLabel: "Video",
+      latest: "Recente",
+      notFound: "Video non trovato",
+      backToVideos: "Torna ai video",
+      ctaTitle: "Ti serve questo specchio per la tua linea?",
+      ctaDesc: "Invia il clip o il riferimento prodotto a BOLEN e il nostro team potrà quotare opzioni OEM/ODM, imballaggio e tempi di consegna.",
+      ctaQuote: "Richiedi un preventivo",
+      ctaCatalog: "Vedi prodotti",
+      relatedProducts: "Prodotti correlati",
+      relatedVideos: "Altri video",
+      viewAll: "Vedi tutto",
+      categories: {
+        "Factory Tour": "Tour della fabbrica",
+        "Product Demo": "Demo prodotto",
+        "Installation": "Installazione",
+        "Smart Features": "Funzioni smart"
+      }
     },
     admin: {
       dashboard: {

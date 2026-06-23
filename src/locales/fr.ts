@@ -5,9 +5,19 @@ export const fr = {
       catalog: "Catalogue",
       ourStory: "Notre Histoire",
       blog: "Journal",
+      videos: "Vidéos",
       adminDashboard: "Tableau de Bord",
       logout: "Déconnexion",
       employeeLogin: "Connexion Employé"
+    },
+    footer: {
+      description: "Fabricant et exportateur de miroirs haut de gamme. Nous fournissons des miroirs de toilette modernes et de qualité aux entreprises du monde entier.",
+      contact: "Contact",
+      quickLinks: "Liens rapides",
+      rights: "Tous droits réservés."
+    },
+    accessibility: {
+      skipToContent: "Aller au contenu"
     },
     ourStoryPage: {
       title: "Notre Histoire",
@@ -148,7 +158,8 @@ export const fr = {
       submitRfq: "Soumettre RFQ",
       submitting: "Soumission...",
       rfqSuccess: "RFQ soumis avec succès ! Nous vous contacterons bientôt.",
-      rfqError: "Échec de la soumission du RFQ. Veuillez réessayer."
+      rfqError: "Échec de la soumission du RFQ. Veuillez réessayer.",
+      relatedVideos: "Vidéos associées"
     },
     blog: {
       metaTitle: "The BOLEN Journal | Perspectives sur les Miroirs LED et Intelligents",
@@ -171,6 +182,34 @@ export const fr = {
       notFound: "Article introuvable",
       backToJournal: "Retour au Journal",
       relatedProducts: "Produits de cet article"
+    },
+    videos: {
+      metaTitle: "Vidéos BOLEN Mirror | Démonstrations produit et visites d'usine",
+      metaDescription: "Regardez les démonstrations de produits BOLEN, les visites d'usine, les clips d'installation et les vidéos de fonctionnalités des miroirs LED intelligents.",
+      kicker: "La preuve produit en mouvement",
+      titleLead: "Vidéos",
+      titleAccent: "BOLEN",
+      intro: "Découvrez les miroirs LED, les fonctions intelligentes, les processus d'usine et les détails d'installation avant de choisir un produit.",
+      search: "Rechercher des vidéos...",
+      allVideos: "Toutes les vidéos",
+      empty: "Aucune vidéo publiée pour le moment. Revenez bientôt.",
+      cardLabel: "Vidéo",
+      latest: "Récent",
+      notFound: "Vidéo introuvable",
+      backToVideos: "Retour aux vidéos",
+      ctaTitle: "Besoin de ce miroir pour votre gamme ?",
+      ctaDesc: "Envoyez le clip ou la référence produit à BOLEN et notre équipe pourra chiffrer les options OEM/ODM, l'emballage et le délai.",
+      ctaQuote: "Demander un devis",
+      ctaCatalog: "Voir les produits",
+      relatedProducts: "Produits associés",
+      relatedVideos: "Plus de vidéos",
+      viewAll: "Voir tout",
+      categories: {
+        "Factory Tour": "Visite d'usine",
+        "Product Demo": "Démonstration produit",
+        "Installation": "Installation",
+        "Smart Features": "Fonctions intelligentes"
+      }
     },
     admin: {
       dashboard: {

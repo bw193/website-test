@@ -8,14 +8,62 @@ const PUBLISHER = {
   logo: 'https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/logo.png',
 };
 
+const SCHEMA_COPY: Record<string, { home: string; videos: string; indexName: string; indexDescription: string }> = {
+  en: {
+    home: 'Home',
+    videos: 'Videos',
+    indexName: 'BOLEN Mirror Video Library',
+    indexDescription:
+      'Product videos, factory walkthroughs, and installation demos for BOLEN LED, smart, vanity, and bath mirrors.',
+  },
+  zh: {
+    home: '首页',
+    videos: '视频',
+    indexName: 'BOLEN 镜业视频库',
+    indexDescription: 'BOLEN LED 镜、智能镜、化妆镜和浴室镜的产品视频、工厂实拍和安装演示。',
+  },
+  es: {
+    home: 'Inicio',
+    videos: 'Videos',
+    indexName: 'Biblioteca de videos de BOLEN Mirror',
+    indexDescription:
+      'Videos de producto, recorridos de fábrica y demostraciones de instalación para espejos LED, smart, de tocador y de baño BOLEN.',
+  },
+  fr: {
+    home: 'Accueil',
+    videos: 'Vidéos',
+    indexName: 'Vidéothèque BOLEN Mirror',
+    indexDescription:
+      "Vidéos produit, visites d'usine et démonstrations d'installation pour les miroirs LED, intelligents, de toilette et de salle de bain BOLEN.",
+  },
+  de: {
+    home: 'Startseite',
+    videos: 'Videos',
+    indexName: 'BOLEN Mirror Videobibliothek',
+    indexDescription:
+      'Produktvideos, Werksrundgänge und Installationsdemos für BOLEN LED-, Smart-, Schmink- und Badspiegel.',
+  },
+  it: {
+    home: 'Home',
+    videos: 'Video',
+    indexName: 'Libreria video BOLEN Mirror',
+    indexDescription:
+      'Video prodotto, tour della fabbrica e demo di installazione per specchi BOLEN LED, smart, da toeletta e da bagno.',
+  },
+};
+
+function schemaCopy(lang: string) {
+  return SCHEMA_COPY[lang] || SCHEMA_COPY.en;
+}
+
 export function buildVideoIndexSchema(lang: string): unknown[] {
+  const copy = schemaCopy(lang);
   return [
     {
       '@context': 'https://schema.org',
       '@type': 'CollectionPage',
-      name: 'BOLEN Mirror Video Library',
-      description:
-        'Product videos, factory walkthroughs, and installation demos for BOLEN LED, smart, vanity, and bath mirrors.',
+      name: copy.indexName,
+      description: copy.indexDescription,
       url: `${SITE_URL}/${lang}/videos/`,
       inLanguage: lang,
       publisher: PUBLISHER,
@@ -24,8 +72,8 @@ export function buildVideoIndexSchema(lang: string): unknown[] {
       '@context': 'https://schema.org',
       '@type': 'BreadcrumbList',
       itemListElement: [
-        { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE_URL}/${lang}/` },
-        { '@type': 'ListItem', position: 2, name: 'Videos', item: `${SITE_URL}/${lang}/videos/` },
+        { '@type': 'ListItem', position: 1, name: copy.home, item: `${SITE_URL}/${lang}/` },
+        { '@type': 'ListItem', position: 2, name: copy.videos, item: `${SITE_URL}/${lang}/videos/` },
       ],
     },
   ];
@@ -53,12 +101,13 @@ export function buildVideoObjectSchema(video: LocalizedVideoPost | VideoListItem
 
 export function buildVideoBreadcrumbSchema(video: { slug: string; title: string }, lang: string): Record<string, unknown> {
   const url = `${SITE_URL}/${lang}/videos/${video.slug}/`;
+  const copy = schemaCopy(lang);
   return {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE_URL}/${lang}/` },
-      { '@type': 'ListItem', position: 2, name: 'Videos', item: `${SITE_URL}/${lang}/videos/` },
+      { '@type': 'ListItem', position: 1, name: copy.home, item: `${SITE_URL}/${lang}/` },
+      { '@type': 'ListItem', position: 2, name: copy.videos, item: `${SITE_URL}/${lang}/videos/` },
       { '@type': 'ListItem', position: 3, name: video.title, item: url },
     ],
   };

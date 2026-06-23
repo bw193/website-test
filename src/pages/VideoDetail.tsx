@@ -144,7 +144,9 @@ export default function VideoDetail() {
               transition={{ duration: 0.7, delay: 0.08 }}
             >
               {video.category && (
-                <p className="mb-4 text-xs font-bold uppercase tracking-[0.24em] text-amber-400">{video.category}</p>
+                <p className="mb-4 text-xs font-bold uppercase tracking-[0.24em] text-amber-400">
+                  {t(`videos.categories.${video.category}`, video.category)}
+                </p>
               )}
               <h1 className="font-serif text-4xl leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl">{video.title}</h1>
               <p className="mt-6 text-lg font-light leading-relaxed text-stone-300">{video.excerpt}</p>
@@ -178,30 +180,6 @@ export default function VideoDetail() {
           </div>
         ) : null}
 
-        <div className="mt-12 rounded-3xl bg-stone-900 p-8 text-white md:p-10">
-          <h2 className="font-serif text-2xl md:text-3xl">{t('videos.ctaTitle', 'Need this mirror for your line?')}</h2>
-          <p className="mt-3 max-w-xl text-sm leading-relaxed text-stone-300">
-            {t(
-              'videos.ctaDesc',
-              'Send the clip or product reference to BOLEN and our team can quote OEM/ODM options, packaging, and lead time.'
-            )}
-          </p>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <Link
-              to={lp('/rfq')}
-              className="inline-flex items-center gap-2 rounded-full bg-amber-500 px-5 py-3 text-sm font-semibold text-stone-950 hover:bg-amber-400"
-            >
-              {t('videos.ctaQuote', 'Request a quote')}
-              <ArrowUpRight className="h-4 w-4" />
-            </Link>
-            <Link
-              to={lp('/products')}
-              className="inline-flex items-center gap-2 rounded-full border border-white/25 px-5 py-3 text-sm font-semibold hover:bg-white/10"
-            >
-              {t('videos.ctaCatalog', 'Browse products')}
-            </Link>
-          </div>
-        </div>
       </div>
 
       {relatedProducts.length > 0 && (
@@ -247,6 +225,35 @@ export default function VideoDetail() {
           </div>
         </section>
       )}
+
+      <section className="border-t border-stone-200 bg-[#FAF9F6]">
+        <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-8">
+          <div className="rounded-3xl bg-stone-900 p-8 text-white md:p-10">
+            <h2 className="font-serif text-2xl md:text-3xl">{t('videos.ctaTitle', 'Need this mirror for your line?')}</h2>
+            <p className="mt-3 max-w-xl text-sm leading-relaxed text-stone-300">
+              {t(
+                'videos.ctaDesc',
+                'Send the clip or product reference to BOLEN and our team can quote OEM/ODM options, packaging, and lead time.'
+              )}
+            </p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Link
+                to={lp('/rfq')}
+                className="inline-flex items-center gap-2 rounded-full bg-amber-500 px-5 py-3 text-sm font-semibold text-stone-950 hover:bg-amber-400"
+              >
+                {t('videos.ctaQuote', 'Request a quote')}
+                <ArrowUpRight className="h-4 w-4" />
+              </Link>
+              <Link
+                to={lp('/products')}
+                className="inline-flex items-center gap-2 rounded-full border border-white/25 px-5 py-3 text-sm font-semibold hover:bg-white/10"
+              >
+                {t('videos.ctaCatalog', 'Browse products')}
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
     </article>
   );
 }

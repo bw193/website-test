@@ -5,6 +5,7 @@
 
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ScrollToTop from './components/ScrollToTop';
@@ -47,12 +48,14 @@ const PageLoader = () => (
 );
 
 export default function App() {
+  const { t } = useTranslation();
+
   return (
       <Router>
         <ScrollToTop />
         <div className="min-h-screen flex flex-col font-sans text-gray-900 bg-gray-50">
           <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100] focus:bg-amber-500 focus:text-white focus:px-4 focus:py-2 focus:rounded-md focus:text-sm focus:font-medium">
-            Skip to content
+            {t('accessibility.skipToContent', 'Skip to content')}
           </a>
           {!hasSupabaseConfig && (
             <div className="bg-amber-600 text-white text-center py-2 px-4 text-sm font-medium">

@@ -5,9 +5,19 @@ export const es = {
       catalog: "Catálogo",
       ourStory: "Nuestra Historia",
       blog: "Blog",
+      videos: "Videos",
       adminDashboard: "Panel de Administración",
       logout: "Cerrar sesión",
       employeeLogin: "Acceso Empleados"
+    },
+    footer: {
+      description: "Fabricante y exportador de espejos premium. Suministramos espejos de tocador modernos y de alta calidad a empresas de todo el mundo.",
+      contact: "Contacto",
+      quickLinks: "Enlaces rápidos",
+      rights: "Todos los derechos reservados."
+    },
+    accessibility: {
+      skipToContent: "Saltar al contenido"
     },
     ourStoryPage: {
       title: "Nuestra Historia",
@@ -148,7 +158,8 @@ export const es = {
       submitRfq: "Enviar RFQ",
       submitting: "Enviando...",
       rfqSuccess: "¡RFQ enviado con éxito! Nos pondremos en contacto con usted pronto.",
-      rfqError: "Error al enviar RFQ. Por favor, inténtelo de nuevo."
+      rfqError: "Error al enviar RFQ. Por favor, inténtelo de nuevo.",
+      relatedVideos: "Videos relacionados"
     },
     blog: {
       metaTitle: "The BOLEN Journal | Perspectivas sobre Espejos LED e Inteligentes",
@@ -171,6 +182,34 @@ export const es = {
       notFound: "Artículo no encontrado",
       backToJournal: "Volver al Journal",
       relatedProducts: "Productos de este artículo"
+    },
+    videos: {
+      metaTitle: "Videos de BOLEN Mirror | Demostraciones de producto y recorridos de fábrica",
+      metaDescription: "Vea demostraciones de productos BOLEN, recorridos de fábrica, clips de instalación y videos de funciones de espejos LED inteligentes.",
+      kicker: "Prueba del producto en movimiento",
+      titleLead: "Videos de",
+      titleAccent: "BOLEN",
+      intro: "Vea espejos LED, funciones inteligentes, procesos de fábrica y detalles de instalación antes de especificar un producto.",
+      search: "Buscar videos...",
+      allVideos: "Todos los videos",
+      empty: "Aún no hay videos publicados. Vuelva pronto.",
+      cardLabel: "Video",
+      latest: "Reciente",
+      notFound: "Video no encontrado",
+      backToVideos: "Volver a videos",
+      ctaTitle: "¿Necesita este espejo para su línea?",
+      ctaDesc: "Envíe el video o la referencia del producto a BOLEN y nuestro equipo podrá cotizar opciones OEM/ODM, embalaje y plazo de entrega.",
+      ctaQuote: "Solicitar presupuesto",
+      ctaCatalog: "Ver productos",
+      relatedProducts: "Productos relacionados",
+      relatedVideos: "Más videos",
+      viewAll: "Ver todo",
+      categories: {
+        "Factory Tour": "Recorrido de fábrica",
+        "Product Demo": "Demostración de producto",
+        "Installation": "Instalación",
+        "Smart Features": "Funciones inteligentes"
+      }
     },
     admin: {
       dashboard: {

@@ -10,6 +10,15 @@ export const en = {
       logout: "Logout",
       employeeLogin: "Employee Login"
     },
+    footer: {
+      description: "Premium mirror manufacturer and exporter. Supplying high-quality, modern vanity mirrors to businesses worldwide.",
+      contact: "Contact",
+      quickLinks: "Quick Links",
+      rights: "All rights reserved."
+    },
+    accessibility: {
+      skipToContent: "Skip to content"
+    },
     ourStoryPage: {
       title: "Our Story",
       subtitle: "Jiaxing Chengtai Mirror Co., Ltd.",
@@ -194,7 +203,13 @@ export const en = {
       ctaCatalog: "Browse products",
       relatedProducts: "Related products",
       relatedVideos: "More videos",
-      viewAll: "View all"
+      viewAll: "View all",
+      categories: {
+        "Factory Tour": "Factory Tour",
+        "Product Demo": "Product Demo",
+        "Installation": "Installation",
+        "Smart Features": "Smart Features"
+      }
     },
     admin: {
       blog: {

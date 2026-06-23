@@ -5,9 +5,19 @@ export const zh = {
       catalog: "产品目录",
       ourStory: "我们的故事",
       blog: "博客",
+      videos: "视频",
       adminDashboard: "管理后台",
       logout: "退出登录",
       employeeLogin: "员工登录"
+    },
+    footer: {
+      description: "高端镜子制造商与出口商，为全球企业供应高品质现代化妆镜。",
+      contact: "联系方式",
+      quickLinks: "快速链接",
+      rights: "版权所有。"
+    },
+    accessibility: {
+      skipToContent: "跳到主要内容"
     },
     ourStoryPage: {
       title: "我们的故事",
@@ -148,7 +158,8 @@ export const zh = {
       submitRfq: "提交 RFQ",
       submitting: "提交中...",
       rfqSuccess: "RFQ 提交成功！我们将尽快与您联系。",
-      rfqError: "提交 RFQ 失败。请重试。"
+      rfqError: "提交 RFQ 失败。请重试。",
+      relatedVideos: "相关视频"
     },
     blog: {
       metaTitle: "BOLEN 博客 | LED 与智能镜行业洞察",
@@ -171,6 +182,34 @@ export const zh = {
       notFound: "未找到文章",
       backToJournal: "返回博客",
       relatedProducts: "本文相关产品"
+    },
+    videos: {
+      metaTitle: "BOLEN 镜业视频 | 产品演示与工厂实拍",
+      metaDescription: "观看 BOLEN 镜子的产品演示、工厂实拍、安装片段以及 LED 智能镜功能视频。",
+      kicker: "动态呈现产品实力",
+      titleLead: "BOLEN",
+      titleAccent: "视频",
+      intro: "在选型前，了解 LED 镜、智能功能、工厂流程和安装细节。",
+      search: "搜索视频...",
+      allVideos: "全部视频",
+      empty: "暂无已发布视频，请稍后再来。",
+      cardLabel: "视频",
+      latest: "最新",
+      notFound: "未找到视频",
+      backToVideos: "返回视频",
+      ctaTitle: "这款镜子适合您的产品线吗？",
+      ctaDesc: "把视频或产品参考发给 BOLEN，我们的团队可以为您提供 OEM/ODM 选项、包装和交期报价。",
+      ctaQuote: "请求报价",
+      ctaCatalog: "浏览产品",
+      relatedProducts: "相关产品",
+      relatedVideos: "更多视频",
+      viewAll: "查看全部",
+      categories: {
+        "Factory Tour": "工厂实拍",
+        "Product Demo": "产品演示",
+        "Installation": "安装演示",
+        "Smart Features": "智能功能"
+      }
     },
     admin: {
       dashboard: {

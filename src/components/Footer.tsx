@@ -1,11 +1,13 @@
 import React from 'react';
 import { Mail, Phone, MapPin, Sparkles } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useLocalizedPath } from '../hooks/useLocalizedPath';
 
 export default function Footer() {
   const location = useLocation();
   const { lp } = useLocalizedPath();
+  const { t } = useTranslation();
   if (location.pathname.endsWith('/our-story')) {
     return null;
   }
@@ -21,11 +23,14 @@ export default function Footer() {
             </div>
             <p className="text-stone-400 text-sm">
               Jiaxing Chengtai Mirror Co., Ltd.<br/>
-              Premium mirror manufacturer and exporter. Supplying high-quality, modern vanity mirrors to businesses worldwide.
+              {t(
+                'footer.description',
+                'Premium mirror manufacturer and exporter. Supplying high-quality, modern vanity mirrors to businesses worldwide.'
+              )}
             </p>
           </div>
           <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wider mb-4 text-amber-500">Contact</h3>
+            <h3 className="text-sm font-semibold uppercase tracking-wider mb-4 text-amber-500">{t('footer.contact', 'Contact')}</h3>
             <ul className="space-y-2 text-stone-400 text-sm">
               <li className="flex items-center gap-2"><Mail className="h-4 w-4" /> bolen2@cnjxctm.com</li>
               <li className="flex items-center gap-2"><Phone className="h-4 w-4" /> +86 18058603602</li>
@@ -33,18 +38,18 @@ export default function Footer() {
             </ul>
           </div>
           <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wider mb-4 text-amber-500">Quick Links</h3>
+            <h3 className="text-sm font-semibold uppercase tracking-wider mb-4 text-amber-500">{t('footer.quickLinks', 'Quick Links')}</h3>
             <ul className="space-y-2 text-stone-400 text-sm">
-              <li><Link to={lp('/products')} className="hover:text-white transition-colors">Product Catalog</Link></li>
-              <li><Link to={lp('/our-story')} className="hover:text-white transition-colors">Our Story</Link></li>
-              <li><Link to={lp('/blog')} className="hover:text-white transition-colors">Journal</Link></li>
-              <li><Link to={lp('/videos')} className="hover:text-white transition-colors">Videos</Link></li>
-              <li><Link to={lp('/rfq')} className="hover:text-white transition-colors">Request a Quote</Link></li>
+              <li><Link to={lp('/products')} className="hover:text-white transition-colors">{t('navbar.catalog', 'Product Catalog')}</Link></li>
+              <li><Link to={lp('/our-story')} className="hover:text-white transition-colors">{t('navbar.ourStory', 'Our Story')}</Link></li>
+              <li><Link to={lp('/blog')} className="hover:text-white transition-colors">{t('navbar.blog', 'Journal')}</Link></li>
+              <li><Link to={lp('/videos')} className="hover:text-white transition-colors">{t('navbar.videos', 'Videos')}</Link></li>
+              <li><Link to={lp('/rfq')} className="hover:text-white transition-colors">{t('blog.ctaQuote', 'Request a quote')}</Link></li>
             </ul>
           </div>
         </div>
         <div className="mt-8 border-t border-stone-800 pt-8 text-center text-sm text-stone-500">
-          &copy; {new Date().getFullYear()} Jiaxing Chengtai Mirror Co., Ltd. (Brand: BOLEN). All rights reserved.
+          &copy; {new Date().getFullYear()} Jiaxing Chengtai Mirror Co., Ltd. (Brand: BOLEN). {t('footer.rights', 'All rights reserved.')}
         </div>
       </div>
     </footer>

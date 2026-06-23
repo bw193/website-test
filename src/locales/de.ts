@@ -5,9 +5,19 @@ export const de = {
       catalog: "Katalog",
       ourStory: "Unsere Geschichte",
       blog: "Journal",
+      videos: "Videos",
       adminDashboard: "Admin-Dashboard",
       logout: "Abmelden",
       employeeLogin: "Mitarbeiter-Login"
+    },
+    footer: {
+      description: "Premium-Spiegelhersteller und Exporteur. Wir liefern hochwertige, moderne Schminkspiegel an Unternehmen weltweit.",
+      contact: "Kontakt",
+      quickLinks: "Schnelllinks",
+      rights: "Alle Rechte vorbehalten."
+    },
+    accessibility: {
+      skipToContent: "Zum Inhalt springen"
     },
     ourStoryPage: {
       title: "Unsere Geschichte",
@@ -148,7 +158,8 @@ export const de = {
       submitRfq: "RFQ senden",
       submitting: "Wird gesendet...",
       rfqSuccess: "RFQ erfolgreich gesendet! Wir werden uns in Kürze bei Ihnen melden.",
-      rfqError: "Senden der RFQ fehlgeschlagen. Bitte versuchen Sie es erneut."
+      rfqError: "Senden der RFQ fehlgeschlagen. Bitte versuchen Sie es erneut.",
+      relatedVideos: "Ähnliche Videos"
     },
     blog: {
       metaTitle: "The BOLEN Journal | Einblicke zu LED- und Smart-Spiegeln",
@@ -171,6 +182,34 @@ export const de = {
       notFound: "Artikel nicht gefunden",
       backToJournal: "Zurück zum Journal",
       relatedProducts: "Im Artikel vorgestellt"
+    },
+    videos: {
+      metaTitle: "BOLEN Mirror Videos | Produktdemos und Werksrundgänge",
+      metaDescription: "Sehen Sie BOLEN Produktdemos, Werksrundgänge, Installationsclips und Funktionsvideos zu LED- und Smart-Spiegeln.",
+      kicker: "Produktnachweis in Bewegung",
+      titleLead: "BOLEN",
+      titleAccent: "Videos",
+      intro: "Sehen Sie LED-Spiegel, Smart-Funktionen, Fertigungsprozesse und Installationsdetails, bevor Sie ein Produkt spezifizieren.",
+      search: "Videos suchen...",
+      allVideos: "Alle Videos",
+      empty: "Noch keine Videos veröffentlicht. Schauen Sie bald wieder vorbei.",
+      cardLabel: "Video",
+      latest: "Neu",
+      notFound: "Video nicht gefunden",
+      backToVideos: "Zurück zu Videos",
+      ctaTitle: "Benötigen Sie diesen Spiegel für Ihre Produktlinie?",
+      ctaDesc: "Senden Sie den Clip oder die Produktreferenz an BOLEN. Unser Team kann OEM/ODM-Optionen, Verpackung und Lieferzeit kalkulieren.",
+      ctaQuote: "Angebot anfordern",
+      ctaCatalog: "Produkte ansehen",
+      relatedProducts: "Ähnliche Produkte",
+      relatedVideos: "Weitere Videos",
+      viewAll: "Alle ansehen",
+      categories: {
+        "Factory Tour": "Werksrundgang",
+        "Product Demo": "Produktdemo",
+        "Installation": "Installation",
+        "Smart Features": "Smart-Funktionen"
+      }
     },
     admin: {
       dashboard: {

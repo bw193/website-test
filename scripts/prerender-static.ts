@@ -1217,54 +1217,52 @@ const VIDEO_COPY: Record<
     relatedProducts: 'Related products',
   },
   zh: {
-    metaTitle: 'BOLEN Mirror Videos | Product Demos & Factory Walkthroughs',
-    metaDesc:
-      'Watch BOLEN mirror product demos, factory walkthroughs, installation clips, and LED smart mirror feature videos.',
-    h1: 'BOLEN Videos',
-    intro:
-      'See LED mirrors, smart features, factory processes, and installation details before you specify a product.',
-    videos: 'Videos',
-    relatedProducts: 'Related products',
+    metaTitle: 'BOLEN 镜业视频 | 产品演示与工厂实拍',
+    metaDesc: '观看 BOLEN 镜子的产品演示、工厂实拍、安装片段以及 LED 智能镜功能视频。',
+    h1: 'BOLEN 视频',
+    intro: '在选型前，了解 LED 镜、智能功能、工厂流程和安装细节。',
+    videos: '视频',
+    relatedProducts: '相关产品',
   },
   es: {
-    metaTitle: 'BOLEN Mirror Videos | Product Demos & Factory Walkthroughs',
+    metaTitle: 'Videos de BOLEN Mirror | Demostraciones de producto y recorridos de fábrica',
     metaDesc:
-      'Watch BOLEN mirror product demos, factory walkthroughs, installation clips, and LED smart mirror feature videos.',
-    h1: 'BOLEN Videos',
+      'Vea demostraciones de productos BOLEN, recorridos de fábrica, clips de instalación y videos de funciones de espejos LED inteligentes.',
+    h1: 'Videos de BOLEN',
     intro:
-      'See LED mirrors, smart features, factory processes, and installation details before you specify a product.',
+      'Vea espejos LED, funciones inteligentes, procesos de fábrica y detalles de instalación antes de especificar un producto.',
     videos: 'Videos',
-    relatedProducts: 'Related products',
+    relatedProducts: 'Productos relacionados',
   },
   fr: {
-    metaTitle: 'BOLEN Mirror Videos | Product Demos & Factory Walkthroughs',
+    metaTitle: "Vidéos BOLEN Mirror | Démonstrations produit et visites d'usine",
     metaDesc:
-      'Watch BOLEN mirror product demos, factory walkthroughs, installation clips, and LED smart mirror feature videos.',
-    h1: 'BOLEN Videos',
+      "Regardez les démonstrations de produits BOLEN, les visites d'usine, les clips d'installation et les vidéos de fonctionnalités des miroirs LED intelligents.",
+    h1: 'Vidéos BOLEN',
     intro:
-      'See LED mirrors, smart features, factory processes, and installation details before you specify a product.',
-    videos: 'Videos',
-    relatedProducts: 'Related products',
+      "Découvrez les miroirs LED, les fonctions intelligentes, les processus d'usine et les détails d'installation avant de choisir un produit.",
+    videos: 'Vidéos',
+    relatedProducts: 'Produits associés',
   },
   de: {
-    metaTitle: 'BOLEN Mirror Videos | Product Demos & Factory Walkthroughs',
+    metaTitle: 'BOLEN Mirror Videos | Produktdemos und Werksrundgänge',
     metaDesc:
-      'Watch BOLEN mirror product demos, factory walkthroughs, installation clips, and LED smart mirror feature videos.',
+      'Sehen Sie BOLEN Produktdemos, Werksrundgänge, Installationsclips und Funktionsvideos zu LED- und Smart-Spiegeln.',
     h1: 'BOLEN Videos',
     intro:
-      'See LED mirrors, smart features, factory processes, and installation details before you specify a product.',
+      'Sehen Sie LED-Spiegel, Smart-Funktionen, Fertigungsprozesse und Installationsdetails, bevor Sie ein Produkt spezifizieren.',
     videos: 'Videos',
-    relatedProducts: 'Related products',
+    relatedProducts: 'Ähnliche Produkte',
   },
   it: {
-    metaTitle: 'BOLEN Mirror Videos | Product Demos & Factory Walkthroughs',
+    metaTitle: 'Video BOLEN Mirror | Demo prodotto e tour della fabbrica',
     metaDesc:
-      'Watch BOLEN mirror product demos, factory walkthroughs, installation clips, and LED smart mirror feature videos.',
-    h1: 'BOLEN Videos',
+      'Guarda demo dei prodotti BOLEN, tour della fabbrica, clip di installazione e video sulle funzioni degli specchi LED smart.',
+    h1: 'Video BOLEN',
     intro:
-      'See LED mirrors, smart features, factory processes, and installation details before you specify a product.',
-    videos: 'Videos',
-    relatedProducts: 'Related products',
+      'Scopri specchi LED, funzioni smart, processi di fabbrica e dettagli di installazione prima di specificare un prodotto.',
+    videos: 'Video',
+    relatedProducts: 'Prodotti correlati',
   },
 };
 

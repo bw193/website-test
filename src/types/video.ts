@@ -45,6 +45,7 @@ export interface LocalizedVideoPost {
   body: string;
   seo_title?: string;
   seo_description?: string;
+  search_text?: string;
 }
 
 export interface VideoListItem {
@@ -60,6 +61,7 @@ export interface VideoListItem {
   published_at?: string | null;
   title: string;
   excerpt: string;
+  search_text?: string;
 }
 
 export interface ProductRecommendationInput {
