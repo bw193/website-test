@@ -11,3 +11,8 @@ lighthouse-*.json
 project_context.md
 website_map.md
 fix_*.cjs
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
