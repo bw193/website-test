@@ -457,9 +457,9 @@ export default function ProductDetail() {
                     {t('videos.viewAll', 'View all')}
                   </Link>
                 </div>
-                <div className="grid grid-cols-1 gap-5">
+                <div className="grid grid-cols-1 gap-3">
                   {relatedVideos.map((video, index) => (
-                    <VideoCard key={video.id} video={video} index={index + 4} />
+                    <VideoCard key={video.id} video={video} index={index + 4} variant="compact" />
                   ))}
                 </div>
               </m.div>

@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../supabase';
-import { Plus, Edit, Trash2, Loader2, Package, Inbox, Users, Check, X, Settings, LogOut, Search, ChevronRight, Archive, BookOpen, Clapperboard } from 'lucide-react';
+import { Plus, Edit, Trash2, Loader2, Package, Inbox, Users, Check, X, Settings, LogOut, Search, ChevronRight, Archive, BookOpen, Clapperboard, RefreshCw } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 import SEO from '../components/SEO';
+import { captureVideoFrame, deriveEmbedThumbnail } from '../utils/videoThumbnail';
+
+const PRODUCT_VIDEO_BUCKET = 'product-videos';
 
 interface Product {
   id: string;
@@ -41,6 +44,10 @@ interface VideoPostRow {
   slug: string;
   status: string;
   source_type?: string | null;
+  video_url?: string | null;
+  embed_url?: string | null;
+  thumbnail_url?: string | null;
+  duration_seconds?: number | null;
   category?: string | null;
   title?: Record<string, string> | null;
 }
@@ -61,6 +68,8 @@ export default function AdminDashboard() {
   const [rfqStartDate, setRfqStartDate] = useState<string>('');
   const [rfqEndDate, setRfqEndDate] = useState<string>('');
   const [productCategoryFilter, setProductCategoryFilter] = useState<string>('all');
+  const [regeneratingVideoId, setRegeneratingVideoId] = useState<string | null>(null);
+  const [regeneratingAllVideos, setRegeneratingAllVideos] = useState(false);
   
   // Stats
   const [stats, setStats] = useState({ products: 0, newRfqs: 0, employees: 0 });
@@ -124,7 +133,7 @@ export default function AdminDashboard() {
       } else if (activeTab === 'videos') {
         const { data, error } = await supabase
           .from('videos')
-          .select('id, slug, status, source_type, category, title')
+          .select('id, slug, status, source_type, video_url, embed_url, thumbnail_url, duration_seconds, category, title')
           .order('created_at', { ascending: false });
         if (error) throw error;
         setVideoPosts(data || []);
@@ -173,6 +182,108 @@ export default function AdminDashboard() {
         console.error("Error deleting video", error);
         alert(t('admin.videos.deleteError', 'Failed to delete video.'));
       }
+    }
+  };
+
+  const uploadVideoThumbnail = async (blob: Blob, slug: string): Promise<string> => {
+    const cleanSlug = slug.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') || 'video';
+    const filePath = `thumbnails/regenerated-${cleanSlug}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.jpg`;
+    const { error } = await supabase.storage.from(PRODUCT_VIDEO_BUCKET).upload(filePath, blob, {
+      cacheControl: '31536000',
+      contentType: 'image/jpeg',
+      upsert: false,
+    });
+    if (error) throw error;
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from(PRODUCT_VIDEO_BUCKET).getPublicUrl(filePath);
+    return publicUrl;
+  };
+
+  const regenerateVideoThumbnail = async (post: VideoPostRow): Promise<void> => {
+    const sourceUrl = post.video_url || post.embed_url || '';
+    if (!sourceUrl) throw new Error('This video has no source URL.');
+
+    let thumbnailUrl = '';
+    let durationSeconds = post.duration_seconds ?? null;
+
+    if (post.source_type === 'embed') {
+      thumbnailUrl = await deriveEmbedThumbnail(sourceUrl);
+      if (!thumbnailUrl) throw new Error('Could not derive a thumbnail for this embedded video.');
+    } else {
+      const snapshot = await captureVideoFrame(sourceUrl);
+      thumbnailUrl = await uploadVideoThumbnail(snapshot.thumbnail, post.slug);
+      durationSeconds = snapshot.durationSeconds ?? durationSeconds;
+    }
+
+    const updatePayload: { thumbnail_url: string; duration_seconds?: number | null } = {
+      thumbnail_url: thumbnailUrl,
+    };
+    if (durationSeconds !== null) updatePayload.duration_seconds = durationSeconds;
+
+    const { error } = await supabase.from('videos').update(updatePayload).eq('id', post.id);
+    if (error) throw error;
+
+    setVideoPosts((current) =>
+      current.map((item) =>
+        item.id === post.id ? { ...item, thumbnail_url: thumbnailUrl, duration_seconds: durationSeconds ?? item.duration_seconds } : item
+      )
+    );
+  };
+
+  const handleRegenerateVideoThumbnail = async (post: VideoPostRow) => {
+    setRegeneratingVideoId(post.id);
+    try {
+      await regenerateVideoThumbnail(post);
+      alert(t('admin.videos.thumbnailRegenerated', 'Thumbnail regenerated.'));
+    } catch (error) {
+      console.error('Error regenerating video thumbnail', error);
+      alert(error instanceof Error ? error.message : t('admin.videos.thumbnailRegenerateError', 'Failed to regenerate thumbnail.'));
+    } finally {
+      setRegeneratingVideoId(null);
+    }
+  };
+
+  const handleRegenerateAllVideoThumbnails = async () => {
+    const candidates = videoPosts.filter((post) => post.video_url || post.embed_url);
+    if (!candidates.length) {
+      alert(t('admin.videos.noRegeneratableVideos', 'No videos with source URLs found.'));
+      return;
+    }
+    if (
+      !window.confirm(
+        t(
+          'admin.videos.regenerateAllConfirm',
+          `Regenerate thumbnails for ${candidates.length} videos? This uploads new JPG thumbnails and updates the video records.`
+        )
+      )
+    ) {
+      return;
+    }
+
+    setRegeneratingAllVideos(true);
+    let successCount = 0;
+    let failureCount = 0;
+    try {
+      for (const post of candidates) {
+        setRegeneratingVideoId(post.id);
+        try {
+          await regenerateVideoThumbnail(post);
+          successCount += 1;
+        } catch (error) {
+          failureCount += 1;
+          console.error(`Error regenerating thumbnail for ${post.slug}`, error);
+        }
+      }
+      alert(
+        t(
+          'admin.videos.regenerateAllDone',
+          `Thumbnail regeneration finished. Success: ${successCount}. Failed: ${failureCount}.`
+        )
+      );
+    } finally {
+      setRegeneratingVideoId(null);
+      setRegeneratingAllVideos(false);
     }
   };
 
@@ -376,10 +487,25 @@ export default function AdminDashboard() {
             </Link>
           )}
           {activeTab === 'videos' && (
-            <Link to="/admin/videos/new" className="inline-flex items-center justify-center px-5 py-2.5 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-stone-900 hover:bg-stone-800 transition-colors">
-              <Plus className="h-4 w-4 mr-2" />
-              {t('admin.videos.addVideo', 'Add Video')}
-            </Link>
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <button
+                type="button"
+                onClick={handleRegenerateAllVideoThumbnails}
+                disabled={regeneratingAllVideos || videoPosts.length === 0}
+                className="inline-flex items-center justify-center rounded-xl border border-stone-200 bg-white px-4 py-2.5 text-sm font-medium text-stone-700 shadow-sm transition-colors hover:bg-stone-50 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {regeneratingAllVideos ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                )}
+                {t('admin.videos.regenerateAllThumbnails', 'Regenerate thumbnails')}
+              </button>
+              <Link to="/admin/videos/new" className="inline-flex items-center justify-center px-5 py-2.5 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-stone-900 hover:bg-stone-800 transition-colors">
+                <Plus className="h-4 w-4 mr-2" />
+                {t('admin.videos.addVideo', 'Add Video')}
+              </Link>
+            </div>
           )}
         </div>
 
@@ -506,6 +632,19 @@ export default function AdminDashboard() {
                       </p>
                     </div>
                     <div className="ml-5 flex-shrink-0 flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleRegenerateVideoThumbnail(post)}
+                        disabled={regeneratingAllVideos || regeneratingVideoId === post.id || (!post.video_url && !post.embed_url)}
+                        title={t('admin.videos.regenerateThumbnail', 'Regenerate thumbnail')}
+                        className="p-2 text-stone-400 hover:text-amber-700 hover:bg-amber-50 rounded-lg transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+                      >
+                        {regeneratingVideoId === post.id ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <RefreshCw className="h-4 w-4" />
+                        )}
+                      </button>
                       <Link to={`/admin/videos/${post.id}`} className="p-2 text-stone-400 hover:text-stone-900 hover:bg-stone-100 rounded-lg transition-colors">
                         <Edit className="h-4 w-4" />
                       </Link>

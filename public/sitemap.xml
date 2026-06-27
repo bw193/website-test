@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
   <url>
     <loc>https://bolenmirror.com/en/</loc>
-    <lastmod>2026-06-23</lastmod>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/" />
@@ -15,7 +15,7 @@
   </url>
   <url>
     <loc>https://bolenmirror.com/en/products/</loc>
-    <lastmod>2026-06-23</lastmod>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/products/" />
@@ -28,7 +28,7 @@
   </url>
   <url>
     <loc>https://bolenmirror.com/en/rfq/</loc>
-    <lastmod>2026-06-23</lastmod>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/rfq/" />
@@ -41,7 +41,7 @@
   </url>
   <url>
     <loc>https://bolenmirror.com/en/our-story/</loc>
-    <lastmod>2026-06-23</lastmod>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/our-story/" />
@@ -54,7 +54,7 @@
   </url>
   <url>
     <loc>https://bolenmirror.com/en/blog/</loc>
-    <lastmod>2026-06-23</lastmod>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/blog/" />
@@ -67,7 +67,7 @@
   </url>
   <url>
     <loc>https://bolenmirror.com/en/videos/</loc>
-    <lastmod>2026-06-23</lastmod>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/" />
@@ -1028,10 +1028,144 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://bolenmirror.com/en/blog/the-relationship-between-bolen-mirror-and-jiaxing-chengtai-mirror-co-ltd/" />
   </url>
   <url>
+    <loc>https://bolenmirror.com/en/videos/large-arch-backlit-bathroom-mirror-luxury-wall-mounted-vanity-mirror-with-led-light-anti-fog-ip44-waterproof/</loc>
+    <lastmod>2026-06-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <video:video>
+      <video:thumbnail_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/thumbnails/1782526758014-hi6dvy1.jpg</video:thumbnail_loc>
+      <video:title>Large Arch Backlit Bathroom Mirror – Luxury Wall Mounted Vanity Mirror with LED Light, Anti Fog &amp; IP44 Waterproof</video:title>
+      <video:description>Curve Design Statement Piece for Modern Bathroom Vanity！ Break free from ordinary circular and rectangular designs. This large arched LED mirror captivates with its bold curved silhouette and stunning backlighting effect. Featuring an integrated LED housing design, it offers IP44 rated water resistance and durability, making it a perfect match for all furniture styles.</video:description>
+      <video:content_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/videos/1782526758014-t1n84v7.mp4</video:content_loc>
+      <video:duration>22</video:duration>
+      <video:publication_date>2026-06-27T02:27:53.074Z</video:publication_date>
+    </video:video>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/large-arch-backlit-bathroom-mirror-luxury-wall-mounted-vanity-mirror-with-led-light-anti-fog-ip44-waterproof/" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://bolenmirror.com/zh/videos/large-arch-backlit-bathroom-mirror-luxury-wall-mounted-vanity-mirror-with-led-light-anti-fog-ip44-waterproof/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bolenmirror.com/es/videos/large-arch-backlit-bathroom-mirror-luxury-wall-mounted-vanity-mirror-with-led-light-anti-fog-ip44-waterproof/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bolenmirror.com/fr/videos/large-arch-backlit-bathroom-mirror-luxury-wall-mounted-vanity-mirror-with-led-light-anti-fog-ip44-waterproof/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://bolenmirror.com/de/videos/large-arch-backlit-bathroom-mirror-luxury-wall-mounted-vanity-mirror-with-led-light-anti-fog-ip44-waterproof/" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://bolenmirror.com/it/videos/large-arch-backlit-bathroom-mirror-luxury-wall-mounted-vanity-mirror-with-led-light-anti-fog-ip44-waterproof/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bolenmirror.com/en/videos/large-arch-backlit-bathroom-mirror-luxury-wall-mounted-vanity-mirror-with-led-light-anti-fog-ip44-waterproof/" />
+  </url>
+  <url>
+    <loc>https://bolenmirror.com/en/videos/frameless-oval-backlit-led-bathroom-mirror-with-touch-control-and-digital-display/</loc>
+    <lastmod>2026-06-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <video:video>
+      <video:thumbnail_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/thumbnails/1782527164027-y0ctwxn.jpg</video:thumbnail_loc>
+      <video:title>Frameless Oval Backlit LED Bathroom Mirror with Touch Control and Digital Display</video:title>
+      <video:description>A sleek frameless oval LED bathroom mirror with soft ambient backlighting, touch control, and an integrated digital display. Ideal for modern bathrooms, hotel projects, apartments, and residential vanities.</video:description>
+      <video:content_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/videos/1782527164027-56mt083.mp4</video:content_loc>
+      <video:duration>13</video:duration>
+      <video:publication_date>2026-06-27T02:26:14.935Z</video:publication_date>
+    </video:video>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/frameless-oval-backlit-led-bathroom-mirror-with-touch-control-and-digital-display/" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://bolenmirror.com/zh/videos/frameless-oval-backlit-led-bathroom-mirror-with-touch-control-and-digital-display/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bolenmirror.com/es/videos/frameless-oval-backlit-led-bathroom-mirror-with-touch-control-and-digital-display/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bolenmirror.com/fr/videos/frameless-oval-backlit-led-bathroom-mirror-with-touch-control-and-digital-display/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://bolenmirror.com/de/videos/frameless-oval-backlit-led-bathroom-mirror-with-touch-control-and-digital-display/" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://bolenmirror.com/it/videos/frameless-oval-backlit-led-bathroom-mirror-with-touch-control-and-digital-display/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bolenmirror.com/en/videos/frameless-oval-backlit-led-bathroom-mirror-with-touch-control-and-digital-display/" />
+  </url>
+  <url>
+    <loc>https://bolenmirror.com/en/videos/teardrop-gold-framed-backlit-led-bathroom-mirror-with-touch-control/</loc>
+    <lastmod>2026-06-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <video:video>
+      <video:thumbnail_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/thumbnails/1782526998029-0xvs378.jpg</video:thumbnail_loc>
+      <video:title>Teardrop Gold Framed Backlit LED Bathroom Mirror with Touch Control</video:title>
+      <video:description>A distinctive teardrop shaped LED bathroom mirror featuring a slim gold frame, soft backlighting, and convenient touch control. Ideal for modern vanities, hotels, apartments, and luxury residential projects.</video:description>
+      <video:content_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/videos/1782526998029-qlrf9wq.mp4</video:content_loc>
+      <video:duration>33</video:duration>
+      <video:publication_date>2026-06-27T02:24:05.295Z</video:publication_date>
+    </video:video>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/teardrop-gold-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://bolenmirror.com/zh/videos/teardrop-gold-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bolenmirror.com/es/videos/teardrop-gold-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bolenmirror.com/fr/videos/teardrop-gold-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://bolenmirror.com/de/videos/teardrop-gold-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://bolenmirror.com/it/videos/teardrop-gold-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bolenmirror.com/en/videos/teardrop-gold-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+  </url>
+  <url>
+    <loc>https://bolenmirror.com/en/videos/irregular-wood-framed-backlit-led-bathroom-mirror-with-touch-control/</loc>
+    <lastmod>2026-06-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <video:video>
+      <video:thumbnail_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/thumbnails/1782526774382-y8z8i3u.jpg</video:thumbnail_loc>
+      <video:title>Irregular Wood Framed Backlit LED Bathroom Mirror with Touch Control</video:title>
+      <video:description>Add sculptural style to modern bathrooms with this irregular wood framed LED mirror, featuring soft backlighting and touch control for adjustable illumination.</video:description>
+      <video:content_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/videos/1782526774382-bs0187r.mp4</video:content_loc>
+      <video:duration>26</video:duration>
+      <video:publication_date>2026-06-27T02:19:46.368Z</video:publication_date>
+    </video:video>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/irregular-wood-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://bolenmirror.com/zh/videos/irregular-wood-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bolenmirror.com/es/videos/irregular-wood-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bolenmirror.com/fr/videos/irregular-wood-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://bolenmirror.com/de/videos/irregular-wood-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://bolenmirror.com/it/videos/irregular-wood-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bolenmirror.com/en/videos/irregular-wood-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+  </url>
+  <url>
+    <loc>https://bolenmirror.com/en/videos/round-led-bathroom-mirror-for-wall-backlit-vanity-mirror-with-touch-switch-anti-fog-glass-easy-installation/</loc>
+    <lastmod>2026-06-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <video:video>
+      <video:thumbnail_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/thumbnails/1782526546663-e0rrtbu.jpg</video:thumbnail_loc>
+      <video:title>Round LED Bathroom Mirror for Wall Backlit Vanity Mirror with Touch Switch, Anti Fog Glass &amp; Easy Installation</video:title>
+      <video:description>The built in touch switch makes it easy to turn on/off, while the anti fog function keeps the reflection crystal clear. A perfect blend of functionality and style for any modern bathroom or powder room.</video:description>
+      <video:content_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/videos/1782526546663-bojr8mg.mp4</video:content_loc>
+      <video:duration>29</video:duration>
+      <video:publication_date>2026-06-27T02:16:06.108Z</video:publication_date>
+    </video:video>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/round-led-bathroom-mirror-for-wall-backlit-vanity-mirror-with-touch-switch-anti-fog-glass-easy-installation/" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://bolenmirror.com/zh/videos/round-led-bathroom-mirror-for-wall-backlit-vanity-mirror-with-touch-switch-anti-fog-glass-easy-installation/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bolenmirror.com/es/videos/round-led-bathroom-mirror-for-wall-backlit-vanity-mirror-with-touch-switch-anti-fog-glass-easy-installation/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bolenmirror.com/fr/videos/round-led-bathroom-mirror-for-wall-backlit-vanity-mirror-with-touch-switch-anti-fog-glass-easy-installation/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://bolenmirror.com/de/videos/round-led-bathroom-mirror-for-wall-backlit-vanity-mirror-with-touch-switch-anti-fog-glass-easy-installation/" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://bolenmirror.com/it/videos/round-led-bathroom-mirror-for-wall-backlit-vanity-mirror-with-touch-switch-anti-fog-glass-easy-installation/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bolenmirror.com/en/videos/round-led-bathroom-mirror-for-wall-backlit-vanity-mirror-with-touch-switch-anti-fog-glass-easy-installation/" />
+  </url>
+  <url>
+    <loc>https://bolenmirror.com/en/videos/modern-round-wood-framed-backlit-led-bathroom-mirror-with-touch-sensor/</loc>
+    <lastmod>2026-06-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <video:video>
+      <video:thumbnail_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/thumbnails/1782526262620-xwanp1b.jpg</video:thumbnail_loc>
+      <video:title>Modern Round Wood Framed Backlit LED Bathroom Mirror with Touch Sensor</video:title>
+      <video:description>A modern round bathroom mirror with a dark wood look frame, soft LED backlighting, and convenient touch control—ideal for hotel, residential, and vanity projects.</video:description>
+      <video:content_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/videos/1782526262620-ht1wajl.mp4</video:content_loc>
+      <video:duration>22</video:duration>
+      <video:publication_date>2026-06-27T02:11:27.008Z</video:publication_date>
+    </video:video>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/modern-round-wood-framed-backlit-led-bathroom-mirror-with-touch-sensor/" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://bolenmirror.com/zh/videos/modern-round-wood-framed-backlit-led-bathroom-mirror-with-touch-sensor/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bolenmirror.com/es/videos/modern-round-wood-framed-backlit-led-bathroom-mirror-with-touch-sensor/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bolenmirror.com/fr/videos/modern-round-wood-framed-backlit-led-bathroom-mirror-with-touch-sensor/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://bolenmirror.com/de/videos/modern-round-wood-framed-backlit-led-bathroom-mirror-with-touch-sensor/" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://bolenmirror.com/it/videos/modern-round-wood-framed-backlit-led-bathroom-mirror-with-touch-sensor/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bolenmirror.com/en/videos/modern-round-wood-framed-backlit-led-bathroom-mirror-with-touch-sensor/" />
+  </url>
+  <url>
     <loc>https://bolenmirror.com/en/videos/bolen-source-factory/</loc>
     <lastmod>2026-06-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <video:video>
+      <video:thumbnail_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/thumbnails/1782197285797-ps8tqm2.jpg</video:thumbnail_loc>
+      <video:title>BOLEN Source Factory Video LED Vanity Mirror Manufacturer</video:title>
+      <video:description>Watch BOLEN&apos;s source factory video for a white aluminum framed LED vanity mirror with touch control, wall mounted installation, and OEM/ODM quote support.</video:description>
+      <video:content_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/videos/1782197285797-56dkwd1.mp4</video:content_loc>
+      <video:duration>130</video:duration>
+      <video:publication_date>2026-06-23T06:50:17.814Z</video:publication_date>
+    </video:video>
     <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/bolen-source-factory/" />
     <xhtml:link rel="alternate" hreflang="zh" href="https://bolenmirror.com/zh/videos/bolen-source-factory/" />
     <xhtml:link rel="alternate" hreflang="es" href="https://bolenmirror.com/es/videos/bolen-source-factory/" />
@@ -1045,6 +1179,14 @@
     <lastmod>2026-06-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <video:video>
+      <video:thumbnail_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/thumbnails/1782196009471-t1vdxa6.jpg</video:thumbnail_loc>
+      <video:title>White Aluminum Touch Screen LED Vanity Mirror Video BOLEN</video:title>
+      <video:description>Watch the BOLEN white aluminum framed wall mounted LED vanity mirror video, featuring touch screen controls, seamless styling, and modern bathroom lighting.</video:description>
+      <video:content_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/videos/1782196009471-tygytkz.mp4</video:content_loc>
+      <video:duration>45</video:duration>
+      <video:publication_date>2026-06-23T06:33:18.326Z</video:publication_date>
+    </video:video>
     <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/seamless-white-aluminum-framed-wall-mounted-touch-screen-led-vanity-mirror/" />
     <xhtml:link rel="alternate" hreflang="zh" href="https://bolenmirror.com/zh/videos/seamless-white-aluminum-framed-wall-mounted-touch-screen-led-vanity-mirror/" />
     <xhtml:link rel="alternate" hreflang="es" href="https://bolenmirror.com/es/videos/seamless-white-aluminum-framed-wall-mounted-touch-screen-led-vanity-mirror/" />
@@ -1055,7 +1197,7 @@
   </url>
   <url>
     <loc>https://bolenmirror.com/zh/</loc>
-    <lastmod>2026-06-23</lastmod>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/" />
@@ -1068,7 +1210,7 @@
   </url>
   <url>
     <loc>https://bolenmirror.com/zh/products/</loc>
-    <lastmod>2026-06-23</lastmod>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/products/" />
@@ -1081,7 +1223,7 @@
   </url>
   <url>
     <loc>https://bolenmirror.com/zh/rfq/</loc>
-    <lastmod>2026-06-23</lastmod>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/rfq/" />
@@ -1094,7 +1236,7 @@
   </url>
   <url>
     <loc>https://bolenmirror.com/zh/our-story/</loc>
-    <lastmod>2026-06-23</lastmod>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/our-story/" />
@@ -1107,7 +1249,7 @@
   </url>
   <url>
     <loc>https://bolenmirror.com/zh/blog/</loc>
-    <lastmod>2026-06-23</lastmod>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/blog/" />
@@ -1120,7 +1262,7 @@
   </url>
   <url>
     <loc>https://bolenmirror.com/zh/videos/</loc>
-    <lastmod>2026-06-23</lastmod>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/" />
@@ -2081,10 +2223,144 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://bolenmirror.com/en/blog/the-relationship-between-bolen-mirror-and-jiaxing-chengtai-mirror-co-ltd/" />
   </url>
   <url>
+    <loc>https://bolenmirror.com/zh/videos/large-arch-backlit-bathroom-mirror-luxury-wall-mounted-vanity-mirror-with-led-light-anti-fog-ip44-waterproof/</loc>
+    <lastmod>2026-06-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <video:video>
+      <video:thumbnail_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/thumbnails/1782526758014-hi6dvy1.jpg</video:thumbnail_loc>
+      <video:title>Large Arch Backlit Bathroom Mirror – Luxury Wall Mounted Vanity Mirror with LED Light, Anti Fog &amp; IP44 Waterproof</video:title>
+      <video:description>Curve Design Statement Piece for Modern Bathroom Vanity！ Break free from ordinary circular and rectangular designs. This large arched LED mirror captivates with its bold curved silhouette and stunning backlighting effect. Featuring an integrated LED housing design, it offers IP44 rated water resistance and durability, making it a perfect match for all furniture styles.</video:description>
+      <video:content_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/videos/1782526758014-t1n84v7.mp4</video:content_loc>
+      <video:duration>22</video:duration>
+      <video:publication_date>2026-06-27T02:27:53.074Z</video:publication_date>
+    </video:video>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/large-arch-backlit-bathroom-mirror-luxury-wall-mounted-vanity-mirror-with-led-light-anti-fog-ip44-waterproof/" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://bolenmirror.com/zh/videos/large-arch-backlit-bathroom-mirror-luxury-wall-mounted-vanity-mirror-with-led-light-anti-fog-ip44-waterproof/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bolenmirror.com/es/videos/large-arch-backlit-bathroom-mirror-luxury-wall-mounted-vanity-mirror-with-led-light-anti-fog-ip44-waterproof/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bolenmirror.com/fr/videos/large-arch-backlit-bathroom-mirror-luxury-wall-mounted-vanity-mirror-with-led-light-anti-fog-ip44-waterproof/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://bolenmirror.com/de/videos/large-arch-backlit-bathroom-mirror-luxury-wall-mounted-vanity-mirror-with-led-light-anti-fog-ip44-waterproof/" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://bolenmirror.com/it/videos/large-arch-backlit-bathroom-mirror-luxury-wall-mounted-vanity-mirror-with-led-light-anti-fog-ip44-waterproof/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bolenmirror.com/en/videos/large-arch-backlit-bathroom-mirror-luxury-wall-mounted-vanity-mirror-with-led-light-anti-fog-ip44-waterproof/" />
+  </url>
+  <url>
+    <loc>https://bolenmirror.com/zh/videos/frameless-oval-backlit-led-bathroom-mirror-with-touch-control-and-digital-display/</loc>
+    <lastmod>2026-06-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <video:video>
+      <video:thumbnail_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/thumbnails/1782527164027-y0ctwxn.jpg</video:thumbnail_loc>
+      <video:title>Frameless Oval Backlit LED Bathroom Mirror with Touch Control and Digital Display</video:title>
+      <video:description>A sleek frameless oval LED bathroom mirror with soft ambient backlighting, touch control, and an integrated digital display. Ideal for modern bathrooms, hotel projects, apartments, and residential vanities.</video:description>
+      <video:content_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/videos/1782527164027-56mt083.mp4</video:content_loc>
+      <video:duration>13</video:duration>
+      <video:publication_date>2026-06-27T02:26:14.935Z</video:publication_date>
+    </video:video>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/frameless-oval-backlit-led-bathroom-mirror-with-touch-control-and-digital-display/" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://bolenmirror.com/zh/videos/frameless-oval-backlit-led-bathroom-mirror-with-touch-control-and-digital-display/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bolenmirror.com/es/videos/frameless-oval-backlit-led-bathroom-mirror-with-touch-control-and-digital-display/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bolenmirror.com/fr/videos/frameless-oval-backlit-led-bathroom-mirror-with-touch-control-and-digital-display/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://bolenmirror.com/de/videos/frameless-oval-backlit-led-bathroom-mirror-with-touch-control-and-digital-display/" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://bolenmirror.com/it/videos/frameless-oval-backlit-led-bathroom-mirror-with-touch-control-and-digital-display/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bolenmirror.com/en/videos/frameless-oval-backlit-led-bathroom-mirror-with-touch-control-and-digital-display/" />
+  </url>
+  <url>
+    <loc>https://bolenmirror.com/zh/videos/teardrop-gold-framed-backlit-led-bathroom-mirror-with-touch-control/</loc>
+    <lastmod>2026-06-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <video:video>
+      <video:thumbnail_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/thumbnails/1782526998029-0xvs378.jpg</video:thumbnail_loc>
+      <video:title>Teardrop Gold Framed Backlit LED Bathroom Mirror with Touch Control</video:title>
+      <video:description>A distinctive teardrop shaped LED bathroom mirror featuring a slim gold frame, soft backlighting, and convenient touch control. Ideal for modern vanities, hotels, apartments, and luxury residential projects.</video:description>
+      <video:content_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/videos/1782526998029-qlrf9wq.mp4</video:content_loc>
+      <video:duration>33</video:duration>
+      <video:publication_date>2026-06-27T02:24:05.295Z</video:publication_date>
+    </video:video>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/teardrop-gold-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://bolenmirror.com/zh/videos/teardrop-gold-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bolenmirror.com/es/videos/teardrop-gold-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bolenmirror.com/fr/videos/teardrop-gold-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://bolenmirror.com/de/videos/teardrop-gold-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://bolenmirror.com/it/videos/teardrop-gold-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bolenmirror.com/en/videos/teardrop-gold-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+  </url>
+  <url>
+    <loc>https://bolenmirror.com/zh/videos/irregular-wood-framed-backlit-led-bathroom-mirror-with-touch-control/</loc>
+    <lastmod>2026-06-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <video:video>
+      <video:thumbnail_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/thumbnails/1782526774382-y8z8i3u.jpg</video:thumbnail_loc>
+      <video:title>Irregular Wood Framed Backlit LED Bathroom Mirror with Touch Control</video:title>
+      <video:description>Add sculptural style to modern bathrooms with this irregular wood framed LED mirror, featuring soft backlighting and touch control for adjustable illumination.</video:description>
+      <video:content_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/videos/1782526774382-bs0187r.mp4</video:content_loc>
+      <video:duration>26</video:duration>
+      <video:publication_date>2026-06-27T02:19:46.368Z</video:publication_date>
+    </video:video>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/irregular-wood-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://bolenmirror.com/zh/videos/irregular-wood-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bolenmirror.com/es/videos/irregular-wood-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bolenmirror.com/fr/videos/irregular-wood-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://bolenmirror.com/de/videos/irregular-wood-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://bolenmirror.com/it/videos/irregular-wood-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bolenmirror.com/en/videos/irregular-wood-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+  </url>
+  <url>
+    <loc>https://bolenmirror.com/zh/videos/round-led-bathroom-mirror-for-wall-backlit-vanity-mirror-with-touch-switch-anti-fog-glass-easy-installation/</loc>
+    <lastmod>2026-06-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <video:video>
+      <video:thumbnail_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/thumbnails/1782526546663-e0rrtbu.jpg</video:thumbnail_loc>
+      <video:title>Round LED Bathroom Mirror for Wall Backlit Vanity Mirror with Touch Switch, Anti Fog Glass &amp; Easy Installation</video:title>
+      <video:description>The built in touch switch makes it easy to turn on/off, while the anti fog function keeps the reflection crystal clear. A perfect blend of functionality and style for any modern bathroom or powder room.</video:description>
+      <video:content_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/videos/1782526546663-bojr8mg.mp4</video:content_loc>
+      <video:duration>29</video:duration>
+      <video:publication_date>2026-06-27T02:16:06.108Z</video:publication_date>
+    </video:video>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/round-led-bathroom-mirror-for-wall-backlit-vanity-mirror-with-touch-switch-anti-fog-glass-easy-installation/" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://bolenmirror.com/zh/videos/round-led-bathroom-mirror-for-wall-backlit-vanity-mirror-with-touch-switch-anti-fog-glass-easy-installation/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bolenmirror.com/es/videos/round-led-bathroom-mirror-for-wall-backlit-vanity-mirror-with-touch-switch-anti-fog-glass-easy-installation/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bolenmirror.com/fr/videos/round-led-bathroom-mirror-for-wall-backlit-vanity-mirror-with-touch-switch-anti-fog-glass-easy-installation/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://bolenmirror.com/de/videos/round-led-bathroom-mirror-for-wall-backlit-vanity-mirror-with-touch-switch-anti-fog-glass-easy-installation/" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://bolenmirror.com/it/videos/round-led-bathroom-mirror-for-wall-backlit-vanity-mirror-with-touch-switch-anti-fog-glass-easy-installation/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bolenmirror.com/en/videos/round-led-bathroom-mirror-for-wall-backlit-vanity-mirror-with-touch-switch-anti-fog-glass-easy-installation/" />
+  </url>
+  <url>
+    <loc>https://bolenmirror.com/zh/videos/modern-round-wood-framed-backlit-led-bathroom-mirror-with-touch-sensor/</loc>
+    <lastmod>2026-06-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <video:video>
+      <video:thumbnail_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/thumbnails/1782526262620-xwanp1b.jpg</video:thumbnail_loc>
+      <video:title>Modern Round Wood Framed Backlit LED Bathroom Mirror with Touch Sensor</video:title>
+      <video:description>A modern round bathroom mirror with a dark wood look frame, soft LED backlighting, and convenient touch control—ideal for hotel, residential, and vanity projects.</video:description>
+      <video:content_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/videos/1782526262620-ht1wajl.mp4</video:content_loc>
+      <video:duration>22</video:duration>
+      <video:publication_date>2026-06-27T02:11:27.008Z</video:publication_date>
+    </video:video>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/modern-round-wood-framed-backlit-led-bathroom-mirror-with-touch-sensor/" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://bolenmirror.com/zh/videos/modern-round-wood-framed-backlit-led-bathroom-mirror-with-touch-sensor/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bolenmirror.com/es/videos/modern-round-wood-framed-backlit-led-bathroom-mirror-with-touch-sensor/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bolenmirror.com/fr/videos/modern-round-wood-framed-backlit-led-bathroom-mirror-with-touch-sensor/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://bolenmirror.com/de/videos/modern-round-wood-framed-backlit-led-bathroom-mirror-with-touch-sensor/" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://bolenmirror.com/it/videos/modern-round-wood-framed-backlit-led-bathroom-mirror-with-touch-sensor/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bolenmirror.com/en/videos/modern-round-wood-framed-backlit-led-bathroom-mirror-with-touch-sensor/" />
+  </url>
+  <url>
     <loc>https://bolenmirror.com/zh/videos/bolen-source-factory/</loc>
     <lastmod>2026-06-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <video:video>
+      <video:thumbnail_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/thumbnails/1782197285797-ps8tqm2.jpg</video:thumbnail_loc>
+      <video:title>BOLEN 源头工厂视频 LED 化妆镜制造商</video:title>
+      <video:description>观看 BOLEN 源头工厂视频，了解白色铝框触控 LED 化妆镜、壁挂安装方式及 OEM/ODM 报价支持。</video:description>
+      <video:content_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/videos/1782197285797-56dkwd1.mp4</video:content_loc>
+      <video:duration>130</video:duration>
+      <video:publication_date>2026-06-23T06:50:17.814Z</video:publication_date>
+    </video:video>
     <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/bolen-source-factory/" />
     <xhtml:link rel="alternate" hreflang="zh" href="https://bolenmirror.com/zh/videos/bolen-source-factory/" />
     <xhtml:link rel="alternate" hreflang="es" href="https://bolenmirror.com/es/videos/bolen-source-factory/" />
@@ -2098,6 +2374,14 @@
     <lastmod>2026-06-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <video:video>
+      <video:thumbnail_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/thumbnails/1782196009471-t1vdxa6.jpg</video:thumbnail_loc>
+      <video:title>白色铝框触摸屏 LED 化妆镜视频 BOLEN</video:title>
+      <video:description>观看 BOLEN 白色铝框壁挂式 LED 化妆镜视频，了解触摸屏控制、无缝外观和现代浴室照明效果。</video:description>
+      <video:content_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/videos/1782196009471-tygytkz.mp4</video:content_loc>
+      <video:duration>45</video:duration>
+      <video:publication_date>2026-06-23T06:33:18.326Z</video:publication_date>
+    </video:video>
     <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/seamless-white-aluminum-framed-wall-mounted-touch-screen-led-vanity-mirror/" />
     <xhtml:link rel="alternate" hreflang="zh" href="https://bolenmirror.com/zh/videos/seamless-white-aluminum-framed-wall-mounted-touch-screen-led-vanity-mirror/" />
     <xhtml:link rel="alternate" hreflang="es" href="https://bolenmirror.com/es/videos/seamless-white-aluminum-framed-wall-mounted-touch-screen-led-vanity-mirror/" />
@@ -2108,7 +2392,7 @@
   </url>
   <url>
     <loc>https://bolenmirror.com/es/</loc>
-    <lastmod>2026-06-23</lastmod>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/" />
@@ -2121,7 +2405,7 @@
   </url>
   <url>
     <loc>https://bolenmirror.com/es/products/</loc>
-    <lastmod>2026-06-23</lastmod>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/products/" />
@@ -2134,7 +2418,7 @@
   </url>
   <url>
     <loc>https://bolenmirror.com/es/rfq/</loc>
-    <lastmod>2026-06-23</lastmod>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/rfq/" />
@@ -2147,7 +2431,7 @@
   </url>
   <url>
     <loc>https://bolenmirror.com/es/our-story/</loc>
-    <lastmod>2026-06-23</lastmod>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/our-story/" />
@@ -2160,7 +2444,7 @@
   </url>
   <url>
     <loc>https://bolenmirror.com/es/blog/</loc>
-    <lastmod>2026-06-23</lastmod>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/blog/" />
@@ -2173,7 +2457,7 @@
   </url>
   <url>
     <loc>https://bolenmirror.com/es/videos/</loc>
-    <lastmod>2026-06-23</lastmod>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/" />
@@ -3134,10 +3418,144 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://bolenmirror.com/en/blog/the-relationship-between-bolen-mirror-and-jiaxing-chengtai-mirror-co-ltd/" />
   </url>
   <url>
+    <loc>https://bolenmirror.com/es/videos/large-arch-backlit-bathroom-mirror-luxury-wall-mounted-vanity-mirror-with-led-light-anti-fog-ip44-waterproof/</loc>
+    <lastmod>2026-06-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <video:video>
+      <video:thumbnail_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/thumbnails/1782526758014-hi6dvy1.jpg</video:thumbnail_loc>
+      <video:title>Large Arch Backlit Bathroom Mirror – Luxury Wall Mounted Vanity Mirror with LED Light, Anti Fog &amp; IP44 Waterproof</video:title>
+      <video:description>Curve Design Statement Piece for Modern Bathroom Vanity！ Break free from ordinary circular and rectangular designs. This large arched LED mirror captivates with its bold curved silhouette and stunning backlighting effect. Featuring an integrated LED housing design, it offers IP44 rated water resistance and durability, making it a perfect match for all furniture styles.</video:description>
+      <video:content_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/videos/1782526758014-t1n84v7.mp4</video:content_loc>
+      <video:duration>22</video:duration>
+      <video:publication_date>2026-06-27T02:27:53.074Z</video:publication_date>
+    </video:video>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/large-arch-backlit-bathroom-mirror-luxury-wall-mounted-vanity-mirror-with-led-light-anti-fog-ip44-waterproof/" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://bolenmirror.com/zh/videos/large-arch-backlit-bathroom-mirror-luxury-wall-mounted-vanity-mirror-with-led-light-anti-fog-ip44-waterproof/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bolenmirror.com/es/videos/large-arch-backlit-bathroom-mirror-luxury-wall-mounted-vanity-mirror-with-led-light-anti-fog-ip44-waterproof/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bolenmirror.com/fr/videos/large-arch-backlit-bathroom-mirror-luxury-wall-mounted-vanity-mirror-with-led-light-anti-fog-ip44-waterproof/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://bolenmirror.com/de/videos/large-arch-backlit-bathroom-mirror-luxury-wall-mounted-vanity-mirror-with-led-light-anti-fog-ip44-waterproof/" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://bolenmirror.com/it/videos/large-arch-backlit-bathroom-mirror-luxury-wall-mounted-vanity-mirror-with-led-light-anti-fog-ip44-waterproof/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bolenmirror.com/en/videos/large-arch-backlit-bathroom-mirror-luxury-wall-mounted-vanity-mirror-with-led-light-anti-fog-ip44-waterproof/" />
+  </url>
+  <url>
+    <loc>https://bolenmirror.com/es/videos/frameless-oval-backlit-led-bathroom-mirror-with-touch-control-and-digital-display/</loc>
+    <lastmod>2026-06-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <video:video>
+      <video:thumbnail_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/thumbnails/1782527164027-y0ctwxn.jpg</video:thumbnail_loc>
+      <video:title>Frameless Oval Backlit LED Bathroom Mirror with Touch Control and Digital Display</video:title>
+      <video:description>A sleek frameless oval LED bathroom mirror with soft ambient backlighting, touch control, and an integrated digital display. Ideal for modern bathrooms, hotel projects, apartments, and residential vanities.</video:description>
+      <video:content_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/videos/1782527164027-56mt083.mp4</video:content_loc>
+      <video:duration>13</video:duration>
+      <video:publication_date>2026-06-27T02:26:14.935Z</video:publication_date>
+    </video:video>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/frameless-oval-backlit-led-bathroom-mirror-with-touch-control-and-digital-display/" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://bolenmirror.com/zh/videos/frameless-oval-backlit-led-bathroom-mirror-with-touch-control-and-digital-display/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bolenmirror.com/es/videos/frameless-oval-backlit-led-bathroom-mirror-with-touch-control-and-digital-display/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bolenmirror.com/fr/videos/frameless-oval-backlit-led-bathroom-mirror-with-touch-control-and-digital-display/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://bolenmirror.com/de/videos/frameless-oval-backlit-led-bathroom-mirror-with-touch-control-and-digital-display/" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://bolenmirror.com/it/videos/frameless-oval-backlit-led-bathroom-mirror-with-touch-control-and-digital-display/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bolenmirror.com/en/videos/frameless-oval-backlit-led-bathroom-mirror-with-touch-control-and-digital-display/" />
+  </url>
+  <url>
+    <loc>https://bolenmirror.com/es/videos/teardrop-gold-framed-backlit-led-bathroom-mirror-with-touch-control/</loc>
+    <lastmod>2026-06-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <video:video>
+      <video:thumbnail_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/thumbnails/1782526998029-0xvs378.jpg</video:thumbnail_loc>
+      <video:title>Teardrop Gold Framed Backlit LED Bathroom Mirror with Touch Control</video:title>
+      <video:description>A distinctive teardrop shaped LED bathroom mirror featuring a slim gold frame, soft backlighting, and convenient touch control. Ideal for modern vanities, hotels, apartments, and luxury residential projects.</video:description>
+      <video:content_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/videos/1782526998029-qlrf9wq.mp4</video:content_loc>
+      <video:duration>33</video:duration>
+      <video:publication_date>2026-06-27T02:24:05.295Z</video:publication_date>
+    </video:video>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/teardrop-gold-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://bolenmirror.com/zh/videos/teardrop-gold-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bolenmirror.com/es/videos/teardrop-gold-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bolenmirror.com/fr/videos/teardrop-gold-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://bolenmirror.com/de/videos/teardrop-gold-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://bolenmirror.com/it/videos/teardrop-gold-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bolenmirror.com/en/videos/teardrop-gold-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+  </url>
+  <url>
+    <loc>https://bolenmirror.com/es/videos/irregular-wood-framed-backlit-led-bathroom-mirror-with-touch-control/</loc>
+    <lastmod>2026-06-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <video:video>
+      <video:thumbnail_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/thumbnails/1782526774382-y8z8i3u.jpg</video:thumbnail_loc>
+      <video:title>Irregular Wood Framed Backlit LED Bathroom Mirror with Touch Control</video:title>
+      <video:description>Add sculptural style to modern bathrooms with this irregular wood framed LED mirror, featuring soft backlighting and touch control for adjustable illumination.</video:description>
+      <video:content_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/videos/1782526774382-bs0187r.mp4</video:content_loc>
+      <video:duration>26</video:duration>
+      <video:publication_date>2026-06-27T02:19:46.368Z</video:publication_date>
+    </video:video>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/irregular-wood-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://bolenmirror.com/zh/videos/irregular-wood-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bolenmirror.com/es/videos/irregular-wood-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bolenmirror.com/fr/videos/irregular-wood-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://bolenmirror.com/de/videos/irregular-wood-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://bolenmirror.com/it/videos/irregular-wood-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bolenmirror.com/en/videos/irregular-wood-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+  </url>
+  <url>
+    <loc>https://bolenmirror.com/es/videos/round-led-bathroom-mirror-for-wall-backlit-vanity-mirror-with-touch-switch-anti-fog-glass-easy-installation/</loc>
+    <lastmod>2026-06-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <video:video>
+      <video:thumbnail_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/thumbnails/1782526546663-e0rrtbu.jpg</video:thumbnail_loc>
+      <video:title>Round LED Bathroom Mirror for Wall Backlit Vanity Mirror with Touch Switch, Anti Fog Glass &amp; Easy Installation</video:title>
+      <video:description>The built in touch switch makes it easy to turn on/off, while the anti fog function keeps the reflection crystal clear. A perfect blend of functionality and style for any modern bathroom or powder room.</video:description>
+      <video:content_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/videos/1782526546663-bojr8mg.mp4</video:content_loc>
+      <video:duration>29</video:duration>
+      <video:publication_date>2026-06-27T02:16:06.108Z</video:publication_date>
+    </video:video>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/round-led-bathroom-mirror-for-wall-backlit-vanity-mirror-with-touch-switch-anti-fog-glass-easy-installation/" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://bolenmirror.com/zh/videos/round-led-bathroom-mirror-for-wall-backlit-vanity-mirror-with-touch-switch-anti-fog-glass-easy-installation/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bolenmirror.com/es/videos/round-led-bathroom-mirror-for-wall-backlit-vanity-mirror-with-touch-switch-anti-fog-glass-easy-installation/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bolenmirror.com/fr/videos/round-led-bathroom-mirror-for-wall-backlit-vanity-mirror-with-touch-switch-anti-fog-glass-easy-installation/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://bolenmirror.com/de/videos/round-led-bathroom-mirror-for-wall-backlit-vanity-mirror-with-touch-switch-anti-fog-glass-easy-installation/" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://bolenmirror.com/it/videos/round-led-bathroom-mirror-for-wall-backlit-vanity-mirror-with-touch-switch-anti-fog-glass-easy-installation/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bolenmirror.com/en/videos/round-led-bathroom-mirror-for-wall-backlit-vanity-mirror-with-touch-switch-anti-fog-glass-easy-installation/" />
+  </url>
+  <url>
+    <loc>https://bolenmirror.com/es/videos/modern-round-wood-framed-backlit-led-bathroom-mirror-with-touch-sensor/</loc>
+    <lastmod>2026-06-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <video:video>
+      <video:thumbnail_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/thumbnails/1782526262620-xwanp1b.jpg</video:thumbnail_loc>
+      <video:title>Modern Round Wood Framed Backlit LED Bathroom Mirror with Touch Sensor</video:title>
+      <video:description>A modern round bathroom mirror with a dark wood look frame, soft LED backlighting, and convenient touch control—ideal for hotel, residential, and vanity projects.</video:description>
+      <video:content_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/videos/1782526262620-ht1wajl.mp4</video:content_loc>
+      <video:duration>22</video:duration>
+      <video:publication_date>2026-06-27T02:11:27.008Z</video:publication_date>
+    </video:video>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/modern-round-wood-framed-backlit-led-bathroom-mirror-with-touch-sensor/" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://bolenmirror.com/zh/videos/modern-round-wood-framed-backlit-led-bathroom-mirror-with-touch-sensor/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bolenmirror.com/es/videos/modern-round-wood-framed-backlit-led-bathroom-mirror-with-touch-sensor/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bolenmirror.com/fr/videos/modern-round-wood-framed-backlit-led-bathroom-mirror-with-touch-sensor/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://bolenmirror.com/de/videos/modern-round-wood-framed-backlit-led-bathroom-mirror-with-touch-sensor/" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://bolenmirror.com/it/videos/modern-round-wood-framed-backlit-led-bathroom-mirror-with-touch-sensor/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bolenmirror.com/en/videos/modern-round-wood-framed-backlit-led-bathroom-mirror-with-touch-sensor/" />
+  </url>
+  <url>
     <loc>https://bolenmirror.com/es/videos/bolen-source-factory/</loc>
     <lastmod>2026-06-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <video:video>
+      <video:thumbnail_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/thumbnails/1782197285797-ps8tqm2.jpg</video:thumbnail_loc>
+      <video:title>Video de fábrica BOLEN Fabricante de espejos LED de tocador</video:title>
+      <video:description>Vea el video de fábrica BOLEN sobre un espejo LED de tocador con marco de aluminio blanco, control táctil, instalación mural y soporte de presupuesto OEM/ODM.</video:description>
+      <video:content_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/videos/1782197285797-56dkwd1.mp4</video:content_loc>
+      <video:duration>130</video:duration>
+      <video:publication_date>2026-06-23T06:50:17.814Z</video:publication_date>
+    </video:video>
     <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/bolen-source-factory/" />
     <xhtml:link rel="alternate" hreflang="zh" href="https://bolenmirror.com/zh/videos/bolen-source-factory/" />
     <xhtml:link rel="alternate" hreflang="es" href="https://bolenmirror.com/es/videos/bolen-source-factory/" />
@@ -3151,6 +3569,14 @@
     <lastmod>2026-06-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <video:video>
+      <video:thumbnail_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/thumbnails/1782196009471-t1vdxa6.jpg</video:thumbnail_loc>
+      <video:title>Video de espejo LED con marco blanco y pantalla táctil BOLEN</video:title>
+      <video:description>Vea el video del espejo de tocador LED mural BOLEN con marco de aluminio blanco, controles táctiles, estilo sin juntas e iluminación moderna para baños.</video:description>
+      <video:content_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/videos/1782196009471-tygytkz.mp4</video:content_loc>
+      <video:duration>45</video:duration>
+      <video:publication_date>2026-06-23T06:33:18.326Z</video:publication_date>
+    </video:video>
     <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/seamless-white-aluminum-framed-wall-mounted-touch-screen-led-vanity-mirror/" />
     <xhtml:link rel="alternate" hreflang="zh" href="https://bolenmirror.com/zh/videos/seamless-white-aluminum-framed-wall-mounted-touch-screen-led-vanity-mirror/" />
     <xhtml:link rel="alternate" hreflang="es" href="https://bolenmirror.com/es/videos/seamless-white-aluminum-framed-wall-mounted-touch-screen-led-vanity-mirror/" />
@@ -3161,7 +3587,7 @@
   </url>
   <url>
     <loc>https://bolenmirror.com/fr/</loc>
-    <lastmod>2026-06-23</lastmod>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/" />
@@ -3174,7 +3600,7 @@
   </url>
   <url>
     <loc>https://bolenmirror.com/fr/products/</loc>
-    <lastmod>2026-06-23</lastmod>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/products/" />
@@ -3187,7 +3613,7 @@
   </url>
   <url>
     <loc>https://bolenmirror.com/fr/rfq/</loc>
-    <lastmod>2026-06-23</lastmod>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/rfq/" />
@@ -3200,7 +3626,7 @@
   </url>
   <url>
     <loc>https://bolenmirror.com/fr/our-story/</loc>
-    <lastmod>2026-06-23</lastmod>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/our-story/" />
@@ -3213,7 +3639,7 @@
   </url>
   <url>
     <loc>https://bolenmirror.com/fr/blog/</loc>
-    <lastmod>2026-06-23</lastmod>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/blog/" />
@@ -3226,7 +3652,7 @@
   </url>
   <url>
     <loc>https://bolenmirror.com/fr/videos/</loc>
-    <lastmod>2026-06-23</lastmod>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/" />
@@ -4187,10 +4613,144 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://bolenmirror.com/en/blog/the-relationship-between-bolen-mirror-and-jiaxing-chengtai-mirror-co-ltd/" />
   </url>
   <url>
+    <loc>https://bolenmirror.com/fr/videos/large-arch-backlit-bathroom-mirror-luxury-wall-mounted-vanity-mirror-with-led-light-anti-fog-ip44-waterproof/</loc>
+    <lastmod>2026-06-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <video:video>
+      <video:thumbnail_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/thumbnails/1782526758014-hi6dvy1.jpg</video:thumbnail_loc>
+      <video:title>Large Arch Backlit Bathroom Mirror – Luxury Wall Mounted Vanity Mirror with LED Light, Anti Fog &amp; IP44 Waterproof</video:title>
+      <video:description>Curve Design Statement Piece for Modern Bathroom Vanity！ Break free from ordinary circular and rectangular designs. This large arched LED mirror captivates with its bold curved silhouette and stunning backlighting effect. Featuring an integrated LED housing design, it offers IP44 rated water resistance and durability, making it a perfect match for all furniture styles.</video:description>
+      <video:content_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/videos/1782526758014-t1n84v7.mp4</video:content_loc>
+      <video:duration>22</video:duration>
+      <video:publication_date>2026-06-27T02:27:53.074Z</video:publication_date>
+    </video:video>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/large-arch-backlit-bathroom-mirror-luxury-wall-mounted-vanity-mirror-with-led-light-anti-fog-ip44-waterproof/" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://bolenmirror.com/zh/videos/large-arch-backlit-bathroom-mirror-luxury-wall-mounted-vanity-mirror-with-led-light-anti-fog-ip44-waterproof/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bolenmirror.com/es/videos/large-arch-backlit-bathroom-mirror-luxury-wall-mounted-vanity-mirror-with-led-light-anti-fog-ip44-waterproof/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bolenmirror.com/fr/videos/large-arch-backlit-bathroom-mirror-luxury-wall-mounted-vanity-mirror-with-led-light-anti-fog-ip44-waterproof/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://bolenmirror.com/de/videos/large-arch-backlit-bathroom-mirror-luxury-wall-mounted-vanity-mirror-with-led-light-anti-fog-ip44-waterproof/" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://bolenmirror.com/it/videos/large-arch-backlit-bathroom-mirror-luxury-wall-mounted-vanity-mirror-with-led-light-anti-fog-ip44-waterproof/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bolenmirror.com/en/videos/large-arch-backlit-bathroom-mirror-luxury-wall-mounted-vanity-mirror-with-led-light-anti-fog-ip44-waterproof/" />
+  </url>
+  <url>
+    <loc>https://bolenmirror.com/fr/videos/frameless-oval-backlit-led-bathroom-mirror-with-touch-control-and-digital-display/</loc>
+    <lastmod>2026-06-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <video:video>
+      <video:thumbnail_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/thumbnails/1782527164027-y0ctwxn.jpg</video:thumbnail_loc>
+      <video:title>Frameless Oval Backlit LED Bathroom Mirror with Touch Control and Digital Display</video:title>
+      <video:description>A sleek frameless oval LED bathroom mirror with soft ambient backlighting, touch control, and an integrated digital display. Ideal for modern bathrooms, hotel projects, apartments, and residential vanities.</video:description>
+      <video:content_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/videos/1782527164027-56mt083.mp4</video:content_loc>
+      <video:duration>13</video:duration>
+      <video:publication_date>2026-06-27T02:26:14.935Z</video:publication_date>
+    </video:video>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/frameless-oval-backlit-led-bathroom-mirror-with-touch-control-and-digital-display/" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://bolenmirror.com/zh/videos/frameless-oval-backlit-led-bathroom-mirror-with-touch-control-and-digital-display/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bolenmirror.com/es/videos/frameless-oval-backlit-led-bathroom-mirror-with-touch-control-and-digital-display/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bolenmirror.com/fr/videos/frameless-oval-backlit-led-bathroom-mirror-with-touch-control-and-digital-display/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://bolenmirror.com/de/videos/frameless-oval-backlit-led-bathroom-mirror-with-touch-control-and-digital-display/" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://bolenmirror.com/it/videos/frameless-oval-backlit-led-bathroom-mirror-with-touch-control-and-digital-display/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bolenmirror.com/en/videos/frameless-oval-backlit-led-bathroom-mirror-with-touch-control-and-digital-display/" />
+  </url>
+  <url>
+    <loc>https://bolenmirror.com/fr/videos/teardrop-gold-framed-backlit-led-bathroom-mirror-with-touch-control/</loc>
+    <lastmod>2026-06-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <video:video>
+      <video:thumbnail_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/thumbnails/1782526998029-0xvs378.jpg</video:thumbnail_loc>
+      <video:title>Teardrop Gold Framed Backlit LED Bathroom Mirror with Touch Control</video:title>
+      <video:description>A distinctive teardrop shaped LED bathroom mirror featuring a slim gold frame, soft backlighting, and convenient touch control. Ideal for modern vanities, hotels, apartments, and luxury residential projects.</video:description>
+      <video:content_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/videos/1782526998029-qlrf9wq.mp4</video:content_loc>
+      <video:duration>33</video:duration>
+      <video:publication_date>2026-06-27T02:24:05.295Z</video:publication_date>
+    </video:video>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/teardrop-gold-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://bolenmirror.com/zh/videos/teardrop-gold-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bolenmirror.com/es/videos/teardrop-gold-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bolenmirror.com/fr/videos/teardrop-gold-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://bolenmirror.com/de/videos/teardrop-gold-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://bolenmirror.com/it/videos/teardrop-gold-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bolenmirror.com/en/videos/teardrop-gold-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+  </url>
+  <url>
+    <loc>https://bolenmirror.com/fr/videos/irregular-wood-framed-backlit-led-bathroom-mirror-with-touch-control/</loc>
+    <lastmod>2026-06-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <video:video>
+      <video:thumbnail_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/thumbnails/1782526774382-y8z8i3u.jpg</video:thumbnail_loc>
+      <video:title>Irregular Wood Framed Backlit LED Bathroom Mirror with Touch Control</video:title>
+      <video:description>Add sculptural style to modern bathrooms with this irregular wood framed LED mirror, featuring soft backlighting and touch control for adjustable illumination.</video:description>
+      <video:content_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/videos/1782526774382-bs0187r.mp4</video:content_loc>
+      <video:duration>26</video:duration>
+      <video:publication_date>2026-06-27T02:19:46.368Z</video:publication_date>
+    </video:video>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/irregular-wood-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://bolenmirror.com/zh/videos/irregular-wood-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bolenmirror.com/es/videos/irregular-wood-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bolenmirror.com/fr/videos/irregular-wood-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://bolenmirror.com/de/videos/irregular-wood-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://bolenmirror.com/it/videos/irregular-wood-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bolenmirror.com/en/videos/irregular-wood-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+  </url>
+  <url>
+    <loc>https://bolenmirror.com/fr/videos/round-led-bathroom-mirror-for-wall-backlit-vanity-mirror-with-touch-switch-anti-fog-glass-easy-installation/</loc>
+    <lastmod>2026-06-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <video:video>
+      <video:thumbnail_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/thumbnails/1782526546663-e0rrtbu.jpg</video:thumbnail_loc>
+      <video:title>Round LED Bathroom Mirror for Wall Backlit Vanity Mirror with Touch Switch, Anti Fog Glass &amp; Easy Installation</video:title>
+      <video:description>The built in touch switch makes it easy to turn on/off, while the anti fog function keeps the reflection crystal clear. A perfect blend of functionality and style for any modern bathroom or powder room.</video:description>
+      <video:content_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/videos/1782526546663-bojr8mg.mp4</video:content_loc>
+      <video:duration>29</video:duration>
+      <video:publication_date>2026-06-27T02:16:06.108Z</video:publication_date>
+    </video:video>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/round-led-bathroom-mirror-for-wall-backlit-vanity-mirror-with-touch-switch-anti-fog-glass-easy-installation/" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://bolenmirror.com/zh/videos/round-led-bathroom-mirror-for-wall-backlit-vanity-mirror-with-touch-switch-anti-fog-glass-easy-installation/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bolenmirror.com/es/videos/round-led-bathroom-mirror-for-wall-backlit-vanity-mirror-with-touch-switch-anti-fog-glass-easy-installation/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bolenmirror.com/fr/videos/round-led-bathroom-mirror-for-wall-backlit-vanity-mirror-with-touch-switch-anti-fog-glass-easy-installation/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://bolenmirror.com/de/videos/round-led-bathroom-mirror-for-wall-backlit-vanity-mirror-with-touch-switch-anti-fog-glass-easy-installation/" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://bolenmirror.com/it/videos/round-led-bathroom-mirror-for-wall-backlit-vanity-mirror-with-touch-switch-anti-fog-glass-easy-installation/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bolenmirror.com/en/videos/round-led-bathroom-mirror-for-wall-backlit-vanity-mirror-with-touch-switch-anti-fog-glass-easy-installation/" />
+  </url>
+  <url>
+    <loc>https://bolenmirror.com/fr/videos/modern-round-wood-framed-backlit-led-bathroom-mirror-with-touch-sensor/</loc>
+    <lastmod>2026-06-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <video:video>
+      <video:thumbnail_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/thumbnails/1782526262620-xwanp1b.jpg</video:thumbnail_loc>
+      <video:title>Modern Round Wood Framed Backlit LED Bathroom Mirror with Touch Sensor</video:title>
+      <video:description>A modern round bathroom mirror with a dark wood look frame, soft LED backlighting, and convenient touch control—ideal for hotel, residential, and vanity projects.</video:description>
+      <video:content_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/videos/1782526262620-ht1wajl.mp4</video:content_loc>
+      <video:duration>22</video:duration>
+      <video:publication_date>2026-06-27T02:11:27.008Z</video:publication_date>
+    </video:video>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/modern-round-wood-framed-backlit-led-bathroom-mirror-with-touch-sensor/" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://bolenmirror.com/zh/videos/modern-round-wood-framed-backlit-led-bathroom-mirror-with-touch-sensor/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bolenmirror.com/es/videos/modern-round-wood-framed-backlit-led-bathroom-mirror-with-touch-sensor/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bolenmirror.com/fr/videos/modern-round-wood-framed-backlit-led-bathroom-mirror-with-touch-sensor/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://bolenmirror.com/de/videos/modern-round-wood-framed-backlit-led-bathroom-mirror-with-touch-sensor/" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://bolenmirror.com/it/videos/modern-round-wood-framed-backlit-led-bathroom-mirror-with-touch-sensor/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bolenmirror.com/en/videos/modern-round-wood-framed-backlit-led-bathroom-mirror-with-touch-sensor/" />
+  </url>
+  <url>
     <loc>https://bolenmirror.com/fr/videos/bolen-source-factory/</loc>
     <lastmod>2026-06-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <video:video>
+      <video:thumbnail_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/thumbnails/1782197285797-ps8tqm2.jpg</video:thumbnail_loc>
+      <video:title>Vidéo usine BOLEN Fabricant de miroirs LED de toilette</video:title>
+      <video:description>Regardez la vidéo usine BOLEN d&apos;un miroir de toilette LED à cadre en aluminium blanc avec commande tactile, pose murale et devis OEM/ODM.</video:description>
+      <video:content_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/videos/1782197285797-56dkwd1.mp4</video:content_loc>
+      <video:duration>130</video:duration>
+      <video:publication_date>2026-06-23T06:50:17.814Z</video:publication_date>
+    </video:video>
     <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/bolen-source-factory/" />
     <xhtml:link rel="alternate" hreflang="zh" href="https://bolenmirror.com/zh/videos/bolen-source-factory/" />
     <xhtml:link rel="alternate" hreflang="es" href="https://bolenmirror.com/es/videos/bolen-source-factory/" />
@@ -4204,6 +4764,14 @@
     <lastmod>2026-06-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <video:video>
+      <video:thumbnail_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/thumbnails/1782196009471-t1vdxa6.jpg</video:thumbnail_loc>
+      <video:title>Vidéo miroir LED blanc à écran tactile BOLEN</video:title>
+      <video:description>Regardez la vidéo du miroir de toilette LED mural BOLEN à cadre en aluminium blanc, avec commandes tactiles, style sans joint et éclairage moderne.</video:description>
+      <video:content_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/videos/1782196009471-tygytkz.mp4</video:content_loc>
+      <video:duration>45</video:duration>
+      <video:publication_date>2026-06-23T06:33:18.326Z</video:publication_date>
+    </video:video>
     <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/seamless-white-aluminum-framed-wall-mounted-touch-screen-led-vanity-mirror/" />
     <xhtml:link rel="alternate" hreflang="zh" href="https://bolenmirror.com/zh/videos/seamless-white-aluminum-framed-wall-mounted-touch-screen-led-vanity-mirror/" />
     <xhtml:link rel="alternate" hreflang="es" href="https://bolenmirror.com/es/videos/seamless-white-aluminum-framed-wall-mounted-touch-screen-led-vanity-mirror/" />
@@ -4214,7 +4782,7 @@
   </url>
   <url>
     <loc>https://bolenmirror.com/de/</loc>
-    <lastmod>2026-06-23</lastmod>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/" />
@@ -4227,7 +4795,7 @@
   </url>
   <url>
     <loc>https://bolenmirror.com/de/products/</loc>
-    <lastmod>2026-06-23</lastmod>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/products/" />
@@ -4240,7 +4808,7 @@
   </url>
   <url>
     <loc>https://bolenmirror.com/de/rfq/</loc>
-    <lastmod>2026-06-23</lastmod>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/rfq/" />
@@ -4253,7 +4821,7 @@
   </url>
   <url>
     <loc>https://bolenmirror.com/de/our-story/</loc>
-    <lastmod>2026-06-23</lastmod>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/our-story/" />
@@ -4266,7 +4834,7 @@
   </url>
   <url>
     <loc>https://bolenmirror.com/de/blog/</loc>
-    <lastmod>2026-06-23</lastmod>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/blog/" />
@@ -4279,7 +4847,7 @@
   </url>
   <url>
     <loc>https://bolenmirror.com/de/videos/</loc>
-    <lastmod>2026-06-23</lastmod>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/" />
@@ -5240,10 +5808,144 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://bolenmirror.com/en/blog/the-relationship-between-bolen-mirror-and-jiaxing-chengtai-mirror-co-ltd/" />
   </url>
   <url>
+    <loc>https://bolenmirror.com/de/videos/large-arch-backlit-bathroom-mirror-luxury-wall-mounted-vanity-mirror-with-led-light-anti-fog-ip44-waterproof/</loc>
+    <lastmod>2026-06-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <video:video>
+      <video:thumbnail_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/thumbnails/1782526758014-hi6dvy1.jpg</video:thumbnail_loc>
+      <video:title>Large Arch Backlit Bathroom Mirror – Luxury Wall Mounted Vanity Mirror with LED Light, Anti Fog &amp; IP44 Waterproof</video:title>
+      <video:description>Curve Design Statement Piece for Modern Bathroom Vanity！ Break free from ordinary circular and rectangular designs. This large arched LED mirror captivates with its bold curved silhouette and stunning backlighting effect. Featuring an integrated LED housing design, it offers IP44 rated water resistance and durability, making it a perfect match for all furniture styles.</video:description>
+      <video:content_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/videos/1782526758014-t1n84v7.mp4</video:content_loc>
+      <video:duration>22</video:duration>
+      <video:publication_date>2026-06-27T02:27:53.074Z</video:publication_date>
+    </video:video>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/large-arch-backlit-bathroom-mirror-luxury-wall-mounted-vanity-mirror-with-led-light-anti-fog-ip44-waterproof/" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://bolenmirror.com/zh/videos/large-arch-backlit-bathroom-mirror-luxury-wall-mounted-vanity-mirror-with-led-light-anti-fog-ip44-waterproof/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bolenmirror.com/es/videos/large-arch-backlit-bathroom-mirror-luxury-wall-mounted-vanity-mirror-with-led-light-anti-fog-ip44-waterproof/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bolenmirror.com/fr/videos/large-arch-backlit-bathroom-mirror-luxury-wall-mounted-vanity-mirror-with-led-light-anti-fog-ip44-waterproof/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://bolenmirror.com/de/videos/large-arch-backlit-bathroom-mirror-luxury-wall-mounted-vanity-mirror-with-led-light-anti-fog-ip44-waterproof/" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://bolenmirror.com/it/videos/large-arch-backlit-bathroom-mirror-luxury-wall-mounted-vanity-mirror-with-led-light-anti-fog-ip44-waterproof/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bolenmirror.com/en/videos/large-arch-backlit-bathroom-mirror-luxury-wall-mounted-vanity-mirror-with-led-light-anti-fog-ip44-waterproof/" />
+  </url>
+  <url>
+    <loc>https://bolenmirror.com/de/videos/frameless-oval-backlit-led-bathroom-mirror-with-touch-control-and-digital-display/</loc>
+    <lastmod>2026-06-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <video:video>
+      <video:thumbnail_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/thumbnails/1782527164027-y0ctwxn.jpg</video:thumbnail_loc>
+      <video:title>Frameless Oval Backlit LED Bathroom Mirror with Touch Control and Digital Display</video:title>
+      <video:description>A sleek frameless oval LED bathroom mirror with soft ambient backlighting, touch control, and an integrated digital display. Ideal for modern bathrooms, hotel projects, apartments, and residential vanities.</video:description>
+      <video:content_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/videos/1782527164027-56mt083.mp4</video:content_loc>
+      <video:duration>13</video:duration>
+      <video:publication_date>2026-06-27T02:26:14.935Z</video:publication_date>
+    </video:video>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/frameless-oval-backlit-led-bathroom-mirror-with-touch-control-and-digital-display/" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://bolenmirror.com/zh/videos/frameless-oval-backlit-led-bathroom-mirror-with-touch-control-and-digital-display/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bolenmirror.com/es/videos/frameless-oval-backlit-led-bathroom-mirror-with-touch-control-and-digital-display/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bolenmirror.com/fr/videos/frameless-oval-backlit-led-bathroom-mirror-with-touch-control-and-digital-display/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://bolenmirror.com/de/videos/frameless-oval-backlit-led-bathroom-mirror-with-touch-control-and-digital-display/" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://bolenmirror.com/it/videos/frameless-oval-backlit-led-bathroom-mirror-with-touch-control-and-digital-display/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bolenmirror.com/en/videos/frameless-oval-backlit-led-bathroom-mirror-with-touch-control-and-digital-display/" />
+  </url>
+  <url>
+    <loc>https://bolenmirror.com/de/videos/teardrop-gold-framed-backlit-led-bathroom-mirror-with-touch-control/</loc>
+    <lastmod>2026-06-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <video:video>
+      <video:thumbnail_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/thumbnails/1782526998029-0xvs378.jpg</video:thumbnail_loc>
+      <video:title>Teardrop Gold Framed Backlit LED Bathroom Mirror with Touch Control</video:title>
+      <video:description>A distinctive teardrop shaped LED bathroom mirror featuring a slim gold frame, soft backlighting, and convenient touch control. Ideal for modern vanities, hotels, apartments, and luxury residential projects.</video:description>
+      <video:content_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/videos/1782526998029-qlrf9wq.mp4</video:content_loc>
+      <video:duration>33</video:duration>
+      <video:publication_date>2026-06-27T02:24:05.295Z</video:publication_date>
+    </video:video>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/teardrop-gold-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://bolenmirror.com/zh/videos/teardrop-gold-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bolenmirror.com/es/videos/teardrop-gold-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bolenmirror.com/fr/videos/teardrop-gold-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://bolenmirror.com/de/videos/teardrop-gold-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://bolenmirror.com/it/videos/teardrop-gold-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bolenmirror.com/en/videos/teardrop-gold-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+  </url>
+  <url>
+    <loc>https://bolenmirror.com/de/videos/irregular-wood-framed-backlit-led-bathroom-mirror-with-touch-control/</loc>
+    <lastmod>2026-06-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <video:video>
+      <video:thumbnail_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/thumbnails/1782526774382-y8z8i3u.jpg</video:thumbnail_loc>
+      <video:title>Irregular Wood Framed Backlit LED Bathroom Mirror with Touch Control</video:title>
+      <video:description>Add sculptural style to modern bathrooms with this irregular wood framed LED mirror, featuring soft backlighting and touch control for adjustable illumination.</video:description>
+      <video:content_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/videos/1782526774382-bs0187r.mp4</video:content_loc>
+      <video:duration>26</video:duration>
+      <video:publication_date>2026-06-27T02:19:46.368Z</video:publication_date>
+    </video:video>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/irregular-wood-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://bolenmirror.com/zh/videos/irregular-wood-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bolenmirror.com/es/videos/irregular-wood-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bolenmirror.com/fr/videos/irregular-wood-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://bolenmirror.com/de/videos/irregular-wood-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://bolenmirror.com/it/videos/irregular-wood-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bolenmirror.com/en/videos/irregular-wood-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+  </url>
+  <url>
+    <loc>https://bolenmirror.com/de/videos/round-led-bathroom-mirror-for-wall-backlit-vanity-mirror-with-touch-switch-anti-fog-glass-easy-installation/</loc>
+    <lastmod>2026-06-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <video:video>
+      <video:thumbnail_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/thumbnails/1782526546663-e0rrtbu.jpg</video:thumbnail_loc>
+      <video:title>Round LED Bathroom Mirror for Wall Backlit Vanity Mirror with Touch Switch, Anti Fog Glass &amp; Easy Installation</video:title>
+      <video:description>The built in touch switch makes it easy to turn on/off, while the anti fog function keeps the reflection crystal clear. A perfect blend of functionality and style for any modern bathroom or powder room.</video:description>
+      <video:content_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/videos/1782526546663-bojr8mg.mp4</video:content_loc>
+      <video:duration>29</video:duration>
+      <video:publication_date>2026-06-27T02:16:06.108Z</video:publication_date>
+    </video:video>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/round-led-bathroom-mirror-for-wall-backlit-vanity-mirror-with-touch-switch-anti-fog-glass-easy-installation/" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://bolenmirror.com/zh/videos/round-led-bathroom-mirror-for-wall-backlit-vanity-mirror-with-touch-switch-anti-fog-glass-easy-installation/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bolenmirror.com/es/videos/round-led-bathroom-mirror-for-wall-backlit-vanity-mirror-with-touch-switch-anti-fog-glass-easy-installation/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bolenmirror.com/fr/videos/round-led-bathroom-mirror-for-wall-backlit-vanity-mirror-with-touch-switch-anti-fog-glass-easy-installation/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://bolenmirror.com/de/videos/round-led-bathroom-mirror-for-wall-backlit-vanity-mirror-with-touch-switch-anti-fog-glass-easy-installation/" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://bolenmirror.com/it/videos/round-led-bathroom-mirror-for-wall-backlit-vanity-mirror-with-touch-switch-anti-fog-glass-easy-installation/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bolenmirror.com/en/videos/round-led-bathroom-mirror-for-wall-backlit-vanity-mirror-with-touch-switch-anti-fog-glass-easy-installation/" />
+  </url>
+  <url>
+    <loc>https://bolenmirror.com/de/videos/modern-round-wood-framed-backlit-led-bathroom-mirror-with-touch-sensor/</loc>
+    <lastmod>2026-06-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <video:video>
+      <video:thumbnail_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/thumbnails/1782526262620-xwanp1b.jpg</video:thumbnail_loc>
+      <video:title>Modern Round Wood Framed Backlit LED Bathroom Mirror with Touch Sensor</video:title>
+      <video:description>A modern round bathroom mirror with a dark wood look frame, soft LED backlighting, and convenient touch control—ideal for hotel, residential, and vanity projects.</video:description>
+      <video:content_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/videos/1782526262620-ht1wajl.mp4</video:content_loc>
+      <video:duration>22</video:duration>
+      <video:publication_date>2026-06-27T02:11:27.008Z</video:publication_date>
+    </video:video>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/modern-round-wood-framed-backlit-led-bathroom-mirror-with-touch-sensor/" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://bolenmirror.com/zh/videos/modern-round-wood-framed-backlit-led-bathroom-mirror-with-touch-sensor/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bolenmirror.com/es/videos/modern-round-wood-framed-backlit-led-bathroom-mirror-with-touch-sensor/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bolenmirror.com/fr/videos/modern-round-wood-framed-backlit-led-bathroom-mirror-with-touch-sensor/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://bolenmirror.com/de/videos/modern-round-wood-framed-backlit-led-bathroom-mirror-with-touch-sensor/" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://bolenmirror.com/it/videos/modern-round-wood-framed-backlit-led-bathroom-mirror-with-touch-sensor/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bolenmirror.com/en/videos/modern-round-wood-framed-backlit-led-bathroom-mirror-with-touch-sensor/" />
+  </url>
+  <url>
     <loc>https://bolenmirror.com/de/videos/bolen-source-factory/</loc>
     <lastmod>2026-06-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <video:video>
+      <video:thumbnail_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/thumbnails/1782197285797-ps8tqm2.jpg</video:thumbnail_loc>
+      <video:title>BOLEN Werksvideo Hersteller von LED Schminkspiegeln</video:title>
+      <video:description>Sehen Sie das BOLEN Werksvideo zu einem LED Schminkspiegel mit weißem Aluminiumrahmen, Touch Steuerung, Wandmontage und OEM/ODM Angebot.</video:description>
+      <video:content_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/videos/1782197285797-56dkwd1.mp4</video:content_loc>
+      <video:duration>130</video:duration>
+      <video:publication_date>2026-06-23T06:50:17.814Z</video:publication_date>
+    </video:video>
     <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/bolen-source-factory/" />
     <xhtml:link rel="alternate" hreflang="zh" href="https://bolenmirror.com/zh/videos/bolen-source-factory/" />
     <xhtml:link rel="alternate" hreflang="es" href="https://bolenmirror.com/es/videos/bolen-source-factory/" />
@@ -5257,6 +5959,14 @@
     <lastmod>2026-06-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <video:video>
+      <video:thumbnail_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/thumbnails/1782196009471-t1vdxa6.jpg</video:thumbnail_loc>
+      <video:title>Video: weißer LED Schminkspiegel mit Touchscreen BOLEN</video:title>
+      <video:description>Sehen Sie das Video zum wandmontierten BOLEN LED Schminkspiegel mit weißem Aluminiumrahmen, Touch Steuerung, nahtlosem Design und moderner Badbeleuchtung.</video:description>
+      <video:content_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/videos/1782196009471-tygytkz.mp4</video:content_loc>
+      <video:duration>45</video:duration>
+      <video:publication_date>2026-06-23T06:33:18.326Z</video:publication_date>
+    </video:video>
     <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/seamless-white-aluminum-framed-wall-mounted-touch-screen-led-vanity-mirror/" />
     <xhtml:link rel="alternate" hreflang="zh" href="https://bolenmirror.com/zh/videos/seamless-white-aluminum-framed-wall-mounted-touch-screen-led-vanity-mirror/" />
     <xhtml:link rel="alternate" hreflang="es" href="https://bolenmirror.com/es/videos/seamless-white-aluminum-framed-wall-mounted-touch-screen-led-vanity-mirror/" />
@@ -5267,7 +5977,7 @@
   </url>
   <url>
     <loc>https://bolenmirror.com/it/</loc>
-    <lastmod>2026-06-23</lastmod>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/" />
@@ -5280,7 +5990,7 @@
   </url>
   <url>
     <loc>https://bolenmirror.com/it/products/</loc>
-    <lastmod>2026-06-23</lastmod>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/products/" />
@@ -5293,7 +6003,7 @@
   </url>
   <url>
     <loc>https://bolenmirror.com/it/rfq/</loc>
-    <lastmod>2026-06-23</lastmod>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/rfq/" />
@@ -5306,7 +6016,7 @@
   </url>
   <url>
     <loc>https://bolenmirror.com/it/our-story/</loc>
-    <lastmod>2026-06-23</lastmod>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/our-story/" />
@@ -5319,7 +6029,7 @@
   </url>
   <url>
     <loc>https://bolenmirror.com/it/blog/</loc>
-    <lastmod>2026-06-23</lastmod>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/blog/" />
@@ -5332,7 +6042,7 @@
   </url>
   <url>
     <loc>https://bolenmirror.com/it/videos/</loc>
-    <lastmod>2026-06-23</lastmod>
+    <lastmod>2026-06-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/" />
@@ -6293,10 +7003,144 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://bolenmirror.com/en/blog/the-relationship-between-bolen-mirror-and-jiaxing-chengtai-mirror-co-ltd/" />
   </url>
   <url>
+    <loc>https://bolenmirror.com/it/videos/large-arch-backlit-bathroom-mirror-luxury-wall-mounted-vanity-mirror-with-led-light-anti-fog-ip44-waterproof/</loc>
+    <lastmod>2026-06-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <video:video>
+      <video:thumbnail_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/thumbnails/1782526758014-hi6dvy1.jpg</video:thumbnail_loc>
+      <video:title>Large Arch Backlit Bathroom Mirror – Luxury Wall Mounted Vanity Mirror with LED Light, Anti Fog &amp; IP44 Waterproof</video:title>
+      <video:description>Curve Design Statement Piece for Modern Bathroom Vanity！ Break free from ordinary circular and rectangular designs. This large arched LED mirror captivates with its bold curved silhouette and stunning backlighting effect. Featuring an integrated LED housing design, it offers IP44 rated water resistance and durability, making it a perfect match for all furniture styles.</video:description>
+      <video:content_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/videos/1782526758014-t1n84v7.mp4</video:content_loc>
+      <video:duration>22</video:duration>
+      <video:publication_date>2026-06-27T02:27:53.074Z</video:publication_date>
+    </video:video>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/large-arch-backlit-bathroom-mirror-luxury-wall-mounted-vanity-mirror-with-led-light-anti-fog-ip44-waterproof/" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://bolenmirror.com/zh/videos/large-arch-backlit-bathroom-mirror-luxury-wall-mounted-vanity-mirror-with-led-light-anti-fog-ip44-waterproof/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bolenmirror.com/es/videos/large-arch-backlit-bathroom-mirror-luxury-wall-mounted-vanity-mirror-with-led-light-anti-fog-ip44-waterproof/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bolenmirror.com/fr/videos/large-arch-backlit-bathroom-mirror-luxury-wall-mounted-vanity-mirror-with-led-light-anti-fog-ip44-waterproof/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://bolenmirror.com/de/videos/large-arch-backlit-bathroom-mirror-luxury-wall-mounted-vanity-mirror-with-led-light-anti-fog-ip44-waterproof/" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://bolenmirror.com/it/videos/large-arch-backlit-bathroom-mirror-luxury-wall-mounted-vanity-mirror-with-led-light-anti-fog-ip44-waterproof/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bolenmirror.com/en/videos/large-arch-backlit-bathroom-mirror-luxury-wall-mounted-vanity-mirror-with-led-light-anti-fog-ip44-waterproof/" />
+  </url>
+  <url>
+    <loc>https://bolenmirror.com/it/videos/frameless-oval-backlit-led-bathroom-mirror-with-touch-control-and-digital-display/</loc>
+    <lastmod>2026-06-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <video:video>
+      <video:thumbnail_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/thumbnails/1782527164027-y0ctwxn.jpg</video:thumbnail_loc>
+      <video:title>Frameless Oval Backlit LED Bathroom Mirror with Touch Control and Digital Display</video:title>
+      <video:description>A sleek frameless oval LED bathroom mirror with soft ambient backlighting, touch control, and an integrated digital display. Ideal for modern bathrooms, hotel projects, apartments, and residential vanities.</video:description>
+      <video:content_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/videos/1782527164027-56mt083.mp4</video:content_loc>
+      <video:duration>13</video:duration>
+      <video:publication_date>2026-06-27T02:26:14.935Z</video:publication_date>
+    </video:video>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/frameless-oval-backlit-led-bathroom-mirror-with-touch-control-and-digital-display/" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://bolenmirror.com/zh/videos/frameless-oval-backlit-led-bathroom-mirror-with-touch-control-and-digital-display/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bolenmirror.com/es/videos/frameless-oval-backlit-led-bathroom-mirror-with-touch-control-and-digital-display/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bolenmirror.com/fr/videos/frameless-oval-backlit-led-bathroom-mirror-with-touch-control-and-digital-display/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://bolenmirror.com/de/videos/frameless-oval-backlit-led-bathroom-mirror-with-touch-control-and-digital-display/" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://bolenmirror.com/it/videos/frameless-oval-backlit-led-bathroom-mirror-with-touch-control-and-digital-display/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bolenmirror.com/en/videos/frameless-oval-backlit-led-bathroom-mirror-with-touch-control-and-digital-display/" />
+  </url>
+  <url>
+    <loc>https://bolenmirror.com/it/videos/teardrop-gold-framed-backlit-led-bathroom-mirror-with-touch-control/</loc>
+    <lastmod>2026-06-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <video:video>
+      <video:thumbnail_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/thumbnails/1782526998029-0xvs378.jpg</video:thumbnail_loc>
+      <video:title>Teardrop Gold Framed Backlit LED Bathroom Mirror with Touch Control</video:title>
+      <video:description>A distinctive teardrop shaped LED bathroom mirror featuring a slim gold frame, soft backlighting, and convenient touch control. Ideal for modern vanities, hotels, apartments, and luxury residential projects.</video:description>
+      <video:content_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/videos/1782526998029-qlrf9wq.mp4</video:content_loc>
+      <video:duration>33</video:duration>
+      <video:publication_date>2026-06-27T02:24:05.295Z</video:publication_date>
+    </video:video>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/teardrop-gold-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://bolenmirror.com/zh/videos/teardrop-gold-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bolenmirror.com/es/videos/teardrop-gold-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bolenmirror.com/fr/videos/teardrop-gold-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://bolenmirror.com/de/videos/teardrop-gold-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://bolenmirror.com/it/videos/teardrop-gold-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bolenmirror.com/en/videos/teardrop-gold-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+  </url>
+  <url>
+    <loc>https://bolenmirror.com/it/videos/irregular-wood-framed-backlit-led-bathroom-mirror-with-touch-control/</loc>
+    <lastmod>2026-06-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <video:video>
+      <video:thumbnail_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/thumbnails/1782526774382-y8z8i3u.jpg</video:thumbnail_loc>
+      <video:title>Irregular Wood Framed Backlit LED Bathroom Mirror with Touch Control</video:title>
+      <video:description>Add sculptural style to modern bathrooms with this irregular wood framed LED mirror, featuring soft backlighting and touch control for adjustable illumination.</video:description>
+      <video:content_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/videos/1782526774382-bs0187r.mp4</video:content_loc>
+      <video:duration>26</video:duration>
+      <video:publication_date>2026-06-27T02:19:46.368Z</video:publication_date>
+    </video:video>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/irregular-wood-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://bolenmirror.com/zh/videos/irregular-wood-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bolenmirror.com/es/videos/irregular-wood-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bolenmirror.com/fr/videos/irregular-wood-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://bolenmirror.com/de/videos/irregular-wood-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://bolenmirror.com/it/videos/irregular-wood-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bolenmirror.com/en/videos/irregular-wood-framed-backlit-led-bathroom-mirror-with-touch-control/" />
+  </url>
+  <url>
+    <loc>https://bolenmirror.com/it/videos/round-led-bathroom-mirror-for-wall-backlit-vanity-mirror-with-touch-switch-anti-fog-glass-easy-installation/</loc>
+    <lastmod>2026-06-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <video:video>
+      <video:thumbnail_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/thumbnails/1782526546663-e0rrtbu.jpg</video:thumbnail_loc>
+      <video:title>Round LED Bathroom Mirror for Wall Backlit Vanity Mirror with Touch Switch, Anti Fog Glass &amp; Easy Installation</video:title>
+      <video:description>The built in touch switch makes it easy to turn on/off, while the anti fog function keeps the reflection crystal clear. A perfect blend of functionality and style for any modern bathroom or powder room.</video:description>
+      <video:content_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/videos/1782526546663-bojr8mg.mp4</video:content_loc>
+      <video:duration>29</video:duration>
+      <video:publication_date>2026-06-27T02:16:06.108Z</video:publication_date>
+    </video:video>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/round-led-bathroom-mirror-for-wall-backlit-vanity-mirror-with-touch-switch-anti-fog-glass-easy-installation/" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://bolenmirror.com/zh/videos/round-led-bathroom-mirror-for-wall-backlit-vanity-mirror-with-touch-switch-anti-fog-glass-easy-installation/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bolenmirror.com/es/videos/round-led-bathroom-mirror-for-wall-backlit-vanity-mirror-with-touch-switch-anti-fog-glass-easy-installation/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bolenmirror.com/fr/videos/round-led-bathroom-mirror-for-wall-backlit-vanity-mirror-with-touch-switch-anti-fog-glass-easy-installation/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://bolenmirror.com/de/videos/round-led-bathroom-mirror-for-wall-backlit-vanity-mirror-with-touch-switch-anti-fog-glass-easy-installation/" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://bolenmirror.com/it/videos/round-led-bathroom-mirror-for-wall-backlit-vanity-mirror-with-touch-switch-anti-fog-glass-easy-installation/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bolenmirror.com/en/videos/round-led-bathroom-mirror-for-wall-backlit-vanity-mirror-with-touch-switch-anti-fog-glass-easy-installation/" />
+  </url>
+  <url>
+    <loc>https://bolenmirror.com/it/videos/modern-round-wood-framed-backlit-led-bathroom-mirror-with-touch-sensor/</loc>
+    <lastmod>2026-06-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <video:video>
+      <video:thumbnail_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/thumbnails/1782526262620-xwanp1b.jpg</video:thumbnail_loc>
+      <video:title>Modern Round Wood Framed Backlit LED Bathroom Mirror with Touch Sensor</video:title>
+      <video:description>A modern round bathroom mirror with a dark wood look frame, soft LED backlighting, and convenient touch control—ideal for hotel, residential, and vanity projects.</video:description>
+      <video:content_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/videos/1782526262620-ht1wajl.mp4</video:content_loc>
+      <video:duration>22</video:duration>
+      <video:publication_date>2026-06-27T02:11:27.008Z</video:publication_date>
+    </video:video>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/modern-round-wood-framed-backlit-led-bathroom-mirror-with-touch-sensor/" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://bolenmirror.com/zh/videos/modern-round-wood-framed-backlit-led-bathroom-mirror-with-touch-sensor/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bolenmirror.com/es/videos/modern-round-wood-framed-backlit-led-bathroom-mirror-with-touch-sensor/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bolenmirror.com/fr/videos/modern-round-wood-framed-backlit-led-bathroom-mirror-with-touch-sensor/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://bolenmirror.com/de/videos/modern-round-wood-framed-backlit-led-bathroom-mirror-with-touch-sensor/" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://bolenmirror.com/it/videos/modern-round-wood-framed-backlit-led-bathroom-mirror-with-touch-sensor/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bolenmirror.com/en/videos/modern-round-wood-framed-backlit-led-bathroom-mirror-with-touch-sensor/" />
+  </url>
+  <url>
     <loc>https://bolenmirror.com/it/videos/bolen-source-factory/</loc>
     <lastmod>2026-06-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <video:video>
+      <video:thumbnail_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/thumbnails/1782197285797-ps8tqm2.jpg</video:thumbnail_loc>
+      <video:title>Video fabbrica BOLEN Produttore di specchi LED da bagno</video:title>
+      <video:description>Guarda il video della fabbrica BOLEN per uno specchio LED da bagno con cornice in alluminio bianco, controllo touch, installazione a parete e preventivo OEM/ODM.</video:description>
+      <video:content_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/videos/1782197285797-56dkwd1.mp4</video:content_loc>
+      <video:duration>130</video:duration>
+      <video:publication_date>2026-06-23T06:50:17.814Z</video:publication_date>
+    </video:video>
     <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/bolen-source-factory/" />
     <xhtml:link rel="alternate" hreflang="zh" href="https://bolenmirror.com/zh/videos/bolen-source-factory/" />
     <xhtml:link rel="alternate" hreflang="es" href="https://bolenmirror.com/es/videos/bolen-source-factory/" />
@@ -6310,6 +7154,14 @@
     <lastmod>2026-06-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <video:video>
+      <video:thumbnail_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/thumbnails/1782196009471-t1vdxa6.jpg</video:thumbnail_loc>
+      <video:title>Video specchio LED bianco con touch screen BOLEN</video:title>
+      <video:description>Guarda il video dello specchio LED da bagno BOLEN a parete con cornice in alluminio bianco, controlli touch, stile senza giunzioni e illuminazione moderna.</video:description>
+      <video:content_loc>https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-videos/videos/1782196009471-tygytkz.mp4</video:content_loc>
+      <video:duration>45</video:duration>
+      <video:publication_date>2026-06-23T06:33:18.326Z</video:publication_date>
+    </video:video>
     <xhtml:link rel="alternate" hreflang="en" href="https://bolenmirror.com/en/videos/seamless-white-aluminum-framed-wall-mounted-touch-screen-led-vanity-mirror/" />
     <xhtml:link rel="alternate" hreflang="zh" href="https://bolenmirror.com/zh/videos/seamless-white-aluminum-framed-wall-mounted-touch-screen-led-vanity-mirror/" />
     <xhtml:link rel="alternate" hreflang="es" href="https://bolenmirror.com/es/videos/seamless-white-aluminum-framed-wall-mounted-touch-screen-led-vanity-mirror/" />

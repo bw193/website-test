@@ -11,13 +11,13 @@ const TRANSFORMS_ENABLED = true;
 
 export function optimizeImage(
   url: string | undefined | null,
-  options: { width?: number; height?: number; quality?: number } = {}
+  options: { width?: number; height?: number; quality?: number; resize?: 'cover' | 'contain' } = {}
 ): string {
   if (!url) return '';
   if (!TRANSFORMS_ENABLED) return url;
   if (!url.includes('supabase.co/storage/v1/object/public/')) return url;
 
-  const { width, height, quality = 80 } = options;
+  const { width, height, quality = 80, resize = 'contain' } = options;
 
   let transformed = url.replace(
     '/storage/v1/object/public/',
@@ -28,10 +28,9 @@ export function optimizeImage(
   if (width) params.set('width', String(width));
   if (height) params.set('height', String(height));
   if (quality !== 80) params.set('quality', String(quality));
-  // Supabase image transforms default to resize=cover, which crops square
-  // sources to a tall portrait when only width is specified. Force `contain`
-  // so the source aspect ratio is always preserved.
-  params.set('resize', 'contain');
+  // Most product/blog images should preserve their source framing. Video cards
+  // can opt into `cover` with a fixed width/height to get true poster crops.
+  params.set('resize', resize);
 
   transformed += (transformed.includes('?') ? '&' : '?') + params.toString();
   return transformed;
@@ -43,12 +42,20 @@ export function optimizeImage(
  */
 export function imageSrcSet(
   url: string | undefined | null,
-  widths: number[] = [400, 800, 1200]
+  widths: number[] = [400, 800, 1200],
+  options: { heightForWidth?: (width: number) => number; quality?: number; resize?: 'cover' | 'contain' } = {}
 ): string {
   if (!url || !TRANSFORMS_ENABLED) return '';
   if (!url.includes('supabase.co/storage/v1/object/public/')) return '';
 
   return widths
-    .map(w => `${optimizeImage(url, { width: w })} ${w}w`)
+    .map((w) =>
+      `${optimizeImage(url, {
+        width: w,
+        height: options.heightForWidth ? options.heightForWidth(w) : undefined,
+        quality: options.quality,
+        resize: options.resize,
+      })} ${w}w`
+    )
     .join(', ');
 }

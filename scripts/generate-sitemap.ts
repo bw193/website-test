@@ -3,6 +3,10 @@ import { writeFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
 import 'dotenv/config';
+import type { LocalizedMap } from '../src/types/blog';
+import type { VideoSourceType } from '../src/types/video';
+import { pickLocalized } from '../src/utils/blog';
+import { getVideoPlayback, normalizeVideoSourceType } from '../src/utils/video';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -20,11 +24,131 @@ const DOMAIN = 'https://bolenmirror.com';
 const LANGUAGES = ['en', 'zh', 'es', 'fr', 'de', 'it'];
 const today = new Date().toISOString().split('T')[0];
 
+type SitemapPage = {
+  loc: string;
+  changefreq: string;
+  priority: string;
+  lastmod: string;
+  videoByLang?: Record<string, string | null>;
+};
+
+type SitemapVideoPost = {
+  slug: string;
+  source_type: VideoSourceType | string | null;
+  video_url?: string | null;
+  embed_url?: string | null;
+  thumbnail_url?: string | null;
+  duration_seconds?: number | null;
+  title?: LocalizedMap | null;
+  excerpt?: LocalizedMap | null;
+  body?: LocalizedMap | null;
+  seo_title?: LocalizedMap | null;
+  seo_description?: LocalizedMap | null;
+  updated_at?: string | null;
+  published_at?: string | null;
+  created_at?: string | null;
+};
+
 function toSlug(title: string): string {
   return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
 }
 
-function buildUrlEntry(pagePath: string, lastmod: string, changefreq: string, priority: string, lang: string): string {
+function escapeXml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+}
+
+function isHttpUrl(value: string | null | undefined): value is string {
+  if (!value) return false;
+  try {
+    const url = new URL(value);
+    return url.protocol === 'http:' || url.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
+function normalizeText(value: string): string {
+  return value
+    .replace(/!\[[^\]]*]\([^)]*\)/g, ' ')
+    .replace(/\[([^\]]+)]\([^)]*\)/g, '$1')
+    .replace(/[`*_>#|~-]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function truncateDescription(value: string): string {
+  const normalized = normalizeText(value);
+  return normalized.length > 2048 ? `${normalized.slice(0, 2045).trimEnd()}...` : normalized;
+}
+
+function toW3cDate(value: string | null | undefined): string {
+  if (!value) return '';
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? '' : date.toISOString();
+}
+
+function buildVideoBlock(video: SitemapVideoPost, lang: string): string | null {
+  const playback = getVideoPlayback({
+    source_type: normalizeVideoSourceType(video.source_type),
+    video_url: video.video_url,
+    embed_url: video.embed_url,
+  });
+  const thumbnail = isHttpUrl(video.thumbnail_url) ? video.thumbnail_url : '';
+  const playbackTag =
+    playback.kind === 'video' && isHttpUrl(playback.src)
+      ? `      <video:content_loc>${escapeXml(playback.src)}</video:content_loc>`
+      : playback.kind === 'embed' && isHttpUrl(playback.src)
+        ? `      <video:player_loc>${escapeXml(playback.src)}</video:player_loc>`
+        : '';
+
+  if (!thumbnail || !playbackTag) {
+    console.warn(
+      `[sitemap] Skipping video metadata for ${video.slug}: missing ${!thumbnail ? 'thumbnail_url' : 'video source URL'}.`
+    );
+    return null;
+  }
+
+  const fallbackTitle = normalizeText(video.slug.replace(/-/g, ' '));
+  const title = normalizeText(pickLocalized(video.seo_title, lang) || pickLocalized(video.title, lang) || fallbackTitle);
+  const description = truncateDescription(
+    pickLocalized(video.seo_description, lang) ||
+      pickLocalized(video.excerpt, lang) ||
+      pickLocalized(video.body, lang) ||
+      title
+  );
+  const duration =
+    typeof video.duration_seconds === 'number' && video.duration_seconds >= 1 && video.duration_seconds <= 28800
+      ? `      <video:duration>${Math.round(video.duration_seconds)}</video:duration>`
+      : '';
+  const publicationDate = toW3cDate(video.published_at);
+
+  return [
+    '    <video:video>',
+    `      <video:thumbnail_loc>${escapeXml(thumbnail)}</video:thumbnail_loc>`,
+    `      <video:title>${escapeXml(title)}</video:title>`,
+    `      <video:description>${escapeXml(description)}</video:description>`,
+    playbackTag,
+    duration,
+    publicationDate ? `      <video:publication_date>${escapeXml(publicationDate)}</video:publication_date>` : '',
+    '    </video:video>',
+  ]
+    .filter(Boolean)
+    .join('\n');
+}
+
+function buildUrlEntry(
+  pagePath: string,
+  lastmod: string,
+  changefreq: string,
+  priority: string,
+  lang: string,
+  videoBlock?: string | null
+): string {
   // Trailing slash matches Cloudflare Pages directory-style serving and the
   // canonical/hreflang URLs the prerender emits, so sitemap URLs resolve
   // 200 directly without a slash-redirect hop.
@@ -39,7 +163,7 @@ function buildUrlEntry(pagePath: string, lastmod: string, changefreq: string, pr
     <lastmod>${lastmod}</lastmod>
     <changefreq>${changefreq}</changefreq>
     <priority>${priority}</priority>
-${hreflangs}
+${videoBlock ? `${videoBlock}\n` : ''}${hreflangs}
 ${xDefault}
   </url>`;
 }
@@ -103,7 +227,9 @@ async function generateSitemap() {
   // URLs instead of breaking the sitemap before scripts/videos.sql is run.
   const { data: videoPosts, error: videoError } = await supabase
     .from('videos')
-    .select('slug, updated_at, published_at, created_at')
+    .select(
+      'slug, source_type, video_url, embed_url, thumbnail_url, duration_seconds, title, excerpt, body, seo_title, seo_description, updated_at, published_at, created_at'
+    )
     .eq('status', 'published')
     .order('published_at', { ascending: false });
 
@@ -111,17 +237,19 @@ async function generateSitemap() {
     console.warn('Could not fetch videos for sitemap:', videoError.message);
   }
 
-  const videoPostPages = (videoPosts || []).map((p) => {
+  const videoPostPages = ((videoPosts || []) as SitemapVideoPost[]).map((p) => {
     const lastmod = (p.updated_at || p.published_at || p.created_at || today).split('T')[0];
+    const videoByLang = Object.fromEntries(LANGUAGES.map((lang) => [lang, buildVideoBlock(p, lang)]));
     return {
       loc: `/videos/${p.slug}`,
       changefreq: 'monthly',
       priority: '0.7',
       lastmod,
+      videoByLang,
     };
   });
 
-  const allPages = [
+  const allPages: SitemapPage[] = [
     ...staticPages.map((p) => ({ ...p, lastmod: today })),
     ...productPages,
     ...blogPostPages,
@@ -130,11 +258,11 @@ async function generateSitemap() {
 
   // Generate a URL entry for each page × each language
   const urls = LANGUAGES.flatMap((lang) =>
-    allPages.map((p) => buildUrlEntry(p.loc, p.lastmod, p.changefreq, p.priority, lang))
+    allPages.map((p) => buildUrlEntry(p.loc, p.lastmod, p.changefreq, p.priority, lang, p.videoByLang?.[lang]))
   );
 
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
 ${urls.join('\n')}
 </urlset>
 `;
