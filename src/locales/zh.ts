@@ -86,13 +86,15 @@ export const zh = {
       },
       featuredVideo: {
         subtitle: "精选影片",
+        nowPlaying: "正在播放",
         title: "在动态中了解我们的镜子",
         desc: "一键走进车间：观看 BOLEN LED 镜、智能镜与化妆镜从制造、打磨到出货前测试的全过程。",
-        watch: "播放视频",
-        details: "视频详情",
+        watch: "观看完整视频",
         viewAll: "全部视频",
-        playHint: "点击播放",
-        playAria: "播放视频：{{title}}"
+        playAria: "播放视频：{{title}}",
+        pauseAria: "暂停背景视频",
+        soundOn: "开启声音",
+        soundOff: "静音"
       },
       advantage: {
         subtitle: "BOLEN 的优势",

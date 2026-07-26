@@ -1,9 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../supabase';
-import { Loader2, Save, Image as ImageIcon, Upload, Plus, Trash2, Settings as SettingsIcon, LayoutTemplate, Tags, Factory, ArrowUp, ArrowDown, Check, CircleSlash, Clock, Film, Play } from 'lucide-react';
+import { Loader2, Save, Image as ImageIcon, Upload, Plus, Trash2, Settings as SettingsIcon, LayoutTemplate, Tags, Factory, ArrowUp, ArrowDown, AlertTriangle, Check, CircleSlash, Clock, Film, Play, Zap } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { pickLocalized } from '../utils/blog';
-import { FALLBACK_VIDEO_THUMB, formatVideoDuration, parseFeaturedVideoSlug } from '../utils/video';
+import {
+  FALLBACK_VIDEO_THUMB,
+  fetchMediaSize,
+  formatMediaSize,
+  formatVideoDuration,
+  parseFeaturedVideoSlug,
+  planAmbientClip,
+} from '../utils/video';
 import { optimizeImage } from '../utils/optimizeImage';
 import type { VideoPost } from '../types/video';
 
@@ -16,6 +23,8 @@ type FeaturedVideoOption = {
   thumbnail_url: string | null;
   category: string | null;
   duration_seconds: number | null;
+  /** File size in bytes; null when it couldn't be read (embeds, network error). */
+  bytes: number | null;
 };
 
 export default function AdminSettings() {
@@ -59,18 +68,23 @@ export default function AdminSettings() {
     try {
       const { data, error } = await supabase
         .from('videos')
-        .select('slug, title, thumbnail_url, category, duration_seconds, published_at')
+        .select('slug, title, thumbnail_url, category, duration_seconds, published_at, video_url')
         .eq('status', 'published')
         .order('published_at', { ascending: false });
       if (error) throw error;
+      // File size decides whether the homepage can autoplay the clip as a
+      // background, so show it up front instead of letting the editor guess.
       setVideoOptions(
-        (data || []).map((row: Partial<VideoPost>) => ({
-          slug: row.slug as string,
-          title: pickLocalized(row.title, 'en') || (row.slug as string),
-          thumbnail_url: row.thumbnail_url ?? null,
-          category: row.category ?? null,
-          duration_seconds: row.duration_seconds ?? null,
-        }))
+        await Promise.all(
+          (data || []).map(async (row: Partial<VideoPost>) => ({
+            slug: row.slug as string,
+            title: pickLocalized(row.title, 'en') || (row.slug as string),
+            thumbnail_url: row.thumbnail_url ?? null,
+            category: row.category ?? null,
+            duration_seconds: row.duration_seconds ?? null,
+            bytes: row.video_url ? await fetchMediaSize(row.video_url) : null,
+          }))
+        )
       );
     } catch (err: any) {
       // A missing videos table just means the picker shows its empty state.
@@ -513,11 +527,16 @@ NOTIFY pgrst, 'reload schema';`}
           )}
         </div>
         <div className="p-6">
-          <p className="text-sm text-stone-500 mb-6">
+          <p className="text-sm text-stone-500 mb-2">
             Pick the video shown in the homepage video section. Only published videos appear here — publish a
             video under the <span className="font-medium text-stone-700">Videos</span> tab first. Choose{' '}
             <span className="font-medium text-stone-700">No video</span> to hide the section entirely, then hit
             Save Settings below.
+          </p>
+          <p className="text-sm text-stone-500 mb-6">
+            The video autoplays silently as the section background. Long or heavy files aren't streamed whole — the
+            homepage loops a short excerpt sized to keep the download small, and falls back to a still image only
+            when even a brief loop would be too heavy.
           </p>
 
           {videosLoading ? (
@@ -605,6 +624,30 @@ NOTIFY pgrst, 'reload schema';`}
                           </>
                         )}
                       </p>
+                      {option.bytes !== null && (() => {
+                        const plan = planAmbientClip(option.bytes, option.duration_seconds);
+                        const label = !plan
+                          ? 'still image only'
+                          : plan.full
+                            ? 'autoplays in full'
+                            : `loops a ${Math.round(plan.seconds)}s excerpt${
+                                plan.bytes ? ` (~${formatMediaSize(plan.bytes)})` : ''
+                              }`;
+                        return (
+                          <p
+                            className={`mt-2 inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[11px] font-semibold ${
+                              plan ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'
+                            }`}
+                          >
+                            {plan ? (
+                              <Zap className="h-3 w-3 shrink-0" />
+                            ) : (
+                              <AlertTriangle className="h-3 w-3 shrink-0" />
+                            )}
+                            {formatMediaSize(option.bytes)} — {label}
+                          </p>
+                        );
+                      })()}
                     </div>
                   </button>
                 );

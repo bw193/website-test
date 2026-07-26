@@ -86,13 +86,15 @@ export const it = {
       },
       featuredVideo: {
         subtitle: "Video in Evidenza",
+        nowPlaying: "In riproduzione",
         title: "I Nostri Specchi in Movimento",
         desc: "Un clic per entrare in reparto: guarda come gli specchi LED, smart e da toeletta BOLEN vengono prodotti, rifiniti e testati prima della spedizione.",
-        watch: "Riproduci il video",
-        details: "Dettagli del video",
+        watch: "Guarda il video completo",
         viewAll: "Tutti i video",
-        playHint: "Clicca per riprodurre",
-        playAria: "Riproduci video: {{title}}"
+        playAria: "Riproduci video: {{title}}",
+        pauseAria: "Metti in pausa il video di sfondo",
+        soundOn: "Attiva l'audio",
+        soundOff: "Disattiva l'audio"
       },
       advantage: {
         subtitle: "Il Vantaggio BOLEN",

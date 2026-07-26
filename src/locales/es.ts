@@ -86,13 +86,15 @@ export const es = {
       },
       featuredVideo: {
         subtitle: "Video Destacado",
+        nowPlaying: "Reproduciendo",
         title: "Vea Nuestros Espejos en Movimiento",
         desc: "Un clic para entrar en la planta: vea cómo se fabrican, acaban y prueban los espejos LED, inteligentes y de tocador de BOLEN antes de enviarlos.",
-        watch: "Reproducir el video",
-        details: "Detalles del video",
+        watch: "Ver el video completo",
         viewAll: "Todos los videos",
-        playHint: "Haga clic para reproducir",
-        playAria: "Reproducir video: {{title}}"
+        playAria: "Reproducir video: {{title}}",
+        pauseAria: "Pausar el video de fondo",
+        soundOn: "Activar el sonido",
+        soundOff: "Silenciar el video"
       },
       advantage: {
         subtitle: "La Ventaja BOLEN",

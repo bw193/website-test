@@ -86,13 +86,15 @@ export const en = {
       },
       featuredVideo: {
         subtitle: "Featured Film",
+        nowPlaying: "Now Playing",
         title: "See Our Mirrors in Motion",
         desc: "One click into the factory floor: watch how BOLEN LED, smart, and vanity mirrors are built, finished, and tested before they ship.",
-        watch: "Play the video",
-        details: "Video details",
+        watch: "Watch full video",
         viewAll: "All videos",
-        playHint: "Click to play",
-        playAria: "Play video: {{title}}"
+        playAria: "Play video: {{title}}",
+        pauseAria: "Pause the background video",
+        soundOn: "Turn on sound",
+        soundOff: "Mute the video"
       },
       advantage: {
         subtitle: "The BOLEN Edge",

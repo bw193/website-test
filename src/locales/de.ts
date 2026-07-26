@@ -86,13 +86,15 @@ export const de = {
       },
       featuredVideo: {
         subtitle: "Ausgewähltes Video",
+        nowPlaying: "Läuft jetzt",
         title: "Unsere Spiegel in Bewegung",
         desc: "Ein Klick in die Fertigung: Sehen Sie, wie BOLEN LED-, Smart- und Schminkspiegel gefertigt, veredelt und vor dem Versand geprüft werden.",
-        watch: "Video abspielen",
-        details: "Videodetails",
+        watch: "Ganzes Video ansehen",
         viewAll: "Alle Videos",
-        playHint: "Zum Abspielen klicken",
-        playAria: "Video abspielen: {{title}}"
+        playAria: "Video abspielen: {{title}}",
+        pauseAria: "Hintergrundvideo anhalten",
+        soundOn: "Ton einschalten",
+        soundOff: "Video stummschalten"
       },
       advantage: {
         subtitle: "Der BOLEN-Vorteil",

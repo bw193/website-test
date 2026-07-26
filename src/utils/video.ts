@@ -18,6 +18,108 @@ export const FALLBACK_VIDEO_THUMB =
 export const VIDEO_LIST_COLUMNS =
   'id, slug, source_type, video_url, embed_url, thumbnail_url, category, tags, duration_seconds, published_at, title, excerpt';
 
+/**
+ * Ceiling on what the homepage's background video may stream, deliberately set
+ * high enough to admit the ~30MB factory film the site owner wants as the
+ * backdrop. That is a lot of data for a section a visitor merely scrolled past,
+ * so the cost is contained elsewhere instead: nothing loads until the band is
+ * in view, metered and slow connections fall back to the poster, playback pauses
+ * off-screen, and repeat visits revalidate to a 304. Lower this to ~6MB to make
+ * the guard strict again — every product clip is under 5MB and still qualifies.
+ */
+export const AMBIENT_CLIP_BUDGET_BYTES = 32 * 1024 * 1024;
+/** Loop length when an excerpt is worth taking. */
+export const AMBIENT_CLIP_PREFERRED_SECONDS = 12;
+/**
+ * How much media a browser pulls regardless of the window we ask for. A media
+ * fragment bounds *playback*, not buffering: measured in Chrome, a 12s window of
+ * a 130s/26MB upload still transferred ~11MB, and a 5s window of a 45s/53MB one
+ * transferred ~47MB. So an excerpt is a byte *reducer*, never a byte guarantee,
+ * and the affordability check has to price in the readahead. Calibrated
+ * conservatively against those two measurements.
+ */
+export const AMBIENT_READAHEAD_SECONDS = 55;
+
+export interface AmbientClipPlan {
+  /** Offset into the file where the loop starts, in seconds. */
+  start: number;
+  /** Length of the looped window, in seconds. */
+  seconds: number;
+  /** True when the whole file fits the budget and no excerpting is needed. */
+  full: boolean;
+  /** Approximate bytes the loop will stream; null when the size is unknown. */
+  bytes: number | null;
+}
+
+/**
+ * Decides whether the homepage can afford a video as its backdrop, and whether
+ * to loop an excerpt instead of the whole thing.
+ *
+ * Excerpting helps exactly one shape of file: long and low-bitrate, where the
+ * browser's readahead covers less than the full duration (a 3-minute 0.1 MB/s
+ * upload transfers ~5MB instead of 18MB). It cannot rescue a high-bitrate file —
+ * the readahead alone busts the budget — so those get the poster instead.
+ */
+export function planAmbientClip(
+  totalBytes: number | null,
+  durationSeconds: number | null | undefined
+): AmbientClipPlan | null {
+  // No duration means no way to size a window, so only pass files already small.
+  if (!durationSeconds || durationSeconds <= 0) {
+    if (totalBytes !== null && totalBytes > AMBIENT_CLIP_BUDGET_BYTES) return null;
+    return { start: 0, seconds: 0, full: true, bytes: totalBytes };
+  }
+
+  // No size means no bitrate to reason about; excerpt long sources on principle.
+  if (totalBytes === null) {
+    const excerpt = durationSeconds > AMBIENT_READAHEAD_SECONDS;
+    return {
+      start: excerpt ? durationSeconds * 0.2 : 0,
+      seconds: excerpt ? AMBIENT_CLIP_PREFERRED_SECONDS : durationSeconds,
+      full: !excerpt,
+      bytes: null,
+    };
+  }
+
+  const bytesPerSecond = totalBytes / durationSeconds;
+  // What the browser will really transfer, whatever window we ask it to play.
+  const estimatedBytes = Math.min(totalBytes, bytesPerSecond * AMBIENT_READAHEAD_SECONDS);
+  if (estimatedBytes > AMBIENT_CLIP_BUDGET_BYTES) return null;
+
+  // Only excerpt when it actually saves bytes — otherwise the browser fetches the
+  // whole file anyway and a short loop would just cost variety for nothing.
+  if (durationSeconds <= AMBIENT_READAHEAD_SECONDS) {
+    return { start: 0, seconds: durationSeconds, full: true, bytes: totalBytes };
+  }
+  // Start a fifth of the way in: the opening seconds of these uploads are
+  // usually a title card or a dark pan.
+  const seconds = AMBIENT_CLIP_PREFERRED_SECONDS;
+  const start = Math.max(0, Math.min(durationSeconds * 0.2, durationSeconds - seconds));
+  return { start, seconds, full: false, bytes: estimatedBytes };
+}
+
+/**
+ * Byte size of a media URL via HEAD. `null` when it can't be determined —
+ * callers should treat that as "no objection" rather than blocking playback.
+ * Supabase storage serves `access-control-allow-origin: *`, and Content-Length
+ * is CORS-safelisted, so this is readable from the browser.
+ */
+export async function fetchMediaSize(url: string): Promise<number | null> {
+  try {
+    const res = await fetch(url, { method: 'HEAD' });
+    if (!res.ok) return null;
+    const bytes = Number(res.headers.get('content-length'));
+    return Number.isFinite(bytes) && bytes > 0 ? bytes : null;
+  } catch {
+    return null;
+  }
+}
+
+export function formatMediaSize(bytes: number): string {
+  if (bytes >= 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+}
+
 export function formatVideoDuration(seconds: number | null | undefined): string {
   if (!seconds || seconds < 1) return '';
   const mins = Math.floor(seconds / 60);
@@ -62,22 +164,6 @@ export function buildEmbedUrl(url: string | null | undefined): string {
     return '';
   }
   return '';
-}
-
-/**
- * Adds the autoplay flag to a YouTube/Vimeo embed URL. Used by the click-to-play
- * facades (home featured video), where the iframe is only created after a real
- * user gesture — so the browser's autoplay policy lets it start with sound.
- */
-export function withAutoplay(src: string): string {
-  if (!src) return src;
-  try {
-    const url = new URL(src);
-    url.searchParams.set('autoplay', '1');
-    return url.toString();
-  } catch {
-    return src.includes('?') ? `${src}&autoplay=1` : `${src}?autoplay=1`;
-  }
 }
 
 /**

@@ -86,13 +86,15 @@ export const fr = {
       },
       featuredVideo: {
         subtitle: "Vidéo à la Une",
+        nowPlaying: "Lecture en cours",
         title: "Découvrez Nos Miroirs en Mouvement",
         desc: "Un clic pour entrer dans l'atelier : découvrez comment les miroirs LED, intelligents et de toilette BOLEN sont fabriqués, finis et testés avant expédition.",
-        watch: "Lire la vidéo",
-        details: "Détails de la vidéo",
+        watch: "Voir la vidéo complète",
         viewAll: "Toutes les vidéos",
-        playHint: "Cliquez pour lire",
-        playAria: "Lire la vidéo : {{title}}"
+        playAria: "Lire la vidéo : {{title}}",
+        pauseAria: "Mettre en pause la vidéo d'arrière-plan",
+        soundOn: "Activer le son",
+        soundOff: "Couper le son"
       },
       advantage: {
         subtitle: "L'Atout BOLEN",

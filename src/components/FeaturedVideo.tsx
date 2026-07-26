@@ -1,168 +1,263 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, ArrowUpRight, CalendarDays, Clock, Film, Play } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, CalendarDays, Clock, Film, Pause, Play, Volume2, VolumeX } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import Reveal from './Reveal';
-import VideoPlayer from './VideoPlayer';
 import { useLocalizedPath } from '../hooks/useLocalizedPath';
 import { formatBlogDate } from '../utils/blog';
-import { FALLBACK_VIDEO_THUMB, formatVideoDuration, getVideoPlayback } from '../utils/video';
+import {
+  FALLBACK_VIDEO_THUMB,
+  fetchMediaSize,
+  formatVideoDuration,
+  getVideoPlayback,
+  planAmbientClip,
+  type AmbientClipPlan,
+} from '../utils/video';
 import { imageSrcSet, optimizeImage } from '../utils/optimizeImage';
 import type { VideoListItem } from '../types/video';
 
-const POSTER_WIDTHS = [480, 720, 960];
-// Uploads get a 4:5 poster from the thumbnail generator; embed providers hand
-// back landscape stills. Used only until the real poster reports its own size.
-const DEFAULT_FILE_ASPECT = '4 / 5';
-const DEFAULT_EMBED_ASPECT = '16 / 9';
+const POSTER_WIDTHS = [640, 1024, 1600];
 
-/**
- * Gates the tilt / hover-preview extras: pointer-driven flourishes only make
- * sense on a real mouse, and never when the visitor asked for reduced motion.
- */
-function supportsRichHover(): boolean {
+function prefersReducedMotion(): boolean {
   if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return false;
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
-  return window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
-function savesData(): boolean {
-  if (typeof navigator === 'undefined') return false;
-  return (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData === true;
+/** Metered or slow connections get the poster, not several megabytes of video. */
+function connectionAllowsAmbient(): boolean {
+  if (typeof navigator === 'undefined') return true;
+  const conn = (navigator as Navigator & {
+    connection?: { saveData?: boolean; effectiveType?: string };
+  }).connection;
+  if (!conn) return true;
+  if (conn.saveData) return false;
+  return !(conn.effectiveType && /2g|^3g$/.test(conn.effectiveType));
 }
 
 /**
- * Home page "featured video" band — an editor-picked video (site_settings
- * `home_featured_video`) presented as a click-to-play facade: the poster and a
- * play button are all that load until the visitor actually asks for the video,
- * so the iframe/MP4 never touches the home page's critical path.
+ * Home page "featured video" band — the editor-picked video (site_settings
+ * `home_featured_video`) plays as a muted, looping cinematic backdrop behind the
+ * section copy.
+ *
+ * Video is expensive, so it is gated hard: nothing is requested until the band
+ * scrolls into view, and then only if motion is welcome and the connection isn't
+ * metered. Rather than streaming whole files, the band loops a short window sized
+ * to a byte budget (see planAmbientClip) — HTTP range requests mean a 12s excerpt
+ * of a 130s tour costs ~2.4MB instead of 26MB. If even a short loop would bust
+ * the budget, a drifting poster stands in. Playback pauses whenever the band
+ * leaves the viewport, and the controls always offer pause + mute (WCAG 2.2.2).
  */
 export default function FeaturedVideo({ video }: { video: VideoListItem }) {
   const { t } = useTranslation();
   const { lp, lang } = useLocalizedPath();
 
-  const stageRef = useRef<HTMLDivElement | null>(null);
-  const tiltFrame = useRef<number | null>(null);
-  const pointerPos = useRef<{ x: number; y: number } | null>(null);
-  const previewTimer = useRef<number | null>(null);
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const progressRef = useRef<HTMLDivElement | null>(null);
 
-  const [richHover, setRichHover] = useState(false);
-  const [playing, setPlaying] = useState(false);
-  const [preview, setPreview] = useState(false);
-  const [previewReady, setPreviewReady] = useState(false);
-  // Shapes vary across the library (vertical product clips, landscape factory
-  // tours), so the frame follows the poster's own ratio and then the file's real
-  // one on play. A fixed 16:9 box would letterbox every vertical clip.
-  const [posterAspect, setPosterAspect] = useState<string | null>(null);
-  const [playerAspect, setPlayerAspect] = useState<string | null>(null);
-
-  useEffect(() => setRichHover(supportsRichHover()), []);
-
-  useEffect(
-    () => () => {
-      if (previewTimer.current !== null) window.clearTimeout(previewTimer.current);
-      if (tiltFrame.current !== null) window.cancelAnimationFrame(tiltFrame.current);
-    },
-    []
-  );
+  const [inView, setInView] = useState(false);
+  // Set once the loop has cleared the gates (or the visitor asked for it
+  // explicitly) — until then the <video> isn't mounted and no bytes move.
+  const [clip, setClip] = useState<AmbientClipPlan | null>(null);
+  const [ambientBlocked, setAmbientBlocked] = useState(false);
+  const [ambientPlaying, setAmbientPlaying] = useState(false);
+  const [userPaused, setUserPaused] = useState(false);
+  const [muted, setMuted] = useState(true);
 
   const playback = getVideoPlayback(video);
-  // Muted hover preview only works for files we control (uploads/direct MP4s);
-  // YouTube/Vimeo embeds would mean loading their player just to hover.
-  const canPreview = richHover && playback.kind === 'video' && !savesData();
+  // Only self-hosted files can be a backdrop. A YouTube/Vimeo embed would mean
+  // loading a third-party player with its own chrome behind the copy.
+  const canAmbient = playback.kind === 'video';
 
-  const applyTilt = useCallback(() => {
-    tiltFrame.current = null;
-    const el = stageRef.current;
-    const pos = pointerPos.current;
-    if (!el || !pos) return;
-    el.style.setProperty('--fv-ry', `${(pos.x - 0.5) * 8}deg`);
-    el.style.setProperty('--fv-rx', `${(0.5 - pos.y) * 6}deg`);
-    el.style.setProperty('--fv-mx', `${pos.x * 100}%`);
-    el.style.setProperty('--fv-my', `${pos.y * 100}%`);
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') {
+      setInView(true);
+      return;
+    }
+    const io = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting), {
+      rootMargin: '200px 0px',
+    });
+    io.observe(el);
+    return () => io.disconnect();
   }, []);
 
-  const handlePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
-    const el = stageRef.current;
-    // Never tilt a playing video — the controls would move under the cursor.
-    if (!richHover || playing || !el) return;
-    const rect = el.getBoundingClientRect();
-    if (!rect.width || !rect.height) return;
-    pointerPos.current = {
-      x: Math.min(Math.max((event.clientX - rect.left) / rect.width, 0), 1),
-      y: Math.min(Math.max((event.clientY - rect.top) / rect.height, 0), 1),
+  // Arm the backdrop the first time the band is approached, subject to the gates.
+  useEffect(() => {
+    if (!canAmbient || !inView || clip || ambientBlocked) return;
+    if (prefersReducedMotion() || !connectionAllowsAmbient()) {
+      setAmbientBlocked(true);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      const bytes = await fetchMediaSize(playback.src);
+      if (cancelled) return;
+      const plan = planAmbientClip(bytes, video.duration_seconds);
+      if (!plan) {
+        setAmbientBlocked(true);
+        return;
+      }
+      setClip(plan);
+    })();
+    return () => {
+      cancelled = true;
     };
-    // Coalesce to one style write per frame — pointermove can outpace paint.
-    if (tiltFrame.current === null) tiltFrame.current = window.requestAnimationFrame(applyTilt);
+  }, [canAmbient, inView, clip, ambientBlocked, playback.src, video.duration_seconds]);
+
+  /**
+   * Seeking (and swapping src) rejects any pending play() with AbortError, which
+   * is routine here because every loop wrap is a seek — treating that as a pause
+   * would strand the backdrop on its first frame. Only a policy refusal is real.
+   */
+  const attemptPlay = (el: HTMLVideoElement) => {
+    el.play().catch((err: unknown) => {
+      if ((err as DOMException | undefined)?.name === 'NotAllowedError') setUserPaused(true);
+    });
   };
 
-  const handlePointerEnter = () => {
-    if (!canPreview || playing) return;
-    previewTimer.current = window.setTimeout(() => setPreview(true), 380);
-  };
-
-  const resetTilt = () => {
-    if (tiltFrame.current !== null) {
-      window.cancelAnimationFrame(tiltFrame.current);
-      tiltFrame.current = null;
+  // Keep playback tied to visibility so an off-screen clip never decodes.
+  useEffect(() => {
+    const el = videoRef.current;
+    if (!el || !clip) return;
+    if (inView && !userPaused) {
+      attemptPlay(el);
+    } else {
+      el.pause();
     }
-    pointerPos.current = null;
-    const el = stageRef.current;
-    if (el) {
-      el.style.removeProperty('--fv-rx');
-      el.style.removeProperty('--fv-ry');
+  }, [inView, userPaused, clip]);
+
+  const clipEnd = clip && !clip.full && clip.seconds > 0 ? clip.start + clip.seconds : null;
+
+  const handleTimeUpdate = () => {
+    const el = videoRef.current;
+    if (!el) return;
+    // Wrap inside the excerpt so the browser never ranges past the window it
+    // already buffered. `loop` can't do this — it always restarts at zero. The
+    // margin has to exceed one timeupdate tick (~250ms) or playback reaches the
+    // fragment end first and we fall through to the `ended` path.
+    if (clipEnd !== null && el.currentTime >= clipEnd - 0.3) {
+      el.currentTime = clip!.start;
+      return;
     }
+    const bar = progressRef.current;
+    if (!bar) return;
+    const start = clip?.start ?? 0;
+    const span = clipEnd !== null ? clip!.seconds : el.duration;
+    if (!span || !Number.isFinite(span)) return;
+    // scaleX on the compositor — no layout, no React re-render per tick.
+    bar.style.transform = `scaleX(${Math.min(Math.max((el.currentTime - start) / span, 0), 1)})`;
   };
 
-  const cancelPreview = () => {
-    if (previewTimer.current !== null) {
-      window.clearTimeout(previewTimer.current);
-      previewTimer.current = null;
+  const togglePlayback = () => {
+    if (!clip) {
+      // Poster mode: the visitor is explicitly opting in, so the reduced-motion
+      // and connection gates no longer apply — but still excerpt long files.
+      setAmbientBlocked(false);
+      setUserPaused(false);
+      setClip(
+        planAmbientClip(null, video.duration_seconds) ?? { start: 0, seconds: 0, full: true, bytes: null }
+      );
+      return;
     }
-    setPreview(false);
-    setPreviewReady(false);
+    setUserPaused((paused) => !paused);
   };
 
-  const handlePointerLeave = () => {
-    resetTilt();
-    cancelPreview();
-  };
-
-  const startPlayback = () => {
-    resetTilt();
-    cancelPreview();
-    setPlaying(true);
+  const toggleSound = () => {
+    const el = videoRef.current;
+    if (!el) return;
+    const next = !muted;
+    el.muted = next;
+    setMuted(next);
+    if (!next && el.paused) el.play().catch(() => setUserPaused(true));
   };
 
   const poster = video.thumbnail_url || FALLBACK_VIDEO_THUMB;
-  const fallbackAspect = playback.kind === 'embed' ? DEFAULT_EMBED_ASPECT : DEFAULT_FILE_ASPECT;
-  const frameAspect = (playing ? playerAspect : null) || posterAspect || fallbackAspect;
   const duration = formatVideoDuration(video.duration_seconds);
   const categoryLabel = video.category
     ? t(`videos.categories.${video.category}`, video.category)
     : t('videos.cardLabel', 'Video');
+  const showingVideo = ambientPlaying && !userPaused;
 
   return (
     <section
+      ref={sectionRef}
       id="featured-video"
       aria-labelledby="featured-video-title"
-      className="relative overflow-hidden bg-stone-950 py-20 text-white sm:py-24"
+      className="relative isolate flex min-h-[34rem] items-center overflow-hidden bg-stone-950 py-20 text-white sm:py-24 lg:min-h-[42rem]"
     >
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-        <div className="fv-grid absolute inset-0 opacity-[0.06]" />
-        <div className="fv-orb absolute -left-24 top-4 h-72 w-72 rounded-full bg-amber-500/25 blur-3xl" />
-        <div className="fv-orb fv-orb-slow absolute -right-24 bottom-0 h-96 w-96 rounded-full bg-stone-300/10 blur-3xl" />
+      {/* ── Backdrop: poster underneath, clip fading in over it ─────────── */}
+      <div aria-hidden="true" className="absolute inset-0 -z-10">
+        <img
+          src={optimizeImage(poster, { width: 1600 })}
+          srcSet={imageSrcSet(poster, POSTER_WIDTHS)}
+          sizes="100vw"
+          alt=""
+          loading="lazy"
+          decoding="async"
+          referrerPolicy="no-referrer"
+          className={`h-full w-full object-cover transition-opacity duration-1000 ${
+            showingVideo ? 'opacity-0' : 'fv-kenburns opacity-100'
+          }`}
+        />
+        {clip && (
+          <video
+            ref={videoRef}
+            // The media fragment makes the browser range-request just this window
+            // instead of streaming from byte zero.
+            src={clipEnd !== null ? `${playback.src}#t=${clip.start.toFixed(2)},${clipEnd.toFixed(2)}` : playback.src}
+            muted={muted}
+            loop={clipEnd === null}
+            playsInline
+            preload="auto"
+            tabIndex={-1}
+            onPlaying={() => setAmbientPlaying(true)}
+            onPause={() => setAmbientPlaying(false)}
+            onTimeUpdate={handleTimeUpdate}
+            onEnded={() => {
+              // Backstop: the browser stops at the fragment end if a timeupdate
+              // tick straddled the wrap point.
+              const el = videoRef.current;
+              if (!el || clipEnd === null) return;
+              el.currentTime = clip.start;
+              attemptPlay(el);
+            }}
+            onSeeked={() => {
+              // A wrap seek cancels the in-flight play(); pick it back up.
+              const el = videoRef.current;
+              if (el && el.paused && inView && !userPaused) attemptPlay(el);
+            }}
+            // These clips are shot in dim bathrooms and read as near-black under
+            // the scrims; a light grade lifts them without touching the poster.
+            className={`absolute inset-0 h-full w-full object-cover brightness-110 contrast-[1.04] saturate-110 transition-opacity duration-1000 ${
+              showingVideo ? 'opacity-100' : 'opacity-0'
+            }`}
+          />
+        )}
+
+        {/* Legibility scrims — heavy on the copy side. On wide screens the right
+            half clears completely so the footage is actually visible; on narrow
+            ones the copy spans the band, so the wash has to carry further. */}
+        <div className="absolute inset-0 bg-gradient-to-r from-stone-950 via-stone-950/80 to-stone-950/60 lg:via-stone-950/70 lg:to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-stone-950/85 via-transparent to-stone-950/35" />
       </div>
 
-      {/* The player track is a definite width: the frame's children are all
-          absolutely positioned, so an `auto` track would collapse it. */}
-      <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_26rem] lg:gap-20 lg:px-8">
-        {/* Editorial column */}
-        <div>
+      {/* ── Copy ────────────────────────────────────────────────────────── */}
+      <div className="relative mx-auto w-full max-w-7xl px-6 sm:px-10 lg:px-14">
+        <div className="max-w-2xl">
           <Reveal>
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.22em] text-amber-300 backdrop-blur-sm">
-              <Film className="h-3.5 w-3.5" />
-              {t('home.featuredVideo.subtitle', 'Featured Film')}
+            <span className="inline-flex items-center gap-2.5 rounded-full border border-white/15 bg-white/[0.06] px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.22em] text-amber-300 backdrop-blur-sm">
+              {showingVideo ? (
+                <>
+                  <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+                  {t('home.featuredVideo.nowPlaying', 'Now Playing')}
+                </>
+              ) : (
+                <>
+                  <Film className="h-3.5 w-3.5" />
+                  {t('home.featuredVideo.subtitle', 'Featured Film')}
+                </>
+              )}
             </span>
           </Reveal>
 
@@ -170,22 +265,22 @@ export default function FeaturedVideo({ video }: { video: VideoListItem }) {
             as="h2"
             id="featured-video-title"
             delay={60}
-            className="mt-6 font-serif text-4xl leading-[1.1] tracking-tight sm:text-5xl"
+            className="mt-6 font-serif text-4xl leading-[1.08] tracking-tight drop-shadow-[0_2px_24px_rgba(0,0,0,0.5)] sm:text-5xl lg:text-6xl"
           >
             {t('home.featuredVideo.title', 'See Our Mirrors in Motion')}
           </Reveal>
 
-          <Reveal as="p" delay={120} className="mt-5 max-w-xl text-lg font-light leading-relaxed text-stone-300">
+          <Reveal as="p" delay={120} className="mt-6 max-w-xl text-lg font-light leading-relaxed text-stone-200">
             {t('home.featuredVideo.desc', 'One click into the factory floor.')}
           </Reveal>
 
           <Reveal delay={180} className="mt-9 border-l-2 border-amber-500/70 pl-5">
             <h3 className="font-serif text-2xl leading-snug text-white">{video.title}</h3>
             {video.excerpt && (
-              <p className="mt-2.5 line-clamp-3 text-sm leading-relaxed text-stone-400">{video.excerpt}</p>
+              <p className="mt-2.5 line-clamp-2 text-sm leading-relaxed text-stone-300">{video.excerpt}</p>
             )}
-            <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-stone-400">
-              <span className="text-amber-300/90">{categoryLabel}</span>
+            <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-stone-300">
+              <span className="text-amber-300">{categoryLabel}</span>
               {duration && (
                 <span className="inline-flex items-center gap-1.5">
                   <Clock className="h-3.5 w-3.5" />
@@ -201,153 +296,69 @@ export default function FeaturedVideo({ video }: { video: VideoListItem }) {
             </div>
           </Reveal>
 
-          <Reveal delay={240} className="mt-9 flex flex-wrap items-center gap-3">
-            <button
-              type="button"
-              onClick={startPlayback}
-              className="group inline-flex items-center gap-2.5 rounded-full bg-amber-400 px-6 py-3.5 text-sm font-bold text-stone-950 shadow-lg shadow-amber-500/20 transition-all duration-300 hover:-translate-y-0.5 hover:bg-amber-300 hover:shadow-xl hover:shadow-amber-500/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 focus-visible:ring-offset-2 focus-visible:ring-offset-stone-950"
-            >
-              <Play className="h-4 w-4 fill-current transition-transform duration-300 group-hover:scale-110" />
-              {t('home.featuredVideo.watch', 'Play the video')}
-            </button>
+          <Reveal delay={240} className="mt-10 flex flex-wrap items-center gap-3">
             <Link
               to={lp(`/videos/${video.slug}`)}
-              className="inline-flex items-center gap-2 rounded-full border border-white/20 px-6 py-3.5 text-sm font-semibold text-white transition-colors duration-300 hover:border-white/45 hover:bg-white/10"
+              className="group inline-flex items-center gap-2.5 rounded-full bg-amber-400 px-6 py-3.5 text-sm font-bold text-stone-950 shadow-lg shadow-amber-500/25 transition-all duration-300 hover:-translate-y-0.5 hover:bg-amber-300 hover:shadow-xl hover:shadow-amber-500/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 focus-visible:ring-offset-2 focus-visible:ring-offset-stone-950"
             >
-              {t('home.featuredVideo.details', 'Video details')}
+              <Play className="h-4 w-4 fill-current transition-transform duration-300 group-hover:scale-110" />
+              {t('home.featuredVideo.watch', 'Watch full video')}
               <ArrowUpRight className="h-4 w-4" />
             </Link>
             <Link
               to={lp('/videos')}
-              className="group inline-flex items-center gap-1.5 px-2 py-3.5 text-sm font-semibold text-amber-300 transition-colors hover:text-amber-200"
+              className="group inline-flex items-center gap-1.5 rounded-full border border-white/20 px-6 py-3.5 text-sm font-semibold text-white transition-colors duration-300 hover:border-white/45 hover:bg-white/10"
             >
               {t('home.featuredVideo.viewAll', 'All videos')}
               <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
             </Link>
           </Reveal>
         </div>
-
-        {/* Player column */}
-        <Reveal delay={100} className="mx-auto w-full max-w-[26rem] lg:mx-0">
-          <div
-            ref={stageRef}
-            onPointerMove={handlePointerMove}
-            onPointerEnter={handlePointerEnter}
-            onPointerLeave={handlePointerLeave}
-            className="fv-stage fv-card group relative"
-          >
-            <div
-              aria-hidden="true"
-              className="absolute -inset-3 rounded-[2rem] bg-gradient-to-tr from-amber-500/25 via-transparent to-white/10 opacity-60 blur-2xl transition-opacity duration-500 group-hover:opacity-100"
-            />
-            <div
-              className="relative overflow-hidden rounded-3xl border border-white/12 bg-stone-900 shadow-2xl shadow-black/60 transition-[aspect-ratio] duration-500 ease-out"
-              style={{ aspectRatio: frameAspect }}
-            >
-              {playing ? (
-                <VideoPlayer
-                  video={video}
-                  autoPlay
-                  aspectRatio={frameAspect}
-                  onVideoMetadata={(w, h) => setPlayerAspect(`${w} / ${h}`)}
-                  className="h-full w-full"
-                />
-              ) : (
-                <button
-                  type="button"
-                  onClick={startPlayback}
-                  aria-label={t('home.featuredVideo.playAria', {
-                    title: video.title,
-                    defaultValue: 'Play video: {{title}}',
-                  })}
-                  className="absolute inset-0 block w-full cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-amber-300"
-                >
-                  <span className="relative block h-full w-full overflow-hidden bg-stone-900">
-                    <img
-                      src={optimizeImage(poster, { width: 960 })}
-                      srcSet={imageSrcSet(poster, POSTER_WIDTHS)}
-                      sizes="(max-width: 1024px) 92vw, 26rem"
-                      alt={video.title}
-                      loading="lazy"
-                      decoding="async"
-                      referrerPolicy="no-referrer"
-                      onLoad={(e) => {
-                        const img = e.currentTarget;
-                        // Match the frame to the real poster so nothing is cropped,
-                        // whatever shape the editor uploaded.
-                        if (img.naturalWidth && img.naturalHeight) {
-                          setPosterAspect(`${img.naturalWidth} / ${img.naturalHeight}`);
-                        }
-                      }}
-                      className="h-full w-full object-cover transition-transform duration-[900ms] ease-out group-hover:scale-[1.04]"
-                    />
-
-                    {/* Muted, silent hover preview — desktop + self-hosted files only. */}
-                    {preview && (
-                      <video
-                        src={playback.src}
-                        muted
-                        loop
-                        autoPlay
-                        playsInline
-                        preload="metadata"
-                        aria-hidden="true"
-                        tabIndex={-1}
-                        onCanPlay={() => setPreviewReady(true)}
-                        className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ${
-                          previewReady ? 'opacity-100' : 'opacity-0'
-                        }`}
-                      />
-                    )}
-
-                    <span
-                      aria-hidden="true"
-                      className="absolute inset-0 bg-gradient-to-t from-stone-950/85 via-stone-950/10 to-stone-950/30"
-                    />
-                    <span aria-hidden="true" className="fv-spot absolute inset-0" />
-                    <span aria-hidden="true" className="absolute inset-0 overflow-hidden">
-                      <span className="fv-sheen absolute inset-y-[-20%] left-0 w-1/4 bg-gradient-to-r from-transparent via-white/25 to-transparent" />
-                    </span>
-
-                    <span
-                      aria-hidden="true"
-                      className="absolute left-5 top-5 inline-flex items-center gap-1.5 rounded-full bg-stone-950/65 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-white backdrop-blur"
-                    >
-                      <Film className="h-3.5 w-3.5 text-amber-400" />
-                      {categoryLabel}
-                    </span>
-
-                    <span aria-hidden="true" className="absolute inset-0 flex items-center justify-center">
-                      <span className="relative flex h-[4.5rem] w-[4.5rem] items-center justify-center rounded-full bg-amber-400 text-stone-950 shadow-2xl shadow-black/40 transition-transform duration-300 ease-out group-hover:scale-110">
-                        <span className="fv-ring absolute inset-0 rounded-full border-2 border-amber-300/70" />
-                        <span className="fv-ring fv-ring-delayed absolute inset-0 rounded-full border-2 border-amber-300/50" />
-                        <Play className="ml-1 h-7 w-7 fill-current" />
-                      </span>
-                    </span>
-
-                    <span aria-hidden="true" className="absolute inset-x-5 bottom-5 flex items-center justify-between gap-3">
-                      <span className="inline-flex items-center gap-2 rounded-full bg-white/12 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-white backdrop-blur transition-colors duration-300 group-hover:bg-amber-400 group-hover:text-stone-950">
-                        <Play className="h-3 w-3 fill-current" />
-                        {t('home.featuredVideo.playHint', 'Click to play')}
-                      </span>
-                      {duration && (
-                        <span className="rounded-full bg-stone-950/70 px-2.5 py-1 text-xs font-semibold text-white backdrop-blur">
-                          {duration}
-                        </span>
-                      )}
-                    </span>
-
-                    {/* Playback-tease bar: fills across the card while hovered. */}
-                    <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-1 bg-white/10">
-                      <span className="block h-full w-0 bg-amber-400 transition-[width] duration-[1400ms] ease-out group-hover:w-full" />
-                    </span>
-                  </span>
-                </button>
-              )}
-            </div>
-          </div>
-        </Reveal>
       </div>
+
+      {/* ── HUD: playback controls + live progress ──────────────────────── */}
+      {canAmbient && (
+        <div className="absolute inset-x-0 bottom-0 z-10">
+          <div className="mx-auto flex max-w-7xl items-center justify-end gap-2 px-6 pb-5 sm:px-10 lg:px-14">
+            <button
+              type="button"
+              onClick={togglePlayback}
+              aria-pressed={showingVideo}
+              aria-label={
+                showingVideo
+                  ? (t('home.featuredVideo.pauseAria', 'Pause the background video') as string)
+                  : (t('home.featuredVideo.playAria', {
+                      title: video.title,
+                      defaultValue: 'Play video: {{title}}',
+                    }) as string)
+              }
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-stone-950/50 text-white backdrop-blur transition-colors duration-300 hover:border-amber-400/70 hover:bg-amber-400 hover:text-stone-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"
+            >
+              {showingVideo ? <Pause className="h-4 w-4 fill-current" /> : <Play className="h-4 w-4 fill-current" />}
+            </button>
+            <button
+              type="button"
+              onClick={toggleSound}
+              disabled={!clip}
+              aria-pressed={!muted}
+              aria-label={
+                muted
+                  ? (t('home.featuredVideo.soundOn', 'Turn on sound') as string)
+                  : (t('home.featuredVideo.soundOff', 'Mute the video') as string)
+              }
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-stone-950/50 text-white backdrop-blur transition-colors duration-300 hover:border-amber-400/70 hover:bg-amber-400 hover:text-stone-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-white/20 disabled:hover:bg-stone-950/50 disabled:hover:text-white"
+            >
+              {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+            </button>
+          </div>
+          <div className="h-[3px] w-full bg-white/10">
+            <div
+              ref={progressRef}
+              className="h-full origin-left scale-x-0 bg-amber-400 transition-transform duration-200 ease-linear"
+            />
+          </div>
+        </div>
+      )}
     </section>
   );
 }

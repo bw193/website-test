@@ -39,65 +39,19 @@
   animation: heroFade 1s ease;
 }
 
-/* Featured video band (home) — ambient + cursor-driven polish, written in CSS
-   rather than `motion` so the home route keeps shipping without the motion
-   runtime. Every animated property is transform/opacity (compositor only). */
-@keyframes fvDrift {
-  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
-  50%      { transform: translate3d(6%, -8%, 0) scale(1.15); }
+/* Featured video band (home). The section leans on the footage itself, so the
+   only decoration here is a slow drift for the still poster — used when the
+   background clip can't play (metered connection, reduced motion, embeds) so the
+   band doesn't look frozen. Kept in CSS rather than `motion` so the home route
+   keeps shipping without the motion runtime. */
+@keyframes fvKenBurns {
+  from { transform: scale(1) translate3d(0, 0, 0); }
+  to   { transform: scale(1.06) translate3d(-1%, -0.5%, 0); }
 }
-@keyframes fvRing {
-  0%   { transform: scale(0.9); opacity: 0.6; }
-  70%  { opacity: 0; }
-  100% { transform: scale(2.1); opacity: 0; }
-}
-@keyframes fvSheen {
-  from { transform: translate3d(-160%, 0, 0) skewX(-12deg); }
-  to   { transform: translate3d(420%, 0, 0) skewX(-12deg); }
-}
-
-.fv-orb { animation: fvDrift 22s ease-in-out infinite; }
-.fv-orb-slow { animation-duration: 32s; animation-direction: reverse; }
-
-/* Faint blueprint grid, faded out towards the edges. */
-.fv-grid {
-  background-image:
-    linear-gradient(to right, rgba(255, 255, 255, 0.5) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.5) 1px, transparent 1px);
-  background-size: 72px 72px;
-  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, #000, transparent 100%);
-  mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, #000, transparent 100%);
-}
-
-/* Cursor-tracked 3D tilt. FeaturedVideo writes --fv-rx/--fv-ry on pointer move
-   and clears them on leave; the transition does the easing/settle. */
-.fv-stage {
-  transform: perspective(1400px) rotateX(var(--fv-rx, 0deg)) rotateY(var(--fv-ry, 0deg));
-  transition: transform 400ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-/* Warm spotlight that follows the cursor across the poster. */
-.fv-spot {
-  background: radial-gradient(
-    260px circle at var(--fv-mx, 50%) var(--fv-my, 50%),
-    rgba(251, 191, 36, 0.28),
-    transparent 68%
-  );
-  opacity: 0;
-  transition: opacity 400ms ease;
-}
-.fv-card:hover .fv-spot { opacity: 1; }
-
-.fv-sheen { transform: translate3d(-160%, 0, 0) skewX(-12deg); }
-.fv-card:hover .fv-sheen { animation: fvSheen 1.15s cubic-bezier(0.4, 0, 0.2, 1); }
-
-.fv-ring { animation: fvRing 2.8s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
-.fv-ring-delayed { animation-delay: 0.95s; }
+.fv-kenburns { animation: fvKenBurns 32s ease-in-out infinite alternate; }
 
 @media (prefers-reduced-motion: reduce) {
   .reveal { opacity: 1; transform: none; transition: none; }
   .hero-fade { animation: none; }
-  .fv-orb, .fv-ring, .fv-sheen { animation: none; }
-  .fv-stage { transform: none; transition: none; }
-  .fv-spot { display: none; }
+  .fv-kenburns { animation: none; }
 }
