@@ -34,6 +34,9 @@ interface PrerenderPayload {
   // Editor-managed factory/company photo strip, baked into the home HTML so
   // crawlers see <figure>/<figcaption>/alt and the SPA mounts byte-identically.
   factoryGallery?: FactoryGalleryItem[];
+  // Editor-picked home video (site_settings.home_featured_video), pre-localized
+  // for `lang` so the home section renders without a Supabase round-trip.
+  featuredVideo?: VideoListItem | null;
   // Localized product copy embedded per page so the SPA can overlay
   // translations synchronously on first render. Home/catalog carry the full
   // map for the language; product pages carry just that product's entry.
@@ -108,6 +111,7 @@ export function readInitialHomeData<T>(): {
   heroLcp?: { src: string; srcset: string };
   categories: string[];
   factoryGallery: FactoryGalleryItem[];
+  featuredVideo: VideoListItem | null;
 } | null {
   const data = getPrerenderData();
   if (data?.route !== 'home' || !Array.isArray(data.products)) return null;
@@ -119,6 +123,7 @@ export function readInitialHomeData<T>(): {
     heroLcp: data.heroLcp && typeof data.heroLcp.src === 'string' ? data.heroLcp : undefined,
     categories: Array.isArray(data.categories) ? data.categories : [],
     factoryGallery: Array.isArray(data.factoryGallery) ? data.factoryGallery : [],
+    featuredVideo: data.featuredVideo?.slug ? data.featuredVideo : null,
   };
 }
 

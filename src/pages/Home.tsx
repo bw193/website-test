@@ -5,9 +5,14 @@ import { useTranslation, Trans } from 'react-i18next';
 import ProductCard from '../components/ProductCard';
 import SEO from '../components/SEO';
 import Reveal from '../components/Reveal';
+import FeaturedVideo from '../components/FeaturedVideo';
 import { optimizeImage } from '../utils/optimizeImage';
 import { useLocalizedPath } from '../hooks/useLocalizedPath';
 import { readInitialHomeData, type FactoryGalleryItem } from '../utils/prerenderData';
+import { parseFeaturedVideoSlug, toVideoListItem, VIDEO_LIST_COLUMNS } from '../utils/video';
+import { buildVideoObjectSchema } from '../utils/videoSchema';
+import { runWhenIdle } from '../utils/idle';
+import type { VideoListItem, VideoPost } from '../types/video';
 
 const GlobalMap = lazy(() => import('../components/GlobalMap'));
 // Lazy so `motion` (used by GlobalMap's animated markers) stays off the home
@@ -48,7 +53,7 @@ const CERTS = [
 
 export default function Home() {
   const { t } = useTranslation();
-  const { lp } = useLocalizedPath();
+  const { lp, lang } = useLocalizedPath();
   const initialData = readInitialHomeData<any>();
   const [heroBgs, setHeroBgs] = useState<string[]>(
     initialData?.heroBgs && initialData.heroBgs.length > 0 ? initialData.heroBgs : DEFAULT_HERO_BGS
@@ -74,6 +79,7 @@ export default function Home() {
   const [factoryGallery, setFactoryGallery] = useState<FactoryGalleryItem[]>(
     initialData?.factoryGallery ?? []
   );
+  const [featuredVideo, setFeaturedVideo] = useState<VideoListItem | null>(initialData?.featuredVideo ?? null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const normalizeCategory = (cat: string | undefined | null) => {
@@ -155,36 +161,74 @@ export default function Home() {
     fetchSettings();
   }, []);
 
-  // Factory gallery is editor-managed and expected to update without a rebuild,
-  // so it always runs — even when the prerender data island has seeded the
-  // other home state. Cheap (one row, cached by Cloudflare) and below the fold.
+  // The factory gallery and the featured video are editor-managed and expected
+  // to update without a rebuild, so they always refetch — even when the
+  // prerender data island has seeded the other home state. Both live below the
+  // fold, so on prerendered builds the refresh is deferred to idle time and
+  // never competes with the hero for bandwidth.
   useEffect(() => {
     let cancelled = false;
-    (async () => {
+
+    const refreshEditorContent = async () => {
       try {
         const { supabase } = await import('../supabase');
         const { data, error } = await supabase
           .from('site_settings')
-          .select('value')
-          .eq('key', 'factory_gallery')
-          .single();
-        if (cancelled || error || !data?.value) return;
-        const parsed = JSON.parse(data.value);
-        if (!Array.isArray(parsed)) return;
-        const cleaned: FactoryGalleryItem[] = parsed
-          .filter((it: any) => it && typeof it.url === 'string' && it.url.trim() !== '')
-          .map((it: any) => ({
-            url: it.url,
-            alt: typeof it.alt === 'string' && it.alt.trim() !== '' ? it.alt : 'BOLEN mirror factory production line',
-            caption: typeof it.caption === 'string' ? it.caption : undefined,
-          }));
-        if (!cancelled) setFactoryGallery(cleaned);
+          .select('key, value')
+          .in('key', ['factory_gallery', 'home_featured_video']);
+        if (cancelled || error || !data) return;
+
+        const galleryValue = data.find((row) => row.key === 'factory_gallery')?.value;
+        if (galleryValue) {
+          try {
+            const parsed = JSON.parse(galleryValue);
+            if (Array.isArray(parsed)) {
+              const cleaned: FactoryGalleryItem[] = parsed
+                .filter((it: any) => it && typeof it.url === 'string' && it.url.trim() !== '')
+                .map((it: any) => ({
+                  url: it.url,
+                  alt:
+                    typeof it.alt === 'string' && it.alt.trim() !== ''
+                      ? it.alt
+                      : 'BOLEN mirror factory production line',
+                  caption: typeof it.caption === 'string' ? it.caption : undefined,
+                }));
+              if (!cancelled) setFactoryGallery(cleaned);
+            }
+          } catch (e) {
+            console.error('Could not parse factory_gallery:', e);
+          }
+        }
+
+        const slug = parseFeaturedVideoSlug(data.find((row) => row.key === 'home_featured_video')?.value);
+        if (!slug) {
+          if (!cancelled) setFeaturedVideo(null);
+          return;
+        }
+        const { data: videoRow, error: videoError } = await supabase
+          .from('videos')
+          .select(VIDEO_LIST_COLUMNS)
+          .eq('slug', slug)
+          .eq('status', 'published')
+          .maybeSingle();
+        if (cancelled || videoError) return;
+        setFeaturedVideo(videoRow ? toVideoListItem(videoRow as VideoPost, lang) : null);
       } catch (e) {
-        console.error('Could not fetch factory_gallery:', e);
+        console.error('Could not fetch editor-managed home content:', e);
       }
-    })();
+    };
+
+    if (initialData) {
+      const cancelIdle = runWhenIdle(refreshEditorContent, 2500);
+      return () => {
+        cancelled = true;
+        cancelIdle();
+      };
+    }
+
+    refreshEditorContent();
     return () => { cancelled = true; };
-  }, []);
+  }, [lang]);
 
   const featuredProducts = allProducts
     .filter(p => selectedCategory ? normalizeCategory(p.category) === normalizeCategory(selectedCategory) : true)
@@ -262,7 +306,11 @@ export default function Home() {
             "description": it.alt,
             ...(it.caption ? { "caption": it.caption } : {}),
           })),
-        }] : [])
+        }] : []),
+        // Key order must stay in lockstep with homeSchema() in
+        // scripts/prerender-static.ts so Helmet adopts the prerendered
+        // <script> tags instead of replacing them on mount.
+        ...(featuredVideo ? [buildVideoObjectSchema(featuredVideo, lang)] : [])
       ]} />
       {/* Hero Section */}
       <div className="relative bg-stone-900 overflow-hidden group">
@@ -419,6 +467,10 @@ export default function Home() {
           ) : null}
         </div>
       </div>
+
+      {/* Featured Video — editor-picked video (site_settings.home_featured_video).
+          Click-to-play facade: nothing but the poster loads until asked. */}
+      {featuredVideo && <FeaturedVideo video={featuredVideo} />}
 
       {/* Manufacturing Advantage — 3 bullets (replaces former 4-step Process) */}
       <div className="py-24 bg-white border-t border-stone-100">

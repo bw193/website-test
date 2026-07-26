@@ -84,6 +84,16 @@ export const zh = {
         desc: "走进我们位于嘉兴的 50,000 平方米生产基地——从原片玻璃到打包出货，垂直整合制造 LED 镜、智能镜、化妆镜与浴室镜。",
         empty: "工厂照片即将上线。"
       },
+      featuredVideo: {
+        subtitle: "精选影片",
+        title: "在动态中了解我们的镜子",
+        desc: "一键走进车间：观看 BOLEN LED 镜、智能镜与化妆镜从制造、打磨到出货前测试的全过程。",
+        watch: "播放视频",
+        details: "视频详情",
+        viewAll: "全部视频",
+        playHint: "点击播放",
+        playAria: "播放视频：{{title}}"
+      },
       advantage: {
         subtitle: "BOLEN 的优势",
         title: "制造优势",

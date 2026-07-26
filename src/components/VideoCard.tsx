@@ -5,11 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { optimizeImage, imageSrcSet } from '../utils/optimizeImage';
 import { useLocalizedPath } from '../hooks/useLocalizedPath';
 import { formatBlogDate } from '../utils/blog';
-import { formatVideoDuration } from '../utils/video';
+import { FALLBACK_VIDEO_THUMB, formatVideoDuration } from '../utils/video';
 import type { VideoListItem } from '../types/video';
-
-const FALLBACK_THUMB =
-  'https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-images/site-assets/1773994889396-9i4t1ap.jpg';
 
 type VideoCardVariant = 'grid' | 'compact';
 
@@ -27,7 +24,7 @@ export default function VideoCard({
 }) {
   const { lp, lang } = useLocalizedPath();
   const { t } = useTranslation();
-  const thumb = video.thumbnail_url || FALLBACK_THUMB;
+  const thumb = video.thumbnail_url || FALLBACK_VIDEO_THUMB;
   const duration = formatVideoDuration(video.duration_seconds);
   const categoryLabel = video.category
     ? t(`videos.categories.${video.category}`, video.category)

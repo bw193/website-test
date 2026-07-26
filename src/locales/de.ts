@@ -84,6 +84,16 @@ export const de = {
         desc: "Ein Blick in unsere 50.000 m² große Produktionsstätte in Jiaxing — vertikal integrierte Fertigung von LED-, Smart-, Schmink- und Badspiegeln, vom Rohglas bis zur versandfertigen Palette.",
         empty: "Fabrikfotos folgen in Kürze."
       },
+      featuredVideo: {
+        subtitle: "Ausgewähltes Video",
+        title: "Unsere Spiegel in Bewegung",
+        desc: "Ein Klick in die Fertigung: Sehen Sie, wie BOLEN LED-, Smart- und Schminkspiegel gefertigt, veredelt und vor dem Versand geprüft werden.",
+        watch: "Video abspielen",
+        details: "Videodetails",
+        viewAll: "Alle Videos",
+        playHint: "Zum Abspielen klicken",
+        playAria: "Video abspielen: {{title}}"
+      },
       advantage: {
         subtitle: "Der BOLEN-Vorteil",
         title: "Fertigungs-Vorteil",

@@ -10,6 +10,14 @@ import { pickLocalized } from './blog';
 
 const DIRECT_VIDEO_RE = /\.(mp4|webm|ogg|mov)(\?.*)?$/i;
 
+/** Poster shown when a video row has no thumbnail of its own. */
+export const FALLBACK_VIDEO_THUMB =
+  'https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-images/site-assets/1773994889396-9i4t1ap.jpg';
+
+/** Columns every video list/card needs — the heavy JSONB body stays out. */
+export const VIDEO_LIST_COLUMNS =
+  'id, slug, source_type, video_url, embed_url, thumbnail_url, category, tags, duration_seconds, published_at, title, excerpt';
+
 export function formatVideoDuration(seconds: number | null | undefined): string {
   if (!seconds || seconds < 1) return '';
   const mins = Math.floor(seconds / 60);
@@ -54,6 +62,41 @@ export function buildEmbedUrl(url: string | null | undefined): string {
     return '';
   }
   return '';
+}
+
+/**
+ * Adds the autoplay flag to a YouTube/Vimeo embed URL. Used by the click-to-play
+ * facades (home featured video), where the iframe is only created after a real
+ * user gesture — so the browser's autoplay policy lets it start with sound.
+ */
+export function withAutoplay(src: string): string {
+  if (!src) return src;
+  try {
+    const url = new URL(src);
+    url.searchParams.set('autoplay', '1');
+    return url.toString();
+  } catch {
+    return src.includes('?') ? `${src}&autoplay=1` : `${src}?autoplay=1`;
+  }
+}
+
+/**
+ * Reads the `home_featured_video` site setting. Stored as `{"slug":"..."}`, but
+ * tolerates a bare JSON string or a raw slug so hand-edited rows still work.
+ */
+export function parseFeaturedVideoSlug(raw: string | null | undefined): string {
+  const trimmed = (raw || '').trim();
+  if (!trimmed) return '';
+  try {
+    const parsed = JSON.parse(trimmed);
+    if (typeof parsed === 'string') return parsed.trim();
+    if (parsed && typeof parsed === 'object' && typeof (parsed as { slug?: unknown }).slug === 'string') {
+      return ((parsed as { slug: string }).slug || '').trim();
+    }
+    return '';
+  } catch {
+    return trimmed.replace(/^"|"$/g, '');
+  }
 }
 
 export function getVideoPlayback(video: {

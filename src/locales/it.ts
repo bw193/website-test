@@ -84,6 +84,16 @@ export const it = {
         desc: "Uno sguardo dentro il nostro stabilimento di 50.000 m² a Jiaxing — produzione verticalmente integrata di specchi LED, smart, da toeletta e da bagno, dal vetro grezzo al pallet pronto per la spedizione.",
         empty: "Foto della fabbrica in arrivo."
       },
+      featuredVideo: {
+        subtitle: "Video in Evidenza",
+        title: "I Nostri Specchi in Movimento",
+        desc: "Un clic per entrare in reparto: guarda come gli specchi LED, smart e da toeletta BOLEN vengono prodotti, rifiniti e testati prima della spedizione.",
+        watch: "Riproduci il video",
+        details: "Dettagli del video",
+        viewAll: "Tutti i video",
+        playHint: "Clicca per riprodurre",
+        playAria: "Riproduci video: {{title}}"
+      },
       advantage: {
         subtitle: "Il Vantaggio BOLEN",
         title: "Vantaggio Produttivo",

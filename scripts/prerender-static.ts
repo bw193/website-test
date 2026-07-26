@@ -26,7 +26,12 @@ import { createClient } from '@supabase/supabase-js';
 import 'dotenv/config';
 import { marked } from 'marked';
 import { localizePost, toListItem } from '../src/utils/blog';
-import { localizeVideo, recommendProductsForVideo, toVideoListItem } from '../src/utils/video';
+import {
+  localizeVideo,
+  parseFeaturedVideoSlug,
+  recommendProductsForVideo,
+  toVideoListItem,
+} from '../src/utils/video';
 import { optimizeImage } from '../src/utils/optimizeImage';
 import {
   buildBlogIndexSchema,
@@ -573,6 +578,81 @@ const FACTORY_COPY: Record<Lang, { heading: string; intro: string }> = {
   },
 };
 
+// Mirrors `home.featuredVideo` in src/locales/*.ts — the visible React section
+// reads those; this copy is only for the crawler-facing static fallback.
+const FEATURED_VIDEO_COPY: Record<Lang, { heading: string; intro: string; cta: string }> = {
+  en: {
+    heading: 'See Our Mirrors in Motion',
+    intro:
+      'One click into the factory floor: watch how BOLEN LED, smart, and vanity mirrors are built, finished, and tested before they ship.',
+    cta: 'All videos',
+  },
+  zh: {
+    heading: '在动态中了解我们的镜子',
+    intro: '一键走进车间：观看 BOLEN LED 镜、智能镜与化妆镜从制造、打磨到出货前测试的全过程。',
+    cta: '全部视频',
+  },
+  es: {
+    heading: 'Vea Nuestros Espejos en Movimiento',
+    intro:
+      'Un clic para entrar en la planta: vea cómo se fabrican, acaban y prueban los espejos LED, inteligentes y de tocador de BOLEN antes de enviarlos.',
+    cta: 'Todos los videos',
+  },
+  fr: {
+    heading: 'Découvrez Nos Miroirs en Mouvement',
+    intro:
+      "Un clic pour entrer dans l'atelier : découvrez comment les miroirs LED, intelligents et de toilette BOLEN sont fabriqués, finis et testés avant expédition.",
+    cta: 'Toutes les vidéos',
+  },
+  de: {
+    heading: 'Unsere Spiegel in Bewegung',
+    intro:
+      'Ein Klick in die Fertigung: Sehen Sie, wie BOLEN LED-, Smart- und Schminkspiegel gefertigt, veredelt und vor dem Versand geprüft werden.',
+    cta: 'Alle Videos',
+  },
+  it: {
+    heading: 'I Nostri Specchi in Movimento',
+    intro:
+      'Un clic per entrare in reparto: guarda come gli specchi LED, smart e da toeletta BOLEN vengono prodotti, rifiniti e testati prima della spedizione.',
+    cta: 'Tutti i video',
+  },
+};
+
+/**
+ * Home island payload for the featured video. `search_text` is dropped — it
+ * concatenates every language's body copy, and the home section never searches,
+ * so keeping it would bloat all six localized home pages.
+ */
+function toFeaturedVideoPayload(video: VideoPost, lang: Lang): VideoListItem {
+  const { search_text, ...rest } = toVideoListItem(video, lang);
+  return rest;
+}
+
+function featuredVideoBlock(lang: Lang, video?: VideoListItem): string {
+  if (!video) return '';
+  const c = FEATURED_VIDEO_COPY[lang];
+  const href = `/${lang}/videos/${video.slug}/`;
+  // Same transform URL FeaturedVideo.tsx requests, so React's <img> on mount
+  // hits the already-downloaded image instead of fetching a second derivative.
+  // No width/height: the poster's real shape isn't known at build time, and the
+  // React frame reserves the box via aspect-ratio.
+  const poster = video.thumbnail_url
+    ? `<img src="${escapeAttr(optimizeImage(video.thumbnail_url, { width: 960 }))}" alt="${escapeAttr(
+        video.title
+      )}" loading="lazy" decoding="async" referrerpolicy="no-referrer" />`
+    : '';
+  const excerpt = video.excerpt ? `<p>${escapeHtml(video.excerpt)}</p>` : '';
+  return `
+    <section id="featured-video" aria-labelledby="featured-video-title">
+      <h2 id="featured-video-title">${escapeHtml(c.heading)}</h2>
+      <p>${escapeHtml(c.intro)}</p>
+      <a href="${escapeAttr(href)}">${poster}<h3>${escapeHtml(video.title)}</h3></a>
+      ${excerpt}
+      <p><a href="/${lang}/videos/">${escapeHtml(c.cta)}</a></p>
+    </section>
+  `.trim();
+}
+
 function factoryGalleryBlock(lang: Lang, gallery: FactoryGalleryItem[]): string {
   if (!gallery.length) return '';
   const fc = FACTORY_COPY[lang];
@@ -600,7 +680,12 @@ function factoryGalleryBlock(lang: Lang, gallery: FactoryGalleryItem[]): string 
 }
 
 // Markup helpers
-function homeContent(lang: Lang, hero?: HeroImage, gallery: FactoryGalleryItem[] = []): string {
+function homeContent(
+  lang: Lang,
+  hero?: HeroImage,
+  gallery: FactoryGalleryItem[] = [],
+  featuredVideo?: VideoListItem
+): string {
   const c = COPY[lang];
   // Bake the LCP hero straight into the static HTML so the browser discovers
   // and fetches it during HTML parse — before any JS runs. React renders a
@@ -620,6 +705,7 @@ function homeContent(lang: Lang, hero?: HeroImage, gallery: FactoryGalleryItem[]
         <a href="/${lang}/our-story/">${escapeHtml(c.navStory)}</a>
         <a href="/${lang}/rfq/">${escapeHtml(c.navRfq)}</a>
       </nav>
+      ${featuredVideoBlock(lang, featuredVideo)}
       ${factoryGalleryBlock(lang, gallery)}
     </div>
   `.trim();
@@ -713,7 +799,7 @@ function rfqContent(lang: Lang): string {
 // Key order matters: JSON.stringify follows insertion order, and `isEqualNode`
 // compares serialized script contents.
 
-function homeSchema(gallery: FactoryGalleryItem[] = []): any[] {
+function homeSchema(lang: Lang, gallery: FactoryGalleryItem[] = [], featuredVideo?: VideoListItem): any[] {
   const base: any[] = [
     {
       '@context': 'https://schema.org',
@@ -769,6 +855,7 @@ function homeSchema(gallery: FactoryGalleryItem[] = []): any[] {
       })),
     });
   }
+  if (featuredVideo) base.push(buildVideoObjectSchema(featuredVideo, lang));
   return base;
 }
 
@@ -942,12 +1029,22 @@ const DEFAULT_CATEGORIES = [
   'Irregular Mirror',
 ];
 
-async function fetchSiteSettings(): Promise<{ heroBgs: string[]; categories: string[]; factoryGallery: FactoryGalleryItem[] }> {
+async function fetchSiteSettings(): Promise<{
+  heroBgs: string[];
+  categories: string[];
+  factoryGallery: FactoryGalleryItem[];
+  featuredVideoSlug: string;
+}> {
   const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || '';
   const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || '';
 
   if (!supabaseUrl || !supabaseKey) {
-    return { heroBgs: DEFAULT_HERO_BGS, categories: DEFAULT_CATEGORIES, factoryGallery: [] };
+    return {
+      heroBgs: DEFAULT_HERO_BGS,
+      categories: DEFAULT_CATEGORIES,
+      factoryGallery: [],
+      featuredVideoSlug: '',
+    };
   }
 
   const supabase = createClient(supabaseUrl, supabaseKey);
@@ -955,6 +1052,7 @@ async function fetchSiteSettings(): Promise<{ heroBgs: string[]; categories: str
   let heroBgs: string[] = DEFAULT_HERO_BGS;
   let categories: string[] = DEFAULT_CATEGORIES;
   let factoryGallery: FactoryGalleryItem[] = [];
+  let featuredVideoSlug = '';
 
   try {
     const { data: heroData } = await supabase
@@ -1025,7 +1123,18 @@ async function fetchSiteSettings(): Promise<{ heroBgs: string[]; categories: str
     console.warn('[prerender-static] factory_gallery fetch failed; section will be empty.', err);
   }
 
-  return { heroBgs, categories, factoryGallery };
+  try {
+    const { data: featuredData } = await supabase
+      .from('site_settings')
+      .select('value')
+      .eq('key', 'home_featured_video')
+      .single();
+    featuredVideoSlug = parseFeaturedVideoSlug(featuredData?.value);
+  } catch (err) {
+    console.warn('[prerender-static] home_featured_video fetch failed; section will be empty.', err);
+  }
+
+  return { heroBgs, categories, factoryGallery, featuredVideoSlug };
 }
 
 // ---- Journal (blog) ---------------------------------------------------------
@@ -1410,8 +1519,8 @@ async function main(): Promise<void> {
   const products = await fetchAllProducts();
   console.log(`[prerender-static] ${products.length} products loaded.`);
 
-  console.log('[prerender-static] Fetching site settings (hero, categories, factory gallery)...');
-  const { heroBgs, categories, factoryGallery } = await fetchSiteSettings();
+  console.log('[prerender-static] Fetching site settings (hero, categories, factory gallery, featured video)...');
+  const { heroBgs, categories, factoryGallery, featuredVideoSlug } = await fetchSiteSettings();
   console.log(`[prerender-static] Factory gallery: ${factoryGallery.length} photo(s).`);
 
   // Probe the primary (LCP) hero's intrinsic size once, then derive the
@@ -1472,6 +1581,17 @@ async function main(): Promise<void> {
   console.log('[prerender-static] Fetching published videos...');
   const videos = await fetchVideos();
   console.log(`[prerender-static] ${videos.length} videos loaded.`);
+
+  // Home featured video: resolved from the published set, so unpublishing the
+  // chosen video simply drops the section from the next build.
+  const featuredVideoPost = featuredVideoSlug ? videos.find((v) => v.slug === featuredVideoSlug) : undefined;
+  if (featuredVideoSlug && !featuredVideoPost) {
+    console.warn(
+      `[prerender-static] home_featured_video "${featuredVideoSlug}" is not a published video; home video section omitted.`
+    );
+  } else if (featuredVideoPost) {
+    console.log(`[prerender-static] Home featured video: ${featuredVideoPost.slug}`);
+  }
   const productById = new Map(products.map((p) => [p.id, p]));
   for (const lang of LANGUAGES) {
     const n = Object.keys(translations[lang]).length;
@@ -1488,6 +1608,7 @@ async function main(): Promise<void> {
     // Home
     {
       const canonical = `${SITE_URL}/${lang}/`;
+      const featuredVideo = featuredVideoPost ? toFeaturedVideoPayload(featuredVideoPost, lang) : undefined;
       const dataScript = prerenderDataScript({
         route: 'home',
         lang,
@@ -1498,6 +1619,7 @@ async function main(): Promise<void> {
         heroLcp,
         categories,
         factoryGallery,
+        featuredVideo,
         productTranslations: translations[lang],
       });
       const headExtras = `${buildHead({
@@ -1508,12 +1630,12 @@ async function main(): Promise<void> {
         ogImage: DEFAULT_OG_IMAGE,
         ogType: 'website',
         routePath: '/',
-        schema: homeSchema(factoryGallery),
+        schema: homeSchema(lang, factoryGallery, featuredVideo),
       })}\n    ${heroPreload}\n    ${dataScript}`;
       const html = injectIntoTemplate(template, {
         lang,
         headExtras,
-        bodyContent: homeContent(lang, hero, factoryGallery),
+        bodyContent: homeContent(lang, hero, factoryGallery, featuredVideo),
       });
       await writeRoute(`${lang}`, html);
       routeCount++;

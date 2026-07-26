@@ -1,6 +1,6 @@
 import React from 'react';
 import { PlayCircle } from 'lucide-react';
-import { getVideoPlayback } from '../utils/video';
+import { getVideoPlayback, withAutoplay } from '../utils/video';
 import type { LocalizedVideoPost, VideoListItem } from '../types/video';
 
 type PlayerVideo = Pick<
@@ -8,14 +8,32 @@ type PlayerVideo = Pick<
   'title' | 'source_type' | 'video_url' | 'embed_url' | 'thumbnail_url'
 >;
 
-export default function VideoPlayer({ video, className = '' }: { video: PlayerVideo; className?: string }) {
+export default function VideoPlayer({
+  video,
+  className = '',
+  autoPlay = false,
+  aspectRatio,
+  onVideoMetadata,
+}: {
+  video: PlayerVideo;
+  className?: string;
+  /** Only pass from a click-to-play facade — the player then starts on mount. */
+  autoPlay?: boolean;
+  /** CSS aspect-ratio for the frame, e.g. "9 / 16". Defaults to 16:9. */
+  aspectRatio?: string;
+  /** Intrinsic size of a direct/uploaded file, once the browser reports it. */
+  onVideoMetadata?: (width: number, height: number) => void;
+}) {
   const playback = getVideoPlayback(video);
 
   return (
-    <div className={`relative aspect-video overflow-hidden bg-stone-950 ${className}`}>
+    <div
+      className={`relative overflow-hidden bg-stone-950 ${aspectRatio ? '' : 'aspect-video'} ${className}`}
+      style={aspectRatio ? { aspectRatio } : undefined}
+    >
       {playback.kind === 'embed' ? (
         <iframe
-          src={playback.src}
+          src={autoPlay ? withAutoplay(playback.src) : playback.src}
           title={video.title}
           className="absolute inset-0 h-full w-full"
           loading="lazy"
@@ -29,7 +47,13 @@ export default function VideoPlayer({ video, className = '' }: { video: PlayerVi
           src={playback.src}
           poster={video.thumbnail_url || undefined}
           controls
-          preload="metadata"
+          autoPlay={autoPlay}
+          playsInline
+          preload={autoPlay ? 'auto' : 'metadata'}
+          onLoadedMetadata={(e) => {
+            const el = e.currentTarget;
+            if (el.videoWidth && el.videoHeight) onVideoMetadata?.(el.videoWidth, el.videoHeight);
+          }}
         />
       ) : (
         <div className="absolute inset-0 flex flex-col items-center justify-center text-white">

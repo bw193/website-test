@@ -84,6 +84,16 @@ export const es = {
         desc: "Un recorrido por nuestra planta de 50.000 m² en Jiaxing: producción verticalmente integrada de espejos LED, inteligentes, de tocador y de baño, desde el vidrio crudo hasta el palé listo para enviar.",
         empty: "Fotos de la fábrica próximamente."
       },
+      featuredVideo: {
+        subtitle: "Video Destacado",
+        title: "Vea Nuestros Espejos en Movimiento",
+        desc: "Un clic para entrar en la planta: vea cómo se fabrican, acaban y prueban los espejos LED, inteligentes y de tocador de BOLEN antes de enviarlos.",
+        watch: "Reproducir el video",
+        details: "Detalles del video",
+        viewAll: "Todos los videos",
+        playHint: "Haga clic para reproducir",
+        playAria: "Reproducir video: {{title}}"
+      },
       advantage: {
         subtitle: "La Ventaja BOLEN",
         title: "Ventaja de Fabricación",

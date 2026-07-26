@@ -1,9 +1,22 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../supabase';
-import { Loader2, Save, Image as ImageIcon, Upload, Plus, Trash2, Settings as SettingsIcon, LayoutTemplate, Tags, Factory, ArrowUp, ArrowDown } from 'lucide-react';
+import { Loader2, Save, Image as ImageIcon, Upload, Plus, Trash2, Settings as SettingsIcon, LayoutTemplate, Tags, Factory, ArrowUp, ArrowDown, Check, CircleSlash, Clock, Film, Play } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { pickLocalized } from '../utils/blog';
+import { FALLBACK_VIDEO_THUMB, formatVideoDuration, parseFeaturedVideoSlug } from '../utils/video';
+import { optimizeImage } from '../utils/optimizeImage';
+import type { VideoPost } from '../types/video';
 
 type FactoryGalleryItem = { url: string; alt: string; caption: string };
+
+/** Published videos offered in the home "featured video" picker. */
+type FeaturedVideoOption = {
+  slug: string;
+  title: string;
+  thumbnail_url: string | null;
+  category: string | null;
+  duration_seconds: number | null;
+};
 
 export default function AdminSettings() {
   const { t } = useTranslation();
@@ -27,13 +40,46 @@ export default function AdminSettings() {
   ]);
   const [factoryGallery, setFactoryGallery] = useState<FactoryGalleryItem[]>([]);
   const [galleryUploading, setGalleryUploading] = useState<number | null>(null);
+  const [featuredVideoSlug, setFeaturedVideoSlug] = useState<string>('');
+  const [videoOptions, setVideoOptions] = useState<FeaturedVideoOption[]>([]);
+  const [videosLoading, setVideosLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [needsSetup, setNeedsSetup] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetchSettings();
+    fetchVideoOptions();
   }, []);
+
+  // The picker only offers published videos — the home section links to
+  // /videos/<slug>, which 404s for drafts.
+  const fetchVideoOptions = async () => {
+    setVideosLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('videos')
+        .select('slug, title, thumbnail_url, category, duration_seconds, published_at')
+        .eq('status', 'published')
+        .order('published_at', { ascending: false });
+      if (error) throw error;
+      setVideoOptions(
+        (data || []).map((row: Partial<VideoPost>) => ({
+          slug: row.slug as string,
+          title: pickLocalized(row.title, 'en') || (row.slug as string),
+          thumbnail_url: row.thumbnail_url ?? null,
+          category: row.category ?? null,
+          duration_seconds: row.duration_seconds ?? null,
+        }))
+      );
+    } catch (err: any) {
+      // A missing videos table just means the picker shows its empty state.
+      console.error('Error fetching videos for featured picker:', err);
+      setVideoOptions([]);
+    } finally {
+      setVideosLoading(false);
+    }
+  };
 
   const fetchSettings = async () => {
     setLoading(true);
@@ -41,7 +87,7 @@ export default function AdminSettings() {
       const { data, error } = await supabase
         .from('site_settings')
         .select('key, value')
-        .in('key', ['hero_bg', 'categories', 'blog_categories', 'factory_gallery']);
+        .in('key', ['hero_bg', 'categories', 'blog_categories', 'factory_gallery', 'home_featured_video']);
 
       if (error) {
         if (error.code === '42P01' || error.code === 'PGRST205') { // relation does not exist or not in schema cache
@@ -109,6 +155,9 @@ export default function AdminSettings() {
             console.error("Error parsing factory_gallery", e);
           }
         }
+
+        const featuredVideoRow = data.find(d => d.key === 'home_featured_video');
+        setFeaturedVideoSlug(parseFeaturedVideoSlug(featuredVideoRow?.value));
       }
     } catch (err: any) {
       console.error("Error fetching settings:", err);
@@ -142,7 +191,8 @@ export default function AdminSettings() {
           { key: 'hero_bg', value: JSON.stringify(validBgs) },
           { key: 'categories', value: JSON.stringify(validCategories) },
           { key: 'blog_categories', value: JSON.stringify(validBlogCategories) },
-          { key: 'factory_gallery', value: JSON.stringify(validGallery) }
+          { key: 'factory_gallery', value: JSON.stringify(validGallery) },
+          { key: 'home_featured_video', value: JSON.stringify({ slug: featuredVideoSlug.trim() }) }
         ]);
 
       if (error) throw error;
@@ -440,6 +490,133 @@ NOTIFY pgrst, 'reload schema';`}
                 ))}
               </div>
             </div>
+          )}
+        </div>
+      </div>
+
+      {/* Home Featured Video — one published video highlighted on the homepage */}
+      <div className="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden">
+        <div className="px-6 py-5 border-b border-stone-100 bg-stone-50/50 flex items-center justify-between gap-3">
+          <h3 className="text-base font-semibold text-stone-900 flex items-center gap-2">
+            <Film className="h-5 w-5 text-stone-400" />
+            Home Featured Video
+          </h3>
+          {featuredVideoSlug ? (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-50 text-amber-700 text-xs font-semibold">
+              <Check className="h-3.5 w-3.5" />
+              1 selected
+            </span>
+          ) : (
+            <span className="px-3 py-1.5 rounded-lg bg-stone-100 text-stone-500 text-xs font-semibold">
+              Section hidden
+            </span>
+          )}
+        </div>
+        <div className="p-6">
+          <p className="text-sm text-stone-500 mb-6">
+            Pick the video shown in the homepage video section. Only published videos appear here — publish a
+            video under the <span className="font-medium text-stone-700">Videos</span> tab first. Choose{' '}
+            <span className="font-medium text-stone-700">No video</span> to hide the section entirely, then hit
+            Save Settings below.
+          </p>
+
+          {videosLoading ? (
+            <div className="flex justify-center py-10">
+              <Loader2 className="h-6 w-6 animate-spin text-stone-400" />
+            </div>
+          ) : videoOptions.length === 0 ? (
+            <div className="text-center py-10 border-2 border-dashed border-stone-200 rounded-xl text-sm text-stone-500">
+              No published videos yet. Add one under the <span className="font-medium text-stone-700">Videos</span> tab,
+              publish it, then come back to feature it here.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <button
+                type="button"
+                onClick={() => setFeaturedVideoSlug('')}
+                aria-pressed={featuredVideoSlug === ''}
+                className={`flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed p-6 text-sm font-medium transition-colors min-h-[180px] ${
+                  featuredVideoSlug === ''
+                    ? 'border-stone-900 bg-stone-900 text-white'
+                    : 'border-stone-200 text-stone-500 hover:border-stone-300 hover:bg-stone-50'
+                }`}
+              >
+                <CircleSlash className="h-6 w-6" />
+                No video
+                <span className={`text-xs font-normal ${featuredVideoSlug === '' ? 'text-stone-300' : 'text-stone-400'}`}>
+                  Hide the section
+                </span>
+              </button>
+
+              {videoOptions.map((option) => {
+                const selected = option.slug === featuredVideoSlug;
+                const duration = formatVideoDuration(option.duration_seconds);
+                return (
+                  <button
+                    key={option.slug}
+                    type="button"
+                    onClick={() => setFeaturedVideoSlug(option.slug)}
+                    aria-pressed={selected}
+                    title={option.title}
+                    className={`group relative overflow-hidden rounded-xl border-2 text-left transition-all ${
+                      selected
+                        ? 'border-amber-500 shadow-md ring-2 ring-amber-200'
+                        : 'border-stone-200 hover:border-stone-300 hover:shadow-sm'
+                    }`}
+                  >
+                    <div className="relative aspect-video w-full bg-stone-100 overflow-hidden">
+                      <img
+                        src={optimizeImage(option.thumbnail_url || FALLBACK_VIDEO_THUMB, {
+                          width: 480,
+                          height: 270,
+                          resize: 'cover',
+                        })}
+                        alt=""
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        referrerPolicy="no-referrer"
+                        loading="lazy"
+                      />
+                      <span className="absolute inset-0 flex items-center justify-center bg-stone-900/25 opacity-0 transition-opacity group-hover:opacity-100">
+                        <Play className="h-8 w-8 text-white fill-current" />
+                      </span>
+                      {selected && (
+                        <span className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-amber-500 text-white shadow-sm">
+                          <Check className="h-4 w-4" />
+                        </span>
+                      )}
+                      {duration && (
+                        <span className="absolute bottom-2 right-2 rounded-md bg-stone-900/80 px-1.5 py-0.5 text-[11px] font-semibold text-white">
+                          {duration}
+                        </span>
+                      )}
+                    </div>
+                    <div className="p-3">
+                      <p className="line-clamp-2 text-sm font-semibold text-stone-900 leading-snug">{option.title}</p>
+                      <p className="mt-1.5 flex items-center gap-1.5 text-[11px] uppercase tracking-wide text-stone-400 font-medium">
+                        {option.category ? (
+                          <>
+                            <Film className="h-3 w-3" />
+                            <span className="truncate">{option.category}</span>
+                          </>
+                        ) : (
+                          <>
+                            <Clock className="h-3 w-3" />
+                            <span className="truncate">/{option.slug}</span>
+                          </>
+                        )}
+                      </p>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {featuredVideoSlug && !videosLoading && !videoOptions.some(v => v.slug === featuredVideoSlug) && (
+            <p className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+              The saved video <span className="font-mono font-semibold">{featuredVideoSlug}</span> is no longer
+              published, so the homepage section is hidden. Pick another video or republish it.
+            </p>
           )}
         </div>
       </div>

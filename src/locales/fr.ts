@@ -84,6 +84,16 @@ export const fr = {
         desc: "Visite de notre site de 50 000 m² à Jiaxing — production verticalement intégrée de miroirs LED, intelligents, de toilette et de salle de bain, du verre brut à la palette prête à expédier.",
         empty: "Photos de l'usine bientôt disponibles."
       },
+      featuredVideo: {
+        subtitle: "Vidéo à la Une",
+        title: "Découvrez Nos Miroirs en Mouvement",
+        desc: "Un clic pour entrer dans l'atelier : découvrez comment les miroirs LED, intelligents et de toilette BOLEN sont fabriqués, finis et testés avant expédition.",
+        watch: "Lire la vidéo",
+        details: "Détails de la vidéo",
+        viewAll: "Toutes les vidéos",
+        playHint: "Cliquez pour lire",
+        playAria: "Lire la vidéo : {{title}}"
+      },
       advantage: {
         subtitle: "L'Atout BOLEN",
         title: "Atout de Fabrication",

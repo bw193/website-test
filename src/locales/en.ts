@@ -84,6 +84,16 @@ export const en = {
         desc: "A look inside our 50,000 m² Jiaxing facility — vertically integrated LED, smart, vanity, and bath mirror production from raw glass to packed pallet.",
         empty: "Factory photos coming soon."
       },
+      featuredVideo: {
+        subtitle: "Featured Film",
+        title: "See Our Mirrors in Motion",
+        desc: "One click into the factory floor: watch how BOLEN LED, smart, and vanity mirrors are built, finished, and tested before they ship.",
+        watch: "Play the video",
+        details: "Video details",
+        viewAll: "All videos",
+        playHint: "Click to play",
+        playAria: "Play video: {{title}}"
+      },
       advantage: {
         subtitle: "The BOLEN Edge",
         title: "Manufacturing Advantage",
