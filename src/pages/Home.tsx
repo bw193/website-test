@@ -360,7 +360,11 @@ export default function Home() {
             >
               <ChevronRight className="w-8 h-8" />
             </button>
-            <div className="absolute bottom-8 sm:bottom-20 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+            {/* Sit low in the frame: at sm:bottom-20 the dots landed on top of
+                the certification badges baked into the banner artwork, which
+                was hidden while the hero carried a heavy scrim and obvious once
+                it didn't. */}
+            <div className="absolute bottom-3 sm:bottom-5 left-1/2 -translate-x-1/2 z-20 flex gap-2">
               {heroBgs.map((_, idx) => (
                 <button
                   key={idx}
@@ -386,16 +390,23 @@ export default function Home() {
           The <img> markup, and therefore the LCP element and its preload, is
           untouched. */}
       <div className="bg-stone-900 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16 sm:pt-14 sm:pb-20">
-          <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-[0.2em] text-amber-400">
-            {t('home.heroKicker')}
-          </p>
-          <div className="mt-3 grid gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:items-end lg:gap-12">
-            <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl leading-[1.1]">
-              {t('home.heroTitle1')}{' '}
-              <span className="italic text-amber-300">{t('home.heroTitle2')}</span>
-            </h1>
+        {/* pb is larger than pt because the stats card below overlaps this band
+            by -mt-8/-mt-10 and would otherwise crowd the buttons. */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16 sm:pt-12 sm:pb-20">
+          <div className="grid gap-7 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:gap-16 lg:items-center">
+            {/* Kicker and h1 are one unit — keeping the kicker outside the grid
+                left it pinned to the top while the h1 dropped to meet the right
+                column, opening a dead gap between them. */}
             <div>
+              <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-[0.2em] text-amber-400">
+                {t('home.heroKicker')}
+              </p>
+              <h1 className="mt-3 font-serif text-3xl sm:text-4xl lg:text-5xl leading-[1.1]">
+                {t('home.heroTitle1')}{' '}
+                <span className="italic text-amber-300">{t('home.heroTitle2')}</span>
+              </h1>
+            </div>
+            <div className="lg:border-l lg:border-white/10 lg:pl-16">
               <p className="text-sm sm:text-base text-stone-300 font-light">
                 {/* heroDesc contains <1>BOLEN</1>, so it must go through Trans
                     rather than t() or the markup renders as literal text. */}
