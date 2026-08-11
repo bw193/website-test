@@ -18,14 +18,14 @@ export default function NotFound() {
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Link
             to={lp('/')}
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-amber-500 text-white rounded-full font-medium hover:bg-amber-600 transition-colors"
+            className="btn-primary"
           >
             <Home className="w-4 h-4" />
             Go Home
           </Link>
           <Link
             to={lp('/products')}
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 border border-stone-300 text-stone-700 rounded-full font-medium hover:bg-stone-100 transition-colors"
+            className="btn-secondary"
           >
             Browse Products
           </Link>

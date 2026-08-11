@@ -1,5 +1,20 @@
 export const en = {
   translation: {
+    // Page-level <title>/<meta description> for the four static routes.
+    // scripts/prerender-static.ts reads these same values, so the tags baked
+    // into the static HTML and the tags react-helmet-async writes on mount
+    // cannot drift. Previously the pages passed hardcoded English, which
+    // overwrote the correctly-localized prerendered meta on 5 locales.
+    seo: {
+      homeTitle: "BOLEN Mirror | LED Mirror Manufacturer & OEM Smart Mirror Factory",
+      homeDesc: "BOLEN Mirror is a leading LED mirror manufacturer specializing in OEM LED mirrors, smart mirrors, vanity mirrors, and bath mirrors for global brands.",
+      catalogTitle: "LED Mirror Products Catalog | BOLEN Mirror Manufacturer",
+      catalogDesc: "Explore our wide range of OEM LED mirrors, smart mirrors, vanity mirrors, and bath mirrors from a leading LED mirror manufacturer. High-quality manufacturing for global brands.",
+      storyTitle: "Our Story | BOLEN LED Mirror Manufacturer",
+      storyDesc: "Learn about the history and manufacturing excellence of BOLEN (Jiaxing Chengtai Mirror Co., Ltd.), a leading LED mirror manufacturer since 1995 specializing in OEM smart mirrors.",
+      rfqTitle: "Request for Quote | BOLEN LED Mirror Manufacturer",
+      rfqDesc: "Contact BOLEN, a leading LED mirror manufacturer, for OEM/ODM inquiries, custom mirror manufacturing, and bulk orders."
+    },
     navbar: {
       home: "Home",
       catalog: "Catalog",
@@ -31,6 +46,7 @@ export const en = {
     },
     home: {
       companyName: "Jiaxing Chengtai Mirror Co., Ltd.",
+      heroKicker: "LED Mirror Manufacturer & OEM Smart Mirror Factory",
       heroTitle1: "Artistically Refined,",
       heroTitle2: "Functionally Brilliant.",
       heroDesc: "Founded in 2005 (with history tracing back to 1995) and operating under our brand <1>BOLEN</1>, we combine Italian design inspiration with over two decades of modern manufacturing expertise to deliver premium mirrors worldwide.",
@@ -147,6 +163,8 @@ export const en = {
       desc: "Browse our extensive collection of premium mirrors, featuring smart LED technology, elegant vanity designs, and customizable options.",
       noProducts: "No products found matching your criteria.",
       viewDetails: "View Details",
+      searchLabel: "Search products",
+      searchPlaceholder: "Search products...",
       allCategories: "All Categories",
       categories: {
         "New Arrival": "New Arrival",
@@ -171,7 +189,12 @@ export const en = {
       submitting: "Submitting...",
       rfqSuccess: "RFQ submitted successfully! We will contact you soon.",
       rfqError: "Failed to submit RFQ. Please try again.",
-      relatedVideos: "Related videos"
+      relatedVideos: "Related videos",
+      // SEO. brandSuffix is appended to every product <title>; descTemplate is
+      // the last-resort <meta description> when a product has no `details`.
+      // Keep {title} in place — it is substituted with the localized title.
+      brandSuffix: "| BOLEN Mirror",
+      descTemplate: "Premium {title} by BOLEN Mirror (Jiaxing Chengtai Mirror Co., Ltd.) — OEM/ODM LED, smart, vanity, and bath mirrors. Request a quote for bulk pricing."
     },
     blog: {
       metaTitle: "The BOLEN Journal | LED & Smart Mirror Insights",

@@ -34,6 +34,31 @@ import {
 } from '../src/utils/video';
 import { optimizeImage } from '../src/utils/optimizeImage';
 import {
+  buildProductDescription,
+  buildProductSeoTitle,
+  normalizeSpecs,
+} from '../src/utils/productSeo';
+import { en as enLocale } from '../src/locales/en';
+import { zh as zhLocale } from '../src/locales/zh';
+import { es as esLocale } from '../src/locales/es';
+import { fr as frLocale } from '../src/locales/fr';
+import { de as deLocale } from '../src/locales/de';
+import { it as itLocale } from '../src/locales/it';
+
+// Single source of truth for the four static routes' <title>/<meta description>.
+// The React pages read the same keys via t('seo.*'), so what gets baked into the
+// static HTML and what react-helmet-async writes on mount are identical — these
+// used to be maintained separately here and hardcoded in English in the pages,
+// which silently overwrote the localized prerendered meta on 5 locales.
+const LOCALE_SEO = {
+  en: enLocale.translation.seo,
+  zh: zhLocale.translation.seo,
+  es: esLocale.translation.seo,
+  fr: frLocale.translation.seo,
+  de: deLocale.translation.seo,
+  it: itLocale.translation.seo,
+} as const;
+import {
   buildBlogIndexSchema,
   buildBlogPostingSchema,
   buildBlogBreadcrumbSchema,
@@ -75,21 +100,13 @@ interface Product {
 const COPY: Record<
   Lang,
   {
-    homeTitle: string;
-    homeDesc: string;
     homeH1: string;
     homeIntro: string;
-    catalogTitle: string;
-    catalogDesc: string;
     catalogH1: string;
     catalogIntro: string;
     productSuffix: string;
-    storyTitle: string;
-    storyDesc: string;
     storyH1: string;
     storyIntro: string;
-    rfqTitle: string;
-    rfqDesc: string;
     rfqH1: string;
     rfqIntro: string;
     breadcrumbHome: string;
@@ -98,31 +115,29 @@ const COPY: Record<
     navCatalog: string;
     navStory: string;
     navRfq: string;
+    /** Headings for the prerendered product body. */
+    detailsHeading: string;
+    specsHeading: string;
+    /**
+     * Last-resort meta description when a product has neither `details` nor a
+     * real `description`. `{title}` is substituted with the localized title —
+     * keep the whole sentence in the target language (it used to be a hardcoded
+     * English literal, which shipped mixed-language meta on 340 pages).
+     */
+    productDescTemplate: string;
   }
 > = {
   en: {
-    homeTitle: 'BOLEN Mirror | LED Mirror Manufacturer & OEM Smart Mirror Factory',
-    homeDesc:
-      'BOLEN Mirror is a leading LED mirror manufacturer specializing in OEM LED mirrors, smart mirrors, vanity mirrors, and bath mirrors for global brands.',
     homeH1: 'BOLEN — LED Mirror Manufacturer & OEM Smart Mirror Factory',
     homeIntro:
       'Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) operates a 50,000+ sqm facility with 200+ skilled artisans, manufacturing premium LED mirrors, smart mirrors, vanity mirrors, and bathroom mirrors for global brands. Over 20 years of OEM/ODM manufacturing experience.',
-    catalogTitle: 'LED Mirror Products Catalog | BOLEN Mirror Manufacturer',
-    catalogDesc:
-      'Explore our wide range of OEM LED mirrors, smart mirrors, vanity mirrors, and bath mirrors from a leading LED mirror manufacturer. High-quality manufacturing for global brands.',
     catalogH1: 'Product Catalog',
     catalogIntro:
       'Browse our extensive collection of premium mirrors, featuring smart LED technology, elegant vanity designs, and customizable options.',
     productSuffix: '| BOLEN Mirror',
-    storyTitle: 'Our Story | BOLEN LED Mirror Manufacturer',
-    storyDesc:
-      'Learn about the history and manufacturing excellence of BOLEN (Jiaxing Chengtai Mirror Co., Ltd.), a leading LED mirror manufacturer since 1995 specializing in OEM smart mirrors.',
     storyH1: 'Our Story',
     storyIntro:
       'Founded in 2005 with roots tracing back to 1995, Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) combines Italian design inspiration with two decades of manufacturing expertise. A 50,000+ sqm facility, two factories, and 200+ skilled workers produce premium LED, smart, vanity, and bath mirrors for global brands.',
-    rfqTitle: 'Request for Quote | BOLEN LED Mirror Manufacturer',
-    rfqDesc:
-      'Contact BOLEN, a leading LED mirror manufacturer, for OEM/ODM inquiries, custom mirror manufacturing, and bulk orders.',
     rfqH1: 'Request a Quote',
     rfqIntro:
       'Contact Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) for OEM/ODM inquiries, custom mirror manufacturing, and bulk orders. Our sales team responds within 24 hours.',
@@ -132,28 +147,21 @@ const COPY: Record<
     navCatalog: 'Catalog',
     navStory: 'Our Story',
     navRfq: 'Request a Quote',
+    detailsHeading: 'Product Details',
+    specsHeading: 'Specifications',
+    productDescTemplate:
+      'Premium {title} by BOLEN Mirror (Jiaxing Chengtai Mirror Co., Ltd.) — OEM/ODM LED, smart, vanity, and bath mirrors. Request a quote for bulk pricing.',
   },
   zh: {
-    homeTitle: 'BOLEN 镜业 | LED 智能镜制造商 & OEM 镜子工厂',
-    homeDesc:
-      'BOLEN Mirror 是领先的 LED 镜制造商，专业生产 OEM LED 镜、智能镜、化妆镜和浴室镜，服务全球品牌。',
     homeH1: 'BOLEN — LED 镜制造商 & OEM 智能镜工厂',
     homeIntro:
       '嘉兴诚泰镜业有限公司（BOLEN）拥有 50,000+ 平米厂房和 200+ 名熟练工匠，为全球品牌制造优质 LED 镜、智能镜、化妆镜和浴室镜。20 年以上 OEM/ODM 制造经验。',
-    catalogTitle: 'LED 镜产品目录 | BOLEN 镜业制造商',
-    catalogDesc:
-      '探索我们丰富的 OEM LED 镜、智能镜、化妆镜和浴室镜产品系列，来自领先的 LED 镜制造商，为全球品牌提供优质制造。',
     catalogH1: '产品目录',
     catalogIntro: '浏览我们丰富的优质镜面系列，包括智能 LED 技术、优雅的化妆镜设计和可定制选项。',
     productSuffix: '| BOLEN 镜业',
-    storyTitle: '关于我们 | BOLEN LED 镜业制造商',
-    storyDesc:
-      '了解 BOLEN（嘉兴诚泰镜业有限公司）的历史和卓越制造，自 1995 年以来领先的 LED 镜制造商，专业生产 OEM 智能镜。',
     storyH1: '关于我们',
     storyIntro:
       '成立于 2005 年，历史可追溯至 1995 年，嘉兴诚泰镜业有限公司（BOLEN）将意大利设计灵感与二十年的制造专业相结合。50,000+ 平米厂房、两家工厂、200+ 熟练工人为全球品牌生产优质 LED、智能、化妆和浴室镜。',
-    rfqTitle: '询价 | BOLEN LED 镜业制造商',
-    rfqDesc: '联系领先的 LED 镜制造商 BOLEN，获取 OEM/ODM 询价、定制镜子制造和批量订单。',
     rfqH1: '请求报价',
     rfqIntro: '联系嘉兴诚泰镜业有限公司（BOLEN）获取 OEM/ODM 询价、定制镜子制造和批量订单。我们的销售团队 24 小时内回复。',
     breadcrumbHome: '首页',
@@ -162,30 +170,22 @@ const COPY: Record<
     navCatalog: '目录',
     navStory: '关于我们',
     navRfq: '询价',
+    detailsHeading: '产品详情',
+    specsHeading: '规格',
+    productDescTemplate:
+      '{title} — 嘉兴诚泰镜业有限公司（BOLEN）优质出品，专业提供 OEM/ODM LED 镜、智能镜、化妆镜和浴室镜。欢迎询价获取批发价格。',
   },
   es: {
-    homeTitle: 'BOLEN Mirror | Fabricante de Espejos LED y Fábrica OEM de Espejos Inteligentes',
-    homeDesc:
-      'BOLEN Mirror es un fabricante líder de espejos LED especializado en espejos LED OEM, espejos inteligentes, espejos de tocador y espejos de baño para marcas globales.',
     homeH1: 'BOLEN — Fabricante de Espejos LED y Fábrica OEM de Espejos Inteligentes',
     homeIntro:
       'Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) opera una instalación de 50,000+ m² con más de 200 artesanos calificados, fabricando espejos LED premium, espejos inteligentes, espejos de tocador y espejos de baño para marcas globales. Más de 20 años de experiencia en fabricación OEM/ODM.',
-    catalogTitle: 'Catálogo de Productos de Espejos LED | Fabricante BOLEN Mirror',
-    catalogDesc:
-      'Explore nuestra amplia gama de espejos LED OEM, espejos inteligentes, espejos de tocador y espejos de baño de un fabricante líder de espejos LED. Fabricación de alta calidad para marcas globales.',
     catalogH1: 'Catálogo de Productos',
     catalogIntro:
       'Explore nuestra extensa colección de espejos premium, con tecnología LED inteligente, elegantes diseños de tocador y opciones personalizables.',
     productSuffix: '| BOLEN Mirror',
-    storyTitle: 'Nuestra Historia | Fabricante de Espejos LED BOLEN',
-    storyDesc:
-      'Conozca la historia y la excelencia en fabricación de BOLEN (Jiaxing Chengtai Mirror Co., Ltd.), un fabricante líder de espejos LED desde 1995 especializado en espejos inteligentes OEM.',
     storyH1: 'Nuestra Historia',
     storyIntro:
       'Fundada en 2005 con raíces que se remontan a 1995, Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) combina la inspiración del diseño italiano con dos décadas de experiencia en fabricación. Una instalación de más de 50,000 m², dos fábricas y más de 200 trabajadores calificados producen espejos LED, inteligentes, de tocador y de baño premium para marcas globales.',
-    rfqTitle: 'Solicitud de Cotización | Fabricante de Espejos LED BOLEN',
-    rfqDesc:
-      'Contacte a BOLEN, un fabricante líder de espejos LED, para consultas OEM/ODM, fabricación de espejos personalizados y pedidos al por mayor.',
     rfqH1: 'Solicitar Cotización',
     rfqIntro:
       'Contacte a Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) para consultas OEM/ODM, fabricación de espejos personalizados y pedidos al por mayor. Nuestro equipo de ventas responde en 24 horas.',
@@ -195,30 +195,22 @@ const COPY: Record<
     navCatalog: 'Catálogo',
     navStory: 'Nuestra Historia',
     navRfq: 'Solicitar Cotización',
+    detailsHeading: 'Detalles del Producto',
+    specsHeading: 'Especificaciones',
+    productDescTemplate:
+      '{title} de primera calidad, fabricado por BOLEN Mirror (Jiaxing Chengtai Mirror Co., Ltd.) — espejos LED, inteligentes, de tocador y de baño OEM/ODM. Solicite una cotización para precios al por mayor.',
   },
   fr: {
-    homeTitle: 'BOLEN Mirror | Fabricant de Miroirs LED et Usine OEM de Miroirs Intelligents',
-    homeDesc:
-      "BOLEN Mirror est un fabricant leader de miroirs LED spécialisé dans les miroirs LED OEM, les miroirs intelligents, les miroirs de toilette et les miroirs de salle de bain pour les marques mondiales.",
     homeH1: 'BOLEN — Fabricant de Miroirs LED et Usine OEM de Miroirs Intelligents',
     homeIntro:
       "Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) exploite une installation de 50 000+ m² avec plus de 200 artisans qualifiés, fabriquant des miroirs LED haut de gamme, des miroirs intelligents, des miroirs de toilette et des miroirs de salle de bain pour les marques mondiales. Plus de 20 ans d'expérience en fabrication OEM/ODM.",
-    catalogTitle: 'Catalogue de Produits Miroirs LED | Fabricant BOLEN Mirror',
-    catalogDesc:
-      "Explorez notre large gamme de miroirs LED OEM, miroirs intelligents, miroirs de toilette et miroirs de salle de bain d'un fabricant leader de miroirs LED. Fabrication de haute qualité pour les marques mondiales.",
     catalogH1: 'Catalogue de Produits',
     catalogIntro:
       "Parcourez notre vaste collection de miroirs haut de gamme, dotés d'une technologie LED intelligente, de designs élégants et d'options personnalisables.",
     productSuffix: '| BOLEN Mirror',
-    storyTitle: 'Notre Histoire | Fabricant de Miroirs LED BOLEN',
-    storyDesc:
-      "Découvrez l'histoire et l'excellence de fabrication de BOLEN (Jiaxing Chengtai Mirror Co., Ltd.), un fabricant leader de miroirs LED depuis 1995 spécialisé dans les miroirs intelligents OEM.",
     storyH1: 'Notre Histoire',
     storyIntro:
       "Fondée en 2005 avec des racines remontant à 1995, Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) combine l'inspiration du design italien avec deux décennies d'expertise en fabrication. Une installation de plus de 50 000 m², deux usines et plus de 200 ouvriers qualifiés produisent des miroirs LED, intelligents, de toilette et de salle de bain haut de gamme pour les marques mondiales.",
-    rfqTitle: 'Demande de Devis | Fabricant de Miroirs LED BOLEN',
-    rfqDesc:
-      'Contactez BOLEN, un fabricant leader de miroirs LED, pour les demandes OEM/ODM, la fabrication de miroirs personnalisés et les commandes en gros.',
     rfqH1: 'Demande de Devis',
     rfqIntro:
       "Contactez Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) pour les demandes OEM/ODM, la fabrication de miroirs personnalisés et les commandes en gros. Notre équipe commerciale répond sous 24 heures.",
@@ -228,30 +220,22 @@ const COPY: Record<
     navCatalog: 'Catalogue',
     navStory: 'Notre Histoire',
     navRfq: 'Demande de Devis',
+    detailsHeading: 'Détails du Produit',
+    specsHeading: 'Spécifications',
+    productDescTemplate:
+      "{title} haut de gamme, fabriqué par BOLEN Mirror (Jiaxing Chengtai Mirror Co., Ltd.) — miroirs LED, intelligents, de toilette et de salle de bain OEM/ODM. Demandez un devis pour les tarifs en gros.",
   },
   de: {
-    homeTitle: 'BOLEN Mirror | LED-Spiegelhersteller & OEM-Smart-Spiegel-Fabrik',
-    homeDesc:
-      'BOLEN Mirror ist ein führender LED-Spiegelhersteller, spezialisiert auf OEM-LED-Spiegel, Smart-Spiegel, Schminkspiegel und Badspiegel für globale Marken.',
     homeH1: 'BOLEN — LED-Spiegelhersteller & OEM-Smart-Spiegel-Fabrik',
     homeIntro:
       'Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) betreibt eine Anlage von über 50.000 m² mit mehr als 200 erfahrenen Handwerkern und fertigt hochwertige LED-Spiegel, Smart-Spiegel, Schminkspiegel und Badspiegel für globale Marken. Über 20 Jahre OEM/ODM-Fertigungserfahrung.',
-    catalogTitle: 'LED-Spiegel Produktkatalog | BOLEN Mirror Hersteller',
-    catalogDesc:
-      'Entdecken Sie unser umfangreiches Sortiment an OEM-LED-Spiegeln, Smart-Spiegeln, Schminkspiegeln und Badspiegeln von einem führenden LED-Spiegelhersteller. Hochwertige Fertigung für globale Marken.',
     catalogH1: 'Produktkatalog',
     catalogIntro:
       'Durchsuchen Sie unsere umfangreiche Kollektion hochwertiger Spiegel mit intelligenter LED-Technologie, eleganten Schminkdesigns und anpassbaren Optionen.',
     productSuffix: '| BOLEN Mirror',
-    storyTitle: 'Unsere Geschichte | BOLEN LED-Spiegelhersteller',
-    storyDesc:
-      'Erfahren Sie mehr über die Geschichte und Fertigungsexzellenz von BOLEN (Jiaxing Chengtai Mirror Co., Ltd.), einem führenden LED-Spiegelhersteller seit 1995, der sich auf OEM-Smart-Spiegel spezialisiert hat.',
     storyH1: 'Unsere Geschichte',
     storyIntro:
       'Gegründet 2005 mit Wurzeln bis 1995, kombiniert Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) italienische Designinspiration mit zwei Jahrzehnten Fertigungsexpertise. Eine Anlage von über 50.000 m², zwei Fabriken und mehr als 200 erfahrene Arbeiter produzieren hochwertige LED-, Smart-, Schmink- und Badspiegel für globale Marken.',
-    rfqTitle: 'Angebotsanfrage | BOLEN LED-Spiegelhersteller',
-    rfqDesc:
-      'Kontaktieren Sie BOLEN, einen führenden LED-Spiegelhersteller, für OEM/ODM-Anfragen, kundenspezifische Spiegelherstellung und Großbestellungen.',
     rfqH1: 'Angebotsanfrage',
     rfqIntro:
       'Kontaktieren Sie Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) für OEM/ODM-Anfragen, kundenspezifische Spiegelherstellung und Großbestellungen. Unser Vertriebsteam antwortet innerhalb von 24 Stunden.',
@@ -261,30 +245,22 @@ const COPY: Record<
     navCatalog: 'Katalog',
     navStory: 'Unsere Geschichte',
     navRfq: 'Angebotsanfrage',
+    detailsHeading: 'Produktdetails',
+    specsHeading: 'Spezifikationen',
+    productDescTemplate:
+      'Hochwertiger {title} von BOLEN Mirror (Jiaxing Chengtai Mirror Co., Ltd.) — OEM/ODM-LED-, Smart-, Schmink- und Badspiegel. Fordern Sie ein Angebot für Großhandelspreise an.',
   },
   it: {
-    homeTitle: 'BOLEN Mirror | Produttore di Specchi LED e Fabbrica OEM di Specchi Smart',
-    homeDesc:
-      'BOLEN Mirror è un produttore leader di specchi LED specializzato in specchi LED OEM, specchi smart, specchi da toeletta e specchi da bagno per marchi globali.',
     homeH1: 'BOLEN — Produttore di Specchi LED e Fabbrica OEM di Specchi Smart',
     homeIntro:
       "Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) gestisce un impianto di oltre 50.000 m² con più di 200 artigiani qualificati, producendo specchi LED premium, specchi smart, specchi da toeletta e specchi da bagno per marchi globali. Oltre 20 anni di esperienza nella produzione OEM/ODM.",
-    catalogTitle: 'Catalogo Prodotti Specchi LED | Produttore BOLEN Mirror',
-    catalogDesc:
-      'Esplora la nostra ampia gamma di specchi LED OEM, specchi smart, specchi da toeletta e specchi da bagno da un produttore leader di specchi LED. Produzione di alta qualità per marchi globali.',
     catalogH1: 'Catalogo Prodotti',
     catalogIntro:
       'Sfoglia la nostra vasta collezione di specchi premium, con tecnologia LED intelligente, eleganti design da toeletta e opzioni personalizzabili.',
     productSuffix: '| BOLEN Mirror',
-    storyTitle: 'La Nostra Storia | Produttore di Specchi LED BOLEN',
-    storyDesc:
-      "Scopri la storia e l'eccellenza produttiva di BOLEN (Jiaxing Chengtai Mirror Co., Ltd.), un produttore leader di specchi LED dal 1995 specializzato in specchi smart OEM.",
     storyH1: 'La Nostra Storia',
     storyIntro:
       "Fondata nel 2005 con radici che risalgono al 1995, Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) combina l'ispirazione del design italiano con due decenni di esperienza produttiva. Un impianto di oltre 50.000 m², due fabbriche e oltre 200 operai qualificati producono specchi LED, smart, da toeletta e da bagno premium per marchi globali.",
-    rfqTitle: 'Richiesta di Preventivo | Produttore di Specchi LED BOLEN',
-    rfqDesc:
-      'Contatta BOLEN, un produttore leader di specchi LED, per richieste OEM/ODM, produzione personalizzata di specchi e ordini all\'ingrosso.',
     rfqH1: 'Richiedi un Preventivo',
     rfqIntro:
       "Contatta Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) per richieste OEM/ODM, produzione personalizzata di specchi e ordini all'ingrosso. Il nostro team commerciale risponde entro 24 ore.",
@@ -294,6 +270,10 @@ const COPY: Record<
     navCatalog: 'Catalogo',
     navStory: 'La Nostra Storia',
     navRfq: 'Richiedi un Preventivo',
+    detailsHeading: 'Dettagli Prodotto',
+    specsHeading: 'Specifiche',
+    productDescTemplate:
+      "{title} di alta qualità, prodotto da BOLEN Mirror (Jiaxing Chengtai Mirror Co., Ltd.) — specchi LED, smart, da toeletta e da bagno OEM/ODM. Richiedi un preventivo per i prezzi all'ingrosso.",
   },
 };
 
@@ -316,6 +296,7 @@ function toSlug(title: string): string {
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/(^-|-$)+/g, '');
 }
+
 
 // Responsive candidate widths for the LCP hero image. Kept in lockstep with
 // the same list in src/pages/Home.tsx so the prerendered <img>/preload URLs are
@@ -542,8 +523,40 @@ function injectIntoTemplate(
     html = html.replace(/<div id="root">\s*<\/div>/, rootBlock);
   }
 
+  // The loader element is gone from prerendered routes (only dist/index.html,
+  // the SPA fallback shell, still has it), so its CSS is dead weight here.
+  // Swap it for styling that makes the fallback readable: React clears #root on
+  // mount via createRoot, but until the entry chunk lands this markup IS the
+  // page, and it carries no Tailwind classes.
+  html = html.replace(
+    /<style>\s*#root-loader\{[\s\S]*?<\/style>/,
+    `<style>${PRERENDER_FALLBACK_CSS}</style>`
+  );
+  html = html.replace(/<noscript><style>#root-loader\{display:none\}<\/style><\/noscript>/, '');
+
   return html;
 }
+
+/**
+ * Minimal styling for the prerendered fallback block. Deliberately tiny and
+ * self-contained — it ships inline in all ~560 route files, and it only has to
+ * hold up for the few hundred ms before the React app replaces #root.
+ * Colours match the app shell (stone/amber on #FAF9F6).
+ */
+const PRERENDER_FALLBACK_CSS = [
+  '[data-prerender]{max-width:52rem;margin:0 auto;padding:2rem 1.25rem 4rem;',
+  'font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:#1c1917;line-height:1.65}',
+  '[data-prerender] h1{font-size:1.875rem;line-height:1.2;margin:0 0 1rem;font-weight:600}',
+  '[data-prerender] h2{font-size:1.25rem;margin:2rem 0 .75rem;font-weight:600}',
+  '[data-prerender] img{max-width:100%;height:auto;border-radius:.75rem;display:block;margin:1.5rem 0}',
+  '[data-prerender] nav{font-size:.875rem;color:#78716c;margin-bottom:1.5rem}',
+  '[data-prerender] a{color:#b45309}',
+  '[data-prerender] ul{list-style:none;padding:0}',
+  '[data-prerender] li{margin:.5rem 0}',
+  '[data-prerender] dl{display:grid;grid-template-columns:auto 1fr;gap:.4rem 1.5rem;font-size:.9375rem}',
+  '[data-prerender] dt{color:#78716c}',
+  '[data-prerender] dd{margin:0}',
+].join('');
 
 interface FactoryGalleryItem {
   url: string;
@@ -743,10 +756,36 @@ function productDetailContent(lang: Lang, product: Product, tr: LangTranslations
   const imgTag = img
     ? `<img src="${escapeAttr(img)}" alt="${escapeAttr(localized.title)}" width="600" height="600" />`
     : '';
-  const desc = localized.description ? `<p>${escapeHtml(localized.description.slice(0, 600))}</p>` : '';
+  // The `description` column holds model codes ("CTL609"), not prose. Render it
+  // as a model number when it is short, and as an actual description only when
+  // it is long enough to be one.
+  const descText = localized.description?.trim() || '';
+  const desc = descText.length >= 30 ? `<p>${escapeHtml(descText.slice(0, 600))}</p>` : '';
+  const modelNo = descText.length > 0 && descText.length < 30 ? `<p>${escapeHtml(descText)}</p>` : '';
   const price = product.price_range
     ? `<p><strong>${escapeHtml(product.price_range.startsWith('$') ? product.price_range : `$${product.price_range}`)}</strong></p>`
     : '';
+
+  // `details` is the real marketing copy (and is translated per-language by
+  // scripts/translate-products.ts). It was fetched but never rendered, which
+  // left every product page under 40 words of crawlable content.
+  const details = localized.details?.trim()
+    ? `<h2>${escapeHtml(c.detailsHeading)}</h2>\n      ${renderMarkdown(localized.details)}`
+    : '';
+
+  const specs = normalizeSpecs(localized.specifications);
+  const specTable = specs.length
+    ? `<h2>${escapeHtml(c.specsHeading)}</h2>
+      <dl>
+        ${specs
+          .map(
+            (s) =>
+              `<dt>${escapeHtml(s.key)}</dt><dd>${escapeHtml(s.value)}</dd>`
+          )
+          .join('\n        ')}
+      </dl>`
+    : '';
+
   return `
     <div data-prerender="product">
       <nav aria-label="Breadcrumb">
@@ -758,8 +797,11 @@ function productDetailContent(lang: Lang, product: Product, tr: LangTranslations
       </nav>
       <h1>${escapeHtml(localized.title)}</h1>
       ${imgTag}
+      ${modelNo}
       ${desc}
       ${price}
+      ${details}
+      ${specTable}
       <p><a href="/${lang}/rfq/">${escapeHtml(c.navRfq)}</a></p>
     </div>
   `.trim();
@@ -886,16 +928,15 @@ function parsePriceRange(range?: string): { low: number; high: number } {
   return { low: Math.min(...nums), high: Math.max(...nums) };
 }
 
-// Mirrors src/pages/ProductDetail.tsx's richDescription / seoTitle helpers.
-function richProductDescription(product: Product): string {
-  if (product.description && product.description.trim().length >= 30) {
-    return product.description;
-  }
-  return `Premium ${product.title} by BOLEN Mirror (Jiaxing Chengtai Mirror Co., Ltd.) — OEM/ODM LED, smart, vanity, and bath mirrors. Request a quote for bulk pricing.`;
+// Thin localized wrappers over the shared helpers in src/utils/productSeo.ts,
+// which src/pages/ProductDetail.tsx also uses — so the prerendered <title>/
+// <meta description> and the values Helmet writes on mount cannot drift.
+function richProductDescription(product: Product, lang: Lang): string {
+  return buildProductDescription(product, COPY[lang].productDescTemplate);
 }
 
-function productSeoTitle(product: Product): string {
-  return product.title.length > 55 ? product.title : `${product.title} | BOLEN Mirror`;
+function productSeoTitle(product: Product, lang: Lang): string {
+  return buildProductSeoTitle(product.title, COPY[lang].productSuffix);
 }
 
 function productDetailSchema(lang: Lang, product: Product, display: Product): any[] {
@@ -908,12 +949,24 @@ function productDetailSchema(lang: Lang, product: Product, display: Product): an
       '@type': 'Product',
       name: display.title,
       image: product.images || [],
-      description: richProductDescription(display),
+      description: richProductDescription(display, lang),
       sku: product.id,
       brand: {
         '@type': 'Brand',
         name: 'BOLEN',
       },
+      // Surfaces the same spec table Google sees in the body as structured
+      // data. Omitted entirely when a product has no specs — an empty
+      // additionalProperty array is worse than none.
+      ...(normalizeSpecs(display.specifications).length
+        ? {
+            additionalProperty: normalizeSpecs(display.specifications).map((s) => ({
+              '@type': 'PropertyValue',
+              name: s.key,
+              value: s.value,
+            })),
+          }
+        : {}),
       offers: {
         '@type': 'AggregateOffer',
         url: productFullUrl,
@@ -1004,15 +1057,26 @@ async function fetchAllProducts(): Promise<Product[]> {
   }
 
   const supabase = createClient(supabaseUrl, supabaseKey);
-  const { data, error } = await supabase
-    .from('products')
-    .select('id, title, description, images, category, price_range, msrp, details, specifications')
-    .order('created_at', { ascending: false });
-  if (error) {
-    console.warn(`[prerender-static] Could not fetch products: ${error.message}`);
-    return [];
+  // Supabase caps an unbounded select at 1000 rows and returns no error, which
+  // would silently truncate the prerendered catalog AND the sitemap. Page
+  // explicitly so growth past 1000 products can't quietly drop pages.
+  const PAGE = 500;
+  const all: Product[] = [];
+  for (let from = 0; ; from += PAGE) {
+    const { data, error } = await supabase
+      .from('products')
+      .select('id, title, description, images, category, price_range, msrp, details, specifications')
+      .order('created_at', { ascending: false })
+      .range(from, from + PAGE - 1);
+    if (error) {
+      console.warn(`[prerender-static] Could not fetch products: ${error.message}`);
+      return from === 0 ? [] : all;
+    }
+    const batch = (data || []) as Product[];
+    all.push(...batch);
+    if (batch.length < PAGE) break;
   }
-  return (data || []) as Product[];
+  return all;
 }
 
 // Defaults mirror Home.tsx so the home data island always has a populated payload
@@ -1563,8 +1627,12 @@ async function main(): Promise<void> {
   const hero: HeroImage | undefined = heroLcp
     ? { ...heroLcp, width: heroSize.w, height: heroSize.h }
     : supabaseHero;
+  // `href` is the fallback candidate for browsers that don't support
+  // imagesrcset on a preload link — without it they parse the tag, find no URL,
+  // and silently drop the LCP preload entirely. Supporting browsers ignore
+  // `href` and pick from imagesrcset as normal.
   const heroPreload = hero
-    ? `<link rel="preload" as="image" imagesrcset="${escapeAttr(hero.srcset)}" imagesizes="100vw" fetchpriority="high" referrerpolicy="no-referrer" />`
+    ? `<link rel="preload" as="image" href="${escapeAttr(hero.src)}" imagesrcset="${escapeAttr(hero.srcset)}" imagesizes="100vw" fetchpriority="high" referrerpolicy="no-referrer" />`
     : '';
   console.log(`[prerender-static] Hero ${heroPrimary ? `${heroSize.w}x${heroSize.h}` : '(none)'} baked into home.`);
 
@@ -1624,8 +1692,8 @@ async function main(): Promise<void> {
       });
       const headExtras = `${buildHead({
         lang,
-        title: c.homeTitle,
-        description: c.homeDesc,
+        title: LOCALE_SEO[lang].homeTitle,
+        description: LOCALE_SEO[lang].homeDesc,
         canonical,
         ogImage: DEFAULT_OG_IMAGE,
         ogType: 'website',
@@ -1654,8 +1722,8 @@ async function main(): Promise<void> {
       });
       const headExtras = `${buildHead({
         lang,
-        title: c.catalogTitle,
-        description: c.catalogDesc,
+        title: LOCALE_SEO[lang].catalogTitle,
+        description: LOCALE_SEO[lang].catalogDesc,
         canonical,
         ogImage: DEFAULT_OG_IMAGE,
         ogType: 'website',
@@ -1676,8 +1744,8 @@ async function main(): Promise<void> {
       const canonical = `${SITE_URL}/${lang}/our-story/`;
       const headExtras = buildHead({
         lang,
-        title: c.storyTitle,
-        description: c.storyDesc,
+        title: LOCALE_SEO[lang].storyTitle,
+        description: LOCALE_SEO[lang].storyDesc,
         canonical,
         ogImage: DEFAULT_OG_IMAGE,
         ogType: 'website',
@@ -1698,8 +1766,8 @@ async function main(): Promise<void> {
       const canonical = `${SITE_URL}/${lang}/rfq/`;
       const headExtras = buildHead({
         lang,
-        title: c.rfqTitle,
-        description: c.rfqDesc,
+        title: LOCALE_SEO[lang].rfqTitle,
+        description: LOCALE_SEO[lang].rfqDesc,
         canonical,
         ogImage: DEFAULT_OG_IMAGE,
         ogType: 'website',
@@ -1848,8 +1916,8 @@ async function main(): Promise<void> {
       const path = `/products/${slug}`; // slug from English title
       const canonical = `${SITE_URL}/${lang}${path}/`;
       const display = localizeProduct(product, translations[lang]);
-      const title = productSeoTitle(display);
-      const description = richProductDescription(display);
+      const title = productSeoTitle(display, lang);
+      const description = richProductDescription(display, lang);
       const productFields = translations[lang][product.id];
       const dataScript = prerenderDataScript({
         route: 'productDetail',

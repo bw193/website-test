@@ -43,8 +43,19 @@ const loadLanguage = async (lng: string) => {
   }
 };
 
-// Load initial language
-loadLanguage(i18n.language);
+/**
+ * Resolves once the language for the CURRENT url is usable.
+ *
+ * i18n.init() only seeds `en`, so on a /de/ route every t() call falls back to
+ * English until the de bundle lands. Combined with createRoot clearing the
+ * prerendered (correctly-localized) markup, that produced a visible
+ * German → English → German flash on 5 of the 6 locales. main.tsx awaits this
+ * before the first render; it resolves synchronously for English.
+ */
+export const initialLanguageReady: Promise<void> = loadLanguage(i18n.language).catch(() => {
+  // A failed locale chunk must not block the app — English is already loaded
+  // and fallbackLng will cover it.
+});
 
 // Load on language change
 i18n.on('languageChanged', loadLanguage);

@@ -1,5 +1,20 @@
 export const it = {
   translation: {
+    // Page-level <title>/<meta description> for the four static routes.
+    // scripts/prerender-static.ts reads these same values, so the tags baked
+    // into the static HTML and the tags react-helmet-async writes on mount
+    // cannot drift. Previously the pages passed hardcoded English, which
+    // overwrote the correctly-localized prerendered meta on 5 locales.
+    seo: {
+      homeTitle: "BOLEN Mirror | Produttore di Specchi LED e Fabbrica OEM di Specchi Smart",
+      homeDesc: "BOLEN Mirror è un produttore leader di specchi LED specializzato in specchi LED OEM, specchi smart, specchi da toeletta e specchi da bagno per marchi globali.",
+      catalogTitle: "Catalogo Prodotti Specchi LED | Produttore BOLEN Mirror",
+      catalogDesc: "Esplora la nostra ampia gamma di specchi LED OEM, specchi smart, specchi da toeletta e specchi da bagno da un produttore leader di specchi LED. Produzione di alta qualità per marchi globali.",
+      storyTitle: "La Nostra Storia | Produttore di Specchi LED BOLEN",
+      storyDesc: "Scopri la storia e l'eccellenza produttiva di BOLEN (Jiaxing Chengtai Mirror Co., Ltd.), un produttore leader di specchi LED dal 1995 specializzato in specchi smart OEM.",
+      rfqTitle: "Richiesta di Preventivo | Produttore di Specchi LED BOLEN",
+      rfqDesc: "Contatta BOLEN, un produttore leader di specchi LED, per richieste OEM/ODM, produzione personalizzata di specchi e ordini all'ingrosso."
+    },
     navbar: {
       home: "Home",
       catalog: "Catalogo",
@@ -31,6 +46,7 @@ export const it = {
     },
     home: {
       companyName: "Jiaxing Chengtai Mirror Co., Ltd.",
+      heroKicker: "Produttore di Specchi LED e Fabbrica OEM di Specchi Smart",
       heroTitle1: "Artisticamente Raffinato,",
       heroTitle2: "Funzionalmente Brillante.",
       heroDesc: "Fondata nel 2005 (con una storia che risale al 1995) e operante con il nostro marchio <1>BOLEN</1>, combiniamo l'ispirazione del design italiano con oltre due decenni di moderna esperienza manifatturiera per fornire specchi premium in tutto il mondo.",
@@ -147,6 +163,8 @@ export const it = {
       desc: "Sfoglia la nostra vasta collezione di specchi premium, con tecnologia LED intelligente, eleganti design da trucco e opzioni personalizzabili.",
       noProducts: "Nessun prodotto trovato corrispondente ai tuoi criteri.",
       viewDetails: "Vedi Dettagli",
+      searchLabel: "Cerca prodotti",
+      searchPlaceholder: "Cerca prodotti...",
       allCategories: "Tutte le Categorie",
       categories: {
         "New Arrival": "Novità",
@@ -171,7 +189,9 @@ export const it = {
       submitting: "Invio in corso...",
       rfqSuccess: "RFQ inviata con successo! Ti contatteremo presto.",
       rfqError: "Impossibile inviare la RFQ. Riprova.",
-      relatedVideos: "Video correlati"
+      relatedVideos: "Video correlati",
+      brandSuffix: "| BOLEN Mirror",
+      descTemplate: "{title} di alta qualità, prodotto da BOLEN Mirror (Jiaxing Chengtai Mirror Co., Ltd.) — specchi LED, smart, da toeletta e da bagno OEM/ODM. Richiedi un preventivo per i prezzi all'ingrosso."
     },
     blog: {
       metaTitle: "The BOLEN Journal | Approfondimenti su Specchi LED e Smart",

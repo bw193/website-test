@@ -1,5 +1,20 @@
 export const fr = {
   translation: {
+    // Page-level <title>/<meta description> for the four static routes.
+    // scripts/prerender-static.ts reads these same values, so the tags baked
+    // into the static HTML and the tags react-helmet-async writes on mount
+    // cannot drift. Previously the pages passed hardcoded English, which
+    // overwrote the correctly-localized prerendered meta on 5 locales.
+    seo: {
+      homeTitle: "BOLEN Mirror | Fabricant de Miroirs LED et Usine OEM de Miroirs Intelligents",
+      homeDesc: "BOLEN Mirror est un fabricant leader de miroirs LED spécialisé dans les miroirs LED OEM, les miroirs intelligents, les miroirs de toilette et les miroirs de salle de bain pour les marques mondiales.",
+      catalogTitle: "Catalogue de Produits Miroirs LED | Fabricant BOLEN Mirror",
+      catalogDesc: "Explorez notre large gamme de miroirs LED OEM, miroirs intelligents, miroirs de toilette et miroirs de salle de bain d'un fabricant leader de miroirs LED. Fabrication de haute qualité pour les marques mondiales.",
+      storyTitle: "Notre Histoire | Fabricant de Miroirs LED BOLEN",
+      storyDesc: "Découvrez l'histoire et l'excellence de fabrication de BOLEN (Jiaxing Chengtai Mirror Co., Ltd.), un fabricant leader de miroirs LED depuis 1995 spécialisé dans les miroirs intelligents OEM.",
+      rfqTitle: "Demande de Devis | Fabricant de Miroirs LED BOLEN",
+      rfqDesc: "Contactez BOLEN, un fabricant leader de miroirs LED, pour les demandes OEM/ODM, la fabrication de miroirs personnalisés et les commandes en gros."
+    },
     navbar: {
       home: "Accueil",
       catalog: "Catalogue",
@@ -31,6 +46,7 @@ export const fr = {
     },
     home: {
       companyName: "Jiaxing Chengtai Mirror Co., Ltd.",
+      heroKicker: "Fabricant de Miroirs LED et Usine OEM de Miroirs Intelligents",
       heroTitle1: "Artistiquement Raffiné,",
       heroTitle2: "Fonctionnellement Brillant.",
       heroDesc: "Fondée en 2005 (avec une histoire remontant à 1995) et opérant sous notre marque <1>BOLEN</1>, nous combinons l'inspiration du design italien avec plus de deux décennies d'expertise en fabrication moderne pour fournir des miroirs haut de gamme dans le monde entier.",
@@ -147,6 +163,8 @@ export const fr = {
       desc: "Parcourez notre vaste collection de miroirs haut de gamme, dotés de la technologie LED intelligente, de designs élégants et d'options personnalisables.",
       noProducts: "Aucun produit trouvé correspondant à vos critères.",
       viewDetails: "Voir les Détails",
+      searchLabel: "Rechercher des produits",
+      searchPlaceholder: "Rechercher des produits...",
       allCategories: "Toutes les Catégories",
       categories: {
         "New Arrival": "Nouveautés",
@@ -171,7 +189,9 @@ export const fr = {
       submitting: "Soumission...",
       rfqSuccess: "RFQ soumis avec succès ! Nous vous contacterons bientôt.",
       rfqError: "Échec de la soumission du RFQ. Veuillez réessayer.",
-      relatedVideos: "Vidéos associées"
+      relatedVideos: "Vidéos associées",
+      brandSuffix: "| BOLEN Mirror",
+      descTemplate: "{title} haut de gamme, fabriqué par BOLEN Mirror (Jiaxing Chengtai Mirror Co., Ltd.) — miroirs LED, intelligents, de toilette et de salle de bain OEM/ODM. Demandez un devis pour les tarifs en gros."
     },
     blog: {
       metaTitle: "The BOLEN Journal | Perspectives sur les Miroirs LED et Intelligents",

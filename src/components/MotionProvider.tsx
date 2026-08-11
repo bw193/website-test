@@ -1,5 +1,5 @@
 import React from 'react';
-import { LazyMotion, domAnimation } from 'motion/react';
+import { LazyMotion, MotionConfig, domAnimation } from 'motion/react';
 
 /**
  * Provides motion's `domAnimation` feature bundle to the `m` components used by
@@ -8,5 +8,12 @@ import { LazyMotion, domAnimation } from 'motion/react';
  * it in. Mirrors the single app-wide <LazyMotion> that used to live in App.tsx.
  */
 export default function MotionProvider({ children }: { children: React.ReactNode }) {
-  return <LazyMotion features={domAnimation}>{children}</LazyMotion>;
+  // reducedMotion="user" makes every `m.*` transform/opacity animation on the
+  // lazy routes honour prefers-reduced-motion without touching each call site.
+  // It lives on MotionConfig, not LazyMotion.
+  return (
+    <MotionConfig reducedMotion="user">
+      <LazyMotion features={domAnimation}>{children}</LazyMotion>
+    </MotionConfig>
+  );
 }

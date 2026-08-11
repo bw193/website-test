@@ -122,8 +122,13 @@ export default function Videos() {
         <div className="mb-12 rounded-2xl border border-stone-200 bg-white p-4 shadow-sm md:p-6">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
             <div className="relative w-full lg:max-w-md">
+              <label htmlFor="video-search" className="sr-only">
+                {t('videos.search', 'Search videos...')}
+              </label>
               <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-400" />
               <input
+                id="video-search"
+                type="search"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder={t('videos.search', 'Search videos...')}

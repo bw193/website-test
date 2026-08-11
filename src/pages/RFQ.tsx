@@ -1,5 +1,5 @@
 import { m } from 'motion/react';
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { CheckCircle2, Mail, Phone, MapPin } from 'lucide-react';
@@ -17,6 +17,14 @@ export default function RFQ() {
   const { t } = useTranslation();
   const lang = useCurrentLang();
   const [rfqStatus, setRfqStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+  // On success the whole <form> is swapped out, which would otherwise leave
+  // focus on a submit button that no longer exists — screen reader and keyboard
+  // users get no indication the submission worked.
+  const successHeadingRef = useRef<HTMLHeadingElement>(null);
+
+  useEffect(() => {
+    if (rfqStatus === 'success') successHeadingRef.current?.focus();
+  }, [rfqStatus]);
   const { register, handleSubmit, reset, formState: { errors } } = useForm<RFQForm>();
 
   const onSubmitRFQ = async (data: RFQForm) => {
@@ -76,8 +84,8 @@ export default function RFQ() {
   return (
     <div className="bg-stone-50 min-h-screen pt-24 pb-16">
       <SEO 
-        title="Request for Quote | BOLEN LED Mirror Manufacturer"
-        description="Contact BOLEN, a leading LED mirror manufacturer, for OEM/ODM inquiries, custom mirror manufacturing, and bulk orders."
+        title={t('seo.rfqTitle')}
+        description={t('seo.rfqDesc')}
         path="/rfq"
         schema={contactSchema}
       />
@@ -161,7 +169,7 @@ export default function RFQ() {
                   <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6">
                     <CheckCircle2 className="h-10 w-10 text-green-600" />
                   </div>
-                  <h3 className="text-2xl font-bold text-green-900 mb-2">Inquiry Sent Successfully!</h3>
+                  <h3 ref={successHeadingRef} tabIndex={-1} className="text-2xl font-bold text-green-900 mb-2 focus:outline-none">Inquiry Sent Successfully!</h3>
                   <p className="text-green-700 text-lg">{t('productDetail.rfqSuccess')}</p>
                   <button onClick={() => setRfqStatus('idle')} className="mt-8 px-6 py-3 bg-green-600 text-white rounded-full font-medium hover:bg-green-700 transition-colors">Send another inquiry</button>
                 </m.div>
@@ -175,9 +183,11 @@ export default function RFQ() {
                         id="customerName"
                         placeholder="Your Company Ltd."
                         {...register('customerName', { required: 'Name is required' })}
-                        className="block w-full rounded-xl border-stone-200 bg-stone-50 focus:bg-white shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm p-3 transition-colors"
+                        aria-invalid={errors.customerName ? true : undefined}
+                        aria-describedby={errors.customerName ? 'customerName-error' : undefined}
+                        className="block w-full rounded-xl border border-stone-200 bg-stone-50 focus:bg-white shadow-sm focus:border-amber-500 focus:ring-2 focus:ring-amber-500 focus:outline-none sm:text-sm p-3 transition-colors"
                       />
-                      {errors.customerName && <p className="mt-1 text-sm text-red-600 font-medium">{errors.customerName.message}</p>}
+                      {errors.customerName && <p id="customerName-error" role="alert" className="mt-1 text-sm text-red-600 font-medium">{errors.customerName.message}</p>}
                     </div>
                     <div>
                       <label htmlFor="customerEmail" className="block text-sm font-medium text-stone-700 mb-1">{t('productDetail.email')}</label>
@@ -189,9 +199,11 @@ export default function RFQ() {
                           required: 'Email is required',
                           pattern: { value: /^\S+@\S+$/i, message: 'Invalid email address' }
                         })}
-                        className="block w-full rounded-xl border-stone-200 bg-stone-50 focus:bg-white shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm p-3 transition-colors"
+                        aria-invalid={errors.customerEmail ? true : undefined}
+                        aria-describedby={errors.customerEmail ? 'customerEmail-error' : undefined}
+                        className="block w-full rounded-xl border border-stone-200 bg-stone-50 focus:bg-white shadow-sm focus:border-amber-500 focus:ring-2 focus:ring-amber-500 focus:outline-none sm:text-sm p-3 transition-colors"
                       />
-                      {errors.customerEmail && <p className="mt-1 text-sm text-red-600 font-medium">{errors.customerEmail.message}</p>}
+                      {errors.customerEmail && <p id="customerEmail-error" role="alert" className="mt-1 text-sm text-red-600 font-medium">{errors.customerEmail.message}</p>}
                     </div>
                   </div>
                   
@@ -202,7 +214,7 @@ export default function RFQ() {
                       id="productInterest"
                       placeholder="e.g. LED Bathroom Mirrors, Custom Vanity Mirrors"
                       {...register('productInterest')}
-                      className="block w-full rounded-xl border-stone-200 bg-stone-50 focus:bg-white shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm p-3 transition-colors"
+                      className="block w-full rounded-xl border border-stone-200 bg-stone-50 focus:bg-white shadow-sm focus:border-amber-500 focus:ring-2 focus:ring-amber-500 focus:outline-none sm:text-sm p-3 transition-colors"
                     />
                   </div>
 
@@ -213,13 +225,15 @@ export default function RFQ() {
                       rows={6}
                       placeholder="Please provide details about your inquiry, including estimated quantities, specific requirements, or questions..."
                       {...register('message', { required: 'Message is required' })}
-                      className="block w-full rounded-xl border-stone-200 bg-stone-50 focus:bg-white shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm p-3 transition-colors resize-none"
+                      aria-invalid={errors.message ? true : undefined}
+                      aria-describedby={errors.message ? 'message-error' : undefined}
+                      className="block w-full rounded-xl border border-stone-200 bg-stone-50 focus:bg-white shadow-sm focus:border-amber-500 focus:ring-2 focus:ring-amber-500 focus:outline-none sm:text-sm p-3 transition-colors resize-none"
                     ></textarea>
-                    {errors.message && <p className="mt-1 text-sm text-red-600 font-medium">{errors.message.message}</p>}
+                    {errors.message && <p id="message-error" role="alert" className="mt-1 text-sm text-red-600 font-medium">{errors.message.message}</p>}
                   </div>
 
                   {rfqStatus === 'error' && (
-                    <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
+                    <div role="alert" className="p-4 bg-red-50 border border-red-200 rounded-xl">
                       <p className="text-sm text-red-600 font-medium">{t('productDetail.rfqError')}</p>
                     </div>
                   )}
@@ -227,7 +241,7 @@ export default function RFQ() {
                   <button
                     type="submit"
                     disabled={rfqStatus === 'submitting'}
-                    className="w-full flex justify-center py-4 px-4 border border-transparent rounded-xl shadow-sm text-base font-bold text-stone-900 bg-amber-400 hover:bg-amber-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                    className="btn-primary w-full py-4 text-base"
                   >
                     {rfqStatus === 'submitting' ? (
                       <span className="flex items-center gap-2">

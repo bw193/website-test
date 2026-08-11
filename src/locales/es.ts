@@ -1,5 +1,20 @@
 export const es = {
   translation: {
+    // Page-level <title>/<meta description> for the four static routes.
+    // scripts/prerender-static.ts reads these same values, so the tags baked
+    // into the static HTML and the tags react-helmet-async writes on mount
+    // cannot drift. Previously the pages passed hardcoded English, which
+    // overwrote the correctly-localized prerendered meta on 5 locales.
+    seo: {
+      homeTitle: "BOLEN Mirror | Fabricante de Espejos LED y Fábrica OEM de Espejos Inteligentes",
+      homeDesc: "BOLEN Mirror es un fabricante líder de espejos LED especializado en espejos LED OEM, espejos inteligentes, espejos de tocador y espejos de baño para marcas globales.",
+      catalogTitle: "Catálogo de Productos de Espejos LED | Fabricante BOLEN Mirror",
+      catalogDesc: "Explore nuestra amplia gama de espejos LED OEM, espejos inteligentes, espejos de tocador y espejos de baño de un fabricante líder de espejos LED. Fabricación de alta calidad para marcas globales.",
+      storyTitle: "Nuestra Historia | Fabricante de Espejos LED BOLEN",
+      storyDesc: "Conozca la historia y la excelencia en fabricación de BOLEN (Jiaxing Chengtai Mirror Co., Ltd.), un fabricante líder de espejos LED desde 1995 especializado en espejos inteligentes OEM.",
+      rfqTitle: "Solicitud de Cotización | Fabricante de Espejos LED BOLEN",
+      rfqDesc: "Contacte a BOLEN, un fabricante líder de espejos LED, para consultas OEM/ODM, fabricación de espejos personalizados y pedidos al por mayor."
+    },
     navbar: {
       home: "Inicio",
       catalog: "Catálogo",
@@ -31,6 +46,7 @@ export const es = {
     },
     home: {
       companyName: "Jiaxing Chengtai Mirror Co., Ltd.",
+      heroKicker: "Fabricante de Espejos LED y Fábrica OEM de Espejos Inteligentes",
       heroTitle1: "Artísticamente Refinado,",
       heroTitle2: "Funcionalmente Brillante.",
       heroDesc: "Fundada en 2005 (con una historia que se remonta a 1995) y operando bajo nuestra marca <1>BOLEN</1>, combinamos la inspiración del diseño italiano con más de dos décadas de experiencia en fabricación moderna para ofrecer espejos de primera calidad en todo el mundo.",
@@ -147,6 +163,8 @@ export const es = {
       desc: "Explore nuestra extensa colección de espejos premium, con tecnología LED inteligente, elegantes diseños de tocador y opciones personalizables.",
       noProducts: "No se encontraron productos que coincidan con sus criterios.",
       viewDetails: "Ver Detalles",
+      searchLabel: "Buscar productos",
+      searchPlaceholder: "Buscar productos...",
       allCategories: "Todas las Categorías",
       categories: {
         "New Arrival": "Novedades",
@@ -171,7 +189,9 @@ export const es = {
       submitting: "Enviando...",
       rfqSuccess: "¡RFQ enviado con éxito! Nos pondremos en contacto con usted pronto.",
       rfqError: "Error al enviar RFQ. Por favor, inténtelo de nuevo.",
-      relatedVideos: "Videos relacionados"
+      relatedVideos: "Videos relacionados",
+      brandSuffix: "| BOLEN Mirror",
+      descTemplate: "{title} de primera calidad, fabricado por BOLEN Mirror (Jiaxing Chengtai Mirror Co., Ltd.) — espejos LED, inteligentes, de tocador y de baño OEM/ODM. Solicite una cotización para precios al por mayor."
     },
     blog: {
       metaTitle: "The BOLEN Journal | Perspectivas sobre Espejos LED e Inteligentes",

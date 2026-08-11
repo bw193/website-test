@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { m } from 'motion/react';
-import ReactMarkdown from 'react-markdown';
+import Markdown from '../components/Markdown';
 import { ArrowUpRight, CalendarDays, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import SEO from '../components/SEO';
@@ -170,14 +170,14 @@ export default function VideoDetail() {
 
       <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
         {video.body ? (
-          <div
+          <Markdown
             className="prose prose-stone prose-lg max-w-none
               prose-headings:font-serif prose-headings:text-stone-900
               prose-a:text-amber-700 prose-a:no-underline hover:prose-a:underline
               prose-p:font-light prose-p:leading-relaxed prose-p:text-stone-700"
           >
-            <ReactMarkdown>{video.body}</ReactMarkdown>
-          </div>
+            {video.body}
+          </Markdown>
         ) : null}
 
       </div>
@@ -239,14 +239,14 @@ export default function VideoDetail() {
             <div className="mt-6 flex flex-wrap gap-3">
               <Link
                 to={lp('/rfq')}
-                className="inline-flex items-center gap-2 rounded-full bg-amber-500 px-5 py-3 text-sm font-semibold text-stone-950 hover:bg-amber-400"
+                className="btn-primary"
               >
                 {t('videos.ctaQuote', 'Request a quote')}
                 <ArrowUpRight className="h-4 w-4" />
               </Link>
               <Link
                 to={lp('/products')}
-                className="inline-flex items-center gap-2 rounded-full border border-white/25 px-5 py-3 text-sm font-semibold hover:bg-white/10"
+                className="btn-secondary-on-dark"
               >
                 {t('videos.ctaCatalog', 'Browse products')}
               </Link>

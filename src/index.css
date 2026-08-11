@@ -6,6 +6,34 @@
   --font-serif: "Playfair Display", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
 }
 
+/* Canonical button roles.
+ *
+ * The same "submit an RFQ" / "go to a money page" action was previously styled
+ * six different ways across RFQ, ProductDetail, Home, NotFound, VideoDetail and
+ * BlogPost — four amber values, two radii, three paddings, two foreground
+ * colours. amber-500 on stone-950 was the most-used pairing, so it wins here. */
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-amber-500 px-6 py-3
+           text-sm font-semibold text-stone-950 shadow-sm transition-colors
+           hover:bg-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-500
+           focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-stone-300
+           px-6 py-3 text-sm font-semibold text-stone-800 transition-colors
+           hover:bg-stone-100 focus:outline-none focus:ring-2 focus:ring-stone-400
+           focus:ring-offset-2;
+  }
+  /* On dark sections (stone-900 CTA bands, video/blog footers). */
+  .btn-secondary-on-dark {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-white/40
+           bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur-sm
+           transition-colors hover:bg-white/20 focus:outline-none focus:ring-2
+           focus:ring-white/60;
+  }
+}
+
 @layer utilities {
   .hide-scrollbar::-webkit-scrollbar {
     display: none;
@@ -54,4 +82,13 @@
   .reveal { opacity: 1; transform: none; transition: none; }
   .hero-fade { animation: none; }
   .fv-kenburns { animation: none; }
+  /* The certificate marquee, the decorative blobs, and the GlobalMap's dash /
+     ping loops all ran indefinitely regardless of the user's preference. The
+     marquee in particular could only be paused by hovering, which is
+     unreachable by touch and by keyboard (WCAG 2.2.2). */
+  .animate-marquee,
+  .animate-pulse,
+  .animate-ping { animation: none !important; }
+  /* .animate-spin is deliberately NOT disabled — loading spinners communicate
+     ongoing state, and a frozen one reads as a hung page. */
 }

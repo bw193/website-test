@@ -1,16 +1,20 @@
 import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Menu, X, Globe, Sparkles } from 'lucide-react';
+import { Menu, X, Globe } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useLocalizedPath, SUPPORTED_LANGUAGES } from '../hooks/useLocalizedPath';
+import { useLocalizedPath } from '../hooks/useLocalizedPath';
+
+const LOGO_URL =
+  'https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/logo.png';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = React.useState(false);
   const [langMenuOpen, setLangMenuOpen] = React.useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { lang, lp } = useLocalizedPath();
+  const navRef = React.useRef<HTMLElement>(null);
 
   const languages = [
     { code: 'en', label: 'English', short: 'EN' },
@@ -30,40 +34,116 @@ export default function Navbar() {
     setLangMenuOpen(false);
   };
 
+  // Both menus are dismissible by Escape and by clicking outside. Previously
+  // neither was: on a phone the language panel could only be closed by tapping
+  // the globe again or navigating away.
+  React.useEffect(() => {
+    const closeAll = () => {
+      setIsOpen(false);
+      setLangMenuOpen(false);
+    };
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeAll();
+    };
+    const onPointerDown = (e: PointerEvent) => {
+      if (!navRef.current?.contains(e.target as Node)) closeAll();
+    };
+    document.addEventListener('keydown', onKeyDown);
+    document.addEventListener('pointerdown', onPointerDown);
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+      document.removeEventListener('pointerdown', onPointerDown);
+    };
+  }, []);
+
+  // Stop the page scrolling behind the open mobile panel.
+  React.useEffect(() => {
+    if (!isOpen) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, [isOpen]);
+
+  // Close both menus on navigation so they never persist across routes.
+  React.useEffect(() => {
+    setIsOpen(false);
+    setLangMenuOpen(false);
+  }, [location.pathname]);
+
+  // Drives both the visual you-are-here cue and aria-current. The mobile panel
+  // used to hardcode the active styling on Home, so every route claimed to be
+  // the homepage.
+  const isActive = (path: string) => {
+    const target = lp(path).replace(/\/$/, '');
+    return location.pathname.replace(/\/$/, '') === target;
+  };
+
+  const navLinks = [
+    { path: '/', label: t('navbar.home') },
+    { path: '/products', label: t('navbar.catalog') },
+    { path: '/blog', label: t('navbar.blog') },
+    { path: '/videos', label: t('navbar.videos', 'Videos') },
+    { path: '/our-story', label: t('navbar.ourStory') },
+  ];
+
+  const languageMenu = (
+    <div className="absolute right-0 mt-2 w-32 bg-white rounded-md shadow-lg py-1 z-50 ring-1 ring-black ring-opacity-5" role="menu" aria-label="Language selection">
+      {languages.map((l) => (
+        <button
+          key={l.code}
+          onClick={() => changeLanguage(l.code)}
+          role="menuitem"
+          className={`block w-full text-left px-4 py-2 text-sm ${
+            currentLang.code === l.code ? 'bg-amber-50 text-amber-600 font-medium' : 'text-stone-700 hover:bg-stone-50'
+          }`}
+        >
+          {l.label}
+        </button>
+      ))}
+    </div>
+  );
+
   return (
-    <nav className="bg-white shadow-sm sticky top-0 z-50" aria-label="Main navigation">
+    <nav ref={navRef} className="bg-white shadow-sm sticky top-0 z-50" aria-label="Main navigation">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link to={lp('/')} className="flex-shrink-0 flex items-center gap-2">
-              <Sparkles className="h-8 w-8 text-amber-600" />
+              <img src={LOGO_URL} alt="" aria-hidden="true" className="h-8 w-8 object-contain" width="32" height="32" />
               <span className="font-bold text-xl text-stone-900 tracking-wide">BOLEN</span>
             </Link>
-            <div className="hidden sm:ml-10 sm:flex sm:items-center sm:space-x-8">
-              <Link to={lp('/')} className="text-stone-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-amber-600 text-sm font-medium">
-                {t('navbar.home')}
-              </Link>
-              <Link to={lp('/products')} className="text-stone-500 hover:text-stone-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-amber-600 text-sm font-medium">
-                {t('navbar.catalog')}
-              </Link>
-              <Link to={lp('/rfq')} className="text-stone-500 hover:text-stone-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-amber-600 text-sm font-medium">
-                {t('productDetail.requestQuote')}
-              </Link>
-              <Link to={lp('/blog')} className="text-stone-500 hover:text-stone-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-amber-600 text-sm font-medium">
-                {t('navbar.blog')}
-              </Link>
-              <Link to={lp('/videos')} className="text-stone-500 hover:text-stone-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-amber-600 text-sm font-medium">
-                {t('navbar.videos', 'Videos')}
-              </Link>
-              <Link to={lp('/our-story')} className="text-stone-500 hover:text-stone-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-amber-600 text-sm font-medium">
-                {t('navbar.ourStory')}
-              </Link>
+            {/* Desktop nav switches on at lg (1024px), not sm (640px): six links
+                plus the language switcher need ~830px in English and more in
+                de/es/fr, so at sm the row used to wrap out of the h-16 bar. */}
+            <div className="hidden lg:ml-10 lg:flex lg:items-center lg:space-x-6">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.path}
+                  to={lp(link.path)}
+                  aria-current={isActive(link.path) ? 'page' : undefined}
+                  className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium whitespace-nowrap ${
+                    isActive(link.path)
+                      ? 'text-stone-900 border-amber-600'
+                      : 'text-stone-500 hover:text-stone-900 border-transparent hover:border-amber-600'
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              ))}
             </div>
           </div>
-          
-          <div className="hidden sm:flex sm:items-center sm:space-x-6">
-            <Link to="/admin/login" className="text-stone-500 hover:text-stone-900 text-sm font-medium">
-              {t('navbar.employeeLogin')}
+
+          <div className="hidden lg:flex lg:items-center lg:space-x-4">
+            {/* The RFQ link is the site's only conversion action — it used to be
+                styled identically to every other nav link (and to Employee
+                Login), so the header carried no CTA at all. */}
+            <Link
+              to={lp('/rfq')}
+              className="inline-flex items-center rounded-full bg-amber-500 px-4 py-2 text-sm font-semibold text-stone-950 transition-colors hover:bg-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 whitespace-nowrap"
+            >
+              {t('productDetail.requestQuote')}
             </Link>
             <div className="relative">
               <button
@@ -72,57 +152,37 @@ export default function Navbar() {
                 title="Change Language"
                 aria-expanded={langMenuOpen}
                 aria-haspopup="true"
+                aria-label={t('navbar.changeLanguage', 'Change language')}
               >
                 <Globe className="h-4 w-4" />
                 {currentLang.short}
               </button>
 
-              {langMenuOpen && (
-                <div className="absolute right-0 mt-2 w-32 bg-white rounded-md shadow-lg py-1 z-50 ring-1 ring-black ring-opacity-5" role="menu" aria-label="Language selection">
-                  {languages.map((lang) => (
-                    <button
-                      key={lang.code}
-                      onClick={() => changeLanguage(lang.code)}
-                      role="menuitem"
-                      className={`block w-full text-left px-4 py-2 text-sm ${
-                        currentLang.code === lang.code ? 'bg-amber-50 text-amber-600 font-medium' : 'text-stone-700 hover:bg-stone-50'
-                      }`}
-                    >
-                      {lang.label}
-                    </button>
-                  ))}
-                </div>
-              )}
+              {langMenuOpen && languageMenu}
             </div>
           </div>
-          <div className="-mr-2 flex items-center sm:hidden gap-2">
+          <div className="-mr-2 flex items-center lg:hidden gap-2">
             <div className="relative">
-              <button 
-                onClick={() => setLangMenuOpen(!langMenuOpen)} 
+              <button
+                onClick={() => setLangMenuOpen(!langMenuOpen)}
                 className="p-2 text-stone-400 hover:text-amber-600 flex items-center gap-1"
+                aria-expanded={langMenuOpen}
+                aria-haspopup="true"
+                aria-label={t('navbar.changeLanguage', 'Change language')}
               >
                 <Globe className="h-5 w-5" />
                 <span className="text-xs font-medium">{currentLang.short}</span>
               </button>
-              
-              {langMenuOpen && (
-                <div className="absolute right-0 mt-2 w-32 bg-white rounded-md shadow-lg py-1 z-50 ring-1 ring-black ring-opacity-5">
-                  {languages.map((lang) => (
-                    <button
-                      key={lang.code}
-                      onClick={() => changeLanguage(lang.code)}
-                      className={`block w-full text-left px-4 py-2 text-sm ${
-                        currentLang.code === lang.code ? 'bg-amber-50 text-amber-600 font-medium' : 'text-stone-700 hover:bg-stone-50'
-                      }`}
-                    >
-                      {lang.label}
-                    </button>
-                  ))}
-                </div>
-              )}
+
+              {langMenuOpen && languageMenu}
             </div>
-            <button onClick={() => setIsOpen(!isOpen)} className="inline-flex items-center justify-center p-2 rounded-md text-stone-400 hover:text-stone-500 hover:bg-stone-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-amber-600">
-              <span className="sr-only">Open main menu</span>
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              aria-expanded={isOpen}
+              aria-controls="mobile-menu"
+              className="inline-flex items-center justify-center p-2 rounded-md text-stone-400 hover:text-stone-500 hover:bg-stone-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-amber-600"
+            >
+              <span className="sr-only">{t('navbar.openMenu', 'Open main menu')}</span>
               {isOpen ? <X className="block h-6 w-6" /> : <Menu className="block h-6 w-6" />}
             </button>
           </div>
@@ -130,17 +190,32 @@ export default function Navbar() {
       </div>
 
       {isOpen && (
-        <div className="sm:hidden">
+        <div className="lg:hidden" id="mobile-menu">
           <div className="pt-2 pb-3 space-y-1">
-            <Link to={lp('/')} onClick={() => setIsOpen(false)} className="bg-amber-50 border-amber-600 text-amber-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium">{t('navbar.home')}</Link>
-            <Link to={lp('/products')} onClick={() => setIsOpen(false)} className="border-transparent text-stone-500 hover:bg-stone-50 hover:border-stone-300 hover:text-stone-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium">{t('navbar.catalog')}</Link>
-            <Link to={lp('/rfq')} onClick={() => setIsOpen(false)} className="border-transparent text-stone-500 hover:bg-stone-50 hover:border-stone-300 hover:text-stone-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium">{t('productDetail.requestQuote')}</Link>
-            <Link to={lp('/blog')} onClick={() => setIsOpen(false)} className="border-transparent text-stone-500 hover:bg-stone-50 hover:border-stone-300 hover:text-stone-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium">{t('navbar.blog')}</Link>
-            <Link to={lp('/videos')} onClick={() => setIsOpen(false)} className="border-transparent text-stone-500 hover:bg-stone-50 hover:border-stone-300 hover:text-stone-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium">{t('navbar.videos', 'Videos')}</Link>
-            <Link to={lp('/our-story')} onClick={() => setIsOpen(false)} className="border-transparent text-stone-500 hover:bg-stone-50 hover:border-stone-300 hover:text-stone-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium">{t('navbar.ourStory')}</Link>
-            <Link to="/admin/login" onClick={() => setIsOpen(false)} className="border-transparent text-stone-500 hover:bg-stone-50 hover:border-stone-300 hover:text-stone-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium">
-              {t('navbar.employeeLogin')}
-            </Link>
+            {navLinks.map((link) => (
+              <Link
+                key={link.path}
+                to={lp(link.path)}
+                onClick={() => setIsOpen(false)}
+                aria-current={isActive(link.path) ? 'page' : undefined}
+                className={`block pl-3 pr-4 py-3 border-l-4 text-base font-medium ${
+                  isActive(link.path)
+                    ? 'bg-amber-50 border-amber-600 text-amber-700'
+                    : 'border-transparent text-stone-500 hover:bg-stone-50 hover:border-stone-300 hover:text-stone-700'
+                }`}
+              >
+                {link.label}
+              </Link>
+            ))}
+            <div className="px-3 pt-3">
+              <Link
+                to={lp('/rfq')}
+                onClick={() => setIsOpen(false)}
+                className="flex w-full items-center justify-center rounded-full bg-amber-500 px-4 py-3 text-base font-semibold text-stone-950 hover:bg-amber-400"
+              >
+                {t('productDetail.requestQuote')}
+              </Link>
+            </div>
           </div>
         </div>
       )}

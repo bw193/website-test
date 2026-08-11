@@ -1,16 +1,12 @@
 import React from 'react';
-import { Mail, Phone, MapPin, Sparkles } from 'lucide-react';
-import { Link, useLocation } from 'react-router-dom';
+import { Mail, Phone, MapPin } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLocalizedPath } from '../hooks/useLocalizedPath';
 
 export default function Footer() {
-  const location = useLocation();
   const { lp } = useLocalizedPath();
   const { t } = useTranslation();
-  if (location.pathname.endsWith('/our-story')) {
-    return null;
-  }
 
   return (
     <footer className="bg-stone-900 text-white">
@@ -18,7 +14,15 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <Sparkles className="h-8 w-8 text-amber-600" />
+              <img
+                src="https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/logo.png"
+                alt=""
+                aria-hidden="true"
+                className="h-8 w-8 object-contain"
+                width="32"
+                height="32"
+                loading="lazy"
+              />
               <span className="font-bold text-xl text-white tracking-wide">BOLEN</span>
             </div>
             <p className="text-stone-400 text-sm">
@@ -48,8 +52,16 @@ export default function Footer() {
             </ul>
           </div>
         </div>
-        <div className="mt-8 border-t border-stone-800 pt-8 text-center text-sm text-stone-500">
-          &copy; {new Date().getFullYear()} Jiaxing Chengtai Mirror Co., Ltd. (Brand: BOLEN). {t('footer.rights', 'All rights reserved.')}
+        <div className="mt-8 border-t border-stone-800 pt-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-stone-500">
+          <p>
+            &copy; {new Date().getFullYear()} Jiaxing Chengtai Mirror Co., Ltd. (Brand: BOLEN). {t('footer.rights', 'All rights reserved.')}
+          </p>
+          {/* Moved out of the public header, where it sat beside the nav links
+              and gave an internal staff entry point the same prominence as the
+              RFQ call to action. */}
+          <Link to="/admin/login" className="text-stone-600 hover:text-stone-400 transition-colors">
+            {t('navbar.employeeLogin')}
+          </Link>
         </div>
       </div>
     </footer>

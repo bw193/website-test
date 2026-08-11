@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Globe, ShieldCheck, Truck, Factory, Lightbulb, Users, Clock, CheckCircle2, ChevronRight, ChevronLeft, Settings, Palette, DollarSign } from 'lucide-react';
 import { useTranslation, Trans } from 'react-i18next';
 import ProductCard from '../components/ProductCard';
+import ProductCardSkeleton from '../components/ProductCardSkeleton';
 import SEO from '../components/SEO';
 import Reveal from '../components/Reveal';
 import FeaturedVideo from '../components/FeaturedVideo';
@@ -18,6 +19,12 @@ const GlobalMap = lazy(() => import('../components/GlobalMap'));
 // Lazy so `motion` (used by GlobalMap's animated markers) stays off the home
 // critical path — it loads with the map, below the fold, after LCP.
 const MotionProvider = lazy(() => import('../components/MotionProvider'));
+
+// Own factory photography for the closing CTA band. Previously a random image
+// from picsum.photos, which is a placeholder service — not something that
+// should ship behind the primary conversion block on a supplier site.
+const CTA_BACKDROP =
+  'https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/factory1.jpg';
 
 const DEFAULT_HERO_BGS = [
   "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-images/site-assets/1773994889396-9i4t1ap.jpg",
@@ -236,6 +243,10 @@ export default function Home() {
 
   useEffect(() => {
     if (heroBgs.length <= 1) return;
+    // Auto-advancing the hero is motion the user did not initiate and cannot
+    // pause, so honour the OS preference and leave it on the first slide (the
+    // prev/next arrows still work).
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
 
     const interval = setInterval(() => {
       setAnimateSlides(true);
@@ -257,7 +268,7 @@ export default function Home() {
 
   return (
     <div className="bg-[#FAF9F6] text-stone-800 font-sans overflow-hidden">
-      <SEO schema={[
+      <SEO title={t('seo.homeTitle')} description={t('seo.homeDesc')} schema={[
         {
           "@context": "https://schema.org",
           "@type": "Organization",
@@ -314,7 +325,6 @@ export default function Home() {
       ]} />
       {/* Hero Section */}
       <div className="relative bg-stone-900 overflow-hidden group">
-        <h1 className="sr-only">BOLEN — LED Mirror Manufacturer & OEM Smart Mirror Factory</h1>
         {/* Image in natural flow to preserve aspect ratio */}
         <div className="relative w-full">
           {heroBgs.length > 0 && (
@@ -334,18 +344,65 @@ export default function Home() {
           )}
         </div>
 
+        {/* Value proposition overlay. The hero used to be a wordless photo with
+            a sr-only h1 and no CTA above the fold, while translated hero copy
+            (home.heroTitle1/2, home.heroDesc) sat unused in all six locale
+            files. Positioned absolutely so the <img> markup — and therefore the
+            LCP element and its preload — is untouched. */}
+        <div className="absolute inset-0 z-10 flex items-center pointer-events-none">
+          {/* Heavy on the left because the editor-managed hero images currently
+              have marketing text and certification badges baked into the
+              artwork; without a strong scrim that text shows through and
+              collides with the copy below. Replacing the hero with clean
+              photography would let this be much lighter. */}
+          <div className="absolute inset-0 bg-gradient-to-r from-stone-950/95 via-stone-950/75 to-stone-950/10" />
+          <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-xl pointer-events-auto">
+              {/* Keeps the keyword phrase visible on the page. It previously
+                  lived only in an sr-only h1, which search engines discount. */}
+              <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-[0.2em] text-amber-300/90">
+                {t('home.heroKicker')}
+              </p>
+              <h1 className="mt-2 font-serif text-2xl sm:text-4xl lg:text-6xl text-white leading-tight drop-shadow-sm">
+                {t('home.heroTitle1')}{' '}
+                <span className="italic text-amber-300">{t('home.heroTitle2')}</span>
+              </h1>
+              <p className="hidden sm:block mt-4 text-sm lg:text-lg text-stone-200 font-light max-w-lg">
+                {/* heroDesc contains <1>BOLEN</1>, so it must go through Trans
+                    rather than t() or the markup renders as literal text. */}
+                <Trans i18nKey="home.heroDesc" components={[<span key="0" />, <strong key="1" className="font-medium text-white" />]} />
+              </p>
+              <div className="mt-4 sm:mt-8 flex flex-wrap gap-3">
+                <Link
+                  to={lp('/rfq')}
+                  className="inline-flex items-center gap-2 rounded-full bg-amber-500 px-5 py-2.5 sm:px-7 sm:py-3.5 text-sm sm:text-base font-semibold text-stone-950 transition-colors hover:bg-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-stone-900"
+                >
+                  {t('productDetail.requestQuote')}
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+                <Link
+                  to={lp('/products')}
+                  className="inline-flex items-center gap-2 rounded-full border border-white/40 bg-white/10 px-5 py-2.5 sm:px-7 sm:py-3.5 text-sm sm:text-base font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/60"
+                >
+                  {t('navbar.catalog')}
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {heroBgs.length > 1 && (
           <>
             <button
               onClick={prevBg}
-              className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-black/20 text-white/70 hover:bg-black/40 hover:text-white transition-all backdrop-blur-sm opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
+              className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-black/20 text-white/70 hover:bg-black/40 hover:text-white transition-all backdrop-blur-sm opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
               aria-label="Previous image"
             >
               <ChevronLeft className="w-8 h-8" />
             </button>
             <button
               onClick={nextBg}
-              className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-black/20 text-white/70 hover:bg-black/40 hover:text-white transition-all backdrop-blur-sm opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
+              className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-black/20 text-white/70 hover:bg-black/40 hover:text-white transition-all backdrop-blur-sm opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
               aria-label="Next image"
             >
               <ChevronRight className="w-8 h-8" />
@@ -380,7 +437,7 @@ export default function Home() {
                 <stat.icon className="h-5 w-5 text-amber-600" />
               </div>
               <p className="text-base sm:text-2xl font-bold text-stone-900 mb-0.5 font-serif whitespace-nowrap">{stat.value}</p>
-              <p className="text-[8px] sm:text-[11px] text-stone-500 uppercase tracking-wide sm:tracking-wider font-semibold leading-tight whitespace-nowrap">{stat.label}</p>
+              <p className="text-[10px] sm:text-[11px] text-stone-500 uppercase tracking-wide sm:tracking-wider font-semibold leading-tight">{stat.label}</p>
             </Reveal>
           ))}
         </div>
@@ -434,18 +491,7 @@ export default function Home() {
           {isLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className="bg-white rounded-2xl flex flex-col h-full overflow-hidden shadow-sm border border-stone-100 relative animate-pulse">
-                  <div className="relative aspect-square overflow-hidden bg-stone-200"></div>
-                  <div className="p-5 flex flex-col flex-1">
-                    <div className="mb-3 w-20 h-5 bg-stone-200 rounded-md"></div>
-                    <div className="w-3/4 h-6 bg-stone-200 rounded mb-2"></div>
-                    <div className="w-full h-4 bg-stone-200 rounded mb-2"></div>
-                    <div className="w-5/6 h-4 bg-stone-200 rounded mb-4"></div>
-                    <div className="mt-auto pt-4 border-t border-stone-100">
-                      <div className="w-24 h-6 bg-stone-200 rounded"></div>
-                    </div>
-                  </div>
-                </div>
+                <ProductCardSkeleton key={i} />
               ))}
             </div>
           ) : featuredProducts.length > 0 ? (
@@ -692,7 +738,9 @@ export default function Home() {
       {/* CTA Section */}
       <div className="relative bg-stone-900 py-24 overflow-hidden">
         <div className="absolute inset-0">
-          <img src="https://picsum.photos/seed/mirror-cta/1200/400" alt="Background" className="w-full h-full object-cover opacity-20" width="1200" height="400" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
+          {/* Decorative — the CTA copy sits on top, so this carries no meaning
+              for screen readers. Was a random picsum.photos placeholder. */}
+          <img src={optimizeImage(CTA_BACKDROP, { width: 1600 })} alt="" aria-hidden="true" className="w-full h-full object-cover opacity-20" width="1200" height="400" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
           <div className="absolute inset-0 bg-stone-900/80" />
         </div>
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -703,10 +751,10 @@ export default function Home() {
             {t('home.cta.desc')}
           </Reveal>
           <Reveal delay={150} className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link to={lp('/products')} className="inline-flex justify-center items-center px-8 py-4 border border-transparent text-base font-medium rounded-full text-stone-900 bg-amber-400 hover:bg-amber-500 transition-colors">
+            <Link to={lp('/products')} className="btn-primary px-8 py-4 text-base">
               {t('home.cta.viewCatalog')}
             </Link>
-            <Link to={lp('/rfq')} className="inline-flex justify-center items-center px-8 py-4 border border-stone-300 text-base font-medium rounded-full text-white hover:bg-white/10 transition-colors">
+            <Link to={lp('/rfq')} className="btn-secondary-on-dark px-8 py-4 text-base">
               {t('home.cta.contactSales')}
             </Link>
           </Reveal>

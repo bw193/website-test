@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowRight } from 'lucide-react';
 import { optimizeImage, imageSrcSet } from '../utils/optimizeImage';
+import { PRODUCT_IMAGE_PLACEHOLDER, handleImageError } from '../utils/imagePlaceholder';
 import { useLocalizedPath } from '../hooks/useLocalizedPath';
 import { toSlug } from '../utils/slug';
 import { useProductTranslator } from '../utils/productI18n';
@@ -39,8 +40,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ id, title, description, image
         {/* Image Container */}
         <div className="relative aspect-square overflow-hidden bg-stone-100">
           <img
-            src={optimizeImage(image, { width: 400 }) || 'https://picsum.photos/seed/mirror/400/500'}
+            src={optimizeImage(image, { width: 400 }) || PRODUCT_IMAGE_PLACEHOLDER}
             srcSet={imageSrcSet(image, [300, 400, 600])}
+            onError={handleImageError}
             alt={displayTitle}
             className="w-full h-full object-center object-contain transition-transform duration-700 group-hover:scale-105"
             width="400"

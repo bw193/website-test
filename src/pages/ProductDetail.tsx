@@ -4,10 +4,12 @@ import { useParams, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { Loader2, CheckCircle2, ChevronLeft, ChevronRight, ArrowLeft, Send, ShieldCheck, Truck, Clock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import ReactMarkdown from 'react-markdown';
+import Markdown from '../components/Markdown';
 import SEO from '../components/SEO';
+import { buildProductDescription, buildProductSeoTitle, normalizeSpecs } from '../utils/productSeo';
 import VideoCard from '../components/VideoCard';
 import { optimizeImage } from '../utils/optimizeImage';
+import { PRODUCT_IMAGE_PLACEHOLDER, handleImageError } from '../utils/imagePlaceholder';
 import { useLocalizedPath } from '../hooks/useLocalizedPath';
 import { readInitialProduct } from '../utils/prerenderData';
 import { toSlug, parseProductParam } from '../utils/slug';
@@ -227,11 +229,14 @@ export default function ProductDetail() {
   };
   const { low: lowPrice, high: highPrice } = parsePriceRange(product?.price_range);
 
-  const richDescription = display.description && display.description.trim().length >= 30
-    ? display.description
-    : `Premium ${display.title} by BOLEN Mirror (Jiaxing Chengtai Mirror Co., Ltd.) — OEM/ODM LED, smart, vanity, and bath mirrors. Request a quote for bulk pricing.`;
+  // Shared with scripts/prerender-static.ts via src/utils/productSeo.ts so the
+  // values Helmet writes on mount match what was baked into the static HTML.
+  const richDescription = buildProductDescription(
+    display,
+    t('productDetail.descTemplate', 'Premium {title} by BOLEN Mirror (Jiaxing Chengtai Mirror Co., Ltd.) — OEM/ODM LED, smart, vanity, and bath mirrors. Request a quote for bulk pricing.')
+  );
 
-  const seoTitle = display.title.length > 55 ? display.title : `${display.title} | BOLEN Mirror`;
+  const seoTitle = buildProductSeoTitle(display.title, t('productDetail.brandSuffix', '| BOLEN Mirror'));
 
   const productSchema = product ? [
     {
@@ -245,6 +250,15 @@ export default function ProductDetail() {
         "@type": "Brand",
         "name": "BOLEN"
       },
+      ...(normalizeSpecs(display.specifications).length
+        ? {
+            "additionalProperty": normalizeSpecs(display.specifications).map((s) => ({
+              "@type": "PropertyValue",
+              "name": s.key,
+              "value": s.value
+            }))
+          }
+        : {}),
       "offers": {
         "@type": "AggregateOffer",
         "url": productFullUrl,
@@ -296,7 +310,7 @@ export default function ProductDetail() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5 }}
-              className="relative aspect-w-4 aspect-h-5 sm:aspect-w-1 sm:aspect-h-1 w-full rounded-2xl overflow-hidden bg-white shadow-sm border border-stone-200 group"
+              className="relative aspect-[4/5] sm:aspect-square w-full rounded-2xl overflow-hidden bg-white shadow-sm border border-stone-200 group"
             >
               <AnimatePresence mode="wait">
                 <m.div
@@ -308,7 +322,8 @@ export default function ProductDetail() {
                   className="h-full w-full"
                 >
                   <img
-                    src={optimizeImage(product.images[currentImageIndex], { width: 800 }) || 'https://picsum.photos/seed/mirror/800/800'}
+                    src={optimizeImage(product.images[currentImageIndex], { width: 800 }) || PRODUCT_IMAGE_PLACEHOLDER}
+                    onError={handleImageError}
                     alt={display.title}
                     className="h-full w-full object-cover object-center"
                     width="800"
@@ -323,14 +338,14 @@ export default function ProductDetail() {
                 <>
                   <button 
                     onClick={prevImage} 
-                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 p-3 rounded-full shadow-lg hover:bg-white text-stone-800 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-300 hover:scale-110"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 p-3 rounded-full shadow-lg hover:bg-white text-stone-800 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 transition-all duration-300 hover:scale-110"
                     aria-label="Previous image"
                   >
                     <ChevronLeft className="w-5 h-5" />
                   </button>
                   <button 
                     onClick={nextImage} 
-                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 p-3 rounded-full shadow-lg hover:bg-white text-stone-800 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-300 hover:scale-110"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 p-3 rounded-full shadow-lg hover:bg-white text-stone-800 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 transition-all duration-300 hover:scale-110"
                     aria-label="Next image"
                   >
                     <ChevronRight className="w-5 h-5" />
@@ -351,13 +366,13 @@ export default function ProductDetail() {
                   <button
                     key={idx}
                     onClick={() => setCurrentImageIndex(idx)}
-                    className={`relative aspect-w-1 aspect-h-1 rounded-xl overflow-hidden transition-all duration-200 ${
+                    className={`relative aspect-square rounded-xl overflow-hidden transition-all duration-200 ${
                       currentImageIndex === idx 
                         ? 'ring-2 ring-amber-500 ring-offset-2 scale-95' 
                         : 'border border-stone-200 hover:border-amber-300 hover:shadow-md'
                     }`}
                   >
-                    <img src={img} alt={`Thumbnail ${idx}`} className="w-full h-full object-cover" width="160" height="160" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
+                    <img src={img} alt={`${display.title} — view ${idx + 1}`} onError={handleImageError} className="w-full h-full object-cover" width="160" height="160" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
                   </button>
                 ))}
               </m.div>
@@ -376,7 +391,7 @@ export default function ProductDetail() {
                 {t(`products.categories.${product.category}`, product.category)}
               </m.p>
             )}
-            <m.h1 variants={fadeInUp} className="text-3xl font-extrabold tracking-tight text-stone-900 sm:text-4xl lg:text-5xl leading-tight">
+            <m.h1 variants={fadeInUp} className="text-3xl font-serif tracking-tight text-stone-900 sm:text-4xl lg:text-5xl leading-tight">
               {display.title}
             </m.h1>
             
@@ -440,9 +455,9 @@ export default function ProductDetail() {
                   <span className="w-1.5 h-6 bg-amber-600 rounded-full"></span>
                   {t('productDetail.productDetails')}
                 </h3>
-                <div className="prose prose-amber prose-stone max-w-none text-stone-600 leading-relaxed bg-white p-6 rounded-2xl border border-stone-200 shadow-sm">
-                  <ReactMarkdown>{display.details}</ReactMarkdown>
-                </div>
+                <Markdown className="prose prose-amber prose-stone max-w-none text-stone-600 leading-relaxed bg-white p-6 rounded-2xl border border-stone-200 shadow-sm">
+                  {display.details}
+                </Markdown>
               </m.div>
             )}
 
@@ -494,7 +509,7 @@ export default function ProductDetail() {
                         id="customerName"
                         placeholder="Your Company Ltd."
                         {...register('customerName', { required: 'Name is required' })}
-                        className="block w-full rounded-xl border-stone-200 bg-stone-50 focus:bg-white shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm p-3 transition-colors"
+                        className="block w-full rounded-xl border border-stone-200 bg-stone-50 focus:bg-white shadow-sm focus:border-amber-500 focus:ring-2 focus:ring-amber-500 focus:outline-none sm:text-sm p-3 transition-colors"
                       />
                       {errors.customerName && <p className="mt-1 text-sm text-red-600 font-medium">{errors.customerName.message}</p>}
                     </div>
@@ -508,7 +523,7 @@ export default function ProductDetail() {
                           required: 'Email is required',
                           pattern: { value: /^\S+@\S+$/i, message: 'Invalid email address' }
                         })}
-                        className="block w-full rounded-xl border-stone-200 bg-stone-50 focus:bg-white shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm p-3 transition-colors"
+                        className="block w-full rounded-xl border border-stone-200 bg-stone-50 focus:bg-white shadow-sm focus:border-amber-500 focus:ring-2 focus:ring-amber-500 focus:outline-none sm:text-sm p-3 transition-colors"
                       />
                       {errors.customerEmail && <p className="mt-1 text-sm text-red-600 font-medium">{errors.customerEmail.message}</p>}
                     </div>
@@ -520,7 +535,7 @@ export default function ProductDetail() {
                       rows={4}
                       placeholder={`I'm interested in ordering ${display.title}. Please provide pricing for 100 units...`}
                       {...register('message', { required: 'Message is required' })}
-                      className="block w-full rounded-xl border-stone-200 bg-stone-50 focus:bg-white shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm p-3 transition-colors resize-none"
+                      className="block w-full rounded-xl border border-stone-200 bg-stone-50 focus:bg-white shadow-sm focus:border-amber-500 focus:ring-2 focus:ring-amber-500 focus:outline-none sm:text-sm p-3 transition-colors resize-none"
                     />
                     {errors.message && <p className="mt-1 text-sm text-red-600 font-medium">{errors.message.message}</p>}
                   </div>
@@ -532,7 +547,7 @@ export default function ProductDetail() {
                   <button
                     type="submit"
                     disabled={rfqStatus === 'submitting'}
-                    className="w-full flex justify-center items-center py-4 px-4 border border-transparent rounded-xl shadow-md text-base font-bold text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 disabled:opacity-50 transition-all hover:shadow-lg hover:-translate-y-0.5"
+                    className="btn-primary w-full py-4 text-base"
                   >
                     {rfqStatus === 'submitting' ? (
                       <Loader2 className="w-5 h-5 animate-spin" />

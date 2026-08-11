@@ -23,8 +23,8 @@ export default function OurStory() {
   return (
     <div ref={containerRef} className="bg-[#FAF9F6] min-h-screen selection:bg-stone-200 selection:text-stone-900">
       <SEO
-        title="Our Story | BOLEN LED Mirror Manufacturer"
-        description="Learn about the history and manufacturing excellence of BOLEN (Jiaxing Chengtai Mirror Co., Ltd.), a leading LED mirror manufacturer since 1995 specializing in OEM smart mirrors."
+        title={t('seo.storyTitle')}
+        description={t('seo.storyDesc')}
         path="/our-story"
         schema={{
           "@context": "https://schema.org",

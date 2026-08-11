@@ -1,5 +1,20 @@
 export const zh = {
   translation: {
+    // Page-level <title>/<meta description> for the four static routes.
+    // scripts/prerender-static.ts reads these same values, so the tags baked
+    // into the static HTML and the tags react-helmet-async writes on mount
+    // cannot drift. Previously the pages passed hardcoded English, which
+    // overwrote the correctly-localized prerendered meta on 5 locales.
+    seo: {
+      homeTitle: "BOLEN 镜业 | LED 智能镜制造商 & OEM 镜子工厂",
+      homeDesc: "BOLEN Mirror 是领先的 LED 镜制造商，专业生产 OEM LED 镜、智能镜、化妆镜和浴室镜，服务全球品牌。",
+      catalogTitle: "LED 镜产品目录 | BOLEN 镜业制造商",
+      catalogDesc: "探索我们丰富的 OEM LED 镜、智能镜、化妆镜和浴室镜产品系列，来自领先的 LED 镜制造商，为全球品牌提供优质制造。",
+      storyTitle: "关于我们 | BOLEN LED 镜业制造商",
+      storyDesc: "了解 BOLEN（嘉兴诚泰镜业有限公司）的历史和卓越制造，自 1995 年以来领先的 LED 镜制造商，专业生产 OEM 智能镜。",
+      rfqTitle: "询价 | BOLEN LED 镜业制造商",
+      rfqDesc: "联系领先的 LED 镜制造商 BOLEN，获取 OEM/ODM 询价、定制镜子制造和批量订单。"
+    },
     navbar: {
       home: "首页",
       catalog: "产品目录",
@@ -31,6 +46,7 @@ export const zh = {
     },
     home: {
       companyName: "嘉兴诚泰镜业有限公司",
+      heroKicker: "LED 镜制造商 & OEM 智能镜工厂",
       heroTitle1: "艺术的精致，",
       heroTitle2: "功能的卓越。",
       heroDesc: "成立于2005年（历史可追溯至1995年），旗下品牌 <1>BOLEN</1>，我们将意大利设计灵感与二十多年的现代制造专业知识相结合，为全球提供优质镜子。",
@@ -147,6 +163,8 @@ export const zh = {
       desc: "浏览我们丰富的优质镜子系列，包括智能LED技术、优雅的化妆镜设计和可定制选项。",
       noProducts: "没有找到符合您标准的产品。",
       viewDetails: "查看详情",
+      searchLabel: "搜索产品",
+      searchPlaceholder: "搜索产品...",
       allCategories: "所有类别",
       categories: {
         "New Arrival": "新品上市",
@@ -171,7 +189,9 @@ export const zh = {
       submitting: "提交中...",
       rfqSuccess: "RFQ 提交成功！我们将尽快与您联系。",
       rfqError: "提交 RFQ 失败。请重试。",
-      relatedVideos: "相关视频"
+      relatedVideos: "相关视频",
+      brandSuffix: "| BOLEN 镜业",
+      descTemplate: "{title} — 嘉兴诚泰镜业有限公司（BOLEN）优质出品，专业提供 OEM/ODM LED 镜、智能镜、化妆镜和浴室镜。欢迎询价获取批发价格。"
     },
     blog: {
       metaTitle: "BOLEN 博客 | LED 与智能镜行业洞察",

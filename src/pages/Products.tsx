@@ -1,6 +1,7 @@
 import { m, AnimatePresence } from 'motion/react';
 import React, { useEffect, useState } from 'react';
 import ProductCard from '../components/ProductCard';
+import ProductCardSkeleton from '../components/ProductCardSkeleton';
 import { Loader2, Search, SlidersHorizontal, PackageX } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import SEO from '../components/SEO';
@@ -17,6 +18,11 @@ interface Product {
   price_range?: string;
   msrp?: string;
 }
+
+// Own factory photography for the catalog header backdrop (replaces a generic
+// Unsplash stock photo). Requested at 2000px because it renders full-bleed.
+const CATALOG_BACKDROP =
+  'https://mxmmffwntosvwaviippd.supabase.co/storage/v1/render/image/public/comp%20image/factory4.jpg?width=2000&resize=contain';
 
 const DEFAULT_CATEGORIES = [
   "New Arrival",
@@ -109,8 +115,8 @@ export default function Products() {
   return (
     <div className="bg-stone-50 min-h-screen pb-24">
       <SEO
-        title="LED Mirror Products Catalog | BOLEN Mirror Manufacturer"
-        description="Explore our wide range of OEM LED mirrors, smart mirrors, vanity mirrors, and bath mirrors from a leading LED mirror manufacturer. High-quality manufacturing for global brands."
+        title={t('seo.catalogTitle')}
+        description={t('seo.catalogDesc')}
         path="/products"
         schema={{
           "@context": "https://schema.org",
@@ -127,7 +133,12 @@ export default function Products() {
       />
       {/* Hero Section */}
       <div className="bg-stone-900 text-white py-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1600566752355-35792bedcfea?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-center" />
+        {/* Own factory photography — was a generic Unsplash bathroom stock shot,
+            which reads as "this factory may not exist" to a sourcing buyer. */}
+        <div
+          className="absolute inset-0 opacity-20 bg-cover bg-center"
+          style={{ backgroundImage: `url('${CATALOG_BACKDROP}')` }}
+        />
         <div className="absolute inset-0 bg-gradient-to-b from-stone-900/50 to-stone-900" />
         
         <div className="relative max-w-7xl mx-auto text-center">
@@ -135,7 +146,7 @@ export default function Products() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="text-4xl md:text-5xl font-extrabold tracking-tight mb-6"
+            className="text-4xl md:text-5xl font-serif tracking-tight mb-6"
           >
             {t('products.catalog')}
           </m.h1>
@@ -155,12 +166,19 @@ export default function Products() {
           <div className="flex flex-col gap-6">
             {/* Search Bar */}
             <div className="relative w-full md:max-w-md">
+              {/* Placeholder-as-label is unreliable (it disappears on input and
+                  is inconsistently announced), and this placeholder was also
+                  the one hardcoded English string on an otherwise localized page. */}
+              <label htmlFor="product-search" className="sr-only">
+                {t('products.searchLabel', 'Search products')}
+              </label>
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Search className="h-5 w-5 text-stone-400" />
               </div>
               <input
-                type="text"
-                placeholder="Search products..."
+                id="product-search"
+                type="search"
+                placeholder={t('products.searchPlaceholder', 'Search products...')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="block w-full pl-10 pr-3 py-3 border border-stone-200 rounded-xl leading-5 bg-stone-50 placeholder-stone-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors sm:text-sm"
@@ -169,9 +187,12 @@ export default function Products() {
 
             {/* Categories */}
             <div className="w-full overflow-x-auto hide-scrollbar">
-              <div className="flex flex-wrap gap-2">
+              {/* aria-pressed carries the filter state — it was previously
+                  conveyed by background colour alone. */}
+              <div className="flex flex-wrap gap-2" role="group" aria-label={t('products.searchLabel', 'Search products')}>
                 <button
                   onClick={() => setSelectedCategory(null)}
+                  aria-pressed={selectedCategory === null}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap ${
                     selectedCategory === null
                       ? 'bg-stone-900 text-white shadow-sm'
@@ -184,6 +205,7 @@ export default function Products() {
                   <button
                     key={cat}
                     onClick={() => setSelectedCategory(cat)}
+                    aria-pressed={selectedCategory === cat}
                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap ${
                       selectedCategory === cat
                         ? 'bg-stone-900 text-white shadow-sm'
@@ -198,21 +220,12 @@ export default function Products() {
           </div>
         </div>
 
+        {/* Grid classes below must match the resolved grid exactly, or the
+            layout shifts when loading finishes. */}
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-10">
             {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-              <div key={i} className="bg-white rounded-2xl flex flex-col h-full overflow-hidden shadow-sm border border-stone-100 relative animate-pulse">
-                <div className="relative aspect-[4/5] overflow-hidden bg-stone-200"></div>
-                <div className="p-5 flex flex-col flex-1">
-                  <div className="mb-3 w-20 h-5 bg-stone-200 rounded-md"></div>
-                  <div className="w-3/4 h-6 bg-stone-200 rounded mb-2"></div>
-                  <div className="w-full h-4 bg-stone-200 rounded mb-2"></div>
-                  <div className="w-5/6 h-4 bg-stone-200 rounded mb-4"></div>
-                  <div className="mt-auto pt-4 border-t border-stone-100">
-                    <div className="w-24 h-6 bg-stone-200 rounded"></div>
-                  </div>
-                </div>
-              </div>
+              <ProductCardSkeleton key={i} />
             ))}
           </div>
         ) : (

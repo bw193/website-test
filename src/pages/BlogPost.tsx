@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { m, useScroll, useTransform } from 'motion/react';
-import ReactMarkdown from 'react-markdown';
+import Markdown from '../components/Markdown';
 import { ArrowUpRight, Clock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import SEO from '../components/SEO';
@@ -212,7 +212,7 @@ export default function BlogPost() {
 
       {/* Body */}
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
-        <div
+        <Markdown
           className="prose prose-stone prose-lg max-w-none
             prose-headings:font-serif prose-headings:tracking-tight prose-headings:text-stone-900
             prose-h2:text-3xl prose-h2:mt-14 prose-h2:mb-5
@@ -225,8 +225,8 @@ export default function BlogPost() {
             prose-li:text-stone-700 prose-li:font-light prose-li:marker:text-amber-500
             [&>p:first-of-type]:first-letter:float-left [&>p:first-of-type]:first-letter:mr-3 [&>p:first-of-type]:first-letter:font-serif [&>p:first-of-type]:first-letter:text-6xl [&>p:first-of-type]:first-letter:leading-[0.8] [&>p:first-of-type]:first-letter:text-stone-900"
         >
-          <ReactMarkdown>{post.body}</ReactMarkdown>
-        </div>
+          {post.body}
+        </Markdown>
 
         {/* Conversion CTA — funnels link equity to the money pages */}
         <div className="mt-16 rounded-3xl bg-stone-900 text-white p-8 md:p-12 relative overflow-hidden">
@@ -243,14 +243,14 @@ export default function BlogPost() {
           <div className="relative mt-7 flex flex-wrap gap-3">
             <Link
               to={lp('/products')}
-              className="inline-flex items-center gap-2 bg-white text-stone-900 px-6 py-3 rounded-full text-sm font-semibold hover:bg-stone-100 transition-colors"
+              className="btn-primary"
             >
               {t('blog.ctaCatalog', 'Browse the catalog')}
               <ArrowUpRight className="w-4 h-4" />
             </Link>
             <Link
               to={lp('/rfq')}
-              className="inline-flex items-center gap-2 border border-white/30 px-6 py-3 rounded-full text-sm font-semibold hover:bg-white/10 transition-colors"
+              className="btn-secondary-on-dark"
             >
               {t('blog.ctaQuote', 'Request a quote')}
             </Link>
