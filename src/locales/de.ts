@@ -46,17 +46,17 @@ export const de = {
     },
     home: {
       companyName: "Jiaxing Chengtai Mirror Co., Ltd.",
-      heroKicker: "LED-Spiegelhersteller & OEM-Smart-Spiegel-Fabrik",
-      heroTitle1: "Künstlerisch Raffiniert,",
-      heroTitle2: "Funktional Brillant.",
-      heroDesc: "Gegründet 2005 (mit einer Geschichte, die bis 1995 zurückreicht) und unter unserer Marke <1>BOLEN</1> tätig, kombinieren wir italienische Designinspiration mit über zwei Jahrzehnten moderner Fertigungsexpertise, um weltweit Premium-Spiegel zu liefern.",
-      exploreBtn: "Entdecken Sie unsere Kollektion",
-      ourStoryBtn: "Unsere Geschichte",
+      heroKicker: "LED-Spiegelhersteller · OEM/ODM-Partner",
+      heroTitle1: "Premium-Spiegel,",
+      heroTitle2: "passgenau für Ihre Marke.",
+      heroDesc: "Seit 2005 unterstützt <1>BOLEN</1> Marken weltweit dabei, unverwechselbare Spiegelkollektionen auf den Markt zu bringen. Von Design und Individualisierung über qualitätsgesicherte Fertigung bis hin zur weltweiten Lieferung machen wir Premiumfertigung einfach, zuverlässig und skalierbar.",
+      heroPrimaryCta: "Projekt starten",
+      heroSecondaryCta: "Produkte entdecken",
       stats: {
-        sqMeters: "Qm Anlage",
-        artisans: "Erfahrene Handwerker",
-        styles: "Verschiedene Stile",
-        global: "Exportreichweite"
+        sqMeters: "Produktionsfläche",
+        artisans: "Qualifizierte Fachkräfte",
+        styles: "Spiegeldesigns",
+        global: "Weltweite Lieferung"
       },
       about: {
         heritage: "Unser Erbe",

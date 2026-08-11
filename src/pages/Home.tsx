@@ -404,8 +404,8 @@ export default function Home() {
                 {t('home.heroKicker')}
               </Reveal>
               <Reveal as="h1" delay={90} className="mt-3 font-serif text-3xl sm:text-4xl lg:text-5xl leading-[1.1]">
-                {t('home.heroTitle1')}{' '}
-                <span className="italic text-sheen">{t('home.heroTitle2')}</span>
+                {t('home.heroTitle1')}
+                <span className="block italic text-sheen">{t('home.heroTitle2')}</span>
               </Reveal>
             </div>
             <div className="lg:border-l lg:border-stone-300/70 lg:pl-16">
@@ -416,11 +416,11 @@ export default function Home() {
               </Reveal>
               <Reveal delay={270} className="mt-6 flex flex-wrap gap-3">
                 <Link to={lp('/rfq')} className="btn-primary">
-                  {t('productDetail.requestQuote')}
+                  {t('home.heroPrimaryCta')}
                   <ArrowRight className="w-4 h-4" />
                 </Link>
                 <Link to={lp('/products')} className="btn-secondary">
-                  {t('navbar.catalog')}
+                  {t('home.heroSecondaryCta')}
                 </Link>
               </Reveal>
             </div>
@@ -434,7 +434,7 @@ export default function Home() {
           className="bg-white rounded-xl sm:rounded-2xl shadow-xl border border-stone-100 py-3 px-2 sm:py-5 sm:px-6 lg:py-6 lg:px-8 flex overflow-x-auto sm:grid sm:grid-cols-4 sm:overflow-visible gap-0 sm:gap-4 lg:gap-6"
         >
           {[
-            { icon: Factory, value: "50k+", label: t('home.stats.sqMeters') },
+            { icon: Factory, value: "50,000+ m²", label: t('home.stats.sqMeters') },
             { icon: Users, value: "200+", label: t('home.stats.artisans') },
             { icon: Lightbulb, value: "200+", label: t('home.stats.styles') },
             { icon: Globe, value: "Global", label: t('home.stats.global') }

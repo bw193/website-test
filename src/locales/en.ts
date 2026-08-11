@@ -46,17 +46,17 @@ export const en = {
     },
     home: {
       companyName: "Jiaxing Chengtai Mirror Co., Ltd.",
-      heroKicker: "LED Mirror Manufacturer & OEM Smart Mirror Factory",
-      heroTitle1: "Artistically Refined,",
-      heroTitle2: "Functionally Brilliant.",
-      heroDesc: "Founded in 2005 (with history tracing back to 1995) and operating under our brand <1>BOLEN</1>, we combine Italian design inspiration with over two decades of modern manufacturing expertise to deliver premium mirrors worldwide.",
-      exploreBtn: "Explore Our Collection",
-      ourStoryBtn: "Our Story",
+      heroKicker: "LED Mirror Manufacturer · OEM/ODM Partner",
+      heroTitle1: "Premium Mirrors,",
+      heroTitle2: "Built Around Your Brand.",
+      heroDesc: "Since 2005, <1>BOLEN</1> has helped global brands bring distinctive mirror collections to market. From design and customization to quality-controlled production and worldwide delivery, we make premium manufacturing simple, reliable, and scalable.",
+      heroPrimaryCta: "Start Your Project",
+      heroSecondaryCta: "Explore Products",
       stats: {
-        sqMeters: "Sq. Meters Facility",
-        artisans: "Skilled Artisans",
-        styles: "Distinct Styles",
-        global: "Export Reach"
+        sqMeters: "Production Base",
+        artisans: "Skilled Specialists",
+        styles: "Mirror Designs",
+        global: "Worldwide Delivery"
       },
       about: {
         heritage: "Our Heritage",

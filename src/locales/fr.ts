@@ -46,17 +46,17 @@ export const fr = {
     },
     home: {
       companyName: "Jiaxing Chengtai Mirror Co., Ltd.",
-      heroKicker: "Fabricant de Miroirs LED et Usine OEM de Miroirs Intelligents",
-      heroTitle1: "Artistiquement Raffiné,",
-      heroTitle2: "Fonctionnellement Brillant.",
-      heroDesc: "Fondée en 2005 (avec une histoire remontant à 1995) et opérant sous notre marque <1>BOLEN</1>, nous combinons l'inspiration du design italien avec plus de deux décennies d'expertise en fabrication moderne pour fournir des miroirs haut de gamme dans le monde entier.",
-      exploreBtn: "Explorer Notre Collection",
-      ourStoryBtn: "Notre Histoire",
+      heroKicker: "Fabricant de miroirs LED · Partenaire OEM/ODM",
+      heroTitle1: "Des miroirs haut de gamme,",
+      heroTitle2: "conçus sur mesure pour votre marque.",
+      heroDesc: "Depuis 2005, <1>BOLEN</1> accompagne des marques du monde entier dans la commercialisation de collections de miroirs distinctives. De la conception et de la personnalisation à la production soumise à un contrôle qualité rigoureux et à la livraison mondiale, nous rendons la fabrication haut de gamme simple, fiable et adaptée à tous les volumes.",
+      heroPrimaryCta: "Lancer votre projet",
+      heroSecondaryCta: "Découvrir nos produits",
       stats: {
-        sqMeters: "Mètres Carrés",
-        artisans: "Artisans Qualifiés",
-        styles: "Styles Uniques",
-        global: "Portée Mondiale"
+        sqMeters: "Site de production",
+        artisans: "Spécialistes qualifiés",
+        styles: "Modèles de miroirs",
+        global: "Livraison mondiale"
       },
       about: {
         heritage: "Notre Héritage",

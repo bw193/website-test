@@ -46,17 +46,17 @@ export const es = {
     },
     home: {
       companyName: "Jiaxing Chengtai Mirror Co., Ltd.",
-      heroKicker: "Fabricante de Espejos LED y Fábrica OEM de Espejos Inteligentes",
-      heroTitle1: "Artísticamente Refinado,",
-      heroTitle2: "Funcionalmente Brillante.",
-      heroDesc: "Fundada en 2005 (con una historia que se remonta a 1995) y operando bajo nuestra marca <1>BOLEN</1>, combinamos la inspiración del diseño italiano con más de dos décadas de experiencia en fabricación moderna para ofrecer espejos de primera calidad en todo el mundo.",
-      exploreBtn: "Explorar Nuestra Colección",
-      ourStoryBtn: "Nuestra Historia",
+      heroKicker: "Fabricante de espejos LED · Socio OEM/ODM",
+      heroTitle1: "Espejos de alta gama,",
+      heroTitle2: "hechos a medida para su marca.",
+      heroDesc: "Desde 2005, <1>BOLEN</1> ayuda a marcas de todo el mundo a llevar al mercado colecciones de espejos con identidad propia. Desde el diseño y la personalización hasta la producción con rigurosos controles de calidad y la entrega en todo el mundo, hacemos que la fabricación de alta gama sea sencilla, fiable y escalable.",
+      heroPrimaryCta: "Inicie su proyecto",
+      heroSecondaryCta: "Explore nuestros productos",
       stats: {
-        sqMeters: "Metros Cuadrados",
-        artisans: "Artesanos Expertos",
-        styles: "Estilos Únicos",
-        global: "Alcance Global"
+        sqMeters: "Planta de producción",
+        artisans: "Profesionales especializados",
+        styles: "Diseños de espejos",
+        global: "Entrega mundial"
       },
       about: {
         heritage: "Nuestra Herencia",

@@ -46,17 +46,17 @@ export const it = {
     },
     home: {
       companyName: "Jiaxing Chengtai Mirror Co., Ltd.",
-      heroKicker: "Produttore di Specchi LED e Fabbrica OEM di Specchi Smart",
-      heroTitle1: "Artisticamente Raffinato,",
-      heroTitle2: "Funzionalmente Brillante.",
-      heroDesc: "Fondata nel 2005 (con una storia che risale al 1995) e operante con il nostro marchio <1>BOLEN</1>, combiniamo l'ispirazione del design italiano con oltre due decenni di moderna esperienza manifatturiera per fornire specchi premium in tutto il mondo.",
-      exploreBtn: "Esplora la Nostra Collezione",
-      ourStoryBtn: "La Nostra Storia",
+      heroKicker: "Produttore di specchi LED · Partner OEM/ODM",
+      heroTitle1: "Specchi di alta gamma,",
+      heroTitle2: "realizzati su misura per il tuo brand.",
+      heroDesc: "Dal 2005, <1>BOLEN</1> aiuta brand di tutto il mondo a portare sul mercato collezioni di specchi dal carattere distintivo. Dalla progettazione e personalizzazione alla produzione con rigorosi controlli di qualità e alla consegna in tutto il mondo, rendiamo la produzione di alta gamma semplice, affidabile e scalabile.",
+      heroPrimaryCta: "Avvia il tuo progetto",
+      heroSecondaryCta: "Scopri i prodotti",
       stats: {
-        sqMeters: "Mq di Struttura",
-        artisans: "Artigiani Esperti",
-        styles: "Stili Distinti",
-        global: "Portata di Esportazione"
+        sqMeters: "Stabilimento produttivo",
+        artisans: "Specialisti qualificati",
+        styles: "Design di specchi",
+        global: "Consegna globale"
       },
       about: {
         heritage: "Il Nostro Patrimonio",

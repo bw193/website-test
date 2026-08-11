@@ -46,17 +46,17 @@ export const zh = {
     },
     home: {
       companyName: "嘉兴诚泰镜业有限公司",
-      heroKicker: "LED 镜制造商 & OEM 智能镜工厂",
-      heroTitle1: "艺术的精致，",
-      heroTitle2: "功能的卓越。",
-      heroDesc: "成立于2005年（历史可追溯至1995年），旗下品牌 <1>BOLEN</1>，我们将意大利设计灵感与二十多年的现代制造专业知识相结合，为全球提供优质镜子。",
-      exploreBtn: "探索我们的系列",
-      ourStoryBtn: "我们的故事",
+      heroKicker: "LED镜制造商 · OEM/ODM合作伙伴",
+      heroTitle1: "高端镜品，",
+      heroTitle2: "为您的品牌量身打造。",
+      heroDesc: "自2005年以来，<1>BOLEN</1>始终助力全球品牌将独具特色的镜类产品系列推向市场。从设计与定制，到严格品控的生产制造和全球交付，我们让高端制造更简单、更可靠，也更易于规模化。",
+      heroPrimaryCta: "启动您的项目",
+      heroSecondaryCta: "浏览产品",
       stats: {
-        sqMeters: "平方米厂房",
-        artisans: "熟练工匠",
-        styles: "独特款式",
-        global: "全球出口"
+        sqMeters: "生产基地",
+        artisans: "专业技术人员",
+        styles: "镜款设计",
+        global: "全球交付"
       },
       about: {
         heritage: "我们的传承",
