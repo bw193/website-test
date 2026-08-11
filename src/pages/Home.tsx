@@ -344,53 +344,6 @@ export default function Home() {
           )}
         </div>
 
-        {/* Value proposition overlay. The hero used to be a wordless photo with
-            a sr-only h1 and no CTA above the fold, while translated hero copy
-            (home.heroTitle1/2, home.heroDesc) sat unused in all six locale
-            files. Positioned absolutely so the <img> markup — and therefore the
-            LCP element and its preload — is untouched. */}
-        <div className="absolute inset-0 z-10 flex items-center pointer-events-none">
-          {/* Heavy on the left because the editor-managed hero images currently
-              have marketing text and certification badges baked into the
-              artwork; without a strong scrim that text shows through and
-              collides with the copy below. Replacing the hero with clean
-              photography would let this be much lighter. */}
-          <div className="absolute inset-0 bg-gradient-to-r from-stone-950/95 via-stone-950/75 to-stone-950/10" />
-          <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="max-w-xl pointer-events-auto">
-              {/* Keeps the keyword phrase visible on the page. It previously
-                  lived only in an sr-only h1, which search engines discount. */}
-              <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-[0.2em] text-amber-300/90">
-                {t('home.heroKicker')}
-              </p>
-              <h1 className="mt-2 font-serif text-2xl sm:text-4xl lg:text-6xl text-white leading-tight drop-shadow-sm">
-                {t('home.heroTitle1')}{' '}
-                <span className="italic text-amber-300">{t('home.heroTitle2')}</span>
-              </h1>
-              <p className="hidden sm:block mt-4 text-sm lg:text-lg text-stone-200 font-light max-w-lg">
-                {/* heroDesc contains <1>BOLEN</1>, so it must go through Trans
-                    rather than t() or the markup renders as literal text. */}
-                <Trans i18nKey="home.heroDesc" components={[<span key="0" />, <strong key="1" className="font-medium text-white" />]} />
-              </p>
-              <div className="mt-4 sm:mt-8 flex flex-wrap gap-3">
-                <Link
-                  to={lp('/rfq')}
-                  className="inline-flex items-center gap-2 rounded-full bg-amber-500 px-5 py-2.5 sm:px-7 sm:py-3.5 text-sm sm:text-base font-semibold text-stone-950 transition-colors hover:bg-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-stone-900"
-                >
-                  {t('productDetail.requestQuote')}
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-                <Link
-                  to={lp('/products')}
-                  className="inline-flex items-center gap-2 rounded-full border border-white/40 bg-white/10 px-5 py-2.5 sm:px-7 sm:py-3.5 text-sm sm:text-base font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/60"
-                >
-                  {t('navbar.catalog')}
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-
         {heroBgs.length > 1 && (
           <>
             <button
@@ -419,6 +372,47 @@ export default function Home() {
             </div>
           </>
         )}
+      </div>
+
+      {/* Value proposition band.
+          Sits BELOW the banner rather than on top of it: the hero images are
+          finished marketing artwork with their own headline and certification
+          badges, so an overlay both fights that composition and needs a scrim
+          heavy enough to smother the photo. Keeping it separate means the
+          banner renders at full fidelity while the page still gets a visible,
+          keyword-bearing h1 and the RFQ call to action — the hero previously
+          had only an sr-only h1 and no CTA, and this translated copy
+          (home.heroTitle1/2, home.heroDesc) sat unused in all six locales.
+          The <img> markup, and therefore the LCP element and its preload, is
+          untouched. */}
+      <div className="bg-stone-900 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16 sm:pt-14 sm:pb-20">
+          <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-[0.2em] text-amber-400">
+            {t('home.heroKicker')}
+          </p>
+          <div className="mt-3 grid gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:items-end lg:gap-12">
+            <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl leading-[1.1]">
+              {t('home.heroTitle1')}{' '}
+              <span className="italic text-amber-300">{t('home.heroTitle2')}</span>
+            </h1>
+            <div>
+              <p className="text-sm sm:text-base text-stone-300 font-light">
+                {/* heroDesc contains <1>BOLEN</1>, so it must go through Trans
+                    rather than t() or the markup renders as literal text. */}
+                <Trans i18nKey="home.heroDesc" components={[<span key="0" />, <strong key="1" className="font-medium text-white" />]} />
+              </p>
+              <div className="mt-6 flex flex-wrap gap-3">
+                <Link to={lp('/rfq')} className="btn-primary">
+                  {t('productDetail.requestQuote')}
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+                <Link to={lp('/products')} className="btn-secondary-on-dark">
+                  {t('navbar.catalog')}
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Stats Section */}
