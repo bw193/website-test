@@ -389,38 +389,40 @@ export default function Home() {
           (home.heroTitle1/2, home.heroDesc) sat unused in all six locales.
           The <img> markup, and therefore the LCP element and its preload, is
           untouched. */}
-      <div className="bg-stone-900 text-white">
+      {/* band-aurora paints a slow drifting amber wash via ::before, so the
+          section needs a stacking context and clipped overflow. */}
+      <div className="band-aurora relative isolate overflow-hidden bg-gradient-to-b from-stone-100 to-[#FAF9F6] text-stone-900">
         {/* pb is larger than pt because the stats card below overlaps this band
             by -mt-8/-mt-10 and would otherwise crowd the buttons. */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16 sm:pt-12 sm:pb-20">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16 sm:pt-12 sm:pb-20">
           <div className="grid gap-7 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:gap-16 lg:items-center">
             {/* Kicker and h1 are one unit — keeping the kicker outside the grid
                 left it pinned to the top while the h1 dropped to meet the right
                 column, opening a dead gap between them. */}
             <div>
-              <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-[0.2em] text-amber-400">
+              <Reveal as="p" className="text-[10px] sm:text-xs font-semibold uppercase tracking-[0.2em] text-amber-600">
                 {t('home.heroKicker')}
-              </p>
-              <h1 className="mt-3 font-serif text-3xl sm:text-4xl lg:text-5xl leading-[1.1]">
+              </Reveal>
+              <Reveal as="h1" delay={90} className="mt-3 font-serif text-3xl sm:text-4xl lg:text-5xl leading-[1.1]">
                 {t('home.heroTitle1')}{' '}
-                <span className="italic text-amber-300">{t('home.heroTitle2')}</span>
-              </h1>
+                <span className="italic text-sheen">{t('home.heroTitle2')}</span>
+              </Reveal>
             </div>
-            <div className="lg:border-l lg:border-white/10 lg:pl-16">
-              <p className="text-sm sm:text-base text-stone-300 font-light">
+            <div className="lg:border-l lg:border-stone-300/70 lg:pl-16">
+              <Reveal as="p" delay={180} className="text-sm sm:text-base text-stone-600 font-light">
                 {/* heroDesc contains <1>BOLEN</1>, so it must go through Trans
                     rather than t() or the markup renders as literal text. */}
-                <Trans i18nKey="home.heroDesc" components={[<span key="0" />, <strong key="1" className="font-medium text-white" />]} />
-              </p>
-              <div className="mt-6 flex flex-wrap gap-3">
+                <Trans i18nKey="home.heroDesc" components={[<span key="0" />, <strong key="1" className="font-medium text-stone-900" />]} />
+              </Reveal>
+              <Reveal delay={270} className="mt-6 flex flex-wrap gap-3">
                 <Link to={lp('/rfq')} className="btn-primary">
                   {t('productDetail.requestQuote')}
                   <ArrowRight className="w-4 h-4" />
                 </Link>
-                <Link to={lp('/products')} className="btn-secondary-on-dark">
+                <Link to={lp('/products')} className="btn-secondary">
                   {t('navbar.catalog')}
                 </Link>
-              </div>
+              </Reveal>
             </div>
           </div>
         </div>

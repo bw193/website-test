@@ -78,10 +78,57 @@
 }
 .fv-kenburns { animation: fvKenBurns 32s ease-in-out infinite alternate; }
 
+/* Home value-proposition band -------------------------------------------
+   Everything here is plain CSS rather than `motion`, so the home route keeps
+   shipping without the motion runtime on its critical path. */
+
+/* A slow amber wash drifting behind the copy. Lives in a ::before so it can be
+   animated on its own compositing layer without touching the text. */
+@keyframes bandAurora {
+  0%   { transform: translate3d(-5%, -3%, 0) scale(1); }
+  50%  { transform: translate3d(5%, 3%, 0) scale(1.18); }
+  100% { transform: translate3d(-5%, -3%, 0) scale(1); }
+}
+.band-aurora::before {
+  content: "";
+  position: absolute;
+  inset: -35%;
+  pointer-events: none;
+  background:
+    radial-gradient(38% 48% at 22% 38%, rgba(245, 158, 11, 0.18), transparent 70%),
+    radial-gradient(32% 42% at 78% 62%, rgba(120, 113, 108, 0.14), transparent 70%);
+  animation: bandAurora 24s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* Slow gradient sweep across the accent phrase. Gated behind @supports so a
+   browser without background-clip:text keeps a solid amber instead of
+   rendering transparent (invisible) text. */
+@keyframes textSheen {
+  to { background-position: 200% center; }
+}
+.text-sheen { color: var(--color-amber-600); }
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .text-sheen {
+    background-image: linear-gradient(
+      100deg,
+      #b45309 0%, #d97706 30%, #fbbf24 48%, #d97706 66%, #b45309 100%
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: textSheen 7s linear infinite;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .reveal { opacity: 1; transform: none; transition: none; }
   .hero-fade { animation: none; }
   .fv-kenburns { animation: none; }
+  /* Keep the gradient, drop the movement. */
+  .band-aurora::before { animation: none; }
+  .text-sheen { animation: none; }
   /* The certificate marquee, the decorative blobs, and the GlobalMap's dash /
      ping loops all ran indefinitely regardless of the user's preference. The
      marquee in particular could only be paused by hovering, which is
