@@ -11,7 +11,7 @@ export const de = {
       catalogTitle: "LED-Spiegel Produktkatalog | BOLEN Mirror Hersteller",
       catalogDesc: "Entdecken Sie unser umfangreiches Sortiment an OEM-LED-Spiegeln, Smart-Spiegeln, Schminkspiegeln und Badspiegeln von einem führenden LED-Spiegelhersteller. Hochwertige Fertigung für globale Marken.",
       storyTitle: "Unsere Geschichte | BOLEN LED-Spiegelhersteller",
-      storyDesc: "Erfahren Sie mehr über die Geschichte und Fertigungsexzellenz von BOLEN (Jiaxing Chengtai Mirror Co., Ltd.), einem führenden LED-Spiegelhersteller seit 1995, der sich auf OEM-Smart-Spiegel spezialisiert hat.",
+      storyDesc: "Erfahren Sie mehr über die Geschichte und Fertigungskompetenz von BOLEN (Jiaxing Chengtai Mirror Co., Ltd.), einem 2005 gegründeten Hersteller von LED- und OEM-Smart-Spiegeln.",
       rfqTitle: "Angebotsanfrage | BOLEN LED-Spiegelhersteller",
       rfqDesc: "Kontaktieren Sie BOLEN, einen führenden LED-Spiegelhersteller, für OEM/ODM-Anfragen, kundenspezifische Spiegelherstellung und Großbestellungen."
     },
@@ -38,10 +38,10 @@ export const de = {
       title: "Unsere Geschichte",
       subtitle: "Jiaxing Chengtai Mirror Co., Ltd.",
       paragraphs: [
-        "Mit über 20 Jahren engagierter Erfahrung in der Spiegelherstellung (deren Wurzeln bis ins Jahr 1995 zurückreichen) hat sich Jiaxing Chengtai Mirror Co., Ltd. einen Ruf aufgebaut, der weit über einen einzelnen Vertriebskanal hinausgeht. Unser Produktionskomplex von über 50.000 Quadratmetern, zwei unabhängige Fabriken und ein Team von über 200 qualifizierten Mitarbeitern geben uns die Kapazität und Flexibilität, Aufträge praktisch jeder Größenordnung zu bewältigen – von Boutique-Innenarchitekturprojekten bis hin zu großen Hotel- und Immobilienentwicklungen.",
+        "Mit über 20 Jahren Erfahrung in der Spiegelherstellung seit 2005 hat sich Jiaxing Chengtai Mirror Co., Ltd. einen Ruf aufgebaut, der weit über einen einzelnen Vertriebskanal hinausgeht. Unser 46.800 Quadratmeter großer Produktionskomplex, zwei unabhängige Fabriken und ein Team von über 200 qualifizierten Mitarbeitern geben uns die Kapazität und Flexibilität, Aufträge praktisch jeder Größenordnung zu bewältigen – von Boutique-Innenarchitekturprojekten bis hin zu großen Hotel- und Immobilienentwicklungen.",
         "Wir beherrschen den gesamten Produktionsprozess im eigenen Haus. Von der Rohglasverarbeitung und LED-Integration bis zur Rahmenfertigung und Montage intelligenter Funktionen wird jede Fertigungsphase unter einem Dach abgewickelt und von engagierten QA/QC-Inspektoren überwacht. Diese vertikale Integration bedeutet, dass wir die Qualität in jedem Schritt kontrollieren, Verzögerungen durch Dritte vermeiden und wettbewerbsfähige Lieferzeiten einhalten.",
         "Unsere über 200 Produktstile in mehreren Kernserien sind keine Standardvorlagen – sie sind das Ergebnis jahrelanger Designiteration, die sowohl von europäischen ästhetischen Trends als auch von realem Käuferfeedback geprägt ist. Für Kunden, die etwas Einzigartiges benötigen, ermöglichen unsere OEM- und ODM-Fähigkeiten eine vollständige Anpassung von Größe, Form, Beleuchtung, intelligenten Funktionen, Materialien und Branding.",
-        "Gestützt auf internationale Zertifizierungen wie CE, RoHS und IP66-Wasserdichtigkeit erfüllen unsere Produkte die Compliance-Anforderungen der Märkte in Europa, Nordamerika, dem Nahen Osten und darüber hinaus. Wir stellen nicht nur Spiegel her – wir bauen langfristige Partnerschaften mit Importeuren, Distributoren, Innenarchitekten und Entwicklern auf, die Beständigkeit, Präzision und einen Lieferanten verlangen, auf den sie sich Jahr für Jahr verlassen können."
+        "Gestützt auf internationale Zertifizierungen wie CE und RoHS sowie produktspezifische IP-Schutzarten und Marktzulassungen können unsere Produkte auf die Compliance-Anforderungen in Europa, Nordamerika, dem Nahen Osten und weiteren Märkten abgestimmt werden. Wir stellen nicht nur Spiegel her – wir bauen langfristige Partnerschaften mit Importeuren, Distributoren, Innenarchitekten und Entwicklern auf, die Beständigkeit, Präzision und einen verlässlichen Lieferanten erwarten."
       ]
     },
     home: {
@@ -49,8 +49,8 @@ export const de = {
       heroKicker: "LED-Spiegelhersteller · OEM/ODM-Partner",
       heroTitle1: "Premium-Spiegel,",
       heroTitle2: "passgenau für Ihre Marke.",
-      heroDesc: "Seit 2005 unterstützt <1>BOLEN</1> Marken weltweit dabei, unverwechselbare Spiegelkollektionen auf den Markt zu bringen. Von Design und Individualisierung über qualitätsgesicherte Fertigung bis hin zur weltweiten Lieferung machen wir Premiumfertigung einfach, zuverlässig und skalierbar.",
-      heroPrimaryCta: "Projekt starten",
+      heroDesc: "<1>BOLEN</1> unterstützt Marken weltweit dabei, unverwechselbare Spiegelkollektionen auf den Markt zu bringen. Von Design und Individualisierung über qualitätsgesicherte Fertigung bis hin zur weltweiten Lieferung machen wir Premiumfertigung einfach, zuverlässig und skalierbar.",
+      heroPrimaryCta: "Preise & MOQ anfragen",
       heroSecondaryCta: "Produkte entdecken",
       stats: {
         sqMeters: "Produktionsfläche",
@@ -97,7 +97,7 @@ export const de = {
       factoryShowcase: {
         subtitle: "Einblick in die Fabrik",
         title: "Wo jeder Spiegel entsteht",
-        desc: "Ein Blick in unsere 50.000 m² große Produktionsstätte in Jiaxing — vertikal integrierte Fertigung von LED-, Smart-, Schmink- und Badspiegeln, vom Rohglas bis zur versandfertigen Palette.",
+        desc: "Ein Blick in unsere 46.800 m² große Produktionsstätte in Jiaxing — vertikal integrierte Fertigung von LED-, Smart-, Schmink- und Badspiegeln, vom Rohglas bis zur versandfertigen Palette.",
         empty: "Fabrikfotos folgen in Kürze."
       },
       featuredVideo: {
@@ -165,6 +165,8 @@ export const de = {
       viewDetails: "Details ansehen",
       searchLabel: "Produkte suchen",
       searchPlaceholder: "Produkte suchen...",
+      resultCount: "{{count}} Produkte gefunden",
+      showMore: "Mehr anzeigen",
       allCategories: "Alle Kategorien",
       categories: {
         "New Arrival": "Neuheiten",
@@ -175,6 +177,8 @@ export const de = {
         "Irregular Mirror": "Unregelmäßiger Spiegel"
       },
       priceRange: "Preisspanne",
+      priceRangeLabel: "Unverbindliche Werkspreisspanne",
+      priceQualifier: "Endpreis abhängig von Menge und Spezifikation",
       msrp: "Unverbindliche Preisempfehlung"
     },
     productDetail: {
@@ -190,8 +194,57 @@ export const de = {
       rfqSuccess: "RFQ erfolgreich gesendet! Wir werden uns in Kürze bei Ihnen melden.",
       rfqError: "Senden der RFQ fehlgeschlagen. Bitte versuchen Sie es erneut.",
       relatedVideos: "Ähnliche Videos",
+      description: "Beschreibung",
+      buyerSummary: "Spiegel direkt ab Werk für Großhandel und OEM/ODM-Projekte. Die Preise werden nach Ihren Spezifikationen kalkuliert – fragen Sie nach MOQ, Mustern, individuellen Größen und Funktionen, Zertifizierungen und Produktionszeit.",
+      factoryQuoteCta: "Werksangebot anfordern",
+      quoteBasis: "Preis nach Spezifikation · MOQ, Muster und Produktionszeit anfragen.",
+      productReference: "Produktreferenz",
+      rfqIntro: "Nennen Sie uns Menge und Spezifikationen. Wir bestätigen Werkskonditionen, MOQ, Musteroptionen und Produktionszeit innerhalb von 24 Stunden.",
+      successTitle: "Anfrage erfolgreich gesendet!",
+      sendAnother: "Weitere Anfrage senden",
+      mobileFactoryPricing: "Werkspreise",
+      mobileQuoteMeta: "MOQ · Muster · Lieferzeit",
+      mobileQuoteLabel: "Schnellzugriff auf Werksangebot",
+      inquiryPlaceholder: "Ich interessiere mich für {{title}}. Bitte erstellen Sie ein Angebot für die geplante Menge und nennen Sie MOQ, Musteroptionen und Produktionszeit.",
+      notFound: "Produkt nicht gefunden.",
+      previousImage: "Vorheriges Bild",
+      nextImage: "Nächstes Bild",
+      galleryView: "{{title}} — Ansicht {{index}}",
+      premiumQuality: "Premiumqualität",
+      globalShipping: "Weltweiter Versand",
+      fastTurnaround: "Schnelle Abwicklung",
+      oemAvailable: "OEM/ODM verfügbar",
       brandSuffix: "| BOLEN Mirror",
       descTemplate: "Hochwertiger {title} von BOLEN Mirror (Jiaxing Chengtai Mirror Co., Ltd.) — OEM/ODM-LED-, Smart-, Schmink- und Badspiegel. Fordern Sie ein Angebot für Großhandelspreise an."
+    },
+    rfq: {
+      intro: "Sie interessieren sich für Großhandelspreise, Sonderanfertigungen oder OEM/ODM? Senden Sie uns Ihre Anfrage; unser Vertrieb antwortet innerhalb von 24 Stunden.",
+      quoteIncludesTitle: "Ihr Angebot enthält",
+      quoteIncludesMoq: "MOQ und Grundlage des Stückpreises",
+      quoteIncludesLeadTime: "Muster- und Produktionszeiten",
+      quoteIncludesOptions: "Anpassungs- und Compliance-Optionen für den Zielmarkt",
+      prefillMessage: "Ich interessiere mich für {{reference}}. Bitte erstellen Sie ein Angebot für die geplante Menge und nennen Sie MOQ, Stückpreisgrundlage, Muster- und Produktionszeiten sowie Anpassungs- und Compliance-Optionen.",
+      contactInformation: "Kontaktinformationen",
+      emailUs: "E-Mail senden",
+      callUs: "Anrufen",
+      visitUs: "Besuchen Sie uns",
+      successTitle: "Anfrage erfolgreich gesendet!",
+      sendAnother: "Weitere Anfrage senden",
+      productInterest: "Produktinteresse (optional)",
+      productPlaceholder: "z. B. LED-Badspiegel oder individuelle Schminkspiegel",
+      messagePlaceholder: "Bitte nennen Sie geplante Menge, Abmessungen, Funktionen, Zielmarkt und Anpassungswünsche.",
+      backupTitle: "Formular kann nicht gesendet werden?",
+      backupText: "Kontaktieren Sie uns direkt per E-Mail oder Telefon; wir helfen Ihnen gerne weiter.",
+      emailDirectly: "E-Mail senden",
+      callDirectly: "Anrufen",
+      emailSubject: "BOLEN Spiegelanfrage",
+      emailSubjectProduct: "Angebotsanfrage: {{reference}}",
+      errors: {
+        nameRequired: "Name ist erforderlich",
+        emailRequired: "E-Mail-Adresse ist erforderlich",
+        invalidEmail: "Ungültige E-Mail-Adresse",
+        messageRequired: "Anfragedetails sind erforderlich"
+      }
     },
     blog: {
       metaTitle: "The BOLEN Journal | Einblicke zu LED- und Smart-Spiegeln",

@@ -394,8 +394,8 @@ export default function Home() {
       <div className="band-aurora relative isolate overflow-hidden bg-gradient-to-b from-stone-100 to-[#FAF9F6] text-stone-900">
         {/* pb is larger than pt because the stats card below overlaps this band
             by -mt-8/-mt-10 and would otherwise crowd the buttons. */}
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16 sm:pt-12 sm:pb-20">
-          <div className="grid gap-7 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:gap-16 lg:items-center">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-14 sm:pt-8 sm:pb-16 lg:pt-6 lg:pb-14">
+          <div className="grid gap-5 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:gap-10 lg:items-center">
             {/* Kicker and h1 are one unit — keeping the kicker outside the grid
                 left it pinned to the top while the h1 dropped to meet the right
                 column, opening a dead gap between them. */}
@@ -403,18 +403,18 @@ export default function Home() {
               <Reveal as="p" className="text-[10px] sm:text-xs font-semibold uppercase tracking-[0.2em] text-amber-600">
                 {t('home.heroKicker')}
               </Reveal>
-              <Reveal as="h1" delay={90} className="mt-3 font-serif text-3xl sm:text-4xl lg:text-5xl leading-[1.1]">
+              <Reveal as="h1" delay={90} className="mt-2 font-serif text-3xl sm:text-4xl lg:text-[2.6rem] leading-[1.08]">
                 {t('home.heroTitle1')}
                 <span className="block italic text-sheen">{t('home.heroTitle2')}</span>
               </Reveal>
             </div>
-            <div className="lg:border-l lg:border-stone-300/70 lg:pl-16">
-              <Reveal as="p" delay={180} className="text-sm sm:text-base text-stone-600 font-light">
+            <div className="lg:border-l lg:border-stone-300/70 lg:pl-10">
+              <Reveal as="p" delay={180} className="text-sm text-stone-600 font-light">
                 {/* heroDesc contains <1>BOLEN</1>, so it must go through Trans
                     rather than t() or the markup renders as literal text. */}
                 <Trans i18nKey="home.heroDesc" components={[<span key="0" />, <strong key="1" className="font-medium text-stone-900" />]} />
               </Reveal>
-              <Reveal delay={270} className="mt-6 flex flex-wrap gap-3">
+              <Reveal delay={270} className="mt-4 flex flex-wrap gap-3">
                 <Link to={lp('/rfq')} className="btn-primary">
                   {t('home.heroPrimaryCta')}
                   <ArrowRight className="w-4 h-4" />
@@ -434,7 +434,7 @@ export default function Home() {
           className="bg-white rounded-xl sm:rounded-2xl shadow-xl border border-stone-100 py-3 px-2 sm:py-5 sm:px-6 lg:py-6 lg:px-8 flex overflow-x-auto sm:grid sm:grid-cols-4 sm:overflow-visible gap-0 sm:gap-4 lg:gap-6"
         >
           {[
-            { icon: Factory, value: "50,000+ m²", label: t('home.stats.sqMeters') },
+            { icon: Factory, value: "46,800 m²", label: t('home.stats.sqMeters') },
             { icon: Users, value: "200+", label: t('home.stats.artisans') },
             { icon: Lightbulb, value: "200+", label: t('home.stats.styles') },
             { icon: Globe, value: "Global", label: t('home.stats.global') }

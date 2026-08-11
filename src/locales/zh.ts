@@ -11,7 +11,7 @@ export const zh = {
       catalogTitle: "LED 镜产品目录 | BOLEN 镜业制造商",
       catalogDesc: "探索我们丰富的 OEM LED 镜、智能镜、化妆镜和浴室镜产品系列，来自领先的 LED 镜制造商，为全球品牌提供优质制造。",
       storyTitle: "关于我们 | BOLEN LED 镜业制造商",
-      storyDesc: "了解 BOLEN（嘉兴诚泰镜业有限公司）的历史和卓越制造，自 1995 年以来领先的 LED 镜制造商，专业生产 OEM 智能镜。",
+      storyDesc: "了解 BOLEN（嘉兴诚泰镜业有限公司）的历史与制造实力：公司成立于 2005 年，专注于 OEM 智能镜及 LED 镜生产。",
       rfqTitle: "询价 | BOLEN LED 镜业制造商",
       rfqDesc: "联系领先的 LED 镜制造商 BOLEN，获取 OEM/ODM 询价、定制镜子制造和批量订单。"
     },
@@ -38,10 +38,10 @@ export const zh = {
       title: "我们的故事",
       subtitle: "嘉兴诚泰镜业有限公司",
       paragraphs: [
-        "凭借在镜子制造领域20多年的专注经验（历史可追溯至1995年），嘉兴诚泰镜业有限公司建立了超越任何单一销售渠道的声誉。我们拥有50,000多平方米的生产综合体、两家独立工厂以及一支由200多名熟练工人组成的团队，这赋予了我们处理几乎任何规模订单的能力和灵活性——从精品室内设计项目到大型酒店和房地产开发。",
+        "嘉兴诚泰镜业有限公司自2005年起专注于镜子制造，已积累20多年行业经验。我们拥有46,800平方米的生产综合体、两家独立工厂以及一支由200多名熟练工人组成的团队，这赋予了我们处理不同规模订单的能力和灵活性——从精品室内设计项目到大型酒店和房地产开发。",
         "我们将整个生产过程掌握在自己手中。从原玻璃加工和LED集成到框架制造和智能功能组装，制造的每个阶段都在同一屋檐下进行，并由专门的QA/QC检查员监督。这种垂直整合意味着我们在每个步骤都控制质量，消除第三方延迟，并保持具有竞争力的交货时间。",
         "我们跨越多个核心系列的200多种产品款式绝非现成的模板——它们代表了多年来结合欧洲审美趋势和真实买家反馈的设计迭代。对于需要独特产品的客户，我们的OEM和ODM能力允许对尺寸、形状、照明、智能功能、材料和品牌进行完全定制。",
-        "在包括CE、RoHS和IP66防水在内的国际认证支持下，我们的产品满足欧洲、北美、中东及其他地区市场的合规要求。我们不仅仅是制造镜子——我们与进口商、分销商、室内设计师和开发商建立长期合作伙伴关系，满足他们对一致性、精确性以及年复一年可靠供应商的需求。"
+        "依托CE、RoHS等国际认证，以及按具体产品标注的IP防护等级和市场认证，我们的产品可根据欧洲、北美、中东及其他地区的要求配置合规方案。我们不仅仅是制造镜子——我们与进口商、分销商、室内设计师和开发商建立长期合作伙伴关系，满足他们对一致性、精确性以及长期可靠供应的需求。"
       ]
     },
     home: {
@@ -49,8 +49,8 @@ export const zh = {
       heroKicker: "LED镜制造商 · OEM/ODM合作伙伴",
       heroTitle1: "高端镜品，",
       heroTitle2: "为您的品牌量身打造。",
-      heroDesc: "自2005年以来，<1>BOLEN</1>始终助力全球品牌将独具特色的镜类产品系列推向市场。从设计与定制，到严格品控的生产制造和全球交付，我们让高端制造更简单、更可靠，也更易于规模化。",
-      heroPrimaryCta: "启动您的项目",
+      heroDesc: "<1>BOLEN</1>助力全球品牌将独具特色的镜类产品系列推向市场。从设计与定制，到严格品控的生产制造和全球交付，我们让高端制造更简单、更可靠，也更易于规模化。",
+      heroPrimaryCta: "获取报价与起订量",
       heroSecondaryCta: "浏览产品",
       stats: {
         sqMeters: "生产基地",
@@ -97,7 +97,7 @@ export const zh = {
       factoryShowcase: {
         subtitle: "走进工厂",
         title: "每一面镜子的诞生之地",
-        desc: "走进我们位于嘉兴的 50,000 平方米生产基地——从原片玻璃到打包出货，垂直整合制造 LED 镜、智能镜、化妆镜与浴室镜。",
+        desc: "走进我们位于嘉兴的 46,800 平方米生产基地——从原片玻璃到打包出货，垂直整合制造 LED 镜、智能镜、化妆镜与浴室镜。",
         empty: "工厂照片即将上线。"
       },
       featuredVideo: {
@@ -165,6 +165,8 @@ export const zh = {
       viewDetails: "查看详情",
       searchLabel: "搜索产品",
       searchPlaceholder: "搜索产品...",
+      resultCount: "找到 {{count}} 个产品",
+      showMore: "加载更多",
       allCategories: "所有类别",
       categories: {
         "New Arrival": "新品上市",
@@ -175,6 +177,8 @@ export const zh = {
         "Irregular Mirror": "异形镜"
       },
       priceRange: "价格区间",
+      priceRangeLabel: "参考工厂价格",
+      priceQualifier: "最终价格取决于数量与规格",
       msrp: "建议零售价"
     },
     productDetail: {
@@ -190,8 +194,57 @@ export const zh = {
       rfqSuccess: "RFQ 提交成功！我们将尽快与您联系。",
       rfqError: "提交 RFQ 失败。请重试。",
       relatedVideos: "相关视频",
+      description: "产品描述",
+      buyerSummary: "工厂直供镜类产品，适用于批发及 OEM/ODM 项目。价格将根据您的规格核算；欢迎咨询起订量、样品、定制尺寸与功能、认证需求和生产交期。",
+      factoryQuoteCta: "获取工厂报价",
+      quoteBasis: "按规格核价 · 可咨询起订量、样品与生产交期。",
+      productReference: "产品编号",
+      rfqIntro: "请告诉我们所需数量和规格。我们将在 24 小时内确认工厂价格、起订量、样品方案及生产交期。",
+      successTitle: "询盘发送成功！",
+      sendAnother: "继续发送询盘",
+      mobileFactoryPricing: "工厂报价",
+      mobileQuoteMeta: "起订量 · 样品 · 交期",
+      mobileQuoteLabel: "工厂报价快捷入口",
+      inquiryPlaceholder: "我对 {{title}} 感兴趣。请按预计数量报价，并提供起订量、样品方案和生产交期。",
+      notFound: "未找到该产品。",
+      previousImage: "上一张图片",
+      nextImage: "下一张图片",
+      galleryView: "{{title}} — 图片 {{index}}",
+      premiumQuality: "优质品质",
+      globalShipping: "全球发货",
+      fastTurnaround: "快速交付",
+      oemAvailable: "支持 OEM/ODM",
       brandSuffix: "| BOLEN 镜业",
       descTemplate: "{title} — 嘉兴诚泰镜业有限公司（BOLEN）优质出品，专业提供 OEM/ODM LED 镜、智能镜、化妆镜和浴室镜。欢迎询价获取批发价格。"
+    },
+    rfq: {
+      intro: "如需批发价格、定制订单或 OEM/ODM 服务，请提交询盘，我们的销售团队将在 24 小时内回复。",
+      quoteIncludesTitle: "报价将包含",
+      quoteIncludesMoq: "起订量与单价依据",
+      quoteIncludesLeadTime: "样品及生产交期",
+      quoteIncludesOptions: "定制方案与目标市场合规选项",
+      prefillMessage: "我对 {{reference}} 感兴趣。请按预计数量报价，并提供起订量、单价依据、样品及生产交期、定制与合规选项。",
+      contactInformation: "联系方式",
+      emailUs: "发送邮件",
+      callUs: "电话联系",
+      visitUs: "来厂参观",
+      successTitle: "询盘发送成功！",
+      sendAnother: "继续发送询盘",
+      productInterest: "感兴趣的产品（选填）",
+      productPlaceholder: "例如 LED 浴室镜或定制化妆镜",
+      messagePlaceholder: "请填写预计数量、尺寸、功能、目标市场及定制需求。",
+      backupTitle: "表单无法发送？",
+      backupText: "您也可以直接通过邮件或电话联系我们，我们会协助处理。",
+      emailDirectly: "发送邮件",
+      callDirectly: "电话联系",
+      emailSubject: "BOLEN 镜类产品询价",
+      emailSubjectProduct: "询价：{{reference}}",
+      errors: {
+        nameRequired: "请填写姓名或公司名称",
+        emailRequired: "请填写电子邮箱",
+        invalidEmail: "邮箱地址格式不正确",
+        messageRequired: "请填写询盘详情"
+      }
     },
     blog: {
       metaTitle: "BOLEN 博客 | LED 与智能镜行业洞察",

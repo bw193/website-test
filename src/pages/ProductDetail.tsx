@@ -1,8 +1,8 @@
 import { m, AnimatePresence } from 'motion/react';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { Loader2, CheckCircle2, ChevronLeft, ChevronRight, ArrowLeft, Send, ShieldCheck, Truck, Clock } from 'lucide-react';
+import { Loader2, CheckCircle2, ChevronLeft, ChevronRight, Send, ShieldCheck, Truck, Clock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import Markdown from '../components/Markdown';
 import SEO from '../components/SEO';
@@ -16,6 +16,8 @@ import { toSlug, parseProductParam } from '../utils/slug';
 import { useProductTranslator } from '../utils/productI18n';
 import { recommendVideosForProduct, toVideoListItem } from '../utils/video';
 import type { VideoListItem, VideoPost } from '../types/video';
+import { trackEvent } from '../utils/analytics';
+import { polishEnglishProductTitle } from '../utils/productCopy';
 
 interface Product {
   id: string;
@@ -28,6 +30,20 @@ interface Product {
   msrp?: string;
   specifications?: Array<{ key: string; value: string }> | Record<string, string>;
 }
+
+const MODEL_REFERENCE_PATTERN = /^(?:model\s*(?:no\.?|number)?\s*[:#-]?\s*)?[a-z0-9][a-z0-9 ._/-]{1,24}$/i;
+
+const normalizeDescription = (value?: string) => (value || '').trim().replace(/\s+/g, ' ');
+
+const looksLikeModelReference = (value?: string) => {
+  const normalized = normalizeDescription(value);
+  return normalized.length > 0 && MODEL_REFERENCE_PATTERN.test(normalized);
+};
+
+const needsBuyerSummary = (value?: string) => {
+  const normalized = normalizeDescription(value);
+  return normalized.length < 60 || looksLikeModelReference(normalized);
+};
 
 interface RFQForm {
   customerName: string;
@@ -49,10 +65,37 @@ export default function ProductDetail() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [rfqStatus, setRfqStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [relatedVideos, setRelatedVideos] = useState<VideoListItem[]>([]);
+  const [hasReachedProductRfq, setHasReachedProductRfq] = useState(false);
   const { t } = useTranslation();
   const translate = useProductTranslator(lang);
+  const successHeadingRef = useRef<HTMLHeadingElement>(null);
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<RFQForm>();
+
+  useEffect(() => {
+    if (rfqStatus === 'success') successHeadingRef.current?.focus();
+  }, [rfqStatus]);
+
+  // Keep the mobile quote bar visible while buyers review the product, then
+  // retire it once the actual form is on screen so it never covers form/footer
+  // content.
+  useEffect(() => {
+    setHasReachedProductRfq(false);
+    if (!product || typeof IntersectionObserver === 'undefined') return;
+
+    const target = document.getElementById('product-rfq');
+    if (!target) return;
+
+    const observer = new IntersectionObserver((entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) {
+        setHasReachedProductRfq(true);
+        observer.disconnect();
+      }
+    }, { threshold: 0.15 });
+
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [product?.id]);
 
   useEffect(() => {
     let cancelled = false;
@@ -134,17 +177,24 @@ export default function ProductDetail() {
           product_name: product.title,
           customer_name: data.customerName,
           customer_email: data.customerEmail,
-          message: data.message,
-          created_at: new Date().toISOString(),
-          status: 'new'
+          message: data.message
         });
       
       if (error) throw error;
-      
+
+      trackEvent('generate_lead', {
+        form_location: 'product_detail',
+        product_id: product.id,
+        product_name: product.title,
+      });
       setRfqStatus('success');
       reset();
     } catch (error) {
       console.error("Error submitting RFQ", error);
+      trackEvent('rfq_submit_error', {
+        form_location: 'product_detail',
+        product_id: product.id,
+      });
       setRfqStatus('error');
     }
   };
@@ -185,14 +235,31 @@ export default function ProductDetail() {
   if (!product) {
     return (
       <div className="text-center py-24 text-stone-500 text-xl">
-        Product not found.
+        {t('productDetail.notFound', 'Product not found.')}
       </div>
     );
   }
 
   // Localized copy for display + SEO. `product` (English) still drives the
   // slug/canonical/lookup so URLs stay identical across languages.
-  const display = translate(product);
+  const translatedProduct = translate(product);
+  const display = {
+    ...translatedProduct,
+    title: lang === 'en'
+      ? polishEnglishProductTitle(translatedProduct.title ?? product.title)
+      : translatedProduct.title ?? product.title,
+  };
+  const originalDescription = normalizeDescription(display.description);
+  const useBuyerSummary = needsBuyerSummary(originalDescription);
+  const visibleDescription = useBuyerSummary
+    ? t(
+        'productDetail.buyerSummary',
+        'Factory-direct mirrors for wholesale and OEM/ODM projects. Pricing is prepared to your specifications—ask about MOQ, sample options, custom sizes and functions, certification needs, and production lead time.'
+      )
+    : originalDescription;
+  const productReference = useBuyerSummary && looksLikeModelReference(originalDescription)
+    ? originalDescription
+    : null;
 
   const nextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % product.images.length);
@@ -272,15 +339,15 @@ export default function ProductDetail() {
       "@context": "https://schema.org",
       "@type": "BreadcrumbList",
       "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "Home", "item": `https://bolenmirror.com/${lang}/` },
-        { "@type": "ListItem", "position": 2, "name": "Products", "item": `https://bolenmirror.com/${lang}/products/` },
+        { "@type": "ListItem", "position": 1, "name": t('navbar.home'), "item": `https://bolenmirror.com/${lang}/` },
+        { "@type": "ListItem", "position": 2, "name": t('navbar.catalog'), "item": `https://bolenmirror.com/${lang}/products/` },
         { "@type": "ListItem", "position": 3, "name": display.title, "item": productFullUrl }
       ]
     }
   ] : undefined;
 
   return (
-    <div className="bg-[#FAF9F6] min-h-screen py-12">
+    <div className="bg-[#FAF9F6] min-h-screen pt-12 pb-28 lg:pb-12">
       <SEO
         title={seoTitle}
         description={richDescription}
@@ -296,7 +363,7 @@ export default function ProductDetail() {
           animate={{ opacity: 1, x: 0 }}
           className="mb-8 flex items-center text-sm font-medium text-stone-500"
         >
-          <Link to={lp('/')} className="hover:text-amber-600 transition-colors">Home</Link>
+          <Link to={lp('/')} className="hover:text-amber-600 transition-colors">{t('navbar.home')}</Link>
           <ChevronRight className="mx-2 h-4 w-4 text-stone-300" />
           <Link to={lp('/products')} className="hover:text-amber-600 transition-colors">{t('productDetail.backToCatalog')}</Link>
           <ChevronRight className="mx-2 h-4 w-4 text-stone-300" />
@@ -339,14 +406,14 @@ export default function ProductDetail() {
                   <button 
                     onClick={prevImage} 
                     className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 p-3 rounded-full shadow-lg hover:bg-white text-stone-800 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 transition-all duration-300 hover:scale-110"
-                    aria-label="Previous image"
+                    aria-label={t('productDetail.previousImage', 'Previous image')}
                   >
                     <ChevronLeft className="w-5 h-5" />
                   </button>
                   <button 
                     onClick={nextImage} 
                     className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 p-3 rounded-full shadow-lg hover:bg-white text-stone-800 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 transition-all duration-300 hover:scale-110"
-                    aria-label="Next image"
+                    aria-label={t('productDetail.nextImage', 'Next image')}
                   >
                     <ChevronRight className="w-5 h-5" />
                   </button>
@@ -372,7 +439,21 @@ export default function ProductDetail() {
                         : 'border border-stone-200 hover:border-amber-300 hover:shadow-md'
                     }`}
                   >
-                    <img src={img} alt={`${display.title} — view ${idx + 1}`} onError={handleImageError} className="w-full h-full object-cover" width="160" height="160" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
+                    <img
+                      src={img}
+                      alt={t('productDetail.galleryView', {
+                        title: display.title,
+                        index: idx + 1,
+                        defaultValue: '{{title}} — view {{index}}',
+                      })}
+                      onError={handleImageError}
+                      className="w-full h-full object-cover"
+                      width="160"
+                      height="160"
+                      referrerPolicy="no-referrer"
+                      loading="lazy"
+                      decoding="async"
+                    />
                   </button>
                 ))}
               </m.div>
@@ -396,36 +477,201 @@ export default function ProductDetail() {
             </m.h1>
             
             {(product.price_range || product.msrp) && (
-              <m.div variants={fadeInUp} className="mt-6 flex items-baseline gap-4">
-                {product.price_range && <div className="text-3xl font-bold text-stone-900">{formatPrice(product.price_range)}</div>}
+              <m.div variants={fadeInUp} className="mt-6 flex flex-wrap items-end gap-x-4 gap-y-2">
+                {product.price_range && (
+                  <div>
+                    <p className="text-[11px] font-semibold uppercase tracking-wide text-stone-500">
+                      {t('products.priceRangeLabel', 'Indicative factory range')}
+                    </p>
+                    <div className="text-3xl font-bold text-stone-900">{formatPrice(product.price_range)}</div>
+                  </div>
+                )}
                 {product.msrp && <div className="text-lg text-stone-500 line-through decoration-stone-300">{t('products.msrp')}: {formatPrice(product.msrp)}</div>}
+                {product.price_range && (
+                  <p className="basis-full text-xs text-stone-500">
+                    {t('products.priceQualifier', 'Final pricing depends on quantity and specifications')}
+                  </p>
+                )}
               </m.div>
             )}
 
+            <m.div variants={fadeInUp} className="mt-6">
+              <a href="#product-rfq" className="btn-primary w-full sm:w-auto px-7 py-3.5 text-base">
+                {t('productDetail.factoryQuoteCta', 'Get factory quote')}
+                <Send className="h-4 w-4" aria-hidden="true" />
+              </a>
+              <p className="mt-3 text-sm leading-relaxed text-stone-500">
+                {t('productDetail.quoteBasis', 'Specification-based pricing · Ask about MOQ, samples and production lead time.')}
+              </p>
+            </m.div>
+
             <m.div variants={fadeInUp} className="mt-8">
-              <h3 className="sr-only">Description</h3>
-              <p className="text-lg text-stone-600 leading-relaxed font-light">{display.description}</p>
+              <h3 className="sr-only">{t('productDetail.description', 'Description')}</h3>
+              <p className="text-lg text-stone-600 leading-relaxed font-light">{visibleDescription}</p>
+              {productReference && (
+                <p className="mt-3 text-sm font-medium text-stone-500">
+                  {t('productDetail.productReference', 'Product reference')}: <span className="text-stone-700">{productReference}</span>
+                </p>
+              )}
             </m.div>
 
             {/* Value Props */}
             <m.div variants={fadeInUp} className="mt-8 grid grid-cols-2 gap-4 py-6 border-y border-stone-200">
               <div className="flex items-center gap-3 text-stone-700">
                 <ShieldCheck className="w-5 h-5 text-amber-600" />
-                <span className="text-sm font-medium">Premium Quality</span>
+                <span className="text-sm font-medium">{t('productDetail.premiumQuality', 'Premium quality')}</span>
               </div>
               <div className="flex items-center gap-3 text-stone-700">
                 <Truck className="w-5 h-5 text-amber-600" />
-                <span className="text-sm font-medium">Global Shipping</span>
+                <span className="text-sm font-medium">{t('productDetail.globalShipping', 'Global shipping')}</span>
               </div>
               <div className="flex items-center gap-3 text-stone-700">
                 <Clock className="w-5 h-5 text-amber-600" />
-                <span className="text-sm font-medium">Fast Turnaround</span>
+                <span className="text-sm font-medium">{t('productDetail.fastTurnaround', 'Fast turnaround')}</span>
               </div>
               <div className="flex items-center gap-3 text-stone-700">
                 <CheckCircle2 className="w-5 h-5 text-amber-600" />
-                <span className="text-sm font-medium">OEM/ODM Available</span>
+                <span className="text-sm font-medium">{t('productDetail.oemAvailable', 'OEM/ODM available')}</span>
               </div>
             </m.div>
+
+            {/* Keep the quote action close to the buying decision. Product
+                specifications, long-form details and videos remain below. */}
+            <m.section
+              id="product-rfq"
+              variants={fadeInUp}
+              className="scroll-mt-24 mt-10 bg-white rounded-3xl p-6 sm:p-8 border border-stone-200 shadow-xl shadow-stone-200/50 relative overflow-hidden"
+              aria-labelledby="product-rfq-title"
+            >
+              <div className="absolute top-0 right-0 w-32 h-32 bg-amber-100 rounded-bl-full -z-10 opacity-50"></div>
+              <h2 id="product-rfq-title" className="text-2xl font-bold text-stone-900 mb-3">{t('productDetail.requestQuote')}</h2>
+              <p className="text-stone-500 mb-8 text-sm leading-relaxed max-w-md">
+                {t(
+                  'productDetail.rfqIntro',
+                  'Tell us the quantity and specifications you need. We will confirm factory pricing, MOQ, sample options and production lead time within 24 hours.'
+                )}
+              </p>
+
+              {rfqStatus === 'success' ? (
+                <m.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="bg-green-50 border border-green-200 rounded-2xl p-8 flex flex-col items-center text-center"
+                  role="status"
+                  aria-live="polite"
+                >
+                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                    <CheckCircle2 className="h-8 w-8 text-green-600" aria-hidden="true" />
+                  </div>
+                  <h3
+                    ref={successHeadingRef}
+                    tabIndex={-1}
+                    className="text-xl font-bold text-green-900 mb-2 focus:outline-none"
+                  >
+                    {t('productDetail.successTitle', 'Inquiry sent successfully!')}
+                  </h3>
+                  <p className="text-green-700">{t('productDetail.rfqSuccess')}</p>
+                  <button
+                    type="button"
+                    onClick={() => setRfqStatus('idle')}
+                    className="mt-6 text-sm font-medium text-green-700 hover:text-green-800 underline underline-offset-4"
+                  >
+                    {t('productDetail.sendAnother', 'Send another inquiry')}
+                  </button>
+                </m.div>
+              ) : (
+                <form
+                  onSubmit={handleSubmit(onSubmitRFQ)}
+                  data-rfq-form="product_detail"
+                  className="space-y-5 relative z-10"
+                  aria-busy={rfqStatus === 'submitting'}
+                >
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <div>
+                      <label htmlFor="customerName" className="block text-sm font-medium text-stone-700 mb-1">{t('productDetail.companyName')}</label>
+                      <input
+                        type="text"
+                        id="customerName"
+                        placeholder="Your Company Ltd."
+                        autoComplete="organization"
+                        {...register('customerName', { required: t('rfq.errors.nameRequired', 'Name is required') })}
+                        aria-invalid={errors.customerName ? true : undefined}
+                        aria-describedby={errors.customerName ? 'customerName-error' : undefined}
+                        className="block w-full rounded-xl border border-stone-200 bg-stone-50 focus:bg-white shadow-sm focus:border-amber-500 focus:ring-2 focus:ring-amber-500 focus:outline-none sm:text-sm p-3 transition-colors"
+                      />
+                      {errors.customerName && (
+                        <p id="customerName-error" role="alert" className="mt-1 text-sm text-red-600 font-medium">
+                          {errors.customerName.message}
+                        </p>
+                      )}
+                    </div>
+                    <div>
+                      <label htmlFor="customerEmail" className="block text-sm font-medium text-stone-700 mb-1">{t('productDetail.email')}</label>
+                      <input
+                        type="email"
+                        id="customerEmail"
+                        placeholder="sales@company.com"
+                        autoComplete="email"
+                        {...register('customerEmail', {
+                          required: t('rfq.errors.emailRequired', 'Email is required'),
+                          pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/i, message: t('rfq.errors.invalidEmail', 'Invalid email address') }
+                        })}
+                        aria-invalid={errors.customerEmail ? true : undefined}
+                        aria-describedby={errors.customerEmail ? 'customerEmail-error' : undefined}
+                        className="block w-full rounded-xl border border-stone-200 bg-stone-50 focus:bg-white shadow-sm focus:border-amber-500 focus:ring-2 focus:ring-amber-500 focus:outline-none sm:text-sm p-3 transition-colors"
+                      />
+                      {errors.customerEmail && (
+                        <p id="customerEmail-error" role="alert" className="mt-1 text-sm text-red-600 font-medium">
+                          {errors.customerEmail.message}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <div>
+                    <label htmlFor="message" className="block text-sm font-medium text-stone-700 mb-1">{t('productDetail.inquiryDetails')}</label>
+                    <textarea
+                      id="message"
+                      rows={4}
+                      placeholder={t('productDetail.inquiryPlaceholder', {
+                        title: display.title,
+                        defaultValue: "I'm interested in {{title}}. Please quote the estimated quantity and include MOQ, sample options and production lead time.",
+                      })}
+                      {...register('message', { required: t('rfq.errors.messageRequired', 'Message is required') })}
+                      aria-invalid={errors.message ? true : undefined}
+                      aria-describedby={errors.message ? 'message-error' : undefined}
+                      className="block w-full rounded-xl border border-stone-200 bg-stone-50 focus:bg-white shadow-sm focus:border-amber-500 focus:ring-2 focus:ring-amber-500 focus:outline-none sm:text-sm p-3 transition-colors resize-none"
+                    />
+                    {errors.message && (
+                      <p id="message-error" role="alert" className="mt-1 text-sm text-red-600 font-medium">
+                        {errors.message.message}
+                      </p>
+                    )}
+                  </div>
+                  {rfqStatus === 'error' && (
+                    <div role="alert" className="p-3 bg-red-50 text-red-700 rounded-lg text-sm font-medium border border-red-100">
+                      {t('productDetail.rfqError')}
+                    </div>
+                  )}
+                  <button
+                    type="submit"
+                    disabled={rfqStatus === 'submitting'}
+                    className="btn-primary w-full py-4 text-base"
+                  >
+                    {rfqStatus === 'submitting' ? (
+                      <>
+                        <Loader2 className="w-5 h-5 animate-spin" aria-hidden="true" />
+                        <span>{t('productDetail.submitting')}</span>
+                      </>
+                    ) : (
+                      <>
+                        {t('productDetail.submitRfq')}
+                        <Send className="w-4 h-4 ml-2" aria-hidden="true" />
+                      </>
+                    )}
+                  </button>
+                </form>
+              )}
+            </m.section>
 
             {display.specifications && (Array.isArray(display.specifications) ? display.specifications.length > 0 : Object.keys(display.specifications).length > 0) && (
               <m.div variants={fadeInUp} className="mt-10">
@@ -480,90 +726,28 @@ export default function ProductDetail() {
               </m.div>
             )}
 
-            {/* RFQ Form */}
-            <m.div variants={fadeInUp} className="mt-12 bg-white rounded-3xl p-8 border border-stone-200 shadow-xl shadow-stone-200/50 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-amber-100 rounded-bl-full -z-10 opacity-50"></div>
-              <h2 className="text-2xl font-bold text-stone-900 mb-3">{t('productDetail.requestQuote')}</h2>
-              <p className="text-stone-500 mb-8 text-sm leading-relaxed max-w-md">Interested in wholesale pricing or custom orders? Send us an inquiry and our sales team will respond within 24 hours.</p>
-              
-              {rfqStatus === 'success' ? (
-                <m.div 
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="bg-green-50 border border-green-200 rounded-2xl p-8 flex flex-col items-center text-center"
-                >
-                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
-                    <CheckCircle2 className="h-8 w-8 text-green-600" />
-                  </div>
-                  <h3 className="text-xl font-bold text-green-900 mb-2">Inquiry Sent Successfully!</h3>
-                  <p className="text-green-700">{t('productDetail.rfqSuccess')}</p>
-                  <button onClick={() => setRfqStatus('idle')} className="mt-6 text-sm font-medium text-green-700 hover:text-green-800 underline underline-offset-4">Send another inquiry</button>
-                </m.div>
-              ) : (
-                <form onSubmit={handleSubmit(onSubmitRFQ)} className="space-y-5 relative z-10">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                    <div>
-                      <label htmlFor="customerName" className="block text-sm font-medium text-stone-700 mb-1">{t('productDetail.companyName')}</label>
-                      <input
-                        type="text"
-                        id="customerName"
-                        placeholder="Your Company Ltd."
-                        {...register('customerName', { required: 'Name is required' })}
-                        className="block w-full rounded-xl border border-stone-200 bg-stone-50 focus:bg-white shadow-sm focus:border-amber-500 focus:ring-2 focus:ring-amber-500 focus:outline-none sm:text-sm p-3 transition-colors"
-                      />
-                      {errors.customerName && <p className="mt-1 text-sm text-red-600 font-medium">{errors.customerName.message}</p>}
-                    </div>
-                    <div>
-                      <label htmlFor="customerEmail" className="block text-sm font-medium text-stone-700 mb-1">{t('productDetail.email')}</label>
-                      <input
-                        type="email"
-                        id="customerEmail"
-                        placeholder="sales@company.com"
-                        {...register('customerEmail', { 
-                          required: 'Email is required',
-                          pattern: { value: /^\S+@\S+$/i, message: 'Invalid email address' }
-                        })}
-                        className="block w-full rounded-xl border border-stone-200 bg-stone-50 focus:bg-white shadow-sm focus:border-amber-500 focus:ring-2 focus:ring-amber-500 focus:outline-none sm:text-sm p-3 transition-colors"
-                      />
-                      {errors.customerEmail && <p className="mt-1 text-sm text-red-600 font-medium">{errors.customerEmail.message}</p>}
-                    </div>
-                  </div>
-                  <div>
-                    <label htmlFor="message" className="block text-sm font-medium text-stone-700 mb-1">{t('productDetail.inquiryDetails')}</label>
-                    <textarea
-                      id="message"
-                      rows={4}
-                      placeholder={`I'm interested in ordering ${display.title}. Please provide pricing for 100 units...`}
-                      {...register('message', { required: 'Message is required' })}
-                      className="block w-full rounded-xl border border-stone-200 bg-stone-50 focus:bg-white shadow-sm focus:border-amber-500 focus:ring-2 focus:ring-amber-500 focus:outline-none sm:text-sm p-3 transition-colors resize-none"
-                    />
-                    {errors.message && <p className="mt-1 text-sm text-red-600 font-medium">{errors.message.message}</p>}
-                  </div>
-                  {rfqStatus === 'error' && (
-                    <div className="p-3 bg-red-50 text-red-700 rounded-lg text-sm font-medium border border-red-100">
-                      {t('productDetail.rfqError')}
-                    </div>
-                  )}
-                  <button
-                    type="submit"
-                    disabled={rfqStatus === 'submitting'}
-                    className="btn-primary w-full py-4 text-base"
-                  >
-                    {rfqStatus === 'submitting' ? (
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                    ) : (
-                      <>
-                        {t('productDetail.submitRfq')}
-                        <Send className="w-4 h-4 ml-2" />
-                      </>
-                    )}
-                  </button>
-                </form>
-              )}
-            </m.div>
           </m.div>
         </div>
       </div>
+
+      {!hasReachedProductRfq && (
+        <div
+          className="fixed inset-x-0 bottom-0 z-40 border-t border-stone-200 bg-white/95 px-4 pt-3 shadow-[0_-8px_24px_rgba(28,25,23,0.12)] backdrop-blur lg:hidden"
+          style={{ paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom))' }}
+          role="region"
+          aria-label={t('productDetail.mobileQuoteLabel', 'Factory quote shortcut')}
+        >
+          <div className="mx-auto flex max-w-lg items-center gap-3">
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold text-stone-900">{t('productDetail.mobileFactoryPricing', 'Factory pricing')}</p>
+              <p className="truncate text-xs text-stone-500">{t('productDetail.mobileQuoteMeta', 'MOQ · Samples · Lead time')}</p>
+            </div>
+            <a href="#product-rfq" className="btn-primary shrink-0 px-5 py-2.5">
+              {t('productDetail.factoryQuoteCta', 'Get factory quote')}
+            </a>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

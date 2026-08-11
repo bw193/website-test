@@ -36,8 +36,14 @@ export default function Footer() {
           <div>
             <h3 className="text-sm font-semibold uppercase tracking-wider mb-4 text-amber-500">{t('footer.contact', 'Contact')}</h3>
             <ul className="space-y-2 text-stone-400 text-sm">
-              <li className="flex items-center gap-2"><Mail className="h-4 w-4" /> bolen2@cnjxctm.com</li>
-              <li className="flex items-center gap-2"><Phone className="h-4 w-4" /> +86 18058603602</li>
+              <li className="flex items-center gap-2">
+                <Mail className="h-4 w-4" />
+                <a href="mailto:bolen2@cnjxctm.com" className="hover:text-white transition-colors">bolen2@cnjxctm.com</a>
+              </li>
+              <li className="flex items-center gap-2">
+                <Phone className="h-4 w-4" />
+                <a href="tel:+8618058603602" className="hover:text-white transition-colors">+86 18058603602</a>
+              </li>
               <li className="flex items-center gap-2"><MapPin className="h-4 w-4" /> Jiaxing, Zhejiang, China</li>
             </ul>
           </div>

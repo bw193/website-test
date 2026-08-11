@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../supabase';
-import { Plus, Edit, Trash2, Loader2, Package, Inbox, Users, Check, X, Settings, LogOut, Search, ChevronRight, Archive, BookOpen, Clapperboard, RefreshCw } from 'lucide-react';
+import { Plus, Edit, Loader2, Package, Inbox, Users, Check, X, Settings, LogOut, Search, ChevronRight, Archive, BookOpen, Clapperboard, RefreshCw } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 import SEO from '../components/SEO';
@@ -64,7 +64,7 @@ export default function AdminDashboard() {
   const [categories, setCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'products' | 'blog' | 'videos' | 'rfqs' | 'employees' | 'settings'>('products');
-  const [rfqStatusFilter, setRfqStatusFilter] = useState<'active' | 'new' | 'read' | 'archived' | 'all'>('active');
+  const [rfqStatusFilter, setRfqStatusFilter] = useState<'active' | 'new' | 'read' | 'archived' | 'all'>('all');
   const [rfqStartDate, setRfqStartDate] = useState<string>('');
   const [rfqEndDate, setRfqEndDate] = useState<string>('');
   const [productCategoryFilter, setProductCategoryFilter] = useState<string>('all');
@@ -72,7 +72,7 @@ export default function AdminDashboard() {
   const [regeneratingAllVideos, setRegeneratingAllVideos] = useState(false);
   
   // Stats
-  const [stats, setStats] = useState({ products: 0, newRfqs: 0, employees: 0 });
+  const [stats, setStats] = useState({ products: 0, totalRfqs: 0, newRfqs: 0, employees: 0 });
 
   useEffect(() => {
     fetchData();
@@ -82,15 +82,17 @@ export default function AdminDashboard() {
     setLoading(true);
     try {
       // Always fetch stats
-      const [prodRes, rfqRes, empRes] = await Promise.all([
-        supabase.from('products').select('id', { count: 'exact' }),
-        supabase.from('rfqs').select('id', { count: 'exact' }).eq('status', 'new'),
-        (role === 'admin' || isMasterAdmin) ? supabase.from('profiles').select('id', { count: 'exact' }) : Promise.resolve({ count: 0 })
+      const [prodRes, totalRfqRes, newRfqRes, empRes] = await Promise.all([
+        supabase.from('products').select('id', { count: 'exact', head: true }),
+        supabase.from('rfqs').select('id', { count: 'exact', head: true }),
+        supabase.from('rfqs').select('id', { count: 'exact', head: true }).eq('status', 'new'),
+        (role === 'admin' || isMasterAdmin) ? supabase.from('profiles').select('id', { count: 'exact', head: true }) : Promise.resolve({ count: 0 })
       ]);
       
       setStats({
         products: prodRes.count || 0,
-        newRfqs: rfqRes.count || 0,
+        totalRfqs: totalRfqRes.count || 0,
+        newRfqs: newRfqRes.count || 0,
         employees: empRes.count || 0
       });
 
@@ -142,46 +144,6 @@ export default function AdminDashboard() {
       console.error("Error fetching admin data", error);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleDeleteProduct = async (id: string) => {
-    if (window.confirm(t('admin.dashboard.products.deleteConfirm'))) {
-      try {
-        const { error } = await supabase.from('products').delete().eq('id', id);
-        if (error) throw error;
-        setProducts(products.filter(p => p.id !== id));
-        setStats(prev => ({ ...prev, products: prev.products - 1 }));
-      } catch (error) {
-        console.error("Error deleting product", error);
-        alert(t('admin.dashboard.products.deleteError'));
-      }
-    }
-  };
-
-  const handleDeleteBlog = async (id: string) => {
-    if (window.confirm(t('admin.blog.deleteConfirm'))) {
-      try {
-        const { error } = await supabase.from('blog_posts').delete().eq('id', id);
-        if (error) throw error;
-        setBlogPosts(blogPosts.filter(p => p.id !== id));
-      } catch (error) {
-        console.error("Error deleting article", error);
-        alert(t('admin.blog.deleteError'));
-      }
-    }
-  };
-
-  const handleDeleteVideo = async (id: string) => {
-    if (window.confirm(t('admin.videos.deleteConfirm', 'Are you sure you want to delete this video?'))) {
-      try {
-        const { error } = await supabase.from('videos').delete().eq('id', id);
-        if (error) throw error;
-        setVideoPosts(videoPosts.filter(p => p.id !== id));
-      } catch (error) {
-        console.error("Error deleting video", error);
-        alert(t('admin.videos.deleteError', 'Failed to delete video.'));
-      }
     }
   };
 
@@ -402,8 +364,13 @@ export default function AdminDashboard() {
               <Inbox className="h-6 w-6" />
             </div>
             <div>
-              <p className="text-sm font-medium text-stone-500">New RFQs</p>
-              <p className="text-2xl font-bold text-stone-900">{stats.newRfqs}</p>
+              <p className="text-sm font-medium text-stone-500">Total RFQs</p>
+              <div className="flex items-center gap-2">
+                <p className="text-2xl font-bold text-stone-900">{stats.totalRfqs}</p>
+                <span className="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-800">
+                  {stats.newRfqs} new
+                </span>
+              </div>
             </div>
           </div>
           {(role === 'admin' || isMasterAdmin) && (
@@ -563,9 +530,6 @@ export default function AdminDashboard() {
                         <Link to={`/admin/products/${product.id}`} className="p-2 text-stone-400 hover:text-stone-900 hover:bg-stone-100 rounded-lg transition-colors">
                           <Edit className="h-4 w-4" />
                         </Link>
-                        <button onClick={() => handleDeleteProduct(product.id)} className="p-2 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
-                          <Trash2 className="h-4 w-4" />
-                        </button>
                       </div>
                     </div>
                   </li>
@@ -600,9 +564,6 @@ export default function AdminDashboard() {
                       <Link to={`/admin/blog/${post.id}`} className="p-2 text-stone-400 hover:text-stone-900 hover:bg-stone-100 rounded-lg transition-colors">
                         <Edit className="h-4 w-4" />
                       </Link>
-                      <button onClick={() => handleDeleteBlog(post.id)} className="p-2 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
-                        <Trash2 className="h-4 w-4" />
-                      </button>
                     </div>
                   </div>
                 </li>
@@ -648,9 +609,6 @@ export default function AdminDashboard() {
                       <Link to={`/admin/videos/${post.id}`} className="p-2 text-stone-400 hover:text-stone-900 hover:bg-stone-100 rounded-lg transition-colors">
                         <Edit className="h-4 w-4" />
                       </Link>
-                      <button onClick={() => handleDeleteVideo(post.id)} className="p-2 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
-                        <Trash2 className="h-4 w-4" />
-                      </button>
                     </div>
                   </div>
                 </li>

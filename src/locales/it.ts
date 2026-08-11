@@ -11,7 +11,7 @@ export const it = {
       catalogTitle: "Catalogo Prodotti Specchi LED | Produttore BOLEN Mirror",
       catalogDesc: "Esplora la nostra ampia gamma di specchi LED OEM, specchi smart, specchi da toeletta e specchi da bagno da un produttore leader di specchi LED. Produzione di alta qualità per marchi globali.",
       storyTitle: "La Nostra Storia | Produttore di Specchi LED BOLEN",
-      storyDesc: "Scopri la storia e l'eccellenza produttiva di BOLEN (Jiaxing Chengtai Mirror Co., Ltd.), un produttore leader di specchi LED dal 1995 specializzato in specchi smart OEM.",
+      storyDesc: "Scopri la storia e la capacità produttiva di BOLEN (Jiaxing Chengtai Mirror Co., Ltd.), produttore di specchi LED e smart OEM fondato nel 2005.",
       rfqTitle: "Richiesta di Preventivo | Produttore di Specchi LED BOLEN",
       rfqDesc: "Contatta BOLEN, un produttore leader di specchi LED, per richieste OEM/ODM, produzione personalizzata di specchi e ordini all'ingrosso."
     },
@@ -38,10 +38,10 @@ export const it = {
       title: "La Nostra Storia",
       subtitle: "Jiaxing Chengtai Mirror Co., Ltd.",
       paragraphs: [
-        "Con oltre 20 anni di esperienza dedicata alla produzione di specchi (le cui origini risalgono al 1995), Jiaxing Chengtai Mirror Co., Ltd. ha costruito una reputazione che va ben oltre qualsiasi singolo canale di vendita. Il nostro complesso produttivo di oltre 50.000 metri quadrati, due stabilimenti indipendenti e un team di oltre 200 lavoratori qualificati ci offrono la capacità e la flessibilità per gestire ordini di praticamente qualsiasi entità, dai progetti boutique di interior design ai grandi sviluppi alberghieri e immobiliari.",
+        "Con oltre 20 anni di esperienza dedicata alla produzione di specchi dal 2005, Jiaxing Chengtai Mirror Co., Ltd. ha costruito una reputazione che va ben oltre qualsiasi singolo canale di vendita. Il nostro complesso produttivo di 46.800 metri quadrati, due stabilimenti indipendenti e un team di oltre 200 lavoratori qualificati ci offrono la capacità e la flessibilità per gestire ordini di praticamente qualsiasi entità, dai progetti boutique di interior design ai grandi sviluppi alberghieri e immobiliari.",
         "Gestiamo internamente l'intero processo produttivo. Dalla lavorazione del vetro grezzo e l'integrazione dei LED alla fabbricazione delle cornici e all'assemblaggio delle funzioni smart, ogni fase della produzione è gestita sotto un unico tetto e supervisionata da ispettori QA/QC dedicati. Questa integrazione verticale significa che controlliamo la qualità in ogni fase, eliminiamo i ritardi di terzi e manteniamo tempi di consegna competitivi.",
         "I nostri oltre 200 stili di prodotto in molteplici serie principali non sono modelli standard: rappresentano anni di iterazione progettuale ispirati sia dalle tendenze estetiche europee sia dai feedback reali degli acquirenti. Per i clienti che necessitano di qualcosa di unico, le nostre capacità OEM e ODM consentono la personalizzazione completa di dimensioni, forma, illuminazione, funzioni smart, materiali e branding.",
-        "Supportati da certificazioni internazionali tra cui CE, RoHS e impermeabilità IP66, i nostri prodotti soddisfano i requisiti di conformità dei mercati di Europa, Nord America, Medio Oriente e oltre. Non ci limitiamo a produrre specchi: costruiamo partnership a lungo termine con importatori, distributori, interior designer e sviluppatori che esigono coerenza, precisione e un fornitore su cui poter contare anno dopo anno."
+        "Supportati da certificazioni internazionali tra cui CE e RoHS, oltre a gradi IP e certificazioni di mercato specifici per prodotto, i nostri prodotti possono essere configurati per i requisiti di conformità di Europa, Nord America, Medio Oriente e altri mercati. Non ci limitiamo a produrre specchi: costruiamo partnership a lungo termine con importatori, distributori, interior designer e sviluppatori che esigono coerenza, precisione e un fornitore affidabile."
       ]
     },
     home: {
@@ -49,8 +49,8 @@ export const it = {
       heroKicker: "Produttore di specchi LED · Partner OEM/ODM",
       heroTitle1: "Specchi di alta gamma,",
       heroTitle2: "realizzati su misura per il tuo brand.",
-      heroDesc: "Dal 2005, <1>BOLEN</1> aiuta brand di tutto il mondo a portare sul mercato collezioni di specchi dal carattere distintivo. Dalla progettazione e personalizzazione alla produzione con rigorosi controlli di qualità e alla consegna in tutto il mondo, rendiamo la produzione di alta gamma semplice, affidabile e scalabile.",
-      heroPrimaryCta: "Avvia il tuo progetto",
+      heroDesc: "<1>BOLEN</1> aiuta brand di tutto il mondo a portare sul mercato collezioni di specchi dal carattere distintivo. Dalla progettazione e personalizzazione alla produzione con rigorosi controlli di qualità e alla consegna in tutto il mondo, rendiamo la produzione di alta gamma semplice, affidabile e scalabile.",
+      heroPrimaryCta: "Richiedi prezzi e MOQ",
       heroSecondaryCta: "Scopri i prodotti",
       stats: {
         sqMeters: "Stabilimento produttivo",
@@ -97,7 +97,7 @@ export const it = {
       factoryShowcase: {
         subtitle: "Dentro la Fabbrica",
         title: "Dove Nasce Ogni Specchio",
-        desc: "Uno sguardo dentro il nostro stabilimento di 50.000 m² a Jiaxing — produzione verticalmente integrata di specchi LED, smart, da toeletta e da bagno, dal vetro grezzo al pallet pronto per la spedizione.",
+        desc: "Uno sguardo dentro il nostro stabilimento di 46.800 m² a Jiaxing — produzione verticalmente integrata di specchi LED, smart, da toeletta e da bagno, dal vetro grezzo al pallet pronto per la spedizione.",
         empty: "Foto della fabbrica in arrivo."
       },
       featuredVideo: {
@@ -165,6 +165,8 @@ export const it = {
       viewDetails: "Vedi Dettagli",
       searchLabel: "Cerca prodotti",
       searchPlaceholder: "Cerca prodotti...",
+      resultCount: "{{count}} prodotti trovati",
+      showMore: "Mostra altro",
       allCategories: "Tutte le Categorie",
       categories: {
         "New Arrival": "Novità",
@@ -175,6 +177,8 @@ export const it = {
         "Irregular Mirror": "Specchio Irregolare"
       },
       priceRange: "Fascia di Prezzo",
+      priceRangeLabel: "Fascia indicativa di fabbrica",
+      priceQualifier: "Il prezzo finale dipende da quantità e specifiche",
       msrp: "Prezzo al Dettaglio Consigliato"
     },
     productDetail: {
@@ -190,8 +194,57 @@ export const it = {
       rfqSuccess: "RFQ inviata con successo! Ti contatteremo presto.",
       rfqError: "Impossibile inviare la RFQ. Riprova.",
       relatedVideos: "Video correlati",
+      description: "Descrizione",
+      buyerSummary: "Specchi diretti dalla fabbrica per progetti all'ingrosso e OEM/ODM. Il prezzo viene calcolato in base alle specifiche: chiedi MOQ, campioni, dimensioni e funzioni personalizzate, certificazioni e tempi di produzione.",
+      factoryQuoteCta: "Richiedi prezzo di fabbrica",
+      quoteBasis: "Prezzo su specifica · Chiedi MOQ, campioni e tempi di produzione.",
+      productReference: "Riferimento prodotto",
+      rfqIntro: "Indicaci quantità e specifiche richieste. Confermeremo prezzo di fabbrica, MOQ, opzioni campione e tempi di produzione entro 24 ore.",
+      successTitle: "Richiesta inviata con successo!",
+      sendAnother: "Invia un'altra richiesta",
+      mobileFactoryPricing: "Prezzo di fabbrica",
+      mobileQuoteMeta: "MOQ · Campioni · Tempi",
+      mobileQuoteLabel: "Accesso rapido al preventivo di fabbrica",
+      inquiryPlaceholder: "Sono interessato a {{title}}. Preparate un preventivo per la quantità stimata includendo MOQ, opzioni campione e tempi di produzione.",
+      notFound: "Prodotto non trovato.",
+      previousImage: "Immagine precedente",
+      nextImage: "Immagine successiva",
+      galleryView: "{{title}} — vista {{index}}",
+      premiumQuality: "Qualità premium",
+      globalShipping: "Spedizione globale",
+      fastTurnaround: "Tempi rapidi",
+      oemAvailable: "OEM/ODM disponibile",
       brandSuffix: "| BOLEN Mirror",
       descTemplate: "{title} di alta qualità, prodotto da BOLEN Mirror (Jiaxing Chengtai Mirror Co., Ltd.) — specchi LED, smart, da toeletta e da bagno OEM/ODM. Richiedi un preventivo per i prezzi all'ingrosso."
+    },
+    rfq: {
+      intro: "Cerchi prezzi all'ingrosso, ordini personalizzati o servizi OEM/ODM? Inviaci la richiesta: il nostro team commerciale risponderà entro 24 ore.",
+      quoteIncludesTitle: "Il preventivo includerà",
+      quoteIncludesMoq: "MOQ e base del prezzo unitario",
+      quoteIncludesLeadTime: "Tempi di campionatura e produzione",
+      quoteIncludesOptions: "Opzioni di personalizzazione e conformità per il mercato di destinazione",
+      prefillMessage: "Sono interessato a {{reference}}. Preparate un preventivo per la quantità stimata includendo MOQ, base del prezzo unitario, tempi di campionatura e produzione, personalizzazione e opzioni di conformità.",
+      contactInformation: "Informazioni di contatto",
+      emailUs: "Scrivici",
+      callUs: "Chiamaci",
+      visitUs: "Visita la sede",
+      successTitle: "Richiesta inviata con successo!",
+      sendAnother: "Invia un'altra richiesta",
+      productInterest: "Prodotto di interesse (facoltativo)",
+      productPlaceholder: "es. specchi LED da bagno o specchi da toeletta personalizzati",
+      messagePlaceholder: "Indica quantità stimata, dimensioni, funzioni, mercato di destinazione ed esigenze di personalizzazione.",
+      backupTitle: "Non riesci a inviare il modulo?",
+      backupText: "Scrivici o chiamaci direttamente e ti aiuteremo con la richiesta.",
+      emailDirectly: "Scrivici",
+      callDirectly: "Chiamaci",
+      emailSubject: "Richiesta preventivo specchi BOLEN",
+      emailSubjectProduct: "Richiesta preventivo: {{reference}}",
+      errors: {
+        nameRequired: "Il nome è obbligatorio",
+        emailRequired: "L'indirizzo e-mail è obbligatorio",
+        invalidEmail: "Indirizzo e-mail non valido",
+        messageRequired: "I dettagli della richiesta sono obbligatori"
+      }
     },
     blog: {
       metaTitle: "The BOLEN Journal | Approfondimenti su Specchi LED e Smart",

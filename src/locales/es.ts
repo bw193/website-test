@@ -11,7 +11,7 @@ export const es = {
       catalogTitle: "Catálogo de Productos de Espejos LED | Fabricante BOLEN Mirror",
       catalogDesc: "Explore nuestra amplia gama de espejos LED OEM, espejos inteligentes, espejos de tocador y espejos de baño de un fabricante líder de espejos LED. Fabricación de alta calidad para marcas globales.",
       storyTitle: "Nuestra Historia | Fabricante de Espejos LED BOLEN",
-      storyDesc: "Conozca la historia y la excelencia en fabricación de BOLEN (Jiaxing Chengtai Mirror Co., Ltd.), un fabricante líder de espejos LED desde 1995 especializado en espejos inteligentes OEM.",
+      storyDesc: "Conozca la historia y la capacidad de fabricación de BOLEN (Jiaxing Chengtai Mirror Co., Ltd.), fabricante de espejos LED e inteligentes OEM fundado en 2005.",
       rfqTitle: "Solicitud de Cotización | Fabricante de Espejos LED BOLEN",
       rfqDesc: "Contacte a BOLEN, un fabricante líder de espejos LED, para consultas OEM/ODM, fabricación de espejos personalizados y pedidos al por mayor."
     },
@@ -38,10 +38,10 @@ export const es = {
       title: "Nuestra Historia",
       subtitle: "Jiaxing Chengtai Mirror Co., Ltd.",
       paragraphs: [
-        "Con más de 20 años de experiencia dedicada a la fabricación de espejos (con orígenes que se remontan a 1995), Jiaxing Chengtai Mirror Co., Ltd. ha construido una reputación que va mucho más allá de cualquier canal de venta individual. Nuestro complejo de producción de más de 50.000 metros cuadrados, dos fábricas independientes y un equipo de más de 200 trabajadores cualificados nos brindan la capacidad y la flexibilidad para gestionar pedidos de prácticamente cualquier escala, desde proyectos boutique de diseño de interiores hasta grandes desarrollos hoteleros e inmobiliarios.",
+        "Con más de 20 años de experiencia dedicada a la fabricación de espejos desde 2005, Jiaxing Chengtai Mirror Co., Ltd. ha construido una reputación que va mucho más allá de cualquier canal de venta individual. Nuestro complejo de producción de 46.800 metros cuadrados, dos fábricas independientes y un equipo de más de 200 trabajadores cualificados nos brindan la capacidad y la flexibilidad para gestionar pedidos de prácticamente cualquier escala, desde proyectos boutique de diseño de interiores hasta grandes desarrollos hoteleros e inmobiliarios.",
         "Somos propietarios de todo el proceso de producción de forma interna. Desde el procesamiento del vidrio en bruto y la integración de LED hasta la fabricación de marcos y el ensamblaje de funciones inteligentes, cada etapa de la fabricación se gestiona bajo un mismo techo y es supervisada por inspectores de QA/QC dedicados. Esta integración vertical significa que controlamos la calidad en cada paso, eliminamos los retrasos de terceros y mantenemos plazos de entrega competitivos.",
         "Nuestros más de 200 estilos de productos en múltiples series principales no son plantillas estándar: representan años de iteración de diseño fundamentados tanto en las tendencias estéticas europeas como en los comentarios reales de los compradores. Para los clientes que necesitan algo único, nuestras capacidades OEM y ODM permiten la personalización completa de tamaño, forma, iluminación, funciones inteligentes, materiales y marca.",
-        "Respaldados por certificaciones internacionales que incluyen CE, RoHS e impermeabilización IP66, nuestros productos cumplen con los requisitos de conformidad de los mercados de Europa, Norteamérica, Oriente Medio y más allá. No solo fabricamos espejos: construimos asociaciones a largo plazo con importadores, distribuidores, diseñadores de interiores y promotores que exigen consistencia, precisión y un proveedor en el que puedan confiar año tras año."
+        "Respaldados por certificaciones internacionales como CE y RoHS, además de grados IP y certificaciones de mercado específicos para cada producto, nuestros productos pueden adaptarse a los requisitos de conformidad de Europa, Norteamérica, Oriente Medio y otros mercados. No solo fabricamos espejos: construimos asociaciones a largo plazo con importadores, distribuidores, diseñadores de interiores y promotores que exigen consistencia, precisión y un proveedor fiable."
       ]
     },
     home: {
@@ -49,8 +49,8 @@ export const es = {
       heroKicker: "Fabricante de espejos LED · Socio OEM/ODM",
       heroTitle1: "Espejos de alta gama,",
       heroTitle2: "hechos a medida para su marca.",
-      heroDesc: "Desde 2005, <1>BOLEN</1> ayuda a marcas de todo el mundo a llevar al mercado colecciones de espejos con identidad propia. Desde el diseño y la personalización hasta la producción con rigurosos controles de calidad y la entrega en todo el mundo, hacemos que la fabricación de alta gama sea sencilla, fiable y escalable.",
-      heroPrimaryCta: "Inicie su proyecto",
+      heroDesc: "<1>BOLEN</1> ayuda a marcas de todo el mundo a llevar al mercado colecciones de espejos con identidad propia. Desde el diseño y la personalización hasta la producción con rigurosos controles de calidad y la entrega en todo el mundo, hacemos que la fabricación de alta gama sea sencilla, fiable y escalable.",
+      heroPrimaryCta: "Solicitar precio y MOQ",
       heroSecondaryCta: "Explore nuestros productos",
       stats: {
         sqMeters: "Planta de producción",
@@ -97,7 +97,7 @@ export const es = {
       factoryShowcase: {
         subtitle: "Dentro de la Fábrica",
         title: "Donde Nace Cada Espejo",
-        desc: "Un recorrido por nuestra planta de 50.000 m² en Jiaxing: producción verticalmente integrada de espejos LED, inteligentes, de tocador y de baño, desde el vidrio crudo hasta el palé listo para enviar.",
+        desc: "Un recorrido por nuestra planta de 46.800 m² en Jiaxing: producción verticalmente integrada de espejos LED, inteligentes, de tocador y de baño, desde el vidrio crudo hasta el palé listo para enviar.",
         empty: "Fotos de la fábrica próximamente."
       },
       featuredVideo: {
@@ -165,6 +165,8 @@ export const es = {
       viewDetails: "Ver Detalles",
       searchLabel: "Buscar productos",
       searchPlaceholder: "Buscar productos...",
+      resultCount: "{{count}} productos encontrados",
+      showMore: "Mostrar más",
       allCategories: "Todas las Categorías",
       categories: {
         "New Arrival": "Novedades",
@@ -175,6 +177,8 @@ export const es = {
         "Irregular Mirror": "Espejo Irregular"
       },
       priceRange: "Rango de Precios",
+      priceRangeLabel: "Rango orientativo de fábrica",
+      priceQualifier: "El precio final depende de la cantidad y las especificaciones",
       msrp: "Precio de Venta Sugerido"
     },
     productDetail: {
@@ -190,8 +194,57 @@ export const es = {
       rfqSuccess: "¡RFQ enviado con éxito! Nos pondremos en contacto con usted pronto.",
       rfqError: "Error al enviar RFQ. Por favor, inténtelo de nuevo.",
       relatedVideos: "Videos relacionados",
+      description: "Descripción",
+      buyerSummary: "Espejos directos de fábrica para proyectos mayoristas y OEM/ODM. El precio se calcula según sus especificaciones; consulte MOQ, muestras, tamaños y funciones personalizados, certificaciones y plazo de producción.",
+      factoryQuoteCta: "Solicitar precio de fábrica",
+      quoteBasis: "Precio según especificación · Consulte MOQ, muestras y plazo de producción.",
+      productReference: "Referencia del producto",
+      rfqIntro: "Indíquenos la cantidad y las especificaciones. Confirmaremos precio de fábrica, MOQ, opciones de muestra y plazo de producción en un máximo de 24 horas.",
+      successTitle: "¡Consulta enviada correctamente!",
+      sendAnother: "Enviar otra consulta",
+      mobileFactoryPricing: "Precio de fábrica",
+      mobileQuoteMeta: "MOQ · Muestras · Plazo",
+      mobileQuoteLabel: "Acceso rápido al precio de fábrica",
+      inquiryPlaceholder: "Me interesa {{title}}. Cotice para la cantidad estimada e incluya MOQ, opciones de muestra y plazo de producción.",
+      notFound: "Producto no encontrado.",
+      previousImage: "Imagen anterior",
+      nextImage: "Imagen siguiente",
+      galleryView: "{{title}} — vista {{index}}",
+      premiumQuality: "Calidad superior",
+      globalShipping: "Envío mundial",
+      fastTurnaround: "Producción ágil",
+      oemAvailable: "OEM/ODM disponible",
       brandSuffix: "| BOLEN Mirror",
       descTemplate: "{title} de primera calidad, fabricado por BOLEN Mirror (Jiaxing Chengtai Mirror Co., Ltd.) — espejos LED, inteligentes, de tocador y de baño OEM/ODM. Solicite una cotización para precios al por mayor."
+    },
+    rfq: {
+      intro: "¿Busca precios al por mayor, pedidos personalizados o servicios OEM/ODM? Envíenos su consulta y nuestro equipo comercial responderá en un máximo de 24 horas.",
+      quoteIncludesTitle: "Su cotización incluirá",
+      quoteIncludesMoq: "MOQ y base del precio unitario",
+      quoteIncludesLeadTime: "Plazos de muestra y producción",
+      quoteIncludesOptions: "Opciones de personalización y conformidad para el mercado de destino",
+      prefillMessage: "Me interesa {{reference}}. Cotice para la cantidad estimada e incluya MOQ, base del precio unitario, plazos de muestra y producción, personalización y opciones de conformidad.",
+      contactInformation: "Información de contacto",
+      emailUs: "Enviar correo",
+      callUs: "Llamar",
+      visitUs: "Visítenos",
+      successTitle: "¡Consulta enviada correctamente!",
+      sendAnother: "Enviar otra consulta",
+      productInterest: "Producto de interés (opcional)",
+      productPlaceholder: "p. ej., espejos LED de baño o espejos de tocador personalizados",
+      messagePlaceholder: "Incluya cantidad estimada, dimensiones, funciones, mercado de destino y necesidades de personalización.",
+      backupTitle: "¿No puede enviar el formulario?",
+      backupText: "Escríbanos o llámenos directamente y le ayudaremos con su solicitud.",
+      emailDirectly: "Enviar correo",
+      callDirectly: "Llamar",
+      emailSubject: "Consulta sobre espejos BOLEN",
+      emailSubjectProduct: "Solicitud de cotización: {{reference}}",
+      errors: {
+        nameRequired: "El nombre es obligatorio",
+        emailRequired: "El correo electrónico es obligatorio",
+        invalidEmail: "Dirección de correo no válida",
+        messageRequired: "Los detalles de la consulta son obligatorios"
+      }
     },
     blog: {
       metaTitle: "The BOLEN Journal | Perspectivas sobre Espejos LED e Inteligentes",

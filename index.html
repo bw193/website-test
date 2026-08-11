@@ -44,6 +44,8 @@
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
+      // GA4 Enhanced Measurement handles browser-history page changes. The app
+      // only adds RFQ funnel events, avoiding duplicate SPA page views.
       gtag('config', 'G-LF1N3WBQXN', { send_page_view: true });
       (function(){
         function loadGA(){
@@ -52,7 +54,7 @@
           s.async=true;
           document.head.appendChild(s);
         }
-        if('requestIdleCallback' in window){requestIdleCallback(loadGA)}
+        if('requestIdleCallback' in window){requestIdleCallback(loadGA,{timeout:3000})}
         else{setTimeout(loadGA,3000)}
       })();
     </script>

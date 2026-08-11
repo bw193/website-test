@@ -1,8 +1,9 @@
 import { m, AnimatePresence } from 'motion/react';
 import React, { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import ProductCardSkeleton from '../components/ProductCardSkeleton';
-import { Loader2, Search, SlidersHorizontal, PackageX } from 'lucide-react';
+import { Search, PackageX } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import SEO from '../components/SEO';
 import { useCurrentLang } from '../hooks/useLocalizedPath';
@@ -33,6 +34,8 @@ const DEFAULT_CATEGORIES = [
   "Irregular Mirror"
 ];
 
+const PAGE_SIZE = 12;
+
 export default function Products() {
   const initialCatalog = readInitialCatalogData<Product>();
   const [products, setProducts] = useState<Product[]>(initialCatalog?.products ?? []);
@@ -43,9 +46,18 @@ export default function Products() {
   );
   const [loading, setLoading] = useState(initialCatalog === null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const searchQuery = searchParams.get('q') || '';
   const { t } = useTranslation();
   const lang = useCurrentLang();
+
+  const updateSearchQuery = (value: string) => {
+    const next = new URLSearchParams(searchParams);
+    if (value.trim()) next.set('q', value);
+    else next.delete('q');
+    setSearchParams(next, { replace: true });
+  };
 
   const normalizeCategory = (cat: string | undefined | null) => {
     if (!cat) return '';
@@ -111,6 +123,13 @@ export default function Products() {
                           (p.description && p.description.toLowerCase().includes(searchQuery.toLowerCase()));
     return matchesCategory && matchesSearch;
   });
+  const visibleProducts = filteredProducts.slice(0, visibleCount);
+
+  // A new search or filter starts at the first batch. All matching products
+  // remain reachable through the incremental Show more control below.
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [searchQuery, selectedCategory]);
 
   return (
     <div className="bg-stone-50 min-h-screen pb-24">
@@ -180,7 +199,7 @@ export default function Products() {
                 type="search"
                 placeholder={t('products.searchPlaceholder', 'Search products...')}
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => updateSearchQuery(e.target.value)}
                 className="block w-full pl-10 pr-3 py-3 border border-stone-200 rounded-xl leading-5 bg-stone-50 placeholder-stone-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors sm:text-sm"
               />
             </div>
@@ -220,6 +239,15 @@ export default function Products() {
           </div>
         </div>
 
+        {!loading && (
+          <p className="mb-6 text-sm font-medium text-stone-600" aria-live="polite">
+            {t('products.resultCount', {
+              count: filteredProducts.length,
+              defaultValue: '{{count}} products found',
+            })}
+          </p>
+        )}
+
         {/* Grid classes below must match the resolved grid exactly, or the
             layout shifts when loading finishes. */}
         {loading ? (
@@ -254,7 +282,7 @@ export default function Products() {
                   <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20">
                     <button
                       onClick={() => {
-                        setSearchQuery('');
+                        updateSearchQuery('');
                         setSelectedCategory(null);
                       }}
                       className="px-6 py-3 bg-stone-900/90 backdrop-blur-md text-white rounded-full text-sm font-medium hover:bg-stone-800 transition-colors shadow-xl border border-white/20 flex items-center gap-2"
@@ -279,7 +307,7 @@ export default function Products() {
                   }
                 }}
               >
-                {filteredProducts.map((product) => (
+                {visibleProducts.map((product) => (
                   <m.div
                     key={product.id}
                     variants={{
@@ -301,6 +329,21 @@ export default function Products() {
               </m.div>
             )}
           </AnimatePresence>
+        )}
+
+        {!loading && filteredProducts.length > visibleCount && (
+          <div className="mt-12 flex flex-col items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setVisibleCount((count) => count + PAGE_SIZE)}
+              className="rounded-full bg-stone-900 px-8 py-3 text-sm font-semibold text-white transition-colors hover:bg-stone-700 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
+            >
+              {t('products.showMore', 'Show more')}
+            </button>
+            <span className="text-xs text-stone-500">
+              {Math.min(visibleCount, filteredProducts.length)} / {filteredProducts.length}
+            </span>
+          </div>
         )}
       </div>
     </div>

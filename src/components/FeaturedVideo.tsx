@@ -7,7 +7,6 @@ import { useLocalizedPath } from '../hooks/useLocalizedPath';
 import { formatBlogDate } from '../utils/blog';
 import {
   FALLBACK_VIDEO_THUMB,
-  fetchMediaSize,
   formatVideoDuration,
   getVideoPlayback,
   planAmbientClip,
@@ -39,13 +38,11 @@ function connectionAllowsAmbient(): boolean {
  * `home_featured_video`) plays as a muted, looping cinematic backdrop behind the
  * section copy.
  *
- * Video is expensive, so it is gated hard: nothing is requested until the band
- * scrolls into view, and then only if motion is welcome and the connection isn't
- * metered. Rather than streaming whole files, the band loops a short window sized
- * to a byte budget (see planAmbientClip) — HTTP range requests mean a 12s excerpt
- * of a 130s tour costs ~2.4MB instead of 26MB. If even a short loop would bust
- * the budget, a drifting poster stands in. Playback pauses whenever the band
- * leaves the viewport, and the controls always offer pause + mute (WCAG 2.2.2).
+ * Nothing is requested until the band approaches the viewport. It then autoplays
+ * muted (the browser-safe autoplay path), using a short excerpt for long films.
+ * Reduced-motion and data-saver visitors still get the poster unless they opt in.
+ * Playback pauses whenever the band leaves the viewport, and the controls always
+ * offer pause + mute (WCAG 2.2.2).
  */
 export default function FeaturedVideo({ video }: { video: VideoListItem }) {
   const { t } = useTranslation();
@@ -82,28 +79,20 @@ export default function FeaturedVideo({ video }: { video: VideoListItem }) {
     return () => io.disconnect();
   }, []);
 
-  // Arm the backdrop the first time the band is approached, subject to the gates.
+  // Arm the backdrop immediately when the band is approached. File-size checks
+  // used to turn large editor-selected videos into a static poster, which made
+  // the homepage video appear broken. Loading remains bounded by viewport,
+  // reduced-motion, data-saver, and excerpting gates.
   useEffect(() => {
     if (!canAmbient || !inView || clip || ambientBlocked) return;
     if (prefersReducedMotion() || !connectionAllowsAmbient()) {
       setAmbientBlocked(true);
       return;
     }
-    let cancelled = false;
-    (async () => {
-      const bytes = await fetchMediaSize(playback.src);
-      if (cancelled) return;
-      const plan = planAmbientClip(bytes, video.duration_seconds);
-      if (!plan) {
-        setAmbientBlocked(true);
-        return;
-      }
-      setClip(plan);
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [canAmbient, inView, clip, ambientBlocked, playback.src, video.duration_seconds]);
+    setClip(
+      planAmbientClip(null, video.duration_seconds) ?? { start: 0, seconds: 0, full: true, bytes: null }
+    );
+  }, [canAmbient, inView, clip, ambientBlocked, video.duration_seconds]);
 
   /**
    * Seeking (and swapping src) rejects any pending play() with AbortError, which
@@ -206,6 +195,7 @@ export default function FeaturedVideo({ video }: { video: VideoListItem }) {
             // The media fragment makes the browser range-request just this window
             // instead of streaming from byte zero.
             src={clipEnd !== null ? `${playback.src}#t=${clip.start.toFixed(2)},${clipEnd.toFixed(2)}` : playback.src}
+            autoPlay
             muted={muted}
             loop={clipEnd === null}
             playsInline

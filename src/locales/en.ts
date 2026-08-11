@@ -11,7 +11,7 @@ export const en = {
       catalogTitle: "LED Mirror Products Catalog | BOLEN Mirror Manufacturer",
       catalogDesc: "Explore our wide range of OEM LED mirrors, smart mirrors, vanity mirrors, and bath mirrors from a leading LED mirror manufacturer. High-quality manufacturing for global brands.",
       storyTitle: "Our Story | BOLEN LED Mirror Manufacturer",
-      storyDesc: "Learn about the history and manufacturing excellence of BOLEN (Jiaxing Chengtai Mirror Co., Ltd.), a leading LED mirror manufacturer since 1995 specializing in OEM smart mirrors.",
+      storyDesc: "Learn about the history and manufacturing excellence of BOLEN (Jiaxing Chengtai Mirror Co., Ltd.), an LED mirror manufacturer established in 2005 and specializing in OEM smart mirrors.",
       rfqTitle: "Request for Quote | BOLEN LED Mirror Manufacturer",
       rfqDesc: "Contact BOLEN, a leading LED mirror manufacturer, for OEM/ODM inquiries, custom mirror manufacturing, and bulk orders."
     },
@@ -38,10 +38,10 @@ export const en = {
       title: "Our Story",
       subtitle: "Jiaxing Chengtai Mirror Co., Ltd.",
       paragraphs: [
-        "With over 20 years of dedicated experience in mirror manufacturing (tracing its roots back to 1995), Jiaxing Chengtai Mirror Co., Ltd. has built a reputation that goes far beyond any single sales channel. Our 50,000+ square meter production complex, two independent factories, and a team of over 200 skilled workers give us the capacity and flexibility to handle orders of virtually any scale — from boutique interior design projects to large-scale hotel and real estate developments.",
+        "With over 20 years of dedicated experience in mirror manufacturing since 2005, Jiaxing Chengtai Mirror Co., Ltd. has built a reputation that goes far beyond any single sales channel. Our 46,800 square meter production complex, two independent factories, and a team of over 200 skilled workers give us the capacity and flexibility to handle orders of virtually any scale — from boutique interior design projects to large-scale hotel and real estate developments.",
         "We own the entire production process in-house. From raw glass processing and LED integration to frame fabrication and smart feature assembly, every stage of manufacturing is handled under one roof and overseen by dedicated QA/QC inspectors. This vertical integration means we control quality at every step, eliminate third-party delays, and keep lead times competitive.",
         "Our 200+ product styles across multiple core series are not off-the-shelf templates — they represent years of design iteration informed by both European aesthetic trends and real-world buyer feedback. For clients who need something unique, our OEM and ODM capabilities allow full customization of size, shape, lighting, smart features, materials, and branding.",
-        "Backed by international certifications including CE, RoHS, and IP66 waterproofing, our products meet the compliance requirements of markets across Europe, North America, the Middle East, and beyond. We don't just manufacture mirrors — we build long-term partnerships with importers, distributors, interior designers, and developers who demand consistency, precision, and a supplier they can rely on year after year."
+        "Backed by international certifications including CE and RoHS, together with product-specific IP ratings and market certifications, our products are prepared for the compliance requirements of markets across Europe, North America, the Middle East, and beyond. We don't just manufacture mirrors — we build long-term partnerships with importers, distributors, interior designers, and developers who demand consistency, precision, and a supplier they can rely on year after year."
       ]
     },
     home: {
@@ -49,8 +49,8 @@ export const en = {
       heroKicker: "LED Mirror Manufacturer · OEM/ODM Partner",
       heroTitle1: "Premium Mirrors,",
       heroTitle2: "Built Around Your Brand.",
-      heroDesc: "Since 2005, <1>BOLEN</1> has helped global brands bring distinctive mirror collections to market. From design and customization to quality-controlled production and worldwide delivery, we make premium manufacturing simple, reliable, and scalable.",
-      heroPrimaryCta: "Start Your Project",
+      heroDesc: "<1>BOLEN</1> helps global brands bring distinctive mirror collections to market. From design and customization to quality-controlled production and worldwide delivery, we make premium manufacturing simple, reliable, and scalable.",
+      heroPrimaryCta: "Get Pricing & MOQ",
       heroSecondaryCta: "Explore Products",
       stats: {
         sqMeters: "Production Base",
@@ -97,7 +97,7 @@ export const en = {
       factoryShowcase: {
         subtitle: "Inside the Factory",
         title: "Where Every Mirror Is Made",
-        desc: "A look inside our 50,000 m² Jiaxing facility — vertically integrated LED, smart, vanity, and bath mirror production from raw glass to packed pallet.",
+        desc: "A look inside our 46,800 m² Jiaxing facility — vertically integrated LED, smart, vanity, and bath mirror production from raw glass to packed pallet.",
         empty: "Factory photos coming soon."
       },
       featuredVideo: {
@@ -165,6 +165,8 @@ export const en = {
       viewDetails: "View Details",
       searchLabel: "Search products",
       searchPlaceholder: "Search products...",
+      resultCount: "{{count}} products found",
+      showMore: "Show more",
       allCategories: "All Categories",
       categories: {
         "New Arrival": "New Arrival",
@@ -175,6 +177,8 @@ export const en = {
         "Irregular Mirror": "Irregular Mirror"
       },
       priceRange: "Price Range",
+      priceRangeLabel: "Indicative factory range",
+      priceQualifier: "Final pricing depends on quantity and specifications",
       msrp: "Suggested Retail Price"
     },
     productDetail: {
@@ -190,11 +194,60 @@ export const en = {
       rfqSuccess: "RFQ submitted successfully! We will contact you soon.",
       rfqError: "Failed to submit RFQ. Please try again.",
       relatedVideos: "Related videos",
+      description: "Description",
+      buyerSummary: "Factory-direct mirrors for wholesale and OEM/ODM projects. Pricing is prepared to your specifications—ask about MOQ, sample options, custom sizes and functions, certification needs, and production lead time.",
+      factoryQuoteCta: "Get factory quote",
+      quoteBasis: "Specification-based pricing · Ask about MOQ, samples and production lead time.",
+      productReference: "Product reference",
+      rfqIntro: "Tell us the quantity and specifications you need. We will confirm factory pricing, MOQ, sample options and production lead time within 24 hours.",
+      successTitle: "Inquiry sent successfully!",
+      sendAnother: "Send another inquiry",
+      mobileFactoryPricing: "Factory pricing",
+      mobileQuoteMeta: "MOQ · Samples · Lead time",
+      mobileQuoteLabel: "Factory quote shortcut",
+      inquiryPlaceholder: "I'm interested in {{title}}. Please quote the estimated quantity and include MOQ, sample options and production lead time.",
+      notFound: "Product not found.",
+      previousImage: "Previous image",
+      nextImage: "Next image",
+      galleryView: "{{title}} — view {{index}}",
+      premiumQuality: "Premium quality",
+      globalShipping: "Global shipping",
+      fastTurnaround: "Fast turnaround",
+      oemAvailable: "OEM/ODM available",
       // SEO. brandSuffix is appended to every product <title>; descTemplate is
       // the last-resort <meta description> when a product has no `details`.
       // Keep {title} in place — it is substituted with the localized title.
       brandSuffix: "| BOLEN Mirror",
       descTemplate: "Premium {title} by BOLEN Mirror (Jiaxing Chengtai Mirror Co., Ltd.) — OEM/ODM LED, smart, vanity, and bath mirrors. Request a quote for bulk pricing."
+    },
+    rfq: {
+      intro: "Interested in wholesale pricing, custom orders, or OEM/ODM services? Send us an inquiry and our sales team will respond within 24 hours.",
+      quoteIncludesTitle: "Your quote will include",
+      quoteIncludesMoq: "MOQ and unit-price basis",
+      quoteIncludesLeadTime: "Sample and production lead times",
+      quoteIncludesOptions: "Customization and target-market compliance options",
+      prefillMessage: "I'm interested in {{reference}}. Please quote for the estimated quantity and include MOQ, unit-price basis, sample and production lead times, customization, and compliance options.",
+      contactInformation: "Contact information",
+      emailUs: "Email us",
+      callUs: "Call us",
+      visitUs: "Visit us",
+      successTitle: "Inquiry sent successfully!",
+      sendAnother: "Send another inquiry",
+      productInterest: "Product of interest (optional)",
+      productPlaceholder: "e.g. LED bathroom mirrors or custom vanity mirrors",
+      messagePlaceholder: "Please include estimated quantity, dimensions, features, target market, and any customization needs.",
+      backupTitle: "Can't send the form?",
+      backupText: "Email or call us directly and we will help with your request.",
+      emailDirectly: "Email us",
+      callDirectly: "Call us",
+      emailSubject: "BOLEN mirror RFQ",
+      emailSubjectProduct: "RFQ: {{reference}}",
+      errors: {
+        nameRequired: "Name is required",
+        emailRequired: "Email is required",
+        invalidEmail: "Invalid email address",
+        messageRequired: "Message is required"
+      }
     },
     blog: {
       metaTitle: "The BOLEN Journal | LED & Smart Mirror Insights",

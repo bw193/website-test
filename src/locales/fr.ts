@@ -11,7 +11,7 @@ export const fr = {
       catalogTitle: "Catalogue de Produits Miroirs LED | Fabricant BOLEN Mirror",
       catalogDesc: "Explorez notre large gamme de miroirs LED OEM, miroirs intelligents, miroirs de toilette et miroirs de salle de bain d'un fabricant leader de miroirs LED. Fabrication de haute qualité pour les marques mondiales.",
       storyTitle: "Notre Histoire | Fabricant de Miroirs LED BOLEN",
-      storyDesc: "Découvrez l'histoire et l'excellence de fabrication de BOLEN (Jiaxing Chengtai Mirror Co., Ltd.), un fabricant leader de miroirs LED depuis 1995 spécialisé dans les miroirs intelligents OEM.",
+      storyDesc: "Découvrez l'histoire et le savoir-faire de BOLEN (Jiaxing Chengtai Mirror Co., Ltd.), fabricant de miroirs LED et intelligents OEM fondé en 2005.",
       rfqTitle: "Demande de Devis | Fabricant de Miroirs LED BOLEN",
       rfqDesc: "Contactez BOLEN, un fabricant leader de miroirs LED, pour les demandes OEM/ODM, la fabrication de miroirs personnalisés et les commandes en gros."
     },
@@ -38,10 +38,10 @@ export const fr = {
       title: "Notre Histoire",
       subtitle: "Jiaxing Chengtai Mirror Co., Ltd.",
       paragraphs: [
-        "Avec plus de 20 ans d'expérience dédiée à la fabrication de miroirs (dont les origines remontent à 1995), Jiaxing Chengtai Mirror Co., Ltd. s'est forgé une réputation qui dépasse largement tout canal de vente unique. Notre complexe de production de plus de 50 000 mètres carrés, deux usines indépendantes et une équipe de plus de 200 ouvriers qualifiés nous donnent la capacité et la flexibilité de gérer des commandes de pratiquement toute envergure, des projets de design d'intérieur de boutique aux grands développements hôteliers et immobiliers.",
+        "Avec plus de 20 ans d'expérience dédiée à la fabrication de miroirs depuis 2005, Jiaxing Chengtai Mirror Co., Ltd. s'est forgé une réputation qui dépasse largement tout canal de vente unique. Notre complexe de production de 46 800 mètres carrés, deux usines indépendantes et une équipe de plus de 200 ouvriers qualifiés nous donnent la capacité et la flexibilité de gérer des commandes de pratiquement toute envergure, des projets de design d'intérieur de boutique aux grands développements hôteliers et immobiliers.",
         "Nous maîtrisons l'intégralité du processus de production en interne. Du traitement du verre brut et de l'intégration des LED à la fabrication des cadres et à l'assemblage des fonctions intelligentes, chaque étape de la fabrication est gérée sous un même toit et supervisée par des inspecteurs QA/QC dédiés. Cette intégration verticale signifie que nous contrôlons la qualité à chaque étape, éliminons les retards liés aux tiers et maintenons des délais de livraison compétitifs.",
         "Nos plus de 200 styles de produits répartis sur plusieurs séries principales ne sont pas des modèles standards : ils représentent des années d'itération de conception nourries à la fois par les tendances esthétiques européennes et par les retours réels des acheteurs. Pour les clients qui ont besoin de quelque chose d'unique, nos capacités OEM et ODM permettent une personnalisation complète de la taille, de la forme, de l'éclairage, des fonctions intelligentes, des matériaux et de la marque.",
-        "Soutenus par des certifications internationales telles que CE, RoHS et l'étanchéité IP66, nos produits répondent aux exigences de conformité des marchés d'Europe, d'Amérique du Nord, du Moyen-Orient et au-delà. Nous ne fabriquons pas seulement des miroirs : nous construisons des partenariats à long terme avec des importateurs, des distributeurs, des architectes d'intérieur et des promoteurs qui exigent constance, précision et un fournisseur sur lequel ils peuvent compter année après année."
+        "Soutenus par des certifications internationales telles que CE et RoHS, ainsi que par des indices IP et des certifications de marché propres à chaque produit, nos produits peuvent être adaptés aux exigences de conformité de l'Europe, de l'Amérique du Nord, du Moyen-Orient et d'autres marchés. Nous ne fabriquons pas seulement des miroirs : nous construisons des partenariats à long terme avec des importateurs, des distributeurs, des architectes d'intérieur et des promoteurs qui exigent constance, précision et fiabilité."
       ]
     },
     home: {
@@ -49,8 +49,8 @@ export const fr = {
       heroKicker: "Fabricant de miroirs LED · Partenaire OEM/ODM",
       heroTitle1: "Des miroirs haut de gamme,",
       heroTitle2: "conçus sur mesure pour votre marque.",
-      heroDesc: "Depuis 2005, <1>BOLEN</1> accompagne des marques du monde entier dans la commercialisation de collections de miroirs distinctives. De la conception et de la personnalisation à la production soumise à un contrôle qualité rigoureux et à la livraison mondiale, nous rendons la fabrication haut de gamme simple, fiable et adaptée à tous les volumes.",
-      heroPrimaryCta: "Lancer votre projet",
+      heroDesc: "<1>BOLEN</1> accompagne des marques du monde entier dans la commercialisation de collections de miroirs distinctives. De la conception et de la personnalisation à la production soumise à un contrôle qualité rigoureux et à la livraison mondiale, nous rendons la fabrication haut de gamme simple, fiable et adaptée à tous les volumes.",
+      heroPrimaryCta: "Demander prix et MOQ",
       heroSecondaryCta: "Découvrir nos produits",
       stats: {
         sqMeters: "Site de production",
@@ -97,7 +97,7 @@ export const fr = {
       factoryShowcase: {
         subtitle: "À l'Intérieur de l'Usine",
         title: "Là Où Naît Chaque Miroir",
-        desc: "Visite de notre site de 50 000 m² à Jiaxing — production verticalement intégrée de miroirs LED, intelligents, de toilette et de salle de bain, du verre brut à la palette prête à expédier.",
+        desc: "Visite de notre site de 46 800 m² à Jiaxing — production verticalement intégrée de miroirs LED, intelligents, de toilette et de salle de bain, du verre brut à la palette prête à expédier.",
         empty: "Photos de l'usine bientôt disponibles."
       },
       featuredVideo: {
@@ -165,6 +165,8 @@ export const fr = {
       viewDetails: "Voir les Détails",
       searchLabel: "Rechercher des produits",
       searchPlaceholder: "Rechercher des produits...",
+      resultCount: "{{count}} produits trouvés",
+      showMore: "Afficher plus",
       allCategories: "Toutes les Catégories",
       categories: {
         "New Arrival": "Nouveautés",
@@ -175,6 +177,8 @@ export const fr = {
         "Irregular Mirror": "Miroir Irrégulier"
       },
       priceRange: "Gamme de Prix",
+      priceRangeLabel: "Fourchette indicative usine",
+      priceQualifier: "Le prix final dépend de la quantité et des spécifications",
       msrp: "Prix de Vente Conseillé"
     },
     productDetail: {
@@ -190,8 +194,57 @@ export const fr = {
       rfqSuccess: "RFQ soumis avec succès ! Nous vous contacterons bientôt.",
       rfqError: "Échec de la soumission du RFQ. Veuillez réessayer.",
       relatedVideos: "Vidéos associées",
+      description: "Description",
+      buyerSummary: "Miroirs en direct d'usine pour projets de gros et OEM/ODM. Le prix est calculé selon vos spécifications : demandez le MOQ, les échantillons, les dimensions et fonctions sur mesure, les certifications et le délai de production.",
+      factoryQuoteCta: "Demander un prix usine",
+      quoteBasis: "Prix selon spécifications · Demandez le MOQ, les échantillons et le délai de production.",
+      productReference: "Référence produit",
+      rfqIntro: "Indiquez-nous la quantité et les spécifications souhaitées. Nous confirmerons le prix usine, le MOQ, les options d'échantillon et le délai de production sous 24 heures.",
+      successTitle: "Demande envoyée avec succès !",
+      sendAnother: "Envoyer une autre demande",
+      mobileFactoryPricing: "Prix usine",
+      mobileQuoteMeta: "MOQ · Échantillons · Délai",
+      mobileQuoteLabel: "Accès rapide au devis usine",
+      inquiryPlaceholder: "Je suis intéressé par {{title}}. Merci d'établir un devis pour la quantité estimée et d'indiquer le MOQ, les options d'échantillon et le délai de production.",
+      notFound: "Produit introuvable.",
+      previousImage: "Image précédente",
+      nextImage: "Image suivante",
+      galleryView: "{{title}} — vue {{index}}",
+      premiumQuality: "Qualité premium",
+      globalShipping: "Expédition mondiale",
+      fastTurnaround: "Production rapide",
+      oemAvailable: "OEM/ODM disponible",
       brandSuffix: "| BOLEN Mirror",
       descTemplate: "{title} haut de gamme, fabriqué par BOLEN Mirror (Jiaxing Chengtai Mirror Co., Ltd.) — miroirs LED, intelligents, de toilette et de salle de bain OEM/ODM. Demandez un devis pour les tarifs en gros."
+    },
+    rfq: {
+      intro: "Vous recherchez des tarifs de gros, une commande sur mesure ou des services OEM/ODM ? Envoyez-nous votre demande ; notre équipe commerciale répondra sous 24 heures.",
+      quoteIncludesTitle: "Votre devis comprendra",
+      quoteIncludesMoq: "MOQ et base du prix unitaire",
+      quoteIncludesLeadTime: "Délais d'échantillon et de production",
+      quoteIncludesOptions: "Options de personnalisation et de conformité au marché cible",
+      prefillMessage: "Je suis intéressé par {{reference}}. Merci d'établir un devis pour la quantité estimée et d'indiquer le MOQ, la base du prix unitaire, les délais d'échantillon et de production, ainsi que les options de personnalisation et de conformité.",
+      contactInformation: "Coordonnées",
+      emailUs: "Nous écrire",
+      callUs: "Nous appeler",
+      visitUs: "Nous rendre visite",
+      successTitle: "Demande envoyée avec succès !",
+      sendAnother: "Envoyer une autre demande",
+      productInterest: "Produit recherché (facultatif)",
+      productPlaceholder: "p. ex. miroirs LED de salle de bain ou miroirs de toilette sur mesure",
+      messagePlaceholder: "Indiquez la quantité estimée, les dimensions, les fonctions, le marché cible et les besoins de personnalisation.",
+      backupTitle: "Impossible d'envoyer le formulaire ?",
+      backupText: "Écrivez-nous ou appelez-nous directement ; nous vous aiderons dans votre demande.",
+      emailDirectly: "Nous écrire",
+      callDirectly: "Nous appeler",
+      emailSubject: "Demande de devis miroirs BOLEN",
+      emailSubjectProduct: "Demande de devis : {{reference}}",
+      errors: {
+        nameRequired: "Le nom est obligatoire",
+        emailRequired: "L'adresse e-mail est obligatoire",
+        invalidEmail: "Adresse e-mail non valide",
+        messageRequired: "Les détails de la demande sont obligatoires"
+      }
     },
     blog: {
       metaTitle: "The BOLEN Journal | Perspectives sur les Miroirs LED et Intelligents",

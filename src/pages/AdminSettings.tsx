@@ -534,9 +534,9 @@ NOTIFY pgrst, 'reload schema';`}
             Save Settings below.
           </p>
           <p className="text-sm text-stone-500 mb-6">
-            The video autoplays silently as the section background. Long or heavy files aren't streamed whole — the
-            homepage loops a short excerpt sized to keep the download small, and falls back to a still image only
-            when even a brief loop would be too heavy.
+            The video autoplays silently when the section approaches the viewport. Long films loop a short excerpt;
+            large files still autoplay but are flagged below so they can be optimized before publishing. Visitors
+            using data saver or reduced motion keep the poster until they press play.
           </p>
 
           {videosLoading ? (
@@ -625,26 +625,29 @@ NOTIFY pgrst, 'reload schema';`}
                         )}
                       </p>
                       {option.bytes !== null && (() => {
-                        const plan = planAmbientClip(option.bytes, option.duration_seconds);
-                        const label = !plan
-                          ? 'still image only'
-                          : plan.full
-                            ? 'autoplays in full'
-                            : `loops a ${Math.round(plan.seconds)}s excerpt${
-                                plan.bytes ? ` (~${formatMediaSize(plan.bytes)})` : ''
-                              }`;
+                        const budgetPlan = planAmbientClip(option.bytes, option.duration_seconds);
+                        const autoplayPlan =
+                          budgetPlan ??
+                          planAmbientClip(null, option.duration_seconds) ??
+                          { start: 0, seconds: 0, full: true, bytes: null };
+                        const isLargeFile = !budgetPlan;
+                        const label = autoplayPlan.full
+                          ? 'autoplays in full'
+                          : `loops a ${Math.round(autoplayPlan.seconds)}s excerpt${
+                              autoplayPlan.bytes ? ` (~${formatMediaSize(autoplayPlan.bytes)})` : ''
+                            }`;
                         return (
                           <p
                             className={`mt-2 inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[11px] font-semibold ${
-                              plan ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'
+                              isLargeFile ? 'bg-amber-50 text-amber-700' : 'bg-emerald-50 text-emerald-700'
                             }`}
                           >
-                            {plan ? (
-                              <Zap className="h-3 w-3 shrink-0" />
-                            ) : (
+                            {isLargeFile ? (
                               <AlertTriangle className="h-3 w-3 shrink-0" />
+                            ) : (
+                              <Zap className="h-3 w-3 shrink-0" />
                             )}
-                            {formatMediaSize(option.bytes)} — {label}
+                            {formatMediaSize(option.bytes)} — {label}{isLargeFile ? ' (large file)' : ''}
                           </p>
                         );
                       })()}

@@ -10,6 +10,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ScrollToTop from './components/ScrollToTop';
 import LanguageLayout from './components/LanguageLayout';
+import AnalyticsTracker from './components/AnalyticsTracker';
 import { hasSupabaseConfig } from './supabaseConfig';
 import Home from './pages/Home';
 
@@ -53,6 +54,7 @@ export default function App() {
   return (
       <Router>
         <ScrollToTop />
+        <AnalyticsTracker />
         <div className="min-h-screen flex flex-col font-sans text-gray-900 bg-gray-50">
           <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100] focus:bg-amber-500 focus:text-white focus:px-4 focus:py-2 focus:rounded-md focus:text-sm focus:font-medium">
             {t('accessibility.skipToContent', 'Skip to content')}
