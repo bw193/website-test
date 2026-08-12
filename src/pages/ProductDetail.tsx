@@ -101,10 +101,6 @@ export default function ProductDetail() {
     let cancelled = false;
     const fetchProduct = async () => {
       if (!routeSlug && !legacyId) return;
-      if (initialProduct) {
-        setLoading(false);
-        return;
-      }
       try {
         const { supabase } = await import('../supabase');
         // Fast path: a legacy URL gives the id outright, and a prerendered
@@ -125,7 +121,7 @@ export default function ProductDetail() {
           if (error) throw error;
           resolved = (data as Product[] | null)?.find((p) => toSlug(p.title) === routeSlug) ?? null;
         }
-        if (!cancelled && resolved) setProduct(resolved);
+        if (!cancelled) setProduct(resolved);
       } catch (error) {
         console.error("Error fetching product", error);
       } finally {

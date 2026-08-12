@@ -95,10 +95,7 @@ export default function Home() {
   };
 
   useEffect(() => {
-    // Prerender data island already seeded state synchronously — skip the
-    // Supabase round-trip on production builds.
-    if (initialData) return;
-
+    let cancelled = false;
     const fetchSettings = async () => {
       try {
         const { supabase } = await import('../supabase');
@@ -115,17 +112,17 @@ export default function Home() {
             if (Array.isArray(parsed) && parsed.length > 0) {
               const filtered = parsed.filter(url => !url.includes('building.jpg'));
               if (filtered.length > 0) {
-                setHeroBgs(filtered);
+                if (!cancelled) setHeroBgs(filtered);
               }
             } else if (typeof data.value === 'string' && data.value.length > 0 && !data.value.startsWith('[')) {
               if (!data.value.includes('building.jpg')) {
-                setHeroBgs([data.value]);
+                if (!cancelled) setHeroBgs([data.value]);
               }
             }
           } catch (e) {
             if (typeof data.value === 'string' && data.value.length > 0) {
               if (!data.value.includes('building.jpg')) {
-                setHeroBgs([data.value]);
+                if (!cancelled) setHeroBgs([data.value]);
               }
             }
           }
@@ -142,7 +139,7 @@ export default function Home() {
           try {
             const parsed = JSON.parse(settingsData.value);
             if (Array.isArray(parsed) && parsed.length > 0) {
-              setCategories(parsed);
+              if (!cancelled) setCategories(parsed);
             }
           } catch (e) {
             console.error("Error parsing categories", e);
@@ -156,16 +153,19 @@ export default function Home() {
           .order('created_at', { ascending: false });
 
         if (!productsError && productsData) {
-          setAllProducts(productsData);
+          if (!cancelled) setAllProducts(productsData);
         }
       } catch (err) {
         // Ignore errors if table doesn't exist or setting not found
         console.error("Could not fetch data:", err);
       } finally {
-        setIsLoading(false);
+        if (!cancelled) setIsLoading(false);
       }
     };
     fetchSettings();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // The factory gallery and the featured video are editor-managed and expected

@@ -8,7 +8,6 @@ import { useTranslation } from 'react-i18next';
 import SEO from '../components/SEO';
 import { useCurrentLang } from '../hooks/useLocalizedPath';
 import { readInitialCatalogData } from '../utils/prerenderData';
-import { runWhenIdle } from '../utils/idle';
 
 interface Product {
   id: string;
@@ -102,14 +101,6 @@ export default function Products() {
         if (active) setLoading(false);
       }
     };
-
-    if (initialCatalog) {
-      const cancel = runWhenIdle(fetchData, 2500);
-      return () => {
-        active = false;
-        cancel();
-      };
-    }
 
     fetchData();
     return () => {
