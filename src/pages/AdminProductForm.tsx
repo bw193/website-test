@@ -226,7 +226,7 @@ export default function AdminProductForm() {
           });
         if (error) throw error;
       }
-      navigate('/admin');
+      navigate('/admin?tab=products');
     } catch (error) {
       console.error("Error saving product", error);
       alert(t('admin.productForm.alerts.saveFailed'));
@@ -237,22 +237,21 @@ export default function AdminProductForm() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-stone-50 flex items-center justify-center">
+      <div className="flex items-center justify-center py-24">
         <Loader2 className="h-8 w-8 text-stone-900 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-stone-50 pb-24">
+    <div className="pb-16">
       <SEO title="Admin Product Form | BOLEN Mirror" noindex={true} />
-      {/* Header */}
-      <header className="bg-white border-b border-stone-200 sticky top-0 z-30">
+      <header className="sticky top-0 z-20 border-b border-stone-200 bg-white/95 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
             <div className="flex items-center gap-4">
               <button 
-                onClick={() => navigate('/admin')} 
+                onClick={() => navigate('/admin?tab=products')} 
                 className="p-2 -ml-2 text-stone-400 hover:text-stone-900 hover:bg-stone-100 rounded-lg transition-colors"
                 title="Back to Dashboard"
               >
@@ -265,7 +264,7 @@ export default function AdminProductForm() {
             <div className="flex items-center gap-3">
               <button 
                 type="button" 
-                onClick={() => navigate('/admin')} 
+                onClick={() => navigate('/admin?tab=products')} 
                 className="px-4 py-2 text-sm font-medium text-stone-700 bg-white border border-stone-300 rounded-xl shadow-sm hover:bg-stone-50 transition-colors"
               >
                 {t('admin.productForm.cancel')}

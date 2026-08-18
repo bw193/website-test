@@ -18,7 +18,7 @@ export interface FactoryGalleryItem {
 }
 
 interface PrerenderPayload {
-  route?: 'home' | 'catalog' | 'productDetail' | 'blog' | 'blogPost' | 'videos' | 'videoPost';
+  route?: 'home' | 'catalog' | 'productDetail' | 'blog' | 'blogPost' | 'videos' | 'videoPost' | 'seoLanding';
   lang?: string;
   products?: unknown[];
   product?: { id?: string; title?: string } & Record<string, unknown>;
@@ -48,6 +48,7 @@ interface PrerenderPayload {
   blogPost?: LocalizedBlogPost;
   videoPosts?: VideoListItem[];
   videoPost?: LocalizedVideoPost;
+  landingSlug?: string;
 }
 
 let cache: PrerenderPayload | null | undefined;
@@ -153,4 +154,10 @@ export function readInitialVideoPost(slug: string): LocalizedVideoPost | null {
   const data = getPrerenderData();
   if (data?.route !== 'videoPost' || !data.videoPost) return null;
   return data.videoPost.slug === slug ? data.videoPost : null;
+}
+
+export function readInitialSeoLandingData<T>(slug: string): { products: T[]; lang?: string } | null {
+  const data = getPrerenderData();
+  if (data?.route !== 'seoLanding' || data.landingSlug !== slug || !Array.isArray(data.products)) return null;
+  return { products: data.products as T[], lang: data.lang };
 }

@@ -3,6 +3,7 @@ import { createServer as createViteServer } from 'vite';
 import path from 'path';
 import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
+import { SEO_LANDING_PAGES } from './src/data/seoLandingPages';
 
 dotenv.config();
 
@@ -29,12 +30,21 @@ async function startServer() {
   const LANGUAGES = ['en', 'zh', 'es', 'fr', 'de', 'it'];
   const DOMAIN = 'https://bolenmirror.com';
 
-  function buildUrlEntry(pagePath: string, lastmod: string, changefreq: string, priority: string, lang: string): string {
+  function buildUrlEntry(
+    pagePath: string,
+    lastmod: string,
+    changefreq: string,
+    priority: string,
+    lang: string,
+    alternateLanguages: readonly string[] = LANGUAGES
+  ): string {
     const slug = pagePath === '/' ? '' : pagePath.replace(/\/+$/, '');
-    const hreflangs = LANGUAGES.map(
+    const hreflangs = alternateLanguages.map(
       (l) => `    <xhtml:link rel="alternate" hreflang="${l}" href="${DOMAIN}/${l}${slug}/" />`
     ).join('\n');
-    const xDefault = `    <xhtml:link rel="alternate" hreflang="x-default" href="${DOMAIN}/en${slug}/" />`;
+    const xDefault = alternateLanguages.includes('en')
+      ? `    <xhtml:link rel="alternate" hreflang="x-default" href="${DOMAIN}/en${slug}/" />`
+      : '';
     return `  <url>
     <loc>${DOMAIN}/${lang}${slug}/</loc>
     <lastmod>${lastmod}</lastmod>
@@ -96,11 +106,19 @@ ${xDefault}
       return { loc: `/videos/${post.slug}`, changefreq: 'monthly', priority: '0.7', lastmod };
     });
 
-    const allPages = [...staticPages, ...productPages, ...blogPostPages, ...videoPostPages];
+    const solutionPages = [
+      { loc: '/solutions', changefreq: 'monthly', priority: '0.9', lastmod: today },
+      ...SEO_LANDING_PAGES.map((page) => ({
+        loc: `/solutions/${page.slug}`,
+        changefreq: 'monthly',
+        priority: '0.9',
+        lastmod: today,
+      })),
+    ];
+    const allPages = [...staticPages, ...solutionPages, ...productPages, ...blogPostPages, ...videoPostPages];
     const urls = LANGUAGES.flatMap((lang) =>
       allPages.map((p) => buildUrlEntry(p.loc, p.lastmod, p.changefreq, p.priority, lang))
     );
-
     return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
 ${urls.join('\n')}
@@ -129,6 +147,8 @@ ${urls.join('\n')}
   app.get('/rfq', (req, res) => res.redirect(301, '/en/rfq/'));
   app.get('/videos', (req, res) => res.redirect(301, '/en/videos/'));
   app.get('/videos/*', (req, res) => res.redirect(301, `/en${req.path.replace(/\/+$/, '')}/`));
+  app.get('/solutions', (req, res) => res.redirect(301, '/en/solutions/'));
+  app.get('/solutions/*', (req, res) => res.redirect(301, `/en${req.path.replace(/\/+$/, '')}/`));
 
   // Vite middleware for development
   if (process.env.NODE_ENV !== 'production') {

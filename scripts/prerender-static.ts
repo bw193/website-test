@@ -35,6 +35,7 @@ import {
 import { optimizeImage } from '../src/utils/optimizeImage';
 import {
   buildProductDescription,
+  buildProductBuyerSummary,
   buildProductSeoTitle,
   normalizeSpecs,
 } from '../src/utils/productSeo';
@@ -44,6 +45,21 @@ import { es as esLocale } from '../src/locales/es';
 import { fr as frLocale } from '../src/locales/fr';
 import { de as deLocale } from '../src/locales/de';
 import { it as itLocale } from '../src/locales/it';
+import {
+  matchesSeoLandingProduct,
+  scoreSeoLandingProduct,
+  SEO_LANDING_BY_SLUG,
+  SEO_LANDING_GROUPS,
+  HOME_SOLUTION_SLUGS,
+  recommendSolutionsForProduct,
+  type SeoLandingPage,
+} from '../src/data/seoLandingPages';
+import {
+  getLocalizedSeoLandingPages,
+  getSeoLandingProductCardCopy,
+  getSeoSolutionsUi,
+  localizeSeoLandingPage,
+} from '../src/data/seoLandingI18n';
 
 // Single source of truth for the four static routes' <title>/<meta description>.
 // The React pages read the same keys via t('seo.*'), so what gets baked into the
@@ -81,6 +97,8 @@ type Lang = (typeof LANGUAGES)[number];
 
 const DEFAULT_OG_IMAGE =
   'https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-images/site-assets/1773994889396-9i4t1ap.jpg';
+const FACTORY_OG_IMAGE =
+  'https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/factory1.jpg';
 
 interface Product {
   id: string;
@@ -92,6 +110,8 @@ interface Product {
   msrp?: string;
   details?: string;
   specifications?: unknown;
+  buyer_summary?: string;
+  display_title?: string;
 }
 
 // Per-language copy. Kept in this file (not src/locales) so the prerender
@@ -409,15 +429,17 @@ function localizeProduct(product: Product, tr: LangTranslations | undefined): Pr
 // causing duplicates (two canonicals, 14 hreflangs, etc).
 const RH = 'data-rh="true"';
 
-function hreflangBlock(routePath: string): string {
+function hreflangBlock(routePath: string, languages: readonly string[] = LANGUAGES): string {
   // Trailing slash matches Cloudflare Pages directory-style URLs (it serves
   // dist/en/products/index.html as /en/products/). Keeping canonical and
   // hreflang URLs aligned with the served URL avoids Google picking a
   // different canonical and dropping URLs from the index.
   const suffix = routePath === '/' ? '' : routePath;
   return [
-    ...LANGUAGES.map((l) => `<link ${RH} rel="alternate" hreflang="${l}" href="${SITE_URL}/${l}${suffix}/" />`),
-    `<link ${RH} rel="alternate" hreflang="x-default" href="${SITE_URL}/en${suffix}/" />`,
+    ...languages.map((l) => `<link ${RH} rel="alternate" hreflang="${l}" href="${SITE_URL}/${l}${suffix}/" />`),
+    ...(languages.includes('en')
+      ? [`<link ${RH} rel="alternate" hreflang="x-default" href="${SITE_URL}/en${suffix}/" />`]
+      : []),
   ].join('\n    ');
 }
 
@@ -473,15 +495,26 @@ function buildHead(opts: {
   ogType?: string;
   routePath: string;
   schema?: any[];
+  alternateLanguages?: readonly string[];
 }): string {
-  const { lang, title, description, canonical, ogImage, ogType = 'website', routePath, schema = [] } = opts;
+  const {
+    lang,
+    title,
+    description,
+    canonical,
+    ogImage,
+    ogType = 'website',
+    routePath,
+    schema = [],
+    alternateLanguages = LANGUAGES,
+  } = opts;
   return [
     // <title> is updated by Helmet via document.title (not appended), so it
     // doesn't need a data-rh marker.
     `<title>${escapeHtml(title)}</title>`,
     `<meta ${RH} name="description" content="${escapeAttr(description)}" />`,
     `<link ${RH} rel="canonical" href="${escapeAttr(canonical)}" />`,
-    hreflangBlock(routePath),
+    hreflangBlock(routePath, alternateLanguages),
     ogTwitterBlock(canonical, title, description, ogImage, ogType),
     schemaBlock(schema),
   ]
@@ -709,6 +742,20 @@ function homeContent(
       </div>
       `
     : '';
+  const solutionPages = getLocalizedSeoLandingPages(lang);
+  const solutionsUi = getSeoSolutionsUi(lang);
+  const solutionLinks = `<section aria-labelledby="manufacturing-solutions-title">
+          <h2 id="manufacturing-solutions-title">${escapeHtml(solutionsUi.homeHeading)}</h2>
+          <p>${escapeHtml(solutionsUi.homeIntro)}</p>
+          <ul>
+            ${HOME_SOLUTION_SLUGS.map((slug) => solutionPages.find((page) => page.slug === slug))
+              .filter((page): page is SeoLandingPage => Boolean(page))
+              .map(
+                (page) =>
+                  `<li><a href="/${lang}/solutions/${escapeAttr(page.slug)}/"><strong>${escapeHtml(page.shortTitle || page.h1)}</strong></a> — ${escapeHtml(page.blurb || page.description)}</li>`
+              ).join('\n            ')}
+          </ul>
+        </section>`;
   return `
     <div data-prerender="home">
       ${heroBlock}<h1>${escapeHtml(c.homeH1)}</h1>
@@ -718,8 +765,100 @@ function homeContent(
         <a href="/${lang}/our-story/">${escapeHtml(c.navStory)}</a>
         <a href="/${lang}/rfq/">${escapeHtml(c.navRfq)}</a>
       </nav>
+      ${solutionLinks}
       ${featuredVideoBlock(lang, featuredVideo)}
       ${factoryGalleryBlock(lang, gallery)}
+    </div>
+  `.trim();
+}
+
+function seoSolutionsContent(lang: Lang): string {
+  const pages = getLocalizedSeoLandingPages(lang);
+  const ui = getSeoSolutionsUi(lang);
+  const groups = SEO_LANDING_GROUPS.map((group) => {
+    const copy = ui.hubGroups[group.id];
+    const links = group.slugs
+      .map((slug) => pages.find((page) => page.slug === slug))
+      .filter((page): page is SeoLandingPage => Boolean(page))
+      .map(
+        (page) => `<li><a href="/${lang}/solutions/${escapeAttr(page.slug)}/"><h3>${escapeHtml(page.shortTitle || page.h1)}</h3></a><p>${escapeHtml(page.blurb || page.description)}</p></li>`
+      )
+      .join('\n        ');
+    return `<section><h2>${escapeHtml(copy.title)}</h2><p>${escapeHtml(copy.description)}</p><ul>${links}</ul></section>`;
+  }).join('\n      ');
+  return `
+    <div data-prerender="seo-solutions">
+      <nav aria-label="Breadcrumb"><a href="/${lang}/">${escapeHtml(ui.home)}</a> &raquo; <span>${escapeHtml(ui.footerLabel)}</span></nav>
+      <h1>${escapeHtml(ui.hubHeading)}</h1>
+      <p>${escapeHtml(ui.hubIntro)}</p>
+      <ol>
+        ${ui.howSteps.map((step) => `<li><h2>${escapeHtml(step.title)}</h2><p>${escapeHtml(step.copy)}</p></li>`).join('\n        ')}
+      </ol>
+      ${groups}
+      <p><a href="/${lang}/rfq/">${escapeHtml(ui.discussProject)}</a></p>
+    </div>
+  `.trim();
+}
+
+function seoLandingContent(
+  lang: Lang,
+  page: SeoLandingPage,
+  sourcePage: SeoLandingPage,
+  products: Product[],
+  tr: LangTranslations
+): string {
+  const ui = getSeoSolutionsUi(lang);
+  const matchedProducts = products
+    .filter((product) => matchesSeoLandingProduct(sourcePage, product))
+    .sort((a, b) => scoreSeoLandingProduct(sourcePage, b) - scoreSeoLandingProduct(sourcePage, a))
+    .slice(0, 6);
+  const proof = page.proofPoints
+    .map((point) => `<li><strong>${escapeHtml(point.value)}</strong> — ${escapeHtml(point.label)}</li>`)
+    .join('\n        ');
+  const sections = page.sections
+    .map((section) => {
+      const paragraphs = section.paragraphs.map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join('\n        ');
+      const bullets = section.bullets?.length
+        ? `<ul>${section.bullets.map((bullet) => `<li>${escapeHtml(bullet)}</li>`).join('')}</ul>`
+        : '';
+      return `<section><h2>${escapeHtml(section.heading)}</h2>${paragraphs}${bullets}</section>`;
+    })
+    .join('\n      ');
+  const productList = matchedProducts
+    .map((product) => {
+      const display = localizeProduct(product, tr);
+      const fallbackCopy = getSeoLandingProductCardCopy(product, lang);
+      const hasTranslation = Boolean(tr[product.id]?.title);
+      const displayTitle = lang === 'en' ? display.title : hasTranslation ? display.title : fallbackCopy.title;
+      const href = `/${lang}/products/${toSlug(product.title)}/`;
+      const image = product.images?.[0]
+        ? `<img src="${escapeAttr(product.images[0])}" alt="${escapeAttr(displayTitle)}" width="400" height="400" loading="lazy" />`
+        : '';
+      const summary = lang === 'en' || hasTranslation ? buildProductBuyerSummary(display) : fallbackCopy.summary;
+      return `<li><a href="${escapeAttr(href)}">${image}<strong>${escapeHtml(displayTitle)}</strong></a>${summary ? `<p>${escapeHtml(summary)}</p>` : ''}</li>`;
+    })
+    .join('\n        ');
+  const faqs = page.faq
+    .map((item) => `<article><h2>${escapeHtml(item.question)}</h2><p>${escapeHtml(item.answer)}</p></article>`)
+    .join('\n      ');
+  const related = page.relatedSlugs
+    .map((slug) => SEO_LANDING_BY_SLUG[slug])
+    .filter((candidate): candidate is SeoLandingPage => Boolean(candidate))
+    .map((candidate) => localizeSeoLandingPage(candidate, lang))
+    .map((candidate) => `<li><a href="/${lang}/solutions/${escapeAttr(candidate.slug)}/">${escapeHtml(candidate.shortTitle || candidate.h1)}</a></li>`)
+    .join('\n        ');
+
+  return `
+    <div data-prerender="seo-landing">
+      <nav aria-label="Breadcrumb"><a href="/${lang}/">${escapeHtml(ui.home)}</a> &raquo; <a href="/${lang}/solutions/">${escapeHtml(ui.footerLabel)}</a> &raquo; <span>${escapeHtml(page.shortTitle || page.h1)}</span></nav>
+      <h1>${escapeHtml(page.h1)}</h1>
+      <p>${escapeHtml(page.intro)}</p>
+      <ul aria-label="BOLEN manufacturing proof points">${proof}</ul>
+      ${productList ? `<section><h2>${escapeHtml(ui.modelsHeading)}</h2><ul>${productList}</ul></section>` : ''}
+      ${sections}
+      <section><h2>${escapeHtml(ui.faqHeading)}</h2>${faqs}</section>
+      <section><h2>${escapeHtml(ui.relatedSolutions)}</h2><ul>${related}</ul></section>
+      <p><a href="/${lang}/rfq/">${escapeHtml(ui.requestQuote)}</a></p>
     </div>
   `.trim();
 }
@@ -785,6 +924,7 @@ function productDetailContent(lang: Lang, product: Product, tr: LangTranslations
           .join('\n        ')}
       </dl>`
     : '';
+  const solutions = relatedSolutionsBlock(lang, product);
 
   return `
     <div data-prerender="product">
@@ -802,9 +942,26 @@ function productDetailContent(lang: Lang, product: Product, tr: LangTranslations
       ${price}
       ${details}
       ${specTable}
+      ${solutions}
       <p><a href="/${lang}/rfq/">${escapeHtml(c.navRfq)}</a></p>
     </div>
   `.trim();
+}
+
+function relatedSolutionsBlock(
+  lang: Lang,
+  seed: { title?: string; category?: string; description?: string }
+): string {
+  const ui = getSeoSolutionsUi(lang);
+  const items = recommendSolutionsForProduct(seed)
+    .map((page) => localizeSeoLandingPage(page, lang))
+    .map(
+      (page) =>
+        `<li><a href="/${lang}/solutions/${escapeAttr(page.slug)}/">${escapeHtml(page.shortTitle || page.h1)}</a></li>`
+    )
+    .join('\n        ');
+  if (!items) return '';
+  return `<section><h2>${escapeHtml(ui.relatedSolutions)}</h2><ul>${items}</ul></section>`;
 }
 
 function storyContent(lang: Lang): string {
@@ -915,6 +1072,88 @@ function catalogSchema(lang: Lang): any[] {
         name: 'BOLEN Mirror',
         url: 'https://bolenmirror.com',
       },
+    },
+  ];
+}
+
+function seoSolutionsSchema(lang: Lang): any[] {
+  const pages = getLocalizedSeoLandingPages(lang);
+  const ui = getSeoSolutionsUi(lang);
+  return [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'ItemList',
+      name: ui.hubHeading,
+      itemListElement: pages.map((page, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        name: page.h1,
+        url: `${SITE_URL}/${lang}/solutions/${page.slug}/`,
+      })),
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: ui.home, item: `${SITE_URL}/${lang}/` },
+        { '@type': 'ListItem', position: 2, name: ui.footerLabel, item: `${SITE_URL}/${lang}/solutions/` },
+      ],
+    },
+  ];
+}
+
+function seoLandingSchema(lang: Lang, page: SeoLandingPage): any[] {
+  const ui = getSeoSolutionsUi(lang);
+  const url = `${SITE_URL}/${lang}/solutions/${page.slug}/`;
+  return [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'Service',
+      name: page.h1,
+      alternateName: page.shortTitle,
+      serviceType: page.shortTitle || page.h1,
+      description: page.description,
+      url,
+      areaServed: {
+        '@type': 'Place',
+        name: 'Worldwide',
+      },
+      audience: {
+        '@type': 'BusinessAudience',
+        audienceType: 'Importers, distributors, brands, hotel and project buyers',
+      },
+      brand: {
+        '@type': 'Brand',
+        name: 'BOLEN',
+      },
+      provider: {
+        '@type': 'Organization',
+        name: 'Jiaxing Chengtai Mirror Co., Ltd. (BOLEN)',
+        url: SITE_URL,
+      },
+      hasOfferCatalog: {
+        '@type': 'OfferCatalog',
+        name: 'BOLEN mirror catalog',
+        url: `${SITE_URL}/${lang}/products/`,
+      },
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: page.faq.map((item) => ({
+        '@type': 'Question',
+        name: item.question,
+        acceptedAnswer: { '@type': 'Answer', text: item.answer },
+      })),
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: ui.home, item: `${SITE_URL}/${lang}/` },
+        { '@type': 'ListItem', position: 2, name: ui.footerLabel, item: `${SITE_URL}/${lang}/solutions/` },
+        { '@type': 'ListItem', position: 3, name: page.h1, item: url },
+      ],
     },
   ];
 }
@@ -1366,9 +1605,13 @@ function blogPostContent(
       ${img}
       <div>${renderMarkdown(post.body)}</div>
       ${relatedBlock}
-      <p><a href="/${lang}/products/">${escapeHtml(hc.navCatalog)}</a> &middot; <a href="/${lang}/rfq/">${escapeHtml(
-        hc.navRfq
-      )}</a></p>
+      ${relatedSolutionsBlock(lang, {
+        title: post.title,
+        category: `${post.category || ''} ${post.excerpt || ''}`,
+      })}
+      <p><a href="/${lang}/products/">${escapeHtml(hc.navCatalog)}</a> &middot; <a href="/${lang}/solutions/">${escapeHtml(
+        getSeoSolutionsUi(lang).navLabel
+      )}</a> &middot; <a href="/${lang}/rfq/">${escapeHtml(hc.navRfq)}</a></p>
     </div>
   `.trim();
 }
@@ -1737,6 +1980,80 @@ async function main(): Promise<void> {
       });
       await writeRoute(`${lang}/products`, html);
       routeCount++;
+    }
+
+    // Buyer-intent solution hub and landing pages in every supported language.
+    {
+      {
+        const routePath = '/solutions';
+        const canonical = `${SITE_URL}/${lang}${routePath}/`;
+        const ui = getSeoSolutionsUi(lang);
+        const headExtras = buildHead({
+          lang,
+          title: ui.hubTitle,
+          description: ui.hubDescription,
+          canonical,
+          ogImage: FACTORY_OG_IMAGE,
+          routePath,
+          schema: seoSolutionsSchema(lang),
+        });
+        const html = injectIntoTemplate(template, {
+          lang,
+          headExtras,
+          bodyContent: seoSolutionsContent(lang),
+        });
+        await writeRoute(`${lang}/solutions`, html);
+        routeCount++;
+      }
+
+      for (const page of getLocalizedSeoLandingPages(lang)) {
+        const sourcePage = SEO_LANDING_BY_SLUG[page.slug];
+        if (!sourcePage) continue;
+        const routePath = `/solutions/${page.slug}`;
+        const canonical = `${SITE_URL}/${lang}${routePath}/`;
+        const landingProducts = products
+          .filter((product) => matchesSeoLandingProduct(sourcePage, product))
+          .sort((a, b) => scoreSeoLandingProduct(sourcePage, b) - scoreSeoLandingProduct(sourcePage, a))
+          .slice(0, 6)
+          .map((product) => {
+            const localized = localizeProduct(product, translations[lang]);
+            const fallbackCopy = getSeoLandingProductCardCopy(product, lang);
+            const hasTranslation = Boolean(translations[lang][product.id]?.title);
+            const { details, specifications, ...rest } = product;
+            return {
+              ...rest,
+              display_title:
+                lang === 'en' ? undefined : hasTranslation ? localized.title : fallbackCopy.title,
+              buyer_summary:
+                lang === 'en' || hasTranslation
+                  ? buildProductBuyerSummary(localized)
+                  : fallbackCopy.summary,
+            };
+          });
+        const dataScript = prerenderDataScript({
+          route: 'seoLanding',
+          lang,
+          landingSlug: page.slug,
+          products: landingProducts,
+          productTranslations: translations[lang],
+        });
+        const headExtras = `${buildHead({
+          lang,
+          title: page.title,
+          description: page.description,
+          canonical,
+          ogImage: landingProducts[0]?.images?.[0] || DEFAULT_OG_IMAGE,
+          routePath,
+          schema: seoLandingSchema(lang, page),
+        })}\n    ${dataScript}`;
+        const html = injectIntoTemplate(template, {
+          lang,
+          headExtras,
+          bodyContent: seoLandingContent(lang, page, sourcePage, products, translations[lang]),
+        });
+        await writeRoute(`${lang}${routePath}`, html);
+        routeCount++;
+      }
     }
 
     // Our Story

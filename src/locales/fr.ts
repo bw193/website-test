@@ -160,8 +160,12 @@ export const fr = {
     },
     products: {
       catalog: "Catalogue de Produits",
+      kicker: "OEM · ODM · Direct usine",
       desc: "Parcourez notre vaste collection de miroirs haut de gamme, dotés de la technologie LED intelligente, de designs élégants et d'options personnalisables.",
       noProducts: "Aucun produit trouvé correspondant à vos critères.",
+      emptyTitle: "Aucun produit trouvé",
+      emptySearch: "Aucun résultat pour « {{query}} ». Essayez d’ajuster votre recherche ou vos filtres.",
+      clearFilters: "Effacer tous les filtres",
       viewDetails: "Voir les Détails",
       searchLabel: "Rechercher des produits",
       searchPlaceholder: "Rechercher des produits...",

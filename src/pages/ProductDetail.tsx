@@ -18,6 +18,8 @@ import { recommendVideosForProduct, toVideoListItem } from '../utils/video';
 import type { VideoListItem, VideoPost } from '../types/video';
 import { trackEvent } from '../utils/analytics';
 import { polishEnglishProductTitle } from '../utils/productCopy';
+import { recommendSolutionsForProduct } from '../data/seoLandingPages';
+import { getSeoSolutionsUi, localizeSeoLandingPage } from '../data/seoLandingI18n';
 
 interface Product {
   id: string;
@@ -256,6 +258,10 @@ export default function ProductDetail() {
   const productReference = useBuyerSummary && looksLikeModelReference(originalDescription)
     ? originalDescription
     : null;
+  const solutionsUi = getSeoSolutionsUi(lang);
+  const relatedSolutions = recommendSolutionsForProduct(product).map((page) =>
+    localizeSeoLandingPage(page, lang)
+  );
 
   const nextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % product.images.length);
@@ -700,6 +706,31 @@ export default function ProductDetail() {
                 <Markdown className="prose prose-amber prose-stone max-w-none text-stone-600 leading-relaxed bg-white p-6 rounded-2xl border border-stone-200 shadow-sm">
                   {display.details}
                 </Markdown>
+              </m.div>
+            )}
+
+            {relatedSolutions.length > 0 && (
+              <m.div variants={fadeInUp} className="mt-10">
+                <h3 className="text-xl font-bold text-stone-900 mb-6 flex items-center gap-2">
+                  <span className="w-1.5 h-6 bg-amber-600 rounded-full"></span>
+                  {solutionsUi.relatedSolutions}
+                </h3>
+                <ul className="space-y-3 rounded-2xl border border-stone-200 bg-white p-5">
+                  {relatedSolutions.map((solution) => (
+                    <li key={solution.slug}>
+                      <Link
+                        to={lp(`/solutions/${solution.slug}`)}
+                        className="flex items-start justify-between gap-3 text-stone-900 hover:text-amber-800"
+                      >
+                        <span>
+                          <span className="block font-medium">{solution.shortTitle || solution.h1}</span>
+                          <span className="mt-1 block text-sm leading-6 text-stone-600">{solution.blurb}</span>
+                        </span>
+                        <ChevronRight className="mt-1 h-4 w-4 shrink-0 text-stone-400" />
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
               </m.div>
             )}
 

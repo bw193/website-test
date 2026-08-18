@@ -34,6 +34,7 @@ const DEFAULT_CATEGORIES = [
 ];
 
 const PAGE_SIZE = 12;
+const GRID_CLASS = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-10';
 
 export default function Products() {
   const initialCatalog = readInitialCatalogData<Product>();
@@ -122,8 +123,13 @@ export default function Products() {
     setVisibleCount(PAGE_SIZE);
   }, [searchQuery, selectedCategory]);
 
+  const categoryChip = (active: boolean) =>
+    `relative pb-3 text-sm font-medium tracking-wide transition-colors whitespace-nowrap ${
+      active ? 'text-stone-900' : 'text-stone-400 hover:text-stone-700'
+    }`;
+
   return (
-    <div className="bg-stone-50 min-h-screen pb-24">
+    <div className="bg-[#FAF9F6] min-h-screen pb-24 selection:bg-amber-200/60 selection:text-stone-900">
       <SEO
         title={t('seo.catalogTitle')}
         description={t('seo.catalogDesc')}
@@ -142,37 +148,46 @@ export default function Products() {
         }}
       />
       {/* Hero Section */}
-      <div className="bg-stone-900 text-white py-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      <div className="bg-stone-950 text-white pt-24 pb-28 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
         {/* Own factory photography — was a generic Unsplash bathroom stock shot,
             which reads as "this factory may not exist" to a sourcing buyer. */}
         <div
-          className="absolute inset-0 opacity-20 bg-cover bg-center"
+          className="absolute inset-0 bg-cover bg-center opacity-30"
           style={{ backgroundImage: `url('${CATALOG_BACKDROP}')` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-stone-900/50 to-stone-900" />
+        <div className="absolute inset-0 bg-gradient-to-b from-stone-950/40 via-stone-950/70 to-stone-950" />
         
-        <div className="relative max-w-7xl mx-auto text-center">
+        <div className="relative max-w-4xl mx-auto text-center">
+          <m.p
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="mb-5 text-xs font-semibold uppercase tracking-[0.32em] text-amber-400"
+          >
+            {t('products.kicker', 'OEM · ODM · Factory direct')}
+          </m.p>
           <m.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-4xl md:text-5xl font-serif tracking-tight mb-6"
+            transition={{ duration: 0.7, delay: 0.08 }}
+            className="font-serif text-5xl leading-[0.95] tracking-tight sm:text-6xl md:text-7xl"
           >
             {t('products.catalog')}
           </m.h1>
+          <div className="mx-auto mt-8 h-px w-24 bg-gradient-to-r from-transparent via-amber-500 to-transparent" />
           <m.p 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-lg md:text-xl text-stone-300 max-w-2xl mx-auto font-light"
+            transition={{ duration: 0.7, delay: 0.18 }}
+            className="mx-auto mt-8 max-w-2xl text-lg font-light leading-relaxed text-stone-300"
           >
             {t('products.desc')}
           </m.p>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10">
-        <div className="bg-white rounded-2xl shadow-sm border border-stone-200 p-4 md:p-6 mb-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 relative z-10">
+        <div className="mb-14 rounded-2xl border border-stone-200/80 bg-white/90 p-5 shadow-sm backdrop-blur-md md:p-6">
           <div className="flex flex-col gap-6">
             {/* Search Bar */}
             <div className="relative w-full md:max-w-md">
@@ -182,8 +197,8 @@ export default function Products() {
               <label htmlFor="product-search" className="sr-only">
                 {t('products.searchLabel', 'Search products')}
               </label>
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search className="h-5 w-5 text-stone-400" />
+              <div className="absolute inset-y-0 left-0 pl-1 flex items-center pointer-events-none">
+                <Search className="h-4 w-4 text-stone-400" />
               </div>
               <input
                 id="product-search"
@@ -191,38 +206,36 @@ export default function Products() {
                 placeholder={t('products.searchPlaceholder', 'Search products...')}
                 value={searchQuery}
                 onChange={(e) => updateSearchQuery(e.target.value)}
-                className="block w-full pl-10 pr-3 py-3 border border-stone-200 rounded-xl leading-5 bg-stone-50 placeholder-stone-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors sm:text-sm"
+                className="block w-full border-0 border-b border-stone-200 bg-transparent py-3 pl-8 pr-3 text-sm text-stone-900 placeholder-stone-400 transition-colors focus:border-amber-600 focus:outline-none focus:ring-0"
               />
             </div>
 
             {/* Categories */}
-            <div className="w-full overflow-x-auto hide-scrollbar">
+            <div className="w-full">
               {/* aria-pressed carries the filter state — it was previously
                   conveyed by background colour alone. */}
-              <div className="flex flex-wrap gap-2" role="group" aria-label={t('products.searchLabel', 'Search products')}>
+              <div className="flex flex-wrap items-center gap-x-7 gap-y-2 border-b border-stone-200" role="group" aria-label={t('products.searchLabel', 'Search products')}>
                 <button
                   onClick={() => setSelectedCategory(null)}
                   aria-pressed={selectedCategory === null}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap ${
-                    selectedCategory === null
-                      ? 'bg-stone-900 text-white shadow-sm'
-                      : 'bg-stone-100 text-stone-600 hover:bg-stone-200 hover:text-stone-900'
-                  }`}
+                  className={categoryChip(selectedCategory === null)}
                 >
                   {t('products.allCategories')}
+                  {selectedCategory === null && (
+                    <span className="absolute inset-x-0 bottom-0 h-[2px] bg-amber-500" />
+                  )}
                 </button>
                 {categories.map(cat => (
                   <button
                     key={cat}
                     onClick={() => setSelectedCategory(cat)}
                     aria-pressed={selectedCategory === cat}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap ${
-                      selectedCategory === cat
-                        ? 'bg-stone-900 text-white shadow-sm'
-                        : 'bg-stone-100 text-stone-600 hover:bg-stone-200 hover:text-stone-900'
-                    }`}
+                    className={categoryChip(selectedCategory === cat)}
                   >
                     {t(`products.categories.${cat}`, cat)}
+                    {selectedCategory === cat && (
+                      <span className="absolute inset-x-0 bottom-0 h-[2px] bg-amber-500" />
+                    )}
                   </button>
                 ))}
               </div>
@@ -231,7 +244,7 @@ export default function Products() {
         </div>
 
         {!loading && (
-          <p className="mb-6 text-sm font-medium text-stone-600" aria-live="polite">
+          <p className="mb-10 text-xs font-semibold uppercase tracking-[0.2em] text-stone-400" aria-live="polite">
             {t('products.resultCount', {
               count: filteredProducts.length,
               defaultValue: '{{count}} products found',
@@ -242,7 +255,7 @@ export default function Products() {
         {/* Grid classes below must match the resolved grid exactly, or the
             layout shifts when loading finishes. */}
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-10">
+          <div className={GRID_CLASS}>
             {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
               <ProductCardSkeleton key={i} />
             ))}
@@ -255,46 +268,44 @@ export default function Products() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="w-full rounded-3xl overflow-hidden shadow-lg relative min-h-[500px] flex items-center justify-center bg-stone-100"
+                className="flex min-h-[420px] w-full items-center justify-center rounded-3xl bg-white"
               >
-                <div className="text-center py-24 w-full h-full flex flex-col items-center justify-center">
-                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-stone-200 mb-6">
+                <div className="flex w-full flex-col items-center justify-center px-6 py-24 text-center">
+                  <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-full bg-stone-100">
                     <PackageX className="h-8 w-8 text-stone-400" />
                   </div>
-                  <h3 className="text-xl font-semibold text-stone-900 mb-2">No products found</h3>
-                  <p className="text-stone-500 max-w-md mx-auto">
+                  <h3 className="mb-2 font-serif text-2xl text-stone-900">
+                    {t('products.emptyTitle', 'No products found')}
+                  </h3>
+                  <p className="mx-auto max-w-md text-stone-500">
                     {searchQuery 
-                      ? `We couldn't find anything matching "${searchQuery}". Try adjusting your search or filters.`
+                      ? t('products.emptySearch', 'We couldn’t find anything matching “{{query}}”. Try adjusting your search or filters.', { query: searchQuery })
                       : t('products.noProducts')}
                   </p>
-                </div>
-                
-                {(searchQuery || selectedCategory) && (
-                  <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20">
+                  {(searchQuery || selectedCategory) && (
                     <button
                       onClick={() => {
                         updateSearchQuery('');
                         setSelectedCategory(null);
                       }}
-                      className="px-6 py-3 bg-stone-900/90 backdrop-blur-md text-white rounded-full text-sm font-medium hover:bg-stone-800 transition-colors shadow-xl border border-white/20 flex items-center gap-2"
+                      className="mt-8 rounded-full border border-stone-300 px-6 py-2.5 text-sm font-medium text-stone-800 transition-colors hover:border-stone-900 hover:text-stone-900"
                     >
-                      <PackageX className="w-4 h-4" />
-                      Clear all filters
+                      {t('products.clearFilters', 'Clear all filters')}
                     </button>
-                  </div>
-                )}
+                  )}
+                </div>
               </m.div>
             ) : (
               <m.div 
                 key="grid"
-                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-10"
+                className={GRID_CLASS}
                 initial="hidden"
                 animate="show"
                 variants={{
                   hidden: { opacity: 0 },
                   show: {
                     opacity: 1,
-                    transition: { staggerChildren: 0.1 }
+                    transition: { staggerChildren: 0.08 }
                   }
                 }}
               >
@@ -323,15 +334,15 @@ export default function Products() {
         )}
 
         {!loading && filteredProducts.length > visibleCount && (
-          <div className="mt-12 flex flex-col items-center gap-3">
+          <div className="mt-16 flex flex-col items-center gap-3">
             <button
               type="button"
               onClick={() => setVisibleCount((count) => count + PAGE_SIZE)}
-              className="rounded-full bg-stone-900 px-8 py-3 text-sm font-semibold text-white transition-colors hover:bg-stone-700 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
+              className="rounded-full border border-stone-300 bg-white px-8 py-3 text-sm font-semibold text-stone-900 transition-colors hover:border-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
             >
               {t('products.showMore', 'Show more')}
             </button>
-            <span className="text-xs text-stone-500">
+            <span className="text-xs tracking-wide text-stone-400">
               {Math.min(visibleCount, filteredProducts.length)} / {filteredProducts.length}
             </span>
           </div>

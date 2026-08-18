@@ -140,23 +140,80 @@ export function isDirectVideoUrl(url: string | null | undefined): boolean {
   return !!url && DIRECT_VIDEO_RE.test(url);
 }
 
+const YOUTUBE_ID_RE = /^[\w-]{11}$/;
+
+function parseAbsoluteUrl(url: string): URL | null {
+  try {
+    return new URL(url);
+  } catch {
+    try {
+      return new URL(`https://${url}`);
+    } catch {
+      return null;
+    }
+  }
+}
+
+function isYouTubeHost(hostname: string): boolean {
+  const host = hostname.replace(/^www\./, '').toLowerCase();
+  return (
+    host === 'youtu.be' ||
+    host === 'youtube.com' ||
+    host.endsWith('.youtube.com') ||
+    host === 'youtube-nocookie.com' ||
+    host.endsWith('.youtube-nocookie.com')
+  );
+}
+
+export function parseYouTubeId(url: string | null | undefined): string {
+  if (!url) return '';
+  const parsed = parseAbsoluteUrl(url.trim());
+  if (!parsed || !isYouTubeHost(parsed.hostname)) return '';
+
+  const fromQuery = parsed.searchParams.get('v') || parsed.searchParams.get('vi');
+  if (fromQuery && YOUTUBE_ID_RE.test(fromQuery)) return fromQuery;
+
+  const host = parsed.hostname.replace(/^www\./, '').toLowerCase();
+  const parts = parsed.pathname.split('/').filter(Boolean);
+  if (host === 'youtu.be') {
+    return parts.find((part) => YOUTUBE_ID_RE.test(part)) || '';
+  }
+
+  const labeled = parsed.pathname.match(/\/(?:embed|shorts|live|v|e|watch)\/([\w-]{11})/);
+  return labeled?.[1] || '';
+}
+
+export function isYouTubeShortsUrl(url: string | null | undefined): boolean {
+  if (!url) return false;
+  const parsed = parseAbsoluteUrl(url.trim());
+  return parsed ? /\/shorts\//i.test(parsed.pathname) : /\/shorts\//i.test(url);
+}
+
+export function youtubePosterUrl(url: string | null | undefined): string {
+  const id = parseYouTubeId(url);
+  return id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : '';
+}
+
+/** Stored cover, or a YouTube poster derived from the watch/embed URL. */
+export function deriveVideoThumbnailUrl(video: {
+  thumbnail_url?: string | null;
+  video_url?: string | null;
+  embed_url?: string | null;
+}): string {
+  const stored = (video.thumbnail_url || '').trim();
+  if (stored) return stored;
+  return youtubePosterUrl(video.video_url) || youtubePosterUrl(video.embed_url);
+}
+
 export function buildEmbedUrl(url: string | null | undefined): string {
   if (!url) return '';
+  const youtubeId = parseYouTubeId(url);
+  if (youtubeId) return `https://www.youtube.com/embed/${youtubeId}`;
   try {
-    const u = new URL(url);
-    const host = u.hostname.replace(/^www\./, '');
-    if (host === 'youtu.be') {
-      const id = u.pathname.split('/').filter(Boolean)[0];
-      return id ? `https://www.youtube.com/embed/${id}` : '';
-    }
-    if (host.endsWith('youtube.com')) {
-      const id =
-        u.searchParams.get('v') ||
-        u.pathname.match(/\/(?:embed|shorts)\/([^/?#]+)/)?.[1] ||
-        '';
-      return id ? `https://www.youtube.com/embed/${id}` : '';
-    }
-    if (host.endsWith('vimeo.com')) {
+    const u = parseAbsoluteUrl(url.trim());
+    if (!u) return '';
+    const host = u.hostname.replace(/^www\./, '').toLowerCase();
+    if (host === 'vimeo.com' || host.endsWith('.vimeo.com')) {
       const id = u.pathname.split('/').filter(Boolean).find((part) => /^\d+$/.test(part));
       return id ? `https://player.vimeo.com/video/${id}` : '';
     }
@@ -164,6 +221,26 @@ export function buildEmbedUrl(url: string | null | undefined): string {
     return '';
   }
   return '';
+}
+
+export function getVideoPlayback(video: {
+  source_type: VideoSourceType;
+  video_url?: string | null;
+  embed_url?: string | null;
+}): { kind: 'embed' | 'video' | 'missing'; src: string } {
+  const derivedFromVideoUrl = buildEmbedUrl(video.video_url);
+  if (video.source_type === 'embed' || derivedFromVideoUrl) {
+    const src = video.embed_url || derivedFromVideoUrl || buildEmbedUrl(video.embed_url);
+    if (src) return { kind: 'embed', src };
+  }
+  if ((video.source_type === 'upload' || video.source_type === 'direct') && video.video_url) {
+    return { kind: 'video', src: video.video_url };
+  }
+  if (isDirectVideoUrl(video.video_url)) {
+    return { kind: 'video', src: video.video_url || '' };
+  }
+  const embedSrc = video.embed_url || buildEmbedUrl(video.embed_url);
+  return embedSrc ? { kind: 'embed', src: embedSrc } : { kind: 'missing', src: '' };
 }
 
 /**
@@ -185,25 +262,6 @@ export function parseFeaturedVideoSlug(raw: string | null | undefined): string {
   }
 }
 
-export function getVideoPlayback(video: {
-  source_type: VideoSourceType;
-  video_url?: string | null;
-  embed_url?: string | null;
-}): { kind: 'embed' | 'video' | 'missing'; src: string } {
-  if (video.source_type === 'embed') {
-    const embed = video.embed_url || buildEmbedUrl(video.video_url);
-    if (embed) return { kind: 'embed', src: embed };
-  }
-  if ((video.source_type === 'upload' || video.source_type === 'direct') && video.video_url) {
-    return { kind: 'video', src: video.video_url };
-  }
-  if (isDirectVideoUrl(video.video_url)) {
-    return { kind: 'video', src: video.video_url || '' };
-  }
-  const embed = video.embed_url || buildEmbedUrl(video.video_url);
-  return embed ? { kind: 'embed', src: embed } : { kind: 'missing', src: '' };
-}
-
 export function localizeVideo(post: VideoPost, lang: string): LocalizedVideoPost {
   return {
     id: post.id,
@@ -212,7 +270,7 @@ export function localizeVideo(post: VideoPost, lang: string): LocalizedVideoPost
     source_type: normalizeVideoSourceType(post.source_type),
     video_url: post.video_url ?? null,
     embed_url: post.embed_url ?? null,
-    thumbnail_url: post.thumbnail_url ?? null,
+    thumbnail_url: deriveVideoThumbnailUrl(post) || null,
     category: post.category ?? null,
     tags: Array.isArray(post.tags) ? post.tags.filter(Boolean) : [],
     duration_seconds: post.duration_seconds ?? null,
@@ -234,7 +292,7 @@ export function toVideoListItem(post: VideoPost, lang: string): VideoListItem {
     source_type: normalizeVideoSourceType(post.source_type),
     video_url: post.video_url ?? null,
     embed_url: post.embed_url ?? null,
-    thumbnail_url: post.thumbnail_url ?? null,
+    thumbnail_url: deriveVideoThumbnailUrl(post) || null,
     category: post.category ?? null,
     tags: Array.isArray(post.tags) ? post.tags.filter(Boolean) : [],
     duration_seconds: post.duration_seconds ?? null,

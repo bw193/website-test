@@ -225,7 +225,7 @@ export default function AdminBlogForm() {
           .insert({ ...payload, created_at: new Date().toISOString() });
         if (error) throw error;
       }
-      navigate('/admin');
+      navigate('/admin?tab=blog');
     } catch (e: any) {
       console.error('Error saving article', e);
       alert(e?.message ? `${t('admin.blog.saveError')}\n${e.message}` : t('admin.blog.saveError'));
@@ -236,21 +236,21 @@ export default function AdminBlogForm() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-stone-50 flex items-center justify-center">
+      <div className="flex items-center justify-center py-24">
         <Loader2 className="h-8 w-8 text-stone-900 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-stone-50 pb-24">
+    <div className="pb-16">
       <SEO title="Admin Journal | BOLEN Mirror" noindex={true} />
-      <header className="bg-white border-b border-stone-200 sticky top-0 z-30">
+      <header className="sticky top-0 z-20 border-b border-stone-200 bg-white/95 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
             <div className="flex items-center gap-4">
               <button
-                onClick={() => navigate('/admin')}
+                onClick={() => navigate('/admin?tab=blog')}
                 className="p-2 -ml-2 text-stone-400 hover:text-stone-900 hover:bg-stone-100 rounded-lg transition-colors"
                 title={t('admin.blog.backToDashboard')}
               >
@@ -263,7 +263,7 @@ export default function AdminBlogForm() {
             <div className="flex items-center gap-3">
               <button
                 type="button"
-                onClick={() => navigate('/admin')}
+                onClick={() => navigate('/admin?tab=blog')}
                 className="px-4 py-2 text-sm font-medium text-stone-700 bg-white border border-stone-300 rounded-xl shadow-sm hover:bg-stone-50 transition-colors"
               >
                 {t('admin.blog.cancel')}

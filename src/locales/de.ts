@@ -160,8 +160,12 @@ export const de = {
     },
     products: {
       catalog: "Produktkatalog",
+      kicker: "OEM · ODM · Direkt ab Werk",
       desc: "Durchsuchen Sie unsere umfangreiche Kollektion an Premium-Spiegeln, die intelligente LED-Technologie, elegante Kosmetikdesigns und anpassbare Optionen bieten.",
       noProducts: "Keine Produkte gefunden, die Ihren Kriterien entsprechen.",
+      emptyTitle: "Keine Produkte gefunden",
+      emptySearch: "Zu „{{query}}“ wurden keine Treffer gefunden. Passen Sie Suche oder Filter an.",
+      clearFilters: "Alle Filter zurücksetzen",
       viewDetails: "Details ansehen",
       searchLabel: "Produkte suchen",
       searchPlaceholder: "Produkte suchen...",

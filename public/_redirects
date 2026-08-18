@@ -8,6 +8,8 @@
 /products/*    /en/products/:splat/    301
 /our-story     /en/our-story/          301
 /rfq           /en/rfq/                301
+/solutions     /en/solutions/          301
+/solutions/*   /en/solutions/:splat/   301
 
 # SPA fallback is handled by wrangler.jsonc's `not_found_handling: "single-page-application"`
 # — do NOT add `/* /index.html 200` here; Cloudflare Workers Static Assets flags it as
