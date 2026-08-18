@@ -409,6 +409,19 @@ export const en = {
         noFilterMatch: "Nothing matches your filters.",
         statusFilter: "Status",
         dateRange: "Date range",
+        dateTo: "to",
+        clearDates: "Clear dates",
+        filterAll: "All",
+        latestJournal: "Latest journal",
+        latestVideos: "Latest videos",
+        pendingApprovals: "{{count}} accounts awaiting approval",
+        colTitle: "Title",
+        colCategory: "Category",
+        colStatus: "Status",
+        colAccount: "Account",
+        colRole: "Role",
+        colActions: "Actions",
+        editItem: "Edit",
         roleEmployee: "Employee",
         roleAdmin: "Admin",
         stats: {
@@ -447,12 +460,23 @@ export const en = {
         rfqs: {
           new: "New",
           replyEmail: "Reply via Email",
-          noRfqs: "No RFQs received yet."
+          noRfqs: "No RFQs received yet.",
+          filterActive: "Active",
+          filterNew: "Unread",
+          filterRead: "Read",
+          filterArchived: "Archived",
+          markRead: "Mark read",
+          markUnread: "Mark unread",
+          archive: "Archive",
+          unarchive: "Unarchive",
+          selectPrompt: "Select an inquiry to read the message."
         },
         employees: {
           status: "Status:",
           approve: "Approve",
           reject: "Reject",
+          approveEmployee: "Approve as employee",
+          approveAdmin: "Approve as admin",
           noEmployees: "No employee accounts found.",
           updateError: "Failed to update employee status.",
           roles: {
@@ -474,7 +498,12 @@ export const en = {
           setupDesc: "To enable site settings, please run the following SQL command in your Supabase SQL Editor:",
           setupBtn: "I have run the SQL command",
           addImage: "Add Image",
-          removeImage: "Remove"
+          removeImage: "Remove",
+          upload: "Upload",
+          navHero: "Homepage images",
+          navVideo: "Featured video",
+          navFactory: "Factory",
+          navCategories: "Categories"
         }
       },
       login: {

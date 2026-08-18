@@ -11,10 +11,10 @@ import {
   Edit,
   Inbox,
   Loader2,
+  Mail,
   Package,
   Plus,
   RefreshCw,
-  Search,
   Users,
   X,
 } from 'lucide-react';
@@ -22,9 +22,22 @@ import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 import SEO from '../components/SEO';
 import { captureVideoFrame, deriveEmbedThumbnail } from '../utils/videoThumbnail';
-import { buildEmbedUrl, deriveVideoThumbnailUrl, FALLBACK_VIDEO_THUMB } from '../utils/video';
+import { buildEmbedUrl, deriveVideoThumbnailUrl, FALLBACK_VIDEO_THUMB, formatVideoDuration } from '../utils/video';
 import { PRODUCT_IMAGE_PLACEHOLDER, handleImageError } from '../utils/imagePlaceholder';
 import { ADMIN_TABS, type AdminShellContext, type AdminTab } from '../components/AdminLayout';
+import {
+  EmptyState,
+  FilterPills,
+  PageCanvas,
+  ResultMeta,
+  SearchField,
+  SectionHeader,
+  StatusPill,
+  Surface,
+  Toolbar,
+  adminPrimaryBtn,
+  adminSecondaryBtn,
+} from '../components/admin/AdminUi';
 
 const PRODUCT_VIDEO_BUCKET = 'product-videos';
 const AdminSettings = React.lazy(() => import('./AdminSettings'));
@@ -73,6 +86,10 @@ interface VideoPostRow {
   title?: Record<string, string> | null;
 }
 
+type RfqStatusFilter = 'active' | 'new' | 'read' | 'archived' | 'all';
+type PublishFilter = 'all' | 'published' | 'draft';
+type RoleFilter = 'all' | 'pending' | 'employee' | 'admin' | 'rejected';
+
 function firstImage(images: unknown): string | null {
   if (Array.isArray(images) && typeof images[0] === 'string' && images[0]) return images[0];
   return null;
@@ -92,6 +109,18 @@ function greetingFallback(hour: number) {
 
 function initialsFromEmail(email: string) {
   return (email.split('@')[0] || 'B').slice(0, 2).toUpperCase();
+}
+
+function formatShortDate(value: string) {
+  return new Date(value).toLocaleDateString(undefined, {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+}
+
+function localizedTitle(title: Record<string, string> | null | undefined, slug: string) {
+  return title?.en || slug;
 }
 
 export default function AdminDashboard() {
@@ -120,14 +149,18 @@ export default function AdminDashboard() {
   const [videoPosts, setVideoPosts] = useState<VideoPostRow[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
-  const [rfqStatusFilter, setRfqStatusFilter] = useState<'active' | 'new' | 'read' | 'archived' | 'all'>('all');
+  const [rfqStatusFilter, setRfqStatusFilter] = useState<RfqStatusFilter>('active');
   const [rfqStartDate, setRfqStartDate] = useState<string>('');
   const [rfqEndDate, setRfqEndDate] = useState<string>('');
+  const [selectedRfqId, setSelectedRfqId] = useState<string | null>(null);
   const [productCategoryFilter, setProductCategoryFilter] = useState<string>('all');
   const [productSearch, setProductSearch] = useState('');
   const [blogSearch, setBlogSearch] = useState('');
+  const [blogStatusFilter, setBlogStatusFilter] = useState<PublishFilter>('all');
   const [videoSearch, setVideoSearch] = useState('');
+  const [videoStatusFilter, setVideoStatusFilter] = useState<PublishFilter>('all');
   const [employeeSearch, setEmployeeSearch] = useState('');
+  const [employeeRoleFilter, setEmployeeRoleFilter] = useState<RoleFilter>('all');
   const [regeneratingVideoId, setRegeneratingVideoId] = useState<string | null>(null);
   const [regeneratingAllVideos, setRegeneratingAllVideos] = useState(false);
   const [stats, setStats] = useState({
@@ -135,6 +168,7 @@ export default function AdminDashboard() {
     totalRfqs: 0,
     newRfqs: 0,
     employees: 0,
+    pendingEmployees: 0,
     blogs: 0,
     videos: 0,
   });
@@ -147,11 +181,14 @@ export default function AdminDashboard() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [prodRes, totalRfqRes, newRfqRes, empRes, blogRes, videoRes] = await Promise.all([
+      const [prodRes, totalRfqRes, newRfqRes, empRes, pendingEmpRes, blogRes, videoRes] = await Promise.all([
         supabase.from('products').select('id', { count: 'exact', head: true }),
         supabase.from('rfqs').select('id', { count: 'exact', head: true }),
         supabase.from('rfqs').select('id', { count: 'exact', head: true }).eq('status', 'new'),
         canManageTeam ? supabase.from('profiles').select('id', { count: 'exact', head: true }) : Promise.resolve({ count: 0 }),
+        canManageTeam
+          ? supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'pending')
+          : Promise.resolve({ count: 0 }),
         supabase.from('blog_posts').select('id', { count: 'exact', head: true }),
         supabase.from('videos').select('id', { count: 'exact', head: true }),
       ]);
@@ -161,6 +198,7 @@ export default function AdminDashboard() {
         totalRfqs: totalRfqRes.count || 0,
         newRfqs: newRfqRes.count || 0,
         employees: empRes.count || 0,
+        pendingEmployees: pendingEmpRes.count || 0,
         blogs: blogRes.count || 0,
         videos: videoRes.count || 0,
       };
@@ -175,14 +213,24 @@ export default function AdminDashboard() {
       }
 
       if (activeTab === 'overview') {
-        const [prodData, rfqData] = await Promise.all([
-          supabase.from('products').select('id, title, category, images').order('created_at', { ascending: false }).limit(6),
-          supabase.from('rfqs').select('*').order('created_at', { ascending: false }).limit(5),
+        const [prodData, rfqData, blogData, videoData] = await Promise.all([
+          supabase.from('products').select('id, title, category, images').order('created_at', { ascending: false }).limit(8),
+          supabase.from('rfqs').select('*').order('created_at', { ascending: false }).limit(6),
+          supabase.from('blog_posts').select('id, slug, status, category, title').order('created_at', { ascending: false }).limit(5),
+          supabase
+            .from('videos')
+            .select('id, slug, status, source_type, video_url, embed_url, thumbnail_url, duration_seconds, category, title')
+            .order('created_at', { ascending: false })
+            .limit(4),
         ]);
         if (prodData.error) throw prodData.error;
         if (rfqData.error) throw rfqData.error;
+        if (blogData.error) throw blogData.error;
+        if (videoData.error) throw videoData.error;
         setProducts(prodData.data || []);
         setRfqs(rfqData.data || []);
+        setBlogPosts(blogData.data || []);
+        setVideoPosts(videoData.data || []);
       } else if (activeTab === 'products') {
         const { data, error } = await supabase
           .from('products')
@@ -327,6 +375,12 @@ export default function AdminDashboard() {
       const { error } = await supabase.from('profiles').update({ role: nextRole }).eq('id', id);
       if (error) throw error;
       setEmployees(employees.map((emp) => (emp.id === id ? { ...emp, role: nextRole } : emp)));
+      if (employees.find((emp) => emp.id === id)?.role === 'pending') {
+        setStats((prev) => ({
+          ...prev,
+          pendingEmployees: Math.max(0, prev.pendingEmployees - 1),
+        }));
+      }
     } catch (error) {
       console.error('Error updating employee status:', error);
       alert(t('admin.dashboard.employees.updateError'));
@@ -389,402 +443,356 @@ export default function AdminDashboard() {
     });
   }, [rfqs, rfqStatusFilter, rfqStartDate, rfqEndDate]);
 
+  useEffect(() => {
+    if (activeTab !== 'rfqs') return;
+    if (filteredRfqs.length === 0) {
+      setSelectedRfqId(null);
+      return;
+    }
+    setSelectedRfqId((current) =>
+      current && filteredRfqs.some((rfq) => rfq.id === current) ? current : filteredRfqs[0].id
+    );
+  }, [activeTab, filteredRfqs]);
+
   const filteredBlog = useMemo(() => {
     const q = blogSearch.trim().toLowerCase();
-    if (!q) return blogPosts;
-    return blogPosts.filter((post) => (post.title?.en || post.slug).toLowerCase().includes(q));
-  }, [blogPosts, blogSearch]);
+    return blogPosts.filter((post) => {
+      if (blogStatusFilter !== 'all' && post.status !== blogStatusFilter) return false;
+      if (q && !(post.title?.en || post.slug).toLowerCase().includes(q)) return false;
+      return true;
+    });
+  }, [blogPosts, blogSearch, blogStatusFilter]);
 
   const filteredVideos = useMemo(() => {
     const q = videoSearch.trim().toLowerCase();
-    if (!q) return videoPosts;
-    return videoPosts.filter((post) => (post.title?.en || post.slug).toLowerCase().includes(q));
-  }, [videoPosts, videoSearch]);
+    return videoPosts.filter((post) => {
+      if (videoStatusFilter !== 'all' && post.status !== videoStatusFilter) return false;
+      if (q && !(post.title?.en || post.slug).toLowerCase().includes(q)) return false;
+      return true;
+    });
+  }, [videoPosts, videoSearch, videoStatusFilter]);
 
   const filteredEmployees = useMemo(() => {
     const q = employeeSearch.trim().toLowerCase();
-    if (!q) return employees;
-    return employees.filter((emp) => emp.email.toLowerCase().includes(q));
-  }, [employees, employeeSearch]);
+    const rank = (roleName: Employee['role']) =>
+      roleName === 'pending' ? 0 : roleName === 'admin' ? 1 : roleName === 'employee' ? 2 : 3;
+    return employees
+      .filter((emp) => {
+        if (employeeRoleFilter !== 'all' && emp.role !== employeeRoleFilter) return false;
+        if (q && !emp.email.toLowerCase().includes(q)) return false;
+        return true;
+      })
+      .slice()
+      .sort((a, b) => rank(a.role) - rank(b.role) || a.email.localeCompare(b.email));
+  }, [employees, employeeSearch, employeeRoleFilter]);
 
+  const rfqCounts = useMemo(() => {
+    const counts = { all: rfqs.length, active: 0, new: 0, read: 0, archived: 0 };
+    for (const rfq of rfqs) {
+      const status = rfq.status || 'new';
+      if (status === 'new' || status === 'read' || status === 'archived') counts[status] += 1;
+      if (status !== 'archived') counts.active += 1;
+    }
+    return counts;
+  }, [rfqs]);
+
+  const blogCounts = useMemo(() => {
+    const counts = { all: blogPosts.length, published: 0, draft: 0 };
+    for (const post of blogPosts) {
+      if (post.status === 'published') counts.published += 1;
+      else counts.draft += 1;
+    }
+    return counts;
+  }, [blogPosts]);
+
+  const videoCounts = useMemo(() => {
+    const counts = { all: videoPosts.length, published: 0, draft: 0 };
+    for (const post of videoPosts) {
+      if (post.status === 'published') counts.published += 1;
+      else counts.draft += 1;
+    }
+    return counts;
+  }, [videoPosts]);
+
+  const employeeCounts = useMemo(() => {
+    const counts = { all: employees.length, pending: 0, employee: 0, admin: 0, rejected: 0 };
+    for (const emp of employees) {
+      counts[emp.role] += 1;
+    }
+    return counts;
+  }, [employees]);
+
+  const selectedRfq = filteredRfqs.find((rfq) => rfq.id === selectedRfqId) || null;
   const hour = new Date().getHours();
   const firstName = (user?.email || '').split('@')[0];
+  const uncategorized = t('admin.dashboard.products.uncategorized');
 
   return (
     <div className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
       <SEO title="Employee Portal | BOLEN Mirror" noindex={true} />
-
-      {loading && activeTab !== 'settings' ? (
-        <DashboardSkeleton />
-      ) : activeTab === 'overview' ? (
-        <div className="space-y-8">
-          <div className="relative overflow-hidden rounded-3xl bg-stone-950 px-6 py-8 text-white sm:px-8">
-            <div className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-amber-500/20 blur-3xl" />
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-400">
-              {t('admin.dashboard.portalName', 'Employee Portal')}
-            </p>
-            <h1 className="relative mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
-              {t(greetingKey(hour), greetingFallback(hour))}, {firstName}
-            </h1>
-            <p className="relative mt-2 max-w-xl text-sm text-stone-400">
-              {t('admin.dashboard.overviewSubtitle', 'Catalog, journal, videos, and buyer RFQs in one workspace.')}
-            </p>
-          </div>
-
-          <div className={`grid grid-cols-2 gap-3 ${canManageTeam ? 'lg:grid-cols-5' : 'lg:grid-cols-4'}`}>
-            <StatTile
-              icon={Package}
-              label={t('admin.dashboard.stats.products', 'Products')}
-              value={stats.products}
-              onClick={() => setActiveTab('products')}
-              tone="amber"
+      <PageCanvas>
+        {loading && activeTab !== 'settings' ? (
+          <DashboardSkeleton />
+        ) : activeTab === 'overview' ? (
+          <OverviewTab
+            hour={hour}
+            firstName={firstName}
+            stats={stats}
+            canManageTeam={canManageTeam}
+            products={products}
+            rfqs={rfqs}
+            blogPosts={blogPosts}
+            videoPosts={videoPosts}
+            uncategorized={uncategorized}
+            onOpenTab={setActiveTab}
+          />
+        ) : activeTab === 'products' ? (
+          <div>
+            <SectionHeader
+              title={t('admin.dashboard.tabs.products')}
+              subtitle={t('admin.dashboard.section.productsHint', '{{count}} products in the catalog.', { count: stats.products })}
+              action={
+                <Link to="/admin/products/new" className={adminPrimaryBtn}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  {t('admin.dashboard.addProduct')}
+                </Link>
+              }
             />
-            <StatTile
-              icon={Inbox}
-              label={t('admin.dashboard.stats.rfqs', 'RFQs')}
-              value={stats.totalRfqs}
-              badge={stats.newRfqs > 0 ? t('admin.dashboard.stats.newRfqs', '{{count}} new', { count: stats.newRfqs }) : undefined}
-              onClick={() => setActiveTab('rfqs')}
-              tone="blue"
-            />
-            <StatTile
-              icon={BookOpen}
-              label={t('admin.dashboard.stats.blog', 'Journal')}
-              value={stats.blogs}
-              onClick={() => setActiveTab('blog')}
-              tone="stone"
-            />
-            <StatTile
-              icon={Clapperboard}
-              label={t('admin.dashboard.stats.videos', 'Videos')}
-              value={stats.videos}
-              onClick={() => setActiveTab('videos')}
-              tone="stone"
-            />
-            {canManageTeam && (
-              <StatTile
-                icon={Users}
-                label={t('admin.dashboard.stats.team', 'Team')}
-                value={stats.employees}
-                onClick={() => setActiveTab('employees')}
-                tone="green"
+            <Toolbar>
+              <SearchField
+                value={productSearch}
+                onChange={setProductSearch}
+                placeholder={t('admin.dashboard.searchProducts', 'Search products…')}
               />
-            )}
-          </div>
-
-          <div className="grid gap-6 lg:grid-cols-5">
-            <section className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm lg:col-span-2">
-              <h2 className="text-sm font-semibold uppercase tracking-wider text-stone-500">
-                {t('admin.dashboard.quickActions', 'Quick actions')}
-              </h2>
-              <div className="mt-4 grid gap-2">
-                <QuickAction to="/admin/products/new" icon={Package} label={t('admin.dashboard.addProduct')} />
-                <QuickAction to="/admin/blog/new" icon={BookOpen} label={t('admin.blog.addPost', 'Add journal post')} />
-                <QuickAction to="/admin/videos/new" icon={Clapperboard} label={t('admin.videos.addVideo', 'Add video')} />
-                <button
-                  type="button"
-                  onClick={() => setActiveTab('rfqs')}
-                  className="flex items-center justify-between rounded-xl border border-stone-200 px-4 py-3 text-left text-sm font-medium text-stone-800 transition-colors hover:border-amber-300 hover:bg-amber-50"
-                >
-                  <span className="flex items-center gap-3">
-                    <Inbox className="h-4 w-4 text-stone-400" />
-                    {t('admin.dashboard.reviewRfqs', 'Review RFQs')}
-                  </span>
-                  {stats.newRfqs > 0 && (
-                    <span className="rounded-full bg-amber-500 px-2 py-0.5 text-[10px] font-bold text-stone-950">
-                      {stats.newRfqs}
-                    </span>
-                  )}
-                </button>
-              </div>
-            </section>
-
-            <section className="rounded-2xl border border-stone-200 bg-white shadow-sm lg:col-span-3">
-              <div className="flex items-center justify-between border-b border-stone-100 px-5 py-4">
-                <h2 className="text-sm font-semibold uppercase tracking-wider text-stone-500">
-                  {t('admin.dashboard.recentRfqs', 'Latest RFQs')}
-                </h2>
-                <button
-                  type="button"
-                  onClick={() => setActiveTab('rfqs')}
-                  className="inline-flex items-center text-xs font-semibold text-amber-700 hover:text-amber-800"
-                >
-                  {t('admin.dashboard.viewAll', 'View all')}
-                  <ArrowRight className="ml-1 h-3.5 w-3.5" />
-                </button>
-              </div>
-              <ul className="divide-y divide-stone-100">
-                {rfqs.length === 0 ? (
-                  <li className="px-5 py-10 text-center text-sm text-stone-500">
-                    {t('admin.dashboard.rfqs.noRfqs')}
-                  </li>
-                ) : (
-                  rfqs.map((rfq) => (
-                    <li key={rfq.id} className="px-5 py-4">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="min-w-0">
-                          <p className="truncate font-semibold text-stone-900">{rfq.customer_name}</p>
-                          <p className="mt-0.5 truncate text-sm text-stone-500">{rfq.product_name}</p>
-                        </div>
-                        <RfqStatusBadge status={rfq.status} newLabel={t('admin.dashboard.rfqs.new')} />
-                      </div>
-                    </li>
-                  ))
-                )}
-              </ul>
-            </section>
-          </div>
-
-          <section>
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-sm font-semibold uppercase tracking-wider text-stone-500">
-                {t('admin.dashboard.recentProducts', 'Latest products')}
-              </h2>
-              <button
-                type="button"
-                onClick={() => setActiveTab('products')}
-                className="inline-flex items-center text-xs font-semibold text-amber-700 hover:text-amber-800"
-              >
-                {t('admin.dashboard.viewAll', 'View all')}
-                <ArrowRight className="ml-1 h-3.5 w-3.5" />
-              </button>
-            </div>
-            {products.length === 0 ? (
+              <FilterPills
+                value={productCategoryFilter}
+                onChange={setProductCategoryFilter}
+                options={[
+                  { id: 'all', label: t('admin.dashboard.allCategories', 'All categories'), count: products.length },
+                  ...categories.map((cat) => ({
+                    id: cat,
+                    label: cat,
+                    count: products.filter((p) => p.category === cat).length,
+                  })),
+                  {
+                    id: 'uncategorized',
+                    label: uncategorized,
+                    count: products.filter((p) => !p.category).length,
+                  },
+                ]}
+              />
+              <ResultMeta shown={filteredProducts.length} total={products.length} label={t('admin.dashboard.stats.products', 'Products')} />
+            </Toolbar>
+            {filteredProducts.length === 0 ? (
               <EmptyState
                 icon={Package}
-                title={t('admin.dashboard.products.noProducts')}
-                action={
-                  <Link to="/admin/products/new" className="btn-primary mt-4 px-4 py-2 text-sm">
-                    <Plus className="h-4 w-4" />
-                    {t('admin.dashboard.addProduct')}
-                  </Link>
-                }
+                title={products.length === 0 ? t('admin.dashboard.products.noProducts') : t('admin.dashboard.noFilterMatch')}
               />
             ) : (
-              <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-6">
-                {products.map((product) => (
-                  <ProductCard key={product.id} product={product} uncategorized={t('admin.dashboard.products.uncategorized')} />
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                {filteredProducts.map((product) => (
+                  <ProductCard key={product.id} product={product} uncategorized={uncategorized} />
                 ))}
               </div>
             )}
-          </section>
-        </div>
-      ) : activeTab === 'products' ? (
-        <SectionFrame
-          title={t('admin.dashboard.tabs.products')}
-          subtitle={t('admin.dashboard.section.productsHint', '{{count}} products in the catalog.', { count: stats.products })}
-          action={
-            <Link to="/admin/products/new" className="inline-flex items-center justify-center rounded-xl bg-stone-900 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-stone-800">
-              <Plus className="mr-2 h-4 w-4" />
-              {t('admin.dashboard.addProduct')}
-            </Link>
-          }
-        >
-          <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center">
-            <SearchField
-              value={productSearch}
-              onChange={setProductSearch}
-              placeholder={t('admin.dashboard.searchProducts', 'Search products…')}
-            />
-            <select
-              value={productCategoryFilter}
-              onChange={(e) => setProductCategoryFilter(e.target.value)}
-              className="block w-full rounded-xl border-stone-200 bg-white py-2.5 pl-3 pr-10 text-sm shadow-sm focus:border-stone-900 focus:outline-none focus:ring-1 focus:ring-stone-900 sm:w-56"
-            >
-              <option value="all">{t('admin.dashboard.allCategories', 'All categories')}</option>
-              {categories.map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat}
-                </option>
-              ))}
-              <option value="uncategorized">{t('admin.dashboard.products.uncategorized')}</option>
-            </select>
           </div>
-          {filteredProducts.length === 0 ? (
-            <EmptyState
-              icon={Package}
-              title={products.length === 0 ? t('admin.dashboard.products.noProducts') : t('admin.dashboard.noFilterMatch', 'No products match your filter.')}
+        ) : activeTab === 'blog' ? (
+          <div>
+            <SectionHeader
+              title={t('admin.blog.tab', 'Journal')}
+              subtitle={t('admin.dashboard.section.blogHint', '{{count}} posts.', { count: stats.blogs })}
+              action={
+                <Link to="/admin/blog/new" className={adminPrimaryBtn}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  {t('admin.blog.addPost')}
+                </Link>
+              }
             />
-          ) : (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-              {filteredProducts.map((product) => (
-                <ProductCard key={product.id} product={product} uncategorized={t('admin.dashboard.products.uncategorized')} />
-              ))}
-            </div>
-          )}
-        </SectionFrame>
-      ) : activeTab === 'blog' ? (
-        <SectionFrame
-          title={t('admin.blog.tab', 'Journal')}
-          subtitle={t('admin.dashboard.section.blogHint', '{{count}} posts.', { count: stats.blogs })}
-          action={
-            <Link to="/admin/blog/new" className="inline-flex items-center justify-center rounded-xl bg-stone-900 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-stone-800">
-              <Plus className="mr-2 h-4 w-4" />
-              {t('admin.blog.addPost')}
-            </Link>
-          }
-        >
-          <div className="mb-5">
-            <SearchField
-              value={blogSearch}
-              onChange={setBlogSearch}
-              placeholder={t('admin.dashboard.searchBlog', 'Search journal posts…')}
-            />
-          </div>
-          <div className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
-            <ul className="divide-y divide-stone-100">
-              {filteredBlog.map((post) => (
-                <li key={post.id} className="transition-colors hover:bg-stone-50">
-                  <Link to={`/admin/blog/${post.id}`} className="flex items-center justify-between gap-4 px-5 py-4">
-                    <div className="min-w-0">
-                      <p className="truncate font-semibold text-stone-900">{post.title?.en || post.slug}</p>
-                      <p className="mt-1 flex items-center gap-2 text-sm text-stone-500">
-                        <span
-                          className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold ${
-                            post.status === 'published' ? 'bg-emerald-50 text-emerald-700' : 'bg-stone-100 text-stone-600'
-                          }`}
-                        >
-                          {post.status === 'published' ? t('admin.blog.published') : t('admin.blog.draft')}
-                        </span>
-                        {post.category && <span className="text-xs text-stone-400">{post.category}</span>}
-                      </p>
-                    </div>
-                    <Edit className="h-4 w-4 shrink-0 text-stone-300" />
-                  </Link>
+            <Toolbar>
+              <SearchField
+                value={blogSearch}
+                onChange={setBlogSearch}
+                placeholder={t('admin.dashboard.searchBlog', 'Search journal posts…')}
+              />
+              <FilterPills<PublishFilter>
+                value={blogStatusFilter}
+                onChange={setBlogStatusFilter}
+                options={[
+                  { id: 'all', label: t('admin.dashboard.filterAll', 'All'), count: blogCounts.all },
+                  { id: 'published', label: t('admin.blog.published', 'Published'), count: blogCounts.published },
+                  { id: 'draft', label: t('admin.blog.draft', 'Draft'), count: blogCounts.draft },
+                ]}
+              />
+              <ResultMeta shown={filteredBlog.length} total={blogPosts.length} label={t('admin.dashboard.stats.blog', 'Journal')} />
+            </Toolbar>
+            <Surface>
+              <ul>
+                <li className="hidden grid-cols-[1fr_10rem_7rem_2.5rem] gap-4 border-b border-stone-100 bg-stone-50 px-5 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-stone-400 md:grid">
+                  <span>{t('admin.dashboard.colTitle', 'Title')}</span>
+                  <span>{t('admin.dashboard.colCategory', 'Category')}</span>
+                  <span>{t('admin.dashboard.colStatus', 'Status')}</span>
+                  <span className="sr-only">{t('admin.dashboard.editItem', 'Edit')}</span>
                 </li>
-              ))}
-              {filteredBlog.length === 0 && (
-                <li>
-                  <EmptyState icon={BookOpen} title={t('admin.blog.noPosts')} embedded />
-                </li>
-              )}
-            </ul>
-          </div>
-        </SectionFrame>
-      ) : activeTab === 'videos' ? (
-        <SectionFrame
-          title={t('admin.videos.tab', 'Videos')}
-          subtitle={t('admin.dashboard.section.videosHint', '{{count}} videos.', { count: stats.videos })}
-          action={
-            <div className="flex flex-col gap-2 sm:flex-row">
-              <button
-                type="button"
-                onClick={handleRegenerateAllVideoThumbnails}
-                disabled={regeneratingAllVideos || videoPosts.length === 0}
-                className="inline-flex items-center justify-center rounded-xl border border-stone-200 bg-white px-4 py-2.5 text-sm font-medium text-stone-700 shadow-sm transition-colors hover:bg-stone-50 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {regeneratingAllVideos ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-2 h-4 w-4" />}
-                {t('admin.videos.regenerateAllThumbnails', 'Regenerate thumbnails')}
-              </button>
-              <Link to="/admin/videos/new" className="inline-flex items-center justify-center rounded-xl bg-stone-900 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-stone-800">
-                <Plus className="mr-2 h-4 w-4" />
-                {t('admin.videos.addVideo', 'Add Video')}
-              </Link>
-            </div>
-          }
-        >
-          <div className="mb-5">
-            <SearchField
-              value={videoSearch}
-              onChange={setVideoSearch}
-              placeholder={t('admin.dashboard.searchVideos', 'Search videos…')}
-            />
-          </div>
-          {filteredVideos.length === 0 ? (
-            <EmptyState
-              icon={Clapperboard}
-              title={t('admin.videos.noVideos', 'No videos yet. Create your first one.')}
-            />
-          ) : (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-              {filteredVideos.map((post) => (
-                <div key={post.id} className="group overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition-shadow hover:shadow-md">
-                  <div className="relative aspect-video bg-stone-100">
-                    <img
-                      src={deriveVideoThumbnailUrl(post) || FALLBACK_VIDEO_THUMB}
-                      alt=""
-                      className="h-full w-full object-cover"
-                      referrerPolicy="no-referrer"
-                      onError={handleImageError}
-                    />
-                    <div className="absolute right-2 top-2 flex gap-1">
-                      <button
-                        type="button"
-                        onClick={() => handleRegenerateVideoThumbnail(post)}
-                        disabled={regeneratingAllVideos || regeneratingVideoId === post.id || (!post.video_url && !post.embed_url)}
-                        title={t('admin.videos.regenerateThumbnail', 'Regenerate thumbnail')}
-                        className="rounded-lg bg-white/90 p-1.5 text-stone-600 shadow-sm transition-colors hover:bg-amber-50 hover:text-amber-700 disabled:cursor-not-allowed disabled:opacity-40"
-                      >
-                        {regeneratingVideoId === post.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
-                      </button>
-                    </div>
-                  </div>
-                  <div className="flex items-start justify-between gap-3 p-4">
-                    <div className="min-w-0">
-                      <p className="truncate font-semibold text-stone-900">{post.title?.en || post.slug}</p>
-                      <p className="mt-1 flex flex-wrap items-center gap-2 text-xs text-stone-500">
-                        <span
-                          className={`inline-flex items-center rounded-full px-2 py-0.5 font-semibold ${
-                            post.status === 'published' ? 'bg-emerald-50 text-emerald-700' : 'bg-stone-100 text-stone-600'
-                          }`}
-                        >
-                          {post.status === 'published' ? t('admin.blog.published') : t('admin.blog.draft')}
-                        </span>
-                        {post.source_type && <span className="uppercase tracking-wide text-stone-400">{post.source_type}</span>}
-                        {post.category && <span>{post.category}</span>}
-                      </p>
-                    </div>
+                {filteredBlog.map((post) => (
+                  <li key={post.id} className="border-b border-stone-100 last:border-0">
                     <Link
-                      to={`/admin/videos/${post.id}`}
-                      className="rounded-lg p-2 text-stone-400 transition-colors hover:bg-stone-100 hover:text-stone-900"
+                      to={`/admin/blog/${post.id}`}
+                      className="grid items-center gap-1 px-5 py-4 transition-colors hover:bg-stone-50 md:grid-cols-[1fr_10rem_7rem_2.5rem] md:gap-4"
                     >
-                      <Edit className="h-4 w-4" />
+                      <p className="truncate font-semibold text-stone-900">{localizedTitle(post.title, post.slug)}</p>
+                      <p className="text-sm text-stone-500">{post.category || uncategorized}</p>
+                      <div>
+                        <StatusPill tone={post.status === 'published' ? 'emerald' : 'stone'}>
+                          {post.status === 'published' ? t('admin.blog.published') : t('admin.blog.draft')}
+                        </StatusPill>
+                      </div>
+                      <Edit className="hidden h-4 w-4 justify-self-end text-stone-300 md:block" />
                     </Link>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </SectionFrame>
-      ) : activeTab === 'rfqs' ? (
-        <SectionFrame
-          title={t('admin.dashboard.tabs.rfqs')}
-          subtitle={t('admin.dashboard.section.rfqsHint', '{{count}} inquiries · {{newCount}} unread.', { count: stats.totalRfqs, newCount: stats.newRfqs })}
-        >
-          <div className="mb-5 flex flex-col gap-3 rounded-2xl border border-stone-200 bg-white p-4 shadow-sm lg:flex-row lg:items-end">
-            <label className="flex flex-1 flex-col gap-1.5">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-stone-500">
-                {t('admin.dashboard.statusFilter', 'Status')}
-              </span>
-              <select
+                  </li>
+                ))}
+                {filteredBlog.length === 0 && (
+                  <li>
+                    <EmptyState icon={BookOpen} title={t('admin.blog.noPosts')} embedded />
+                  </li>
+                )}
+              </ul>
+            </Surface>
+          </div>
+        ) : activeTab === 'videos' ? (
+          <div>
+            <SectionHeader
+              title={t('admin.videos.tab', 'Videos')}
+              subtitle={t('admin.dashboard.section.videosHint', '{{count}} videos.', { count: stats.videos })}
+              action={
+                <>
+                  <button
+                    type="button"
+                    onClick={handleRegenerateAllVideoThumbnails}
+                    disabled={regeneratingAllVideos || videoPosts.length === 0}
+                    className={adminSecondaryBtn}
+                  >
+                    {regeneratingAllVideos ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-2 h-4 w-4" />}
+                    {t('admin.videos.regenerateAllThumbnails', 'Regenerate thumbnails')}
+                  </button>
+                  <Link to="/admin/videos/new" className={adminPrimaryBtn}>
+                    <Plus className="mr-2 h-4 w-4" />
+                    {t('admin.videos.addVideo', 'Add Video')}
+                  </Link>
+                </>
+              }
+            />
+            <Toolbar>
+              <SearchField
+                value={videoSearch}
+                onChange={setVideoSearch}
+                placeholder={t('admin.dashboard.searchVideos', 'Search videos…')}
+              />
+              <FilterPills<PublishFilter>
+                value={videoStatusFilter}
+                onChange={setVideoStatusFilter}
+                options={[
+                  { id: 'all', label: t('admin.dashboard.filterAll', 'All'), count: videoCounts.all },
+                  { id: 'published', label: t('admin.blog.published', 'Published'), count: videoCounts.published },
+                  { id: 'draft', label: t('admin.blog.draft', 'Draft'), count: videoCounts.draft },
+                ]}
+              />
+              <ResultMeta shown={filteredVideos.length} total={videoPosts.length} label={t('admin.dashboard.stats.videos', 'Videos')} />
+            </Toolbar>
+            {filteredVideos.length === 0 ? (
+              <EmptyState icon={Clapperboard} title={t('admin.videos.noVideos', 'No videos yet. Create your first one.')} />
+            ) : (
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                {filteredVideos.map((post) => {
+                  const duration = formatVideoDuration(post.duration_seconds);
+                  const busy = regeneratingAllVideos || regeneratingVideoId === post.id;
+                  return (
+                    <article key={post.id} className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
+                      <div className="relative aspect-video bg-stone-100">
+                        <img
+                          src={deriveVideoThumbnailUrl(post) || FALLBACK_VIDEO_THUMB}
+                          alt=""
+                          className="h-full w-full object-cover"
+                          referrerPolicy="no-referrer"
+                          onError={handleImageError}
+                        />
+                        {duration && (
+                          <span className="absolute bottom-2 right-2 rounded-md bg-stone-950/80 px-1.5 py-0.5 text-[11px] font-semibold text-white">
+                            {duration}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex flex-col gap-3 p-4">
+                        <div className="min-w-0">
+                          <p className="truncate font-semibold text-stone-900">{localizedTitle(post.title, post.slug)}</p>
+                          <div className="mt-2 flex flex-wrap items-center gap-2">
+                            <StatusPill tone={post.status === 'published' ? 'emerald' : 'stone'}>
+                              {post.status === 'published' ? t('admin.blog.published') : t('admin.blog.draft')}
+                            </StatusPill>
+                            {post.source_type && (
+                              <span className="text-[11px] font-medium uppercase tracking-wide text-stone-400">{post.source_type}</span>
+                            )}
+                            {post.category && <span className="text-xs text-stone-500">{post.category}</span>}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 border-t border-stone-100 pt-3">
+                          <button
+                            type="button"
+                            onClick={() => handleRegenerateVideoThumbnail(post)}
+                            disabled={busy || (!post.video_url && !post.embed_url)}
+                            className={`${adminSecondaryBtn} flex-1 py-2 text-xs`}
+                          >
+                            {regeneratingVideoId === post.id ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="mr-1.5 h-3.5 w-3.5" />}
+                            {t('admin.videos.regenerateThumbnail', 'Cover')}
+                          </button>
+                          <Link to={`/admin/videos/${post.id}`} className={`${adminPrimaryBtn} flex-1 py-2 text-xs`}>
+                            <Edit className="mr-1.5 h-3.5 w-3.5" />
+                            {t('admin.dashboard.editItem', 'Edit')}
+                          </Link>
+                        </div>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        ) : activeTab === 'rfqs' ? (
+          <div>
+            <SectionHeader
+              title={t('admin.dashboard.tabs.rfqs')}
+              subtitle={t('admin.dashboard.section.rfqsHint', '{{count}} inquiries · {{newCount}} unread.', {
+                count: stats.totalRfqs,
+                newCount: stats.newRfqs,
+              })}
+            />
+            <Toolbar>
+              <FilterPills<RfqStatusFilter>
                 value={rfqStatusFilter}
-                onChange={(e) => setRfqStatusFilter(e.target.value as typeof rfqStatusFilter)}
-                className="block w-full rounded-xl border-stone-200 bg-stone-50 py-2 pl-3 pr-10 text-sm focus:border-stone-900 focus:outline-none focus:ring-1 focus:ring-stone-900"
-              >
-                <option value="active">Active (New & Read)</option>
-                <option value="new">Unread (New)</option>
-                <option value="read">Read</option>
-                <option value="archived">Archived</option>
-                <option value="all">All RFQs</option>
-              </select>
-            </label>
-            <label className="flex flex-col gap-1.5 lg:flex-1">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-stone-500">
-                {t('admin.dashboard.dateRange', 'Date range')}
-              </span>
-              <div className="flex items-center gap-2">
+                onChange={setRfqStatusFilter}
+                options={[
+                  { id: 'active', label: t('admin.dashboard.rfqs.filterActive', 'Active'), count: rfqCounts.active },
+                  { id: 'new', label: t('admin.dashboard.rfqs.filterNew', 'Unread'), count: rfqCounts.new },
+                  { id: 'read', label: t('admin.dashboard.rfqs.filterRead', 'Read'), count: rfqCounts.read },
+                  { id: 'archived', label: t('admin.dashboard.rfqs.filterArchived', 'Archived'), count: rfqCounts.archived },
+                  { id: 'all', label: t('admin.dashboard.filterAll', 'All'), count: rfqCounts.all },
+                ]}
+              />
+              <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2 lg:justify-end">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-stone-400">
+                  {t('admin.dashboard.dateRange', 'Date range')}
+                </span>
                 <input
                   type="date"
                   value={rfqStartDate}
                   onChange={(e) => setRfqStartDate(e.target.value)}
-                  className="block w-full rounded-xl border-stone-200 bg-stone-50 py-2 px-3 text-sm focus:border-stone-900 focus:outline-none focus:ring-1 focus:ring-stone-900"
+                  className="rounded-xl border-stone-200 bg-stone-50 py-2 px-3 text-sm focus:border-stone-900 focus:outline-none focus:ring-1 focus:ring-stone-900"
                 />
-                <span className="text-sm text-stone-400">to</span>
+                <span className="text-xs text-stone-400">{t('admin.dashboard.dateTo', 'to')}</span>
                 <input
                   type="date"
                   value={rfqEndDate}
                   onChange={(e) => setRfqEndDate(e.target.value)}
-                  className="block w-full rounded-xl border-stone-200 bg-stone-50 py-2 px-3 text-sm focus:border-stone-900 focus:outline-none focus:ring-1 focus:ring-stone-900"
+                  className="rounded-xl border-stone-200 bg-stone-50 py-2 px-3 text-sm focus:border-stone-900 focus:outline-none focus:ring-1 focus:ring-stone-900"
                 />
                 {(rfqStartDate || rfqEndDate) && (
                   <button
@@ -793,253 +801,488 @@ export default function AdminDashboard() {
                       setRfqStartDate('');
                       setRfqEndDate('');
                     }}
-                    className="rounded-lg bg-stone-100 p-2 text-stone-400 transition-colors hover:bg-stone-200 hover:text-stone-900"
-                    title="Clear date filter"
+                    className="rounded-lg p-2 text-stone-400 hover:bg-stone-100 hover:text-stone-900"
+                    title={t('admin.dashboard.clearDates', 'Clear dates')}
                   >
                     <X className="h-4 w-4" />
                   </button>
                 )}
               </div>
-            </label>
-          </div>
-
-          <div className="space-y-4">
-            {filteredRfqs.map((rfq) => (
-              <article
-                key={rfq.id}
-                className={`rounded-2xl border p-5 shadow-sm ${
-                  rfq.status === 'new'
-                    ? 'border-amber-200 bg-amber-50/40'
-                    : rfq.status === 'archived'
-                      ? 'border-stone-200 bg-stone-50/70 opacity-80'
-                      : 'border-stone-200 bg-white'
-                }`}
-              >
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                  <div className="min-w-0">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="text-lg font-bold text-stone-900">{rfq.customer_name}</h3>
-                      <span className="hidden text-stone-300 sm:inline">·</span>
-                      <span className="text-sm font-medium text-stone-600">{rfq.product_name}</span>
-                    </div>
-                    <p className="mt-1 text-sm text-stone-500">
-                      <a href={`mailto:${rfq.customer_email}`} className="text-amber-700 hover:underline">
-                        {rfq.customer_email}
-                      </a>
-                    </p>
-                    <p className="mt-1 font-mono text-xs text-stone-400">
-                      {new Date(rfq.created_at).toLocaleString()}
-                    </p>
-                  </div>
-                  <div className="flex flex-wrap items-center gap-2 sm:flex-col sm:items-end">
-                    <RfqStatusBadge status={rfq.status} newLabel={t('admin.dashboard.rfqs.new')} />
-                    {rfq.status === 'new' ? (
-                      <button
-                        type="button"
-                        onClick={() => handleUpdateRfqStatus(rfq.id, 'read', rfq.status)}
-                        className="inline-flex items-center gap-1.5 rounded-lg bg-stone-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-stone-800"
-                      >
-                        <Check className="h-3.5 w-3.5" /> Mark Read
-                      </button>
-                    ) : rfq.status === 'archived' ? (
-                      <button
-                        type="button"
-                        onClick={() => handleUpdateRfqStatus(rfq.id, 'read', rfq.status)}
-                        className="inline-flex items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-xs font-medium text-stone-600 ring-1 ring-stone-200 hover:bg-stone-50"
-                      >
-                        <Inbox className="h-3.5 w-3.5" /> Unarchive
-                      </button>
-                    ) : (
-                      <div className="flex gap-2">
-                        <button
-                          type="button"
-                          onClick={() => handleUpdateRfqStatus(rfq.id, 'new', rfq.status)}
-                          className="rounded-lg bg-white px-3 py-1.5 text-xs font-medium text-stone-600 ring-1 ring-stone-200 hover:bg-stone-50"
-                        >
-                          Mark Unread
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleUpdateRfqStatus(rfq.id, 'archived', rfq.status)}
-                          className="inline-flex items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-xs font-medium text-stone-600 ring-1 ring-stone-200 hover:bg-red-50 hover:text-red-600"
-                        >
-                          <Archive className="h-3.5 w-3.5" /> Archive
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <div className="mt-4 whitespace-pre-wrap rounded-xl border border-stone-200/70 bg-white p-4 text-sm leading-relaxed text-stone-700">
-                  {rfq.message}
-                </div>
-                <a
-                  href={`mailto:${rfq.customer_email}?subject=Re: RFQ for ${rfq.product_name}`}
-                  className="mt-4 inline-flex items-center text-sm font-semibold text-amber-700 hover:text-amber-800"
-                >
-                  {t('admin.dashboard.rfqs.replyEmail')}
-                  <ChevronRight className="ml-1 h-4 w-4" />
-                </a>
-              </article>
-            ))}
-            {filteredRfqs.length === 0 && (
+            </Toolbar>
+            {filteredRfqs.length === 0 ? (
               <EmptyState
                 icon={Inbox}
-                title={rfqs.length === 0 ? t('admin.dashboard.rfqs.noRfqs') : t('admin.dashboard.noFilterMatch', 'No RFQs match your filters.')}
+                title={rfqs.length === 0 ? t('admin.dashboard.rfqs.noRfqs') : t('admin.dashboard.noFilterMatch')}
               />
+            ) : (
+              <div className="grid gap-4 lg:grid-cols-[minmax(280px,360px)_1fr] lg:items-start">
+                <Surface className="max-h-[42vh] overflow-y-auto lg:sticky lg:top-4 lg:max-h-[calc(100dvh-13rem)]">
+                  <ul className="divide-y divide-stone-100">
+                    {filteredRfqs.map((rfq) => {
+                      const selected = rfq.id === selectedRfqId;
+                      return (
+                        <li key={rfq.id}>
+                          <button
+                            type="button"
+                            onClick={() => setSelectedRfqId(rfq.id)}
+                            className={`w-full px-4 py-3.5 text-left transition-colors ${
+                              selected ? 'bg-amber-50' : 'hover:bg-stone-50'
+                            }`}
+                          >
+                            <div className="flex items-start justify-between gap-2">
+                              <p className="truncate font-semibold text-stone-900">{rfq.customer_name}</p>
+                              <RfqStatusBadge status={rfq.status} newLabel={t('admin.dashboard.rfqs.new')} />
+                            </div>
+                            <p className="mt-1 truncate text-sm text-stone-500">{rfq.product_name}</p>
+                            <p className="mt-1 text-[11px] text-stone-400">{formatShortDate(rfq.created_at)}</p>
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </Surface>
+                <Surface className="p-5 sm:p-6">
+                  {selectedRfq ? (
+                    <RfqDetail
+                      rfq={selectedRfq}
+                      onUpdateStatus={handleUpdateRfqStatus}
+                    />
+                  ) : (
+                    <EmptyState icon={Inbox} title={t('admin.dashboard.rfqs.selectPrompt', 'Select an inquiry to read the message.')} embedded />
+                  )}
+                </Surface>
+              </div>
             )}
           </div>
-        </SectionFrame>
-      ) : activeTab === 'employees' ? (
-        <SectionFrame
-          title={t('admin.dashboard.tabs.employees')}
-          subtitle={t('admin.dashboard.section.teamHint', '{{count}} accounts.', { count: stats.employees })}
-        >
-          <div className="mb-5">
-            <SearchField
-              value={employeeSearch}
-              onChange={setEmployeeSearch}
-              placeholder={t('admin.dashboard.searchTeam', 'Search by email…')}
+        ) : activeTab === 'employees' ? (
+          <div>
+            <SectionHeader
+              title={t('admin.dashboard.tabs.employees')}
+              subtitle={t('admin.dashboard.section.teamHint', '{{count}} accounts.', { count: stats.employees })}
             />
-          </div>
-          <div className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
-            <ul className="divide-y divide-stone-100">
-              {filteredEmployees.map((employee) => (
-                <li key={employee.id} className="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="flex min-w-0 items-center gap-3">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-stone-900 text-xs font-bold text-amber-400">
-                      {initialsFromEmail(employee.email)}
-                    </div>
-                    <div className="min-w-0">
+            {employeeCounts.pending > 0 && employeeRoleFilter === 'all' && (
+              <button
+                type="button"
+                onClick={() => setEmployeeRoleFilter('pending')}
+                className="mb-4 flex w-full items-center justify-between rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-left"
+              >
+                <span className="text-sm font-medium text-amber-900">
+                  {t('admin.dashboard.pendingApprovals', '{{count}} accounts awaiting approval', { count: employeeCounts.pending })}
+                </span>
+                <ChevronRight className="h-4 w-4 text-amber-700" />
+              </button>
+            )}
+            <Toolbar>
+              <SearchField
+                value={employeeSearch}
+                onChange={setEmployeeSearch}
+                placeholder={t('admin.dashboard.searchTeam', 'Search by email…')}
+              />
+              <FilterPills<RoleFilter>
+                value={employeeRoleFilter}
+                onChange={setEmployeeRoleFilter}
+                options={[
+                  { id: 'all', label: t('admin.dashboard.filterAll', 'All'), count: employeeCounts.all },
+                  { id: 'pending', label: t('admin.dashboard.employees.roles.pending', 'Pending'), count: employeeCounts.pending },
+                  { id: 'employee', label: t('admin.dashboard.roleEmployee', 'Employee'), count: employeeCounts.employee },
+                  { id: 'admin', label: t('admin.dashboard.roleAdmin', 'Admin'), count: employeeCounts.admin },
+                  { id: 'rejected', label: t('admin.dashboard.employees.roles.rejected', 'Rejected'), count: employeeCounts.rejected },
+                ]}
+              />
+              <ResultMeta shown={filteredEmployees.length} total={employees.length} label={t('admin.dashboard.stats.team', 'Team')} />
+            </Toolbar>
+            <Surface>
+              <ul>
+                <li className="hidden grid-cols-[1fr_8rem_auto] gap-4 border-b border-stone-100 bg-stone-50 px-5 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-stone-400 md:grid">
+                  <span>{t('admin.dashboard.colAccount', 'Account')}</span>
+                  <span>{t('admin.dashboard.colRole', 'Role')}</span>
+                  <span>{t('admin.dashboard.colActions', 'Actions')}</span>
+                </li>
+                {filteredEmployees.map((employee) => (
+                  <li
+                    key={employee.id}
+                    className={`grid items-center gap-3 border-b border-stone-100 px-5 py-4 last:border-0 md:grid-cols-[1fr_8rem_auto] ${
+                      employee.role === 'pending' ? 'bg-amber-50/50' : ''
+                    }`}
+                  >
+                    <div className="flex min-w-0 items-center gap-3">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-stone-900 text-xs font-bold text-amber-400">
+                        {initialsFromEmail(employee.email)}
+                      </div>
                       <p className="truncate font-semibold text-stone-900">{employee.email}</p>
-                      <p className="mt-1">
-                        <span
-                          className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold ${
-                            employee.role === 'admin'
-                              ? 'bg-emerald-50 text-emerald-700'
-                              : employee.role === 'employee'
-                                ? 'bg-sky-50 text-sky-800'
-                                : employee.role === 'rejected'
-                                  ? 'bg-red-50 text-red-700'
-                                  : 'bg-amber-50 text-amber-800'
-                          }`}
-                        >
-                          {employee.role.charAt(0).toUpperCase() + employee.role.slice(1)}
-                        </span>
-                      </p>
                     </div>
-                  </div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    {employee.role === 'pending' ? (
-                      <>
-                        <button
-                          type="button"
-                          onClick={() => handleUpdateEmployeeStatus(employee.id, 'employee')}
-                          className="rounded-lg bg-stone-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-stone-800"
+                    <div>
+                      <EmployeeRoleBadge role={employee.role} />
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      {employee.role === 'pending' ? (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => handleUpdateEmployeeStatus(employee.id, 'employee')}
+                            className={`${adminPrimaryBtn} px-3 py-1.5 text-xs`}
+                          >
+                            {t('admin.dashboard.employees.approveEmployee', 'Approve as employee')}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleUpdateEmployeeStatus(employee.id, 'admin')}
+                            className={`${adminSecondaryBtn} px-3 py-1.5 text-xs`}
+                          >
+                            {t('admin.dashboard.employees.approveAdmin', 'Approve as admin')}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleUpdateEmployeeStatus(employee.id, 'rejected')}
+                            className="rounded-lg p-1.5 text-red-600 hover:bg-red-50"
+                            title={t('admin.dashboard.employees.reject')}
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                        </>
+                      ) : (
+                        <select
+                          value={employee.role}
+                          onChange={(e) => handleUpdateEmployeeStatus(employee.id, e.target.value as 'admin' | 'employee' | 'rejected')}
+                          className="rounded-lg border-stone-200 bg-stone-50 py-1.5 text-sm shadow-sm focus:border-stone-900 focus:ring-stone-900"
                         >
-                          Approve as Employee
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleUpdateEmployeeStatus(employee.id, 'admin')}
-                          className="rounded-lg bg-stone-100 px-3 py-1.5 text-xs font-medium text-stone-900 hover:bg-stone-200"
-                        >
-                          Approve as Admin
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleUpdateEmployeeStatus(employee.id, 'rejected')}
-                          className="rounded-lg p-1.5 text-red-600 hover:bg-red-50"
-                          title={t('admin.dashboard.employees.reject')}
-                        >
-                          <X className="h-4 w-4" />
-                        </button>
-                      </>
-                    ) : (
-                      <select
-                        value={employee.role}
-                        onChange={(e) => handleUpdateEmployeeStatus(employee.id, e.target.value as 'admin' | 'employee' | 'rejected')}
-                        className="rounded-lg border-stone-200 bg-stone-50 py-1.5 text-sm shadow-sm focus:border-stone-900 focus:ring-stone-900"
-                      >
-                        <option value="employee">Employee</option>
-                        <option value="admin">Admin</option>
-                        <option value="rejected">Rejected</option>
-                      </select>
-                    )}
-                  </div>
-                </li>
-              ))}
-              {filteredEmployees.length === 0 && (
-                <li>
-                  <EmptyState icon={Users} title={t('admin.dashboard.employees.noEmployees')} embedded />
-                </li>
-              )}
-            </ul>
+                          <option value="employee">{t('admin.dashboard.roleEmployee', 'Employee')}</option>
+                          <option value="admin">{t('admin.dashboard.roleAdmin', 'Admin')}</option>
+                          <option value="rejected">{t('admin.dashboard.employees.roles.rejected', 'Rejected')}</option>
+                        </select>
+                      )}
+                    </div>
+                  </li>
+                ))}
+                {filteredEmployees.length === 0 && (
+                  <li>
+                    <EmptyState icon={Users} title={t('admin.dashboard.employees.noEmployees')} embedded />
+                  </li>
+                )}
+              </ul>
+            </Surface>
           </div>
-        </SectionFrame>
-      ) : activeTab === 'settings' ? (
-        <SectionFrame
-          title={t('admin.dashboard.settings.title')}
-          subtitle={t('admin.dashboard.section.settingsHint', 'Homepage media, categories, and featured video.')}
-        >
-          <React.Suspense
-            fallback={
-              <div className="flex justify-center py-16">
-                <Loader2 className="h-8 w-8 animate-spin text-stone-400" />
-              </div>
-            }
-          >
-            <AdminSettings />
-          </React.Suspense>
-        </SectionFrame>
-      ) : null}
+        ) : activeTab === 'settings' ? (
+          <div>
+            <SectionHeader
+              title={t('admin.dashboard.settings.title')}
+              subtitle={t('admin.dashboard.section.settingsHint', 'Homepage media, categories, and featured video.')}
+            />
+            <React.Suspense
+              fallback={
+                <div className="flex justify-center py-16">
+                  <Loader2 className="h-8 w-8 animate-spin text-stone-400" />
+                </div>
+              }
+            >
+              <AdminSettings />
+            </React.Suspense>
+          </div>
+        ) : null}
+      </PageCanvas>
     </div>
   );
 }
 
-function SectionFrame({
-  title,
-  subtitle,
-  action,
-  children,
+function OverviewTab({
+  hour,
+  firstName,
+  stats,
+  canManageTeam,
+  products,
+  rfqs,
+  blogPosts,
+  videoPosts,
+  uncategorized,
+  onOpenTab,
 }: {
-  title: string;
-  subtitle?: string;
-  action?: React.ReactNode;
-  children: React.ReactNode;
+  hour: number;
+  firstName: string;
+  stats: {
+    products: number;
+    totalRfqs: number;
+    newRfqs: number;
+    employees: number;
+    pendingEmployees: number;
+    blogs: number;
+    videos: number;
+  };
+  canManageTeam: boolean;
+  products: Product[];
+  rfqs: RFQ[];
+  blogPosts: BlogPostRow[];
+  videoPosts: VideoPostRow[];
+  uncategorized: string;
+  onOpenTab: (tab: AdminTab) => void;
 }) {
+  const { t } = useTranslation();
+
+  return (
+    <div className="space-y-8">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-700">
+            {t('admin.dashboard.portalName', 'Employee Portal')}
+          </p>
+          <h1 className="mt-1 text-2xl font-semibold tracking-tight text-stone-900 sm:text-3xl">
+            {t(greetingKey(hour), greetingFallback(hour))}, {firstName}
+          </h1>
+          <p className="mt-1 max-w-xl text-sm text-stone-500">
+            {t('admin.dashboard.overviewSubtitle', 'Catalog, journal, videos, and buyer RFQs in one workspace.')}
+          </p>
+        </div>
+        {stats.newRfqs > 0 && (
+          <button type="button" onClick={() => onOpenTab('rfqs')} className={adminPrimaryBtn}>
+            <Inbox className="mr-2 h-4 w-4" />
+            {t('admin.dashboard.reviewRfqs', 'Review RFQs')}
+            <span className="ml-2 rounded-full bg-amber-400 px-1.5 py-0.5 text-[10px] font-bold text-stone-950">{stats.newRfqs}</span>
+          </button>
+        )}
+      </div>
+
+      {canManageTeam && stats.pendingEmployees > 0 && (
+        <button
+          type="button"
+          onClick={() => onOpenTab('employees')}
+          className="flex w-full items-center justify-between rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-left"
+        >
+          <span className="text-sm font-medium text-amber-900">
+            {t('admin.dashboard.pendingApprovals', '{{count}} accounts awaiting approval', { count: stats.pendingEmployees })}
+          </span>
+          <ChevronRight className="h-4 w-4 text-amber-700" />
+        </button>
+      )}
+
+      <div className={`grid grid-cols-2 gap-3 ${canManageTeam ? 'xl:grid-cols-5' : 'xl:grid-cols-4'}`}>
+        <StatTile icon={Package} label={t('admin.dashboard.stats.products', 'Products')} value={stats.products} onClick={() => onOpenTab('products')} tone="amber" />
+        <StatTile
+          icon={Inbox}
+          label={t('admin.dashboard.stats.rfqs', 'RFQs')}
+          value={stats.totalRfqs}
+          badge={stats.newRfqs > 0 ? t('admin.dashboard.stats.newRfqs', '{{count}} new', { count: stats.newRfqs }) : undefined}
+          onClick={() => onOpenTab('rfqs')}
+          tone="blue"
+        />
+        <StatTile icon={BookOpen} label={t('admin.dashboard.stats.blog', 'Journal')} value={stats.blogs} onClick={() => onOpenTab('blog')} tone="stone" />
+        <StatTile icon={Clapperboard} label={t('admin.dashboard.stats.videos', 'Videos')} value={stats.videos} onClick={() => onOpenTab('videos')} tone="stone" />
+        {canManageTeam && (
+          <StatTile icon={Users} label={t('admin.dashboard.stats.team', 'Team')} value={stats.employees} onClick={() => onOpenTab('employees')} tone="green" />
+        )}
+      </div>
+
+      <div className="grid gap-6 xl:grid-cols-12">
+        <Surface className="xl:col-span-7">
+          <div className="flex items-center justify-between border-b border-stone-100 px-5 py-4">
+            <h2 className="text-sm font-semibold text-stone-900">{t('admin.dashboard.recentRfqs', 'Latest RFQs')}</h2>
+            <button type="button" onClick={() => onOpenTab('rfqs')} className="inline-flex items-center text-xs font-semibold text-amber-700 hover:text-amber-800">
+              {t('admin.dashboard.viewAll', 'View all')}
+              <ArrowRight className="ml-1 h-3.5 w-3.5" />
+            </button>
+          </div>
+          <ul className="divide-y divide-stone-100">
+            {rfqs.length === 0 ? (
+              <li className="px-5 py-10 text-center text-sm text-stone-500">{t('admin.dashboard.rfqs.noRfqs')}</li>
+            ) : (
+              rfqs.map((rfq) => (
+                <li key={rfq.id} className="px-5 py-3.5">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="truncate font-semibold text-stone-900">{rfq.customer_name}</p>
+                      <p className="mt-0.5 truncate text-sm text-stone-500">{rfq.product_name}</p>
+                    </div>
+                    <div className="flex shrink-0 flex-col items-end gap-1">
+                      <RfqStatusBadge status={rfq.status} newLabel={t('admin.dashboard.rfqs.new')} />
+                      <span className="text-[11px] text-stone-400">{formatShortDate(rfq.created_at)}</span>
+                    </div>
+                  </div>
+                </li>
+              ))
+            )}
+          </ul>
+        </Surface>
+
+        <Surface className="xl:col-span-5">
+          <div className="border-b border-stone-100 px-5 py-4">
+            <h2 className="text-sm font-semibold text-stone-900">{t('admin.dashboard.quickActions', 'Quick actions')}</h2>
+          </div>
+          <div className="grid gap-2 p-4">
+            <QuickAction to="/admin/products/new" icon={Package} label={t('admin.dashboard.addProduct')} />
+            <QuickAction to="/admin/blog/new" icon={BookOpen} label={t('admin.blog.addPost', 'Add journal post')} />
+            <QuickAction to="/admin/videos/new" icon={Clapperboard} label={t('admin.videos.addVideo', 'Add video')} />
+            <button
+              type="button"
+              onClick={() => onOpenTab('rfqs')}
+              className="flex items-center justify-between rounded-xl border border-stone-200 px-4 py-3 text-left text-sm font-medium text-stone-800 transition-colors hover:border-amber-300 hover:bg-amber-50"
+            >
+              <span className="flex items-center gap-3">
+                <Inbox className="h-4 w-4 text-stone-400" />
+                {t('admin.dashboard.reviewRfqs', 'Review RFQs')}
+              </span>
+              {stats.newRfqs > 0 ? (
+                <span className="rounded-full bg-amber-500 px-2 py-0.5 text-[10px] font-bold text-stone-950">{stats.newRfqs}</span>
+              ) : (
+                <ArrowRight className="h-4 w-4 text-stone-300" />
+              )}
+            </button>
+          </div>
+        </Surface>
+      </div>
+
+      <section>
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-sm font-semibold text-stone-900">{t('admin.dashboard.recentProducts', 'Latest products')}</h2>
+          <button type="button" onClick={() => onOpenTab('products')} className="inline-flex items-center text-xs font-semibold text-amber-700 hover:text-amber-800">
+            {t('admin.dashboard.viewAll', 'View all')}
+            <ArrowRight className="ml-1 h-3.5 w-3.5" />
+          </button>
+        </div>
+        {products.length === 0 ? (
+          <EmptyState
+            icon={Package}
+            title={t('admin.dashboard.products.noProducts')}
+            action={
+              <Link to="/admin/products/new" className={`${adminPrimaryBtn} mt-4`}>
+                <Plus className="h-4 w-4" />
+                {t('admin.dashboard.addProduct')}
+              </Link>
+            }
+          />
+        ) : (
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+            {products.map((product) => (
+              <ProductCard key={product.id} product={product} uncategorized={uncategorized} compact />
+            ))}
+          </div>
+        )}
+      </section>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Surface>
+          <div className="flex items-center justify-between border-b border-stone-100 px-5 py-4">
+            <h2 className="text-sm font-semibold text-stone-900">{t('admin.dashboard.latestJournal', 'Latest journal')}</h2>
+            <button type="button" onClick={() => onOpenTab('blog')} className="inline-flex items-center text-xs font-semibold text-amber-700 hover:text-amber-800">
+              {t('admin.dashboard.viewAll', 'View all')}
+              <ArrowRight className="ml-1 h-3.5 w-3.5" />
+            </button>
+          </div>
+          <ul className="divide-y divide-stone-100">
+            {blogPosts.length === 0 ? (
+              <li className="px-5 py-10 text-center text-sm text-stone-500">{t('admin.blog.noPosts')}</li>
+            ) : (
+              blogPosts.map((post) => (
+                <li key={post.id}>
+                  <Link to={`/admin/blog/${post.id}`} className="flex items-center justify-between gap-3 px-5 py-3.5 hover:bg-stone-50">
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold text-stone-900">{localizedTitle(post.title, post.slug)}</p>
+                      <p className="mt-0.5 text-xs text-stone-400">{post.category || uncategorized}</p>
+                    </div>
+                    <StatusPill tone={post.status === 'published' ? 'emerald' : 'stone'}>
+                      {post.status === 'published' ? t('admin.blog.published') : t('admin.blog.draft')}
+                    </StatusPill>
+                  </Link>
+                </li>
+              ))
+            )}
+          </ul>
+        </Surface>
+
+        <Surface>
+          <div className="flex items-center justify-between border-b border-stone-100 px-5 py-4">
+            <h2 className="text-sm font-semibold text-stone-900">{t('admin.dashboard.latestVideos', 'Latest videos')}</h2>
+            <button type="button" onClick={() => onOpenTab('videos')} className="inline-flex items-center text-xs font-semibold text-amber-700 hover:text-amber-800">
+              {t('admin.dashboard.viewAll', 'View all')}
+              <ArrowRight className="ml-1 h-3.5 w-3.5" />
+            </button>
+          </div>
+          {videoPosts.length === 0 ? (
+            <p className="px-5 py-10 text-center text-sm text-stone-500">{t('admin.videos.noVideos', 'No videos yet.')}</p>
+          ) : (
+            <div className="grid grid-cols-2 gap-3 p-4">
+              {videoPosts.map((post) => (
+                <Link key={post.id} to={`/admin/videos/${post.id}`} className="group min-w-0">
+                  <div className="aspect-video overflow-hidden rounded-xl bg-stone-100">
+                    <img
+                      src={deriveVideoThumbnailUrl(post) || FALLBACK_VIDEO_THUMB}
+                      alt=""
+                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      referrerPolicy="no-referrer"
+                      onError={handleImageError}
+                    />
+                  </div>
+                  <p className="mt-2 truncate text-sm font-semibold text-stone-900">{localizedTitle(post.title, post.slug)}</p>
+                </Link>
+              ))}
+            </div>
+          )}
+        </Surface>
+      </div>
+    </div>
+  );
+}
+
+function RfqDetail({
+  rfq,
+  onUpdateStatus,
+}: {
+  rfq: RFQ;
+  onUpdateStatus: (id: string, newStatus: string, currentStatus: string) => void;
+}) {
+  const { t } = useTranslation();
+
   return (
     <div>
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-stone-900">{title}</h1>
-          {subtitle && <p className="mt-1 text-sm text-stone-500">{subtitle}</p>}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <h2 className="text-xl font-semibold text-stone-900">{rfq.customer_name}</h2>
+            <RfqStatusBadge status={rfq.status} newLabel={t('admin.dashboard.rfqs.new')} />
+          </div>
+          <p className="mt-1 text-sm font-medium text-stone-600">{rfq.product_name}</p>
+          <p className="mt-2 text-sm text-stone-500">
+            <a href={`mailto:${rfq.customer_email}`} className="text-amber-700 hover:underline">
+              {rfq.customer_email}
+            </a>
+          </p>
+          <p className="mt-1 font-mono text-xs text-stone-400">{new Date(rfq.created_at).toLocaleString()}</p>
         </div>
-        {action}
+        <div className="flex flex-wrap gap-2">
+          {rfq.status === 'new' ? (
+            <button type="button" onClick={() => onUpdateStatus(rfq.id, 'read', rfq.status)} className={`${adminPrimaryBtn} px-3 py-1.5 text-xs`}>
+              <Check className="mr-1.5 h-3.5 w-3.5" />
+              {t('admin.dashboard.rfqs.markRead', 'Mark read')}
+            </button>
+          ) : rfq.status === 'archived' ? (
+            <button type="button" onClick={() => onUpdateStatus(rfq.id, 'read', rfq.status)} className={`${adminSecondaryBtn} px-3 py-1.5 text-xs`}>
+              <Inbox className="mr-1.5 h-3.5 w-3.5" />
+              {t('admin.dashboard.rfqs.unarchive', 'Unarchive')}
+            </button>
+          ) : (
+            <>
+              <button type="button" onClick={() => onUpdateStatus(rfq.id, 'new', rfq.status)} className={`${adminSecondaryBtn} px-3 py-1.5 text-xs`}>
+                {t('admin.dashboard.rfqs.markUnread', 'Mark unread')}
+              </button>
+              <button
+                type="button"
+                onClick={() => onUpdateStatus(rfq.id, 'archived', rfq.status)}
+                className={`${adminSecondaryBtn} px-3 py-1.5 text-xs hover:border-red-200 hover:bg-red-50 hover:text-red-700`}
+              >
+                <Archive className="mr-1.5 h-3.5 w-3.5" />
+                {t('admin.dashboard.rfqs.archive', 'Archive')}
+              </button>
+            </>
+          )}
+        </div>
       </div>
-      {children}
-    </div>
-  );
-}
-
-function SearchField({
-  value,
-  onChange,
-  placeholder,
-}: {
-  value: string;
-  onChange: (value: string) => void;
-  placeholder: string;
-}) {
-  return (
-    <div className="relative w-full sm:max-w-sm">
-      <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400" />
-      <input
-        type="search"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        className="block w-full rounded-xl border-stone-200 bg-white py-2.5 pl-9 pr-3 text-sm shadow-sm placeholder:text-stone-400 focus:border-stone-900 focus:outline-none focus:ring-1 focus:ring-stone-900"
-      />
+      <div className="mt-5 whitespace-pre-wrap rounded-xl border border-stone-200 bg-stone-50 p-4 text-sm leading-relaxed text-stone-700">
+        {rfq.message}
+      </div>
+      <a
+        href={`mailto:${rfq.customer_email}?subject=Re: RFQ for ${rfq.product_name}`}
+        className={`${adminPrimaryBtn} mt-5`}
+      >
+        <Mail className="mr-2 h-4 w-4" />
+        {t('admin.dashboard.rfqs.replyEmail')}
+      </a>
     </div>
   );
 }
@@ -1051,7 +1294,6 @@ function StatTile({
   badge,
   onClick,
   tone,
-  className = '',
 }: {
   icon: React.ComponentType<{ className?: string }>;
   label: string;
@@ -1059,7 +1301,6 @@ function StatTile({
   badge?: string;
   onClick: () => void;
   tone: 'amber' | 'blue' | 'green' | 'stone';
-  className?: string;
 }) {
   const tones = {
     amber: 'bg-amber-50 text-amber-700',
@@ -1071,17 +1312,17 @@ function StatTile({
     <button
       type="button"
       onClick={onClick}
-      className={`rounded-2xl border border-stone-200 bg-white p-4 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-stone-300 hover:shadow-md ${className}`}
+      className="flex items-center gap-3 rounded-2xl border border-stone-200 bg-white p-4 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-stone-300 hover:shadow-md"
     >
-      <div className={`mb-3 inline-flex rounded-xl p-2.5 ${tones[tone]}`}>
+      <div className={`inline-flex rounded-xl p-2.5 ${tones[tone]}`}>
         <Icon className="h-5 w-5" />
       </div>
-      <p className="text-xs font-medium uppercase tracking-wider text-stone-500">{label}</p>
-      <div className="mt-1 flex items-center gap-2">
-        <p className="text-2xl font-bold text-stone-900">{value}</p>
-        {badge && (
-          <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-800">{badge}</span>
-        )}
+      <div className="min-w-0">
+        <p className="text-[11px] font-medium uppercase tracking-wider text-stone-500">{label}</p>
+        <div className="mt-0.5 flex items-center gap-2">
+          <p className="text-xl font-bold tabular-nums text-stone-900">{value}</p>
+          {badge && <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-800">{badge}</span>}
+        </div>
       </div>
     </button>
   );
@@ -1102,73 +1343,68 @@ function QuickAction({ to, icon: Icon, label }: { to: string; icon: React.Compon
   );
 }
 
-function ProductCard({ product, uncategorized }: { product: Product; uncategorized: string }) {
+function ProductCard({ product, uncategorized, compact }: { product: Product; uncategorized: string; compact?: boolean }) {
   const src = firstImage(product.images) || PRODUCT_IMAGE_PLACEHOLDER;
   return (
     <Link
       to={`/admin/products/${product.id}`}
       className="group overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
     >
-      <div className="aspect-[4/3] bg-stone-100">
+      <div className={`bg-stone-100 ${compact ? 'aspect-square' : 'aspect-[4/3]'}`}>
         <img src={src} alt="" className="h-full w-full object-cover" onError={handleImageError} />
       </div>
-      <div className="p-3">
-        <p className="truncate text-sm font-semibold text-stone-900 group-hover:text-amber-800">{product.title}</p>
-        <p className="mt-1 truncate text-[11px] font-medium uppercase tracking-wide text-stone-400">
-          {product.category || uncategorized}
-        </p>
+      <div className={compact ? 'p-3' : 'flex items-start justify-between gap-2 p-4'}>
+        <div className="min-w-0">
+          <p className="truncate text-sm font-semibold text-stone-900 group-hover:text-amber-800">{product.title}</p>
+          <p className="mt-1 truncate text-[11px] font-medium uppercase tracking-wide text-stone-400">{product.category || uncategorized}</p>
+        </div>
+        {!compact && <Edit className="mt-0.5 h-4 w-4 shrink-0 text-stone-300 group-hover:text-stone-500" />}
       </div>
     </Link>
   );
 }
 
 function RfqStatusBadge({ status, newLabel }: { status: string; newLabel: string }) {
-  const label = status === 'new' ? newLabel : status === 'archived' ? 'Archived' : 'Read';
-  const cls =
+  const { t } = useTranslation();
+  const label =
     status === 'new'
-      ? 'bg-amber-100 text-amber-800'
+      ? newLabel
       : status === 'archived'
-        ? 'bg-stone-200 text-stone-500'
-        : 'bg-sky-50 text-sky-800';
-  return (
-    <span className={`inline-flex items-center rounded-md px-2 py-1 text-[10px] font-bold uppercase tracking-wider ${cls}`}>
-      {label}
-    </span>
-  );
+        ? t('admin.dashboard.rfqs.filterArchived', 'Archived')
+        : t('admin.dashboard.rfqs.filterRead', 'Read');
+  const tone = status === 'new' ? 'amber' : status === 'archived' ? 'stone' : 'sky';
+  return <StatusPill tone={tone}>{label}</StatusPill>;
 }
 
-function EmptyState({
-  icon: Icon,
-  title,
-  action,
-  embedded,
-}: {
-  icon: React.ComponentType<{ className?: string }>;
-  title: string;
-  action?: React.ReactNode;
-  embedded?: boolean;
-}) {
-  return (
-    <div className={`px-6 py-14 text-center ${embedded ? '' : 'rounded-2xl border border-dashed border-stone-300 bg-white'}`}>
-      <Icon className="mx-auto h-10 w-10 text-stone-300" />
-      <p className="mt-3 font-medium text-stone-500">{title}</p>
-      {action}
-    </div>
-  );
+function EmployeeRoleBadge({ role }: { role: Employee['role'] }) {
+  const { t } = useTranslation();
+  const tone = role === 'admin' ? 'emerald' : role === 'employee' ? 'sky' : role === 'rejected' ? 'red' : 'amber';
+  const label =
+    role === 'admin'
+      ? t('admin.dashboard.roleAdmin', 'Admin')
+      : role === 'employee'
+        ? t('admin.dashboard.roleEmployee', 'Employee')
+        : role === 'rejected'
+          ? t('admin.dashboard.employees.roles.rejected', 'Rejected')
+          : t('admin.dashboard.employees.roles.pending', 'Pending');
+  return <StatusPill tone={tone}>{label}</StatusPill>;
 }
 
 function DashboardSkeleton() {
   return (
     <div className="animate-pulse space-y-6">
-      <div className="h-8 w-48 rounded-lg bg-stone-200" />
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="h-28 rounded-2xl bg-white ring-1 ring-stone-200" />
+      <div className="space-y-2">
+        <div className="h-3 w-28 rounded bg-stone-200" />
+        <div className="h-8 w-64 rounded-lg bg-stone-200" />
+      </div>
+      <div className="grid grid-cols-2 gap-3 xl:grid-cols-5">
+        {[1, 2, 3, 4, 5].map((i) => (
+          <div key={i} className="h-20 rounded-2xl bg-white ring-1 ring-stone-200" />
         ))}
       </div>
-      <div className="grid gap-6 lg:grid-cols-5">
-        <div className="h-64 rounded-2xl bg-white ring-1 ring-stone-200 lg:col-span-2" />
-        <div className="h-64 rounded-2xl bg-white ring-1 ring-stone-200 lg:col-span-3" />
+      <div className="grid gap-6 xl:grid-cols-12">
+        <div className="h-72 rounded-2xl bg-white ring-1 ring-stone-200 xl:col-span-7" />
+        <div className="h-72 rounded-2xl bg-white ring-1 ring-stone-200 xl:col-span-5" />
       </div>
     </div>
   );

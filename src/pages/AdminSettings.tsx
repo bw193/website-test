@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../supabase';
 import { Loader2, Save, Image as ImageIcon, Upload, Plus, Trash2, Settings as SettingsIcon, LayoutTemplate, Tags, Factory, ArrowUp, ArrowDown, AlertTriangle, Check, CircleSlash, Clock, Film, Play, Zap } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { FilterPills, adminPrimaryBtn, adminSecondaryBtn } from '../components/admin/AdminUi';
 import { pickLocalized } from '../utils/blog';
 import {
   deriveVideoThumbnailUrl,
@@ -27,6 +28,8 @@ type FeaturedVideoOption = {
   /** File size in bytes; null when it couldn't be read (embeds, network error). */
   bytes: number | null;
 };
+
+type SettingsSection = 'hero' | 'video' | 'factory' | 'categories';
 
 export default function AdminSettings() {
   const { t } = useTranslation();
@@ -55,6 +58,7 @@ export default function AdminSettings() {
   const [videosLoading, setVideosLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [needsSetup, setNeedsSetup] = useState(false);
+  const [section, setSection] = useState<SettingsSection>('hero');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -414,41 +418,74 @@ NOTIFY pgrst, 'reload schema';`}
     );
   }
 
+  const saveButton = (
+    <button onClick={handleSave} disabled={saving} className={adminPrimaryBtn}>
+      {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+      {saving ? t('admin.dashboard.settings.saving') : t('admin.dashboard.settings.save')}
+    </button>
+  );
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {error && (
-        <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm font-medium">
+        <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-medium text-red-700">
           {error}
         </div>
       )}
 
-      {/* Hero Backgrounds */}
-      <div className="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden">
-        <div className="px-6 py-5 border-b border-stone-100 bg-stone-50/50 flex items-center justify-between">
-          <h3 className="text-base font-semibold text-stone-900 flex items-center gap-2">
+      <div className="flex flex-col gap-3 rounded-2xl border border-stone-200 bg-white p-3 shadow-sm lg:flex-row lg:items-center lg:justify-between">
+        <FilterPills<SettingsSection>
+          value={section}
+          onChange={setSection}
+          options={[
+            { id: 'hero', label: t('admin.dashboard.settings.navHero', 'Homepage images') },
+            { id: 'video', label: t('admin.dashboard.settings.navVideo', 'Featured video') },
+            { id: 'factory', label: t('admin.dashboard.settings.navFactory', 'Factory') },
+            { id: 'categories', label: t('admin.dashboard.settings.navCategories', 'Categories') },
+          ]}
+        />
+        {saveButton}
+      </div>
+
+      {section === 'hero' && (
+      <div className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
+        <div className="flex items-center justify-between border-b border-stone-100 bg-stone-50/50 px-6 py-5">
+          <h3 className="flex items-center gap-2 text-base font-semibold text-stone-900">
             <LayoutTemplate className="h-5 w-5 text-stone-400" />
             {t('admin.dashboard.settings.heroBgLabel')}
           </h3>
           <button
             type="button"
             onClick={handleAddBg}
-            className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg text-stone-700 bg-stone-100 hover:bg-stone-200 transition-colors"
+            className="inline-flex items-center rounded-lg bg-stone-100 px-3 py-1.5 text-xs font-medium text-stone-700 transition-colors hover:bg-stone-200"
           >
-            <Plus className="h-3.5 w-3.5 mr-1" />
+            <Plus className="mr-1 h-3.5 w-3.5" />
             {t('admin.dashboard.settings.addImage')}
           </button>
         </div>
         <div className="p-6">
-          <p className="text-sm text-stone-500 mb-6">
+          <p className="mb-6 text-sm text-stone-500">
             {t('admin.dashboard.settings.heroBgHelp')}
           </p>
           
           <div className="space-y-4">
             {heroBgs.map((bg, index) => (
-              <div key={index} className="flex flex-col sm:flex-row gap-4 items-start sm:items-center p-4 bg-stone-50 rounded-xl border border-stone-200">
-                <div className="flex-1 w-full">
+              <div key={index} className="flex flex-col gap-4 rounded-xl border border-stone-200 bg-stone-50 p-4 sm:flex-row sm:items-center">
+                <div className="relative h-24 w-full shrink-0 overflow-hidden rounded-lg border border-stone-200 bg-stone-200 sm:h-20 sm:w-36">
+                  {bg.trim() ? (
+                    <img src={bg} alt="" className="h-full w-full object-cover" referrerPolicy="no-referrer" />
+                  ) : (
+                    <div className="flex h-full items-center justify-center text-stone-400">
+                      <ImageIcon className="h-6 w-6" />
+                    </div>
+                  )}
+                  <span className="absolute left-2 top-2 rounded bg-stone-950/80 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                    {index + 1}
+                  </span>
+                </div>
+                <div className="min-w-0 flex-1">
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                       <ImageIcon className="h-4 w-4 text-stone-400" />
                     </div>
                     <input
@@ -456,11 +493,11 @@ NOTIFY pgrst, 'reload schema';`}
                       value={bg}
                       onChange={(e) => handleBgChange(index, e.target.value)}
                       placeholder={t('admin.dashboard.settings.heroBgPlaceholder')}
-                      className="block w-full pl-10 rounded-xl border-stone-200 py-2 text-sm focus:border-stone-900 focus:ring-1 focus:ring-stone-900 bg-white"
+                      className="block w-full rounded-xl border-stone-200 bg-white py-2 pl-10 text-sm focus:border-stone-900 focus:ring-1 focus:ring-stone-900"
                     />
                   </div>
                 </div>
-                <div className="flex items-center gap-2 w-full sm:w-auto">
+                <div className="flex w-full items-center gap-2 sm:w-auto">
                   <input
                     type="file"
                     accept="image/*"
@@ -472,15 +509,15 @@ NOTIFY pgrst, 'reload schema';`}
                     type="button"
                     onClick={() => document.getElementById(`file-upload-${index}`)?.click()}
                     disabled={uploading}
-                    className="flex-1 sm:flex-none inline-flex justify-center items-center px-4 py-2 border border-stone-200 rounded-xl shadow-sm text-sm font-medium text-stone-700 bg-white hover:bg-stone-50 transition-colors disabled:opacity-50"
+                    className={`${adminSecondaryBtn} flex-1 py-2 sm:flex-none`}
                   >
-                    {uploading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Upload className="h-4 w-4 mr-2 text-stone-400" />}
-                    Upload
+                    {uploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4 text-stone-400" />}
+                    {t('admin.dashboard.settings.upload', 'Upload')}
                   </button>
                   <button
                     type="button"
                     onClick={() => handleRemoveBg(index)}
-                    className="p-2 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    className="rounded-lg p-2 text-stone-400 transition-colors hover:bg-red-50 hover:text-red-600"
                     title={t('admin.dashboard.settings.removeImage')}
                   >
                     <Trash2 className="h-5 w-5" />
@@ -489,28 +526,12 @@ NOTIFY pgrst, 'reload schema';`}
               </div>
             ))}
           </div>
-
-          {heroBgs.some(bg => bg.trim() !== '') && (
-            <div className="mt-8 pt-6 border-t border-stone-100">
-              <p className="text-sm font-semibold text-stone-900 mb-4">{t('admin.dashboard.settings.preview')}</p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {heroBgs.filter(bg => bg.trim() !== '').map((bg, index) => (
-                  <div key={index} className="aspect-video w-full rounded-xl overflow-hidden border border-stone-200 bg-stone-100 relative group">
-                    <img src={bg} alt={`Hero Background Preview ${index + 1}`} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-                    <div className="absolute inset-0 bg-stone-900/10 group-hover:bg-transparent transition-colors"></div>
-                    <div className="absolute top-2 left-2 bg-stone-900/80 text-white text-xs font-bold px-2 py-1 rounded-md backdrop-blur-sm">
-                      Slide {index + 1}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       </div>
+      )}
 
-      {/* Home Featured Video — one published video highlighted on the homepage */}
-      <div className="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden">
+      {section === 'video' && (
+      <div className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
         <div className="px-6 py-5 border-b border-stone-100 bg-stone-50/50 flex items-center justify-between gap-3">
           <h3 className="text-base font-semibold text-stone-900 flex items-center gap-2">
             <Film className="h-5 w-5 text-stone-400" />
@@ -667,9 +688,10 @@ NOTIFY pgrst, 'reload schema';`}
           )}
         </div>
       </div>
+      )}
 
-      {/* Factory Gallery — homepage company image showcase */}
-      <div className="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden">
+      {section === 'factory' && (
+      <div className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
         <div className="px-6 py-5 border-b border-stone-100 bg-stone-50/50 flex items-center justify-between">
           <h3 className="text-base font-semibold text-stone-900 flex items-center gap-2">
             <Factory className="h-5 w-5 text-stone-400" />
@@ -798,9 +820,11 @@ NOTIFY pgrst, 'reload schema';`}
           )}
         </div>
       </div>
+      )}
 
-      {/* Categories */}
-      <div className="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden">
+      {section === 'categories' && (
+      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
         <div className="px-6 py-5 border-b border-stone-100 bg-stone-50/50 flex items-center justify-between">
           <h3 className="text-base font-semibold text-stone-900 flex items-center gap-2">
             <Tags className="h-5 w-5 text-stone-400" />
@@ -820,7 +844,7 @@ NOTIFY pgrst, 'reload schema';`}
             Manage product categories shown in the catalog and product form.
           </p>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-3">
             {categories.map((cat, index) => (
               <div key={index} className="flex items-center gap-2 bg-stone-50 p-2 rounded-xl border border-stone-200">
                 <input
@@ -844,8 +868,7 @@ NOTIFY pgrst, 'reload schema';`}
         </div>
       </div>
 
-      {/* Journal Categories */}
-      <div className="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden">
+      <div className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
         <div className="px-6 py-5 border-b border-stone-100 bg-stone-50/50 flex items-center justify-between">
           <h3 className="text-base font-semibold text-stone-900 flex items-center gap-2">
             <Tags className="h-5 w-5 text-stone-400" />
@@ -865,7 +888,7 @@ NOTIFY pgrst, 'reload schema';`}
             Manage the categories available when writing Journal articles.
           </p>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-3">
             {blogCategories.map((cat, index) => (
               <div key={index} className="flex items-center gap-2 bg-stone-50 p-2 rounded-xl border border-stone-200">
                 <input
@@ -889,17 +912,8 @@ NOTIFY pgrst, 'reload schema';`}
         </div>
       </div>
 
-      {/* Save Button */}
-      <div className="flex justify-end">
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="inline-flex items-center px-6 py-3 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-stone-900 hover:bg-stone-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-stone-900 disabled:opacity-50 transition-colors"
-        >
-          {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
-          {saving ? t('admin.dashboard.settings.saving') : t('admin.dashboard.settings.save')}
-        </button>
       </div>
+      )}
     </div>
   );
 }
