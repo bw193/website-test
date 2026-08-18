@@ -18,8 +18,8 @@ import SEO from '../components/SEO';
 import { supabase, hasSupabaseConfig } from '../supabase';
 import { supabaseConfig } from '../supabaseConfig';
 import type { VideoSourceType } from '../types/video';
-import { buildEmbedUrl } from '../utils/video';
-import { captureVideoFrame, deriveEmbedThumbnail } from '../utils/videoThumbnail';
+import { buildEmbedUrl, youtubePosterUrl } from '../utils/video';
+import { captureVideoFrame, deriveEmbedThumbnail, isDerivedEmbedThumbnail } from '../utils/videoThumbnail';
 import { toSlug } from '../utils/slug';
 
 const DEFAULT_VIDEO_CATEGORIES = ['Product Demo', 'Factory Tour', 'Installation', 'Technology', 'Quality Control'];
@@ -182,19 +182,39 @@ export default function AdminVideoForm() {
   }, []);
 
   useEffect(() => {
-    if (sourceType !== 'embed' || !videoUrl.trim()) return;
+    const url = videoUrl.trim();
+    const embedUrl = buildEmbedUrl(url);
+    if (!embedUrl) return;
+
     let active = true;
-    const refreshEmbedFields = async () => {
-      const embedUrl = buildEmbedUrl(videoUrl.trim());
-      if (embedUrl) setValue('embed_url', embedUrl, { shouldDirty: true });
-      const thumbnail = await deriveEmbedThumbnail(videoUrl.trim());
-      if (active && thumbnail) setValue('thumbnail_url', thumbnail, { shouldDirty: true });
-    };
-    refreshEmbedFields();
+    const timer = window.setTimeout(async () => {
+      if (getValues('source_type') !== 'embed') {
+        setValue('source_type', 'embed', { shouldDirty: true });
+      }
+      if (getValues('embed_url') !== embedUrl) {
+        setValue('embed_url', embedUrl, { shouldDirty: true });
+      }
+
+      const currentThumb = getValues('thumbnail_url');
+      if (currentThumb && !isDerivedEmbedThumbnail(currentThumb)) return;
+
+      const instantThumb = youtubePosterUrl(url);
+      if (instantThumb && currentThumb !== instantThumb) {
+        setValue('thumbnail_url', instantThumb, { shouldDirty: true });
+      }
+
+      const thumbnail = await deriveEmbedThumbnail(url);
+      if (!active || !thumbnail) return;
+      const latestThumb = getValues('thumbnail_url');
+      if (latestThumb && !isDerivedEmbedThumbnail(latestThumb)) return;
+      if (latestThumb !== thumbnail) setValue('thumbnail_url', thumbnail, { shouldDirty: true });
+    }, 250);
+
     return () => {
       active = false;
+      window.clearTimeout(timer);
     };
-  }, [sourceType, videoUrl, setValue]);
+  }, [sourceType, videoUrl, getValues, setValue]);
 
   const uploadBlobToBucket = async (blob: Blob, folder: string, extension: string): Promise<string> => {
     const fileName = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}.${extension}`;
@@ -313,13 +333,23 @@ export default function AdminVideoForm() {
       alert(t('admin.videos.videoUrlRequired', 'A video URL is required for this source type.'));
       return;
     }
-    if (!hasSupabaseConfig) {
-      alert(t('admin.productForm.alerts.supabaseNotConfigured'));
-      return;
-    }
 
     setGeneratingCover(true);
     try {
+      const embedUrl = buildEmbedUrl(url);
+      if (embedUrl) {
+        setValue('source_type', 'embed', { shouldDirty: true });
+        setValue('embed_url', embedUrl, { shouldDirty: true });
+        const thumbnail = await deriveEmbedThumbnail(url);
+        if (!thumbnail) throw new Error('Could not derive a thumbnail for this embedded video.');
+        setValue('thumbnail_url', thumbnail, { shouldDirty: true });
+        return;
+      }
+      if (!hasSupabaseConfig) {
+        alert(t('admin.productForm.alerts.supabaseNotConfigured'));
+        return;
+      }
+
       const snapshot = await captureVideoFrame(url);
       const thumbnailPublicUrl = await uploadBlobToBucket(snapshot.thumbnail, 'thumbnails', 'jpg');
       setValue('thumbnail_url', thumbnailPublicUrl, { shouldDirty: true });
@@ -353,23 +383,30 @@ export default function AdminVideoForm() {
       return;
     }
 
-    const derivedEmbedUrl = values.source_type === 'embed'
-      ? values.embed_url.trim() || buildEmbedUrl(trimmedVideoUrl)
+    const embedFromUrl = buildEmbedUrl(trimmedVideoUrl);
+    const sourceTypeToSave = embedFromUrl ? 'embed' : values.source_type;
+    const derivedEmbedUrl = sourceTypeToSave === 'embed'
+      ? values.embed_url.trim() || embedFromUrl
       : '';
-    if (values.source_type === 'embed' && !derivedEmbedUrl) {
+    if (sourceTypeToSave === 'embed' && !derivedEmbedUrl) {
       alert(t('admin.videos.embedUrlRequired', 'A supported embed URL is required.'));
       return;
     }
 
     setSaving(true);
     try {
+      let thumbnailUrl = values.thumbnail_url.trim();
+      if (!thumbnailUrl && (sourceTypeToSave === 'embed' || embedFromUrl)) {
+        thumbnailUrl = await deriveEmbedThumbnail(trimmedVideoUrl);
+      }
+
       const payload: Record<string, unknown> = {
         slug,
         status: values.status,
-        source_type: values.source_type,
+        source_type: sourceTypeToSave,
         video_url: trimmedVideoUrl,
         embed_url: derivedEmbedUrl || null,
-        thumbnail_url: values.thumbnail_url.trim() || null,
+        thumbnail_url: thumbnailUrl || null,
         category: values.category || null,
         tags: splitTags(values.tags),
         duration_seconds: values.duration_seconds ? parseInt(values.duration_seconds, 10) || null : null,
@@ -566,7 +603,7 @@ export default function AdminVideoForm() {
                   </div>
                 )}
 
-                {sourceType === 'direct' && (
+                {(sourceType === 'direct' || sourceType === 'embed') && (
                   <button
                     type="button"
                     onClick={handleGenerateCoverFromUrl}
@@ -580,7 +617,7 @@ export default function AdminVideoForm() {
 
                 {sourceType === 'embed' && (
                   <p className="rounded-xl bg-stone-50 p-3 text-xs leading-relaxed text-stone-500">
-                    {t('admin.videos.embedHelp', 'YouTube and Vimeo watch URLs are converted automatically if this is blank.')}
+                    {t('admin.videos.embedHelp', 'Paste a YouTube or Vimeo URL (watch, Shorts, or youtu.be). The embed and cover are filled in automatically.')}
                   </p>
                 )}
               </div>
@@ -595,7 +632,7 @@ export default function AdminVideoForm() {
                 </div>
                 <div className="aspect-video overflow-hidden rounded-xl border border-stone-200 bg-white">
                   {thumbUrl ? (
-                    <img src={thumbUrl} alt="" className="h-full w-full object-cover" />
+                    <img src={thumbUrl} alt="" className="h-full w-full object-cover" referrerPolicy="no-referrer" />
                   ) : (
                     <div className="flex h-full flex-col items-center justify-center px-6 text-center text-stone-400">
                       <ImageIcon className="mb-2 h-8 w-8" />

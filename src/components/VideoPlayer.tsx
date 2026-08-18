@@ -34,7 +34,7 @@ export default function VideoPlayer({ video, className = '' }: { video: PlayerVi
       ) : (
         <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
           {video.thumbnail_url && (
-            <img src={video.thumbnail_url} alt="" className="absolute inset-0 h-full w-full object-cover opacity-50" />
+            <img src={video.thumbnail_url} alt="" className="absolute inset-0 h-full w-full object-cover opacity-50" referrerPolicy="no-referrer" />
           )}
           <PlayCircle className="relative h-14 w-14 text-white/80" />
         </div>

@@ -4,6 +4,7 @@ import { Loader2, Save, Image as ImageIcon, Upload, Plus, Trash2, Settings as Se
 import { useTranslation } from 'react-i18next';
 import { pickLocalized } from '../utils/blog';
 import {
+  deriveVideoThumbnailUrl,
   FALLBACK_VIDEO_THUMB,
   fetchMediaSize,
   formatMediaSize,
@@ -68,7 +69,7 @@ export default function AdminSettings() {
     try {
       const { data, error } = await supabase
         .from('videos')
-        .select('slug, title, thumbnail_url, category, duration_seconds, published_at, video_url')
+        .select('slug, title, thumbnail_url, category, duration_seconds, published_at, video_url, embed_url')
         .eq('status', 'published')
         .order('published_at', { ascending: false });
       if (error) throw error;
@@ -79,7 +80,7 @@ export default function AdminSettings() {
           (data || []).map(async (row: Partial<VideoPost>) => ({
             slug: row.slug as string,
             title: pickLocalized(row.title, 'en') || (row.slug as string),
-            thumbnail_url: row.thumbnail_url ?? null,
+            thumbnail_url: deriveVideoThumbnailUrl(row) || null,
             category: row.category ?? null,
             duration_seconds: row.duration_seconds ?? null,
             bytes: row.video_url ? await fetchMediaSize(row.video_url) : null,

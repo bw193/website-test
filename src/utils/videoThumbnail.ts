@@ -1,3 +1,5 @@
+import { isYouTubeShortsUrl, parseYouTubeId } from './video';
+
 const FRAME_SAMPLE_COUNT = 5;
 const MIN_ACCEPTABLE_LUMA = 22;
 const THUMBNAIL_POSTER_WIDTH = 960;
@@ -145,34 +147,73 @@ export async function captureVideoFrame(source: File | string): Promise<{ thumbn
   }
 }
 
-function getYouTubeId(url: string): string {
+const YOUTUBE_PLACEHOLDER_EDGE = 120;
+
+function isVimeoUrl(url: string): boolean {
   try {
-    const u = new URL(url);
-    const host = u.hostname.replace(/^www\./, '');
-    if (host === 'youtu.be') return u.pathname.split('/').filter(Boolean)[0] || '';
-    if (host.endsWith('youtube.com')) {
-      return u.searchParams.get('v') || u.pathname.match(/\/(?:embed|shorts)\/([^/?#]+)/)?.[1] || '';
-    }
+    const host = new URL(url).hostname.replace(/^www\./, '').toLowerCase();
+    return host === 'vimeo.com' || host.endsWith('.vimeo.com');
   } catch {
-    return '';
+    return false;
   }
-  return '';
+}
+
+export function isDerivedEmbedThumbnail(url: string | null | undefined): boolean {
+  if (!url) return false;
+  return /ytimg\.com|img\.youtube\.com|vimeocdn\.com/i.test(url);
+}
+
+function probeImageSize(url: string): Promise<{ width: number; height: number } | null> {
+  if (typeof Image === 'undefined') return Promise.resolve(null);
+  return new Promise((resolve) => {
+    const img = new Image();
+    const timer = setTimeout(() => {
+      img.onload = null;
+      img.onerror = null;
+      resolve(null);
+    }, 2500);
+    img.referrerPolicy = 'no-referrer';
+    img.onload = () => {
+      clearTimeout(timer);
+      resolve({ width: img.naturalWidth, height: img.naturalHeight });
+    };
+    img.onerror = () => {
+      clearTimeout(timer);
+      resolve(null);
+    };
+    img.src = url;
+  });
+}
+
+async function youtubeThumbnailUrl(videoId: string, shorts: boolean): Promise<string> {
+  const files = shorts
+    ? ['oar2.jpg', 'maxresdefault.jpg', 'hq720.jpg', 'sddefault.jpg', 'hqdefault.jpg', 'mqdefault.jpg']
+    : ['maxresdefault.jpg', 'hq720.jpg', 'sddefault.jpg', 'hqdefault.jpg', 'mqdefault.jpg'];
+  const fallback = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+  if (typeof Image === 'undefined') return fallback;
+
+  const probed = await Promise.all(
+    files.map(async (file) => {
+      const candidate = `https://i.ytimg.com/vi/${videoId}/${file}`;
+      const size = await probeImageSize(candidate);
+      if (!size || size.width <= YOUTUBE_PLACEHOLDER_EDGE || size.height <= YOUTUBE_PLACEHOLDER_EDGE) return null;
+      return candidate;
+    })
+  );
+  return probed.find((candidate): candidate is string => Boolean(candidate)) || fallback;
 }
 
 export async function deriveEmbedThumbnail(url: string): Promise<string> {
-  const youtubeId = getYouTubeId(url);
-  if (youtubeId) return `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`;
+  const youtubeId = parseYouTubeId(url);
+  if (youtubeId) return youtubeThumbnailUrl(youtubeId, isYouTubeShortsUrl(url));
 
+  if (!isVimeoUrl(url)) return '';
   try {
-    const u = new URL(url);
-    if (u.hostname.replace(/^www\./, '').endsWith('vimeo.com')) {
-      const res = await fetch(`https://vimeo.com/api/oembed.json?url=${encodeURIComponent(url)}`);
-      if (!res.ok) return '';
-      const data = (await res.json()) as { thumbnail_url?: string };
-      return data.thumbnail_url || '';
-    }
+    const res = await fetch(`https://vimeo.com/api/oembed.json?url=${encodeURIComponent(url)}`);
+    if (!res.ok) return '';
+    const data = (await res.json()) as { thumbnail_url?: string };
+    return data.thumbnail_url || '';
   } catch {
     return '';
   }
-  return '';
 }

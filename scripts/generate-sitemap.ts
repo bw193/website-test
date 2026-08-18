@@ -6,7 +6,7 @@ import 'dotenv/config';
 import type { LocalizedMap } from '../src/types/blog';
 import type { VideoSourceType } from '../src/types/video';
 import { pickLocalized } from '../src/utils/blog';
-import { getVideoPlayback, normalizeVideoSourceType } from '../src/utils/video';
+import { deriveVideoThumbnailUrl, getVideoPlayback, normalizeVideoSourceType } from '../src/utils/video';
 import { SEO_LANDING_PAGES } from '../src/data/seoLandingPages';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -99,7 +99,8 @@ function buildVideoBlock(video: SitemapVideoPost, lang: string): string | null {
     video_url: video.video_url,
     embed_url: video.embed_url,
   });
-  const thumbnail = isHttpUrl(video.thumbnail_url) ? video.thumbnail_url : '';
+  const thumbnail = deriveVideoThumbnailUrl(video);
+  const thumbnailLoc = isHttpUrl(thumbnail) ? thumbnail : '';
   const playbackTag =
     playback.kind === 'video' && isHttpUrl(playback.src)
       ? `      <video:content_loc>${escapeXml(playback.src)}</video:content_loc>`
@@ -107,9 +108,9 @@ function buildVideoBlock(video: SitemapVideoPost, lang: string): string | null {
         ? `      <video:player_loc>${escapeXml(playback.src)}</video:player_loc>`
         : '';
 
-  if (!thumbnail || !playbackTag) {
+  if (!thumbnailLoc || !playbackTag) {
     console.warn(
-      `[sitemap] Skipping video metadata for ${video.slug}: missing ${!thumbnail ? 'thumbnail_url' : 'video source URL'}.`
+      `[sitemap] Skipping video metadata for ${video.slug}: missing ${!thumbnailLoc ? 'thumbnail_url' : 'video source URL'}.`
     );
     return null;
   }
@@ -130,7 +131,7 @@ function buildVideoBlock(video: SitemapVideoPost, lang: string): string | null {
 
   return [
     '    <video:video>',
-    `      <video:thumbnail_loc>${escapeXml(thumbnail)}</video:thumbnail_loc>`,
+    `      <video:thumbnail_loc>${escapeXml(thumbnailLoc)}</video:thumbnail_loc>`,
     `      <video:title>${escapeXml(title)}</video:title>`,
     `      <video:description>${escapeXml(description)}</video:description>`,
     playbackTag,

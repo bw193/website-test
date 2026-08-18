@@ -22,7 +22,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 import SEO from '../components/SEO';
 import { captureVideoFrame, deriveEmbedThumbnail } from '../utils/videoThumbnail';
-import { FALLBACK_VIDEO_THUMB } from '../utils/video';
+import { buildEmbedUrl, deriveVideoThumbnailUrl, FALLBACK_VIDEO_THUMB } from '../utils/video';
 import { PRODUCT_IMAGE_PLACEHOLDER, handleImageError } from '../utils/imagePlaceholder';
 import { ADMIN_TABS, type AdminShellContext, type AdminTab } from '../components/AdminLayout';
 
@@ -242,7 +242,7 @@ export default function AdminDashboard() {
     let thumbnailUrl = '';
     let durationSeconds = post.duration_seconds ?? null;
 
-    if (post.source_type === 'embed') {
+    if (post.source_type === 'embed' || buildEmbedUrl(sourceUrl)) {
       thumbnailUrl = await deriveEmbedThumbnail(sourceUrl);
       if (!thumbnailUrl) throw new Error('Could not derive a thumbnail for this embedded video.');
     } else {
@@ -701,9 +701,10 @@ export default function AdminDashboard() {
                 <div key={post.id} className="group overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition-shadow hover:shadow-md">
                   <div className="relative aspect-video bg-stone-100">
                     <img
-                      src={post.thumbnail_url || FALLBACK_VIDEO_THUMB}
+                      src={deriveVideoThumbnailUrl(post) || FALLBACK_VIDEO_THUMB}
                       alt=""
                       className="h-full w-full object-cover"
+                      referrerPolicy="no-referrer"
                       onError={handleImageError}
                     />
                     <div className="absolute right-2 top-2 flex gap-1">

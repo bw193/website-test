@@ -363,7 +363,7 @@ export const en = {
         sourceUpload: "Supabase upload",
         videoUrl: "Video URL",
         embedUrl: "Embed URL",
-        embedHelp: "YouTube and Vimeo watch URLs are converted automatically if this is blank.",
+        embedHelp: "Paste a YouTube or Vimeo URL (watch, Shorts, or youtu.be). The embed and cover are filled in automatically.",
           uploadVideo: "Upload video",
           uploadingProgress: "Uploading {{progress}}%",
           uploadLimitHelp: "MP4, WebM, OGG, MOV. Bucket limit: 500MB. Storage > Settings > Global file size limit must also be above the video size.",
