@@ -391,7 +391,7 @@ export default function AdminVideoForm() {
         const { error } = await supabase.from('videos').insert({ ...payload, created_at: new Date().toISOString() });
         if (error) throw error;
       }
-      navigate('/admin');
+      navigate('/admin?tab=videos');
     } catch (err: unknown) {
       console.error('Error saving video', err);
       const message = err instanceof Error ? err.message : '';
@@ -403,21 +403,21 @@ export default function AdminVideoForm() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-stone-50">
+      <div className="flex items-center justify-center py-24">
         <Loader2 className="h-8 w-8 animate-spin text-stone-900" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-stone-50 pb-24">
+    <div className="pb-16">
       <SEO title="Admin Videos | BOLEN Mirror" noindex={true} />
-      <header className="sticky top-0 z-30 border-b border-stone-200 bg-white">
+      <header className="sticky top-0 z-20 border-b border-stone-200 bg-white/95 backdrop-blur-sm">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center gap-4">
               <button
-                onClick={() => navigate('/admin')}
+                onClick={() => navigate('/admin?tab=videos')}
                 className="-ml-2 rounded-lg p-2 text-stone-400 transition-colors hover:bg-stone-100 hover:text-stone-900"
                 title={t('admin.blog.backToDashboard')}
               >
@@ -430,7 +430,7 @@ export default function AdminVideoForm() {
             <div className="flex items-center gap-3">
               <button
                 type="button"
-                onClick={() => navigate('/admin')}
+                onClick={() => navigate('/admin?tab=videos')}
                 className="rounded-xl border border-stone-300 bg-white px-4 py-2 text-sm font-medium text-stone-700 shadow-sm transition-colors hover:bg-stone-50"
               >
                 {t('admin.blog.cancel')}

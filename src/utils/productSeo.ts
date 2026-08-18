@@ -117,6 +117,24 @@ export function buildProductDescription(
 }
 
 /**
+ * Short buyer-facing card copy derived from the product's real long-form copy.
+ * Legacy `description` values are often model numbers, so they are only used
+ * when they read like prose. The return value is intentionally empty when no
+ * trustworthy summary exists; ProductCard then uses its localized OEM fallback.
+ */
+export function buildProductBuyerSummary(
+  product: Pick<ProductSeoFields, 'description' | 'details'>,
+  max = 185
+): string {
+  const details = product.details ? markdownToPlainText(product.details) : '';
+  if (details.length >= 50) return truncateAtWord(details, max);
+
+  const description = product.description ? collapseWhitespace(product.description) : '';
+  if (description.length >= 60) return truncateAtWord(description, max);
+  return '';
+}
+
+/**
  * Title for a product page. Google truncates around 60 characters; raw product
  * titles here run to 121, so trim to a word boundary and always leave room for
  * the brand suffix — previously any title over 55 chars got no brand at all and

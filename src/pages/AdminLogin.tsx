@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Sparkles, LogIn, UserPlus, ArrowLeft } from 'lucide-react';
+import { LogIn, UserPlus, ArrowLeft, Clock, ShieldOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 import SEO from '../components/SEO';
+
+const LOGO_URL =
+  'https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/logo.png';
 
 export default function AdminLogin() {
   const { user, isAdmin, isPending, loginWithEmail, registerWithEmail, loading, logout } = useAuth();
@@ -43,150 +45,168 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex">
-      <SEO title="Admin Login | BOLEN Mirror" noindex={true} />
-      {/* Left Panel - Form */}
-      <div className="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:w-[480px] xl:w-[560px] lg:px-20 xl:px-24">
-        <div className="mx-auto w-full max-w-sm lg:w-96">
-          <Link to="/" className="inline-flex items-center text-sm font-medium text-stone-500 hover:text-stone-900 mb-8 transition-colors">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Website
+    <div className="flex min-h-[100dvh] bg-stone-50">
+      <SEO title="Employee Portal | BOLEN Mirror" noindex={true} />
+
+      <div className="relative flex flex-1 flex-col justify-center px-6 py-12 sm:px-10 lg:flex-none lg:w-[520px] lg:px-16 xl:px-20">
+        <div className="mx-auto w-full max-w-sm">
+          <Link
+            to="/en/"
+            className="inline-flex items-center text-sm font-medium text-stone-500 transition-colors hover:text-stone-900"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            {t('admin.login.backToWebsite', 'Back to website')}
           </Link>
-          
-          <div>
-            <div className="flex items-center gap-3">
-              <div className="bg-stone-900 p-2 rounded-xl">
-                <Sparkles className="h-6 w-6 text-amber-500" />
-              </div>
-              <h2 className="text-2xl font-bold tracking-tight text-stone-900">
-                BOLEN Admin
-              </h2>
+
+          <div className="mt-10 flex items-center gap-3">
+            <img src={LOGO_URL} alt="" className="h-11 w-11 rounded-xl bg-white object-contain shadow-sm ring-1 ring-stone-200" width="44" height="44" />
+            <div>
+              <p className="text-lg font-semibold tracking-tight text-stone-900">BOLEN</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-600">
+                {t('admin.login.title')}
+              </p>
             </div>
-            <h2 className="mt-8 text-3xl font-extrabold text-stone-900 tracking-tight">
-              {t('admin.login.title')}
-            </h2>
-            <p className="mt-2 text-sm text-stone-500">
-              {isRegistering ? t('admin.login.subtitleRegister') : t('admin.login.subtitleLogin')}
-            </p>
           </div>
+
+          <h1 className="mt-8 text-3xl font-semibold tracking-tight text-stone-900">
+            {isRegistering
+              ? t('admin.login.registerHeading', 'Request access')
+              : t('admin.login.signInHeading', 'Sign in')}
+          </h1>
+          <p className="mt-2 text-sm leading-relaxed text-stone-500">
+            {isRegistering ? t('admin.login.subtitleRegister') : t('admin.login.subtitleLogin')}
+          </p>
 
           <div className="mt-8">
             {error && (
-              <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-r-md">
-                <div className="flex">
-                  <div className="ml-3">
-                    <p className="text-sm text-red-700">{error}</p>
-                  </div>
-                </div>
+              <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                {error}
               </div>
             )}
             {registrationSuccess && !user && (
-              <div className="bg-green-50 border-l-4 border-green-500 p-4 mb-6 rounded-r-md">
-                <div className="flex">
-                  <div className="ml-3">
-                    <p className="text-sm text-green-700 font-medium">Registration successful!</p>
-                    <p className="text-sm text-green-600 mt-1">Your account is pending approval from an administrator. You will be able to log in once approved.</p>
-                  </div>
-                </div>
+              <div className="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+                <p className="font-medium">{t('admin.login.registerSuccessTitle', 'Registration successful')}</p>
+                <p className="mt-1 text-emerald-700">
+                  {t('admin.login.registerSuccessDesc', 'Your account is pending administrator approval. You can sign in once it is approved.')}
+                </p>
               </div>
             )}
+
             {user && isPending ? (
-              <div className="bg-amber-50 border-l-4 border-amber-500 p-4 mb-6 rounded-r-md">
-                <div className="flex">
-                  <div className="ml-3">
-                    <p className="text-sm text-amber-800 font-medium">{t('admin.login.pendingTitle')}</p>
-                    <p className="text-sm text-amber-700 mt-1">{t('admin.login.pendingDesc', { email: user.email })}</p>
+              <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5">
+                <div className="flex items-start gap-3">
+                  <div className="rounded-xl bg-amber-100 p-2 text-amber-700">
+                    <Clock className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-amber-900">{t('admin.login.pendingTitle')}</p>
+                    <p className="mt-1 text-sm text-amber-800">{t('admin.login.pendingDesc', { email: user.email })}</p>
                   </div>
                 </div>
-              </div>
-            ) : user && !isAdmin ? (
-              <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-r-md">
-                <div className="flex">
-                  <div className="ml-3">
-                    <p className="text-sm text-red-800 font-medium">{t('admin.login.deniedTitle')}</p>
-                    <p className="text-sm text-red-700 mt-1">{t('admin.login.deniedDesc', { email: user.email })}</p>
-                  </div>
-                </div>
-              </div>
-            ) : null}
-            
-            {user ? (
-              <div className="mt-6">
                 <button
+                  type="button"
                   onClick={() => logout()}
-                  className="w-full flex justify-center py-3 px-4 border border-stone-300 rounded-xl shadow-sm text-sm font-medium text-stone-700 bg-white hover:bg-stone-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-stone-900 transition-all"
+                  className="mt-5 w-full rounded-xl border border-amber-200 bg-white py-2.5 text-sm font-medium text-stone-700 hover:bg-amber-50"
                 >
-                  Sign Out
+                  {t('admin.dashboard.signOut', 'Sign out')}
                 </button>
               </div>
-            ) : (
+            ) : user && !isAdmin ? (
+              <div className="rounded-2xl border border-red-200 bg-red-50 p-5">
+                <div className="flex items-start gap-3">
+                  <div className="rounded-xl bg-red-100 p-2 text-red-700">
+                    <ShieldOff className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-red-900">{t('admin.login.deniedTitle')}</p>
+                    <p className="mt-1 text-sm text-red-800">{t('admin.login.deniedDesc', { email: user.email })}</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => logout()}
+                  className="mt-5 w-full rounded-xl border border-red-200 bg-white py-2.5 text-sm font-medium text-stone-700 hover:bg-red-50"
+                >
+                  {t('admin.dashboard.signOut', 'Sign out')}
+                </button>
+              </div>
+            ) : !user ? (
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div>
-                  <label className="block text-sm font-medium text-stone-700 mb-1">{t('admin.login.email')}</label>
+                  <label className="mb-1.5 block text-sm font-medium text-stone-700">{t('admin.login.email')}</label>
                   <input
                     type="email"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="appearance-none block w-full px-4 py-3 border border-stone-200 rounded-xl shadow-sm placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-stone-900 focus:border-transparent transition-all sm:text-sm bg-stone-50"
-                    placeholder="admin@bolen.com"
+                    className="block w-full rounded-xl border border-stone-200 bg-white px-4 py-3 text-sm shadow-sm placeholder:text-stone-400 focus:border-stone-900 focus:outline-none focus:ring-2 focus:ring-stone-900/10"
+                    placeholder="you@bolen.com"
+                    autoComplete="email"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-stone-700 mb-1">{t('admin.login.password')}</label>
+                  <label className="mb-1.5 block text-sm font-medium text-stone-700">{t('admin.login.password')}</label>
                   <input
                     type="password"
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="appearance-none block w-full px-4 py-3 border border-stone-200 rounded-xl shadow-sm placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-stone-900 focus:border-transparent transition-all sm:text-sm bg-stone-50"
+                    className="block w-full rounded-xl border border-stone-200 bg-white px-4 py-3 text-sm shadow-sm placeholder:text-stone-400 focus:border-stone-900 focus:outline-none focus:ring-2 focus:ring-stone-900/10"
                     placeholder="••••••••"
+                    autoComplete={isRegistering ? 'new-password' : 'current-password'}
                   />
                 </div>
 
                 <button
                   type="submit"
                   disabled={loading || isLoading}
-                  className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-stone-900 hover:bg-stone-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-stone-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all mt-6"
+                  className="mt-2 flex w-full items-center justify-center rounded-xl bg-stone-900 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-stone-800 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {isLoading ? (
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                    <div className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
                   ) : isRegistering ? (
-                    <UserPlus className="w-5 h-5 mr-2" />
+                    <UserPlus className="mr-2 h-5 w-5" />
                   ) : (
-                    <LogIn className="w-5 h-5 mr-2" />
+                    <LogIn className="mr-2 h-5 w-5" />
                   )}
                   {isRegistering ? t('admin.login.registerBtn') : t('admin.login.signInBtn')}
                 </button>
 
-                <div className="mt-6 text-center">
+                <div className="text-center">
                   <button
                     type="button"
                     onClick={() => setIsRegistering(!isRegistering)}
-                    className="text-sm text-stone-500 hover:text-stone-900 font-medium transition-colors"
+                    className="text-sm font-medium text-stone-500 transition-colors hover:text-stone-900"
                   >
                     {isRegistering ? t('admin.login.alreadyHaveAccount') : t('admin.login.needAccount')}
                   </button>
                 </div>
               </form>
-            )}
+            ) : null}
           </div>
         </div>
       </div>
 
-      {/* Right Panel - Image */}
-      <div className="hidden lg:block relative w-0 flex-1 bg-stone-900">
+      <div className="relative hidden flex-1 bg-stone-950 lg:block">
         <img
-          className="absolute inset-0 h-full w-full object-cover opacity-80"
+          className="absolute inset-0 h-full w-full object-cover opacity-70"
           src="https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-images/site-assets/1773994889396-9i4t1ap.jpg"
-          alt="Premium LED Mirrors"
+          alt=""
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-stone-900/80 via-stone-900/20 to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 p-12 text-white">
-          <h3 className="text-3xl font-bold mb-2">Manage Your Catalog</h3>
-          <p className="text-stone-300 max-w-lg">
-            Access the BOLEN admin portal to update products, manage customer RFQs, and oversee your global B2B operations.
+        <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/40 to-stone-950/10" />
+        <div className="absolute inset-x-0 bottom-0 p-12 text-white">
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-amber-400">
+            {t('admin.login.panelKicker', 'Staff workspace')}
+          </p>
+          <h2 className="mt-3 max-w-lg text-3xl font-semibold tracking-tight">
+            {t('admin.login.panelTitle', 'Catalog, journal, and buyer RFQs in one place.')}
+          </h2>
+          <p className="mt-3 max-w-lg text-sm leading-relaxed text-stone-300">
+            {t(
+              'admin.login.panelDesc',
+              'Update products, publish factory videos, and reply to global buyers without leaving the portal.'
+            )}
           </p>
         </div>
       </div>

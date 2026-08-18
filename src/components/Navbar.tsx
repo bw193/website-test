@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Menu, X, Globe } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useLocalizedPath } from '../hooks/useLocalizedPath';
+import { getSeoSolutionsUi } from '../data/seoLandingI18n';
 
 const LOGO_URL =
   'https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/logo.png';
@@ -14,6 +15,7 @@ export default function Navbar() {
   const location = useLocation();
   const { t } = useTranslation();
   const { lang, lp } = useLocalizedPath();
+  const solutionsUi = getSeoSolutionsUi(lang);
   const navRef = React.useRef<HTMLElement>(null);
 
   const languages = [
@@ -83,6 +85,7 @@ export default function Navbar() {
   const navLinks = [
     { path: '/', label: t('navbar.home') },
     { path: '/products', label: t('navbar.catalog') },
+    { path: '/solutions', label: solutionsUi.navLabel },
     { path: '/blog', label: t('navbar.blog') },
     { path: '/videos', label: t('navbar.videos', 'Videos') },
     { path: '/our-story', label: t('navbar.ourStory') },

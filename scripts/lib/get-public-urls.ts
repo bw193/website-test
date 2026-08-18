@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import 'dotenv/config';
+import { SEO_LANDING_PAGES } from '../../src/data/seoLandingPages';
 
 export const LANGUAGES = ['en', 'zh', 'es', 'fr', 'de', 'it'] as const;
 export type Language = (typeof LANGUAGES)[number];
@@ -16,6 +17,12 @@ export const STATIC_PAGES: Omit<PublicPage, 'lastmod'>[] = [
   { path: '/products', changefreq: 'weekly', priority: '0.9' },
   { path: '/rfq', changefreq: 'monthly', priority: '0.8' },
   { path: '/our-story', changefreq: 'monthly', priority: '0.7' },
+  { path: '/solutions', changefreq: 'monthly', priority: '0.9' },
+  ...SEO_LANDING_PAGES.map((page) => ({
+    path: `/solutions/${page.slug}`,
+    changefreq: 'monthly',
+    priority: '0.9',
+  })),
 ];
 
 function toSlug(title: string): string {

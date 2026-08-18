@@ -10,10 +10,12 @@ import ProductCard from '../components/ProductCard';
 import { useLocalizedPath, useCurrentLang } from '../hooks/useLocalizedPath';
 import { readInitialBlogPost } from '../utils/prerenderData';
 import { localizePost, toListItem, formatBlogDate } from '../utils/blog';
+import type { BlogPost as RawBlogPost, BlogListItem, LocalizedBlogPost } from '../types/blog';
 import { buildBlogPostingSchema, buildBlogBreadcrumbSchema } from '../utils/blogSchema';
 import { optimizeImage } from '../utils/optimizeImage';
 import { runWhenIdle } from '../utils/idle';
-import type { BlogPost as RawBlogPost, BlogListItem, LocalizedBlogPost } from '../types/blog';
+import { recommendSolutionsForProduct } from '../data/seoLandingPages';
+import { getSeoSolutionsUi, localizeSeoLandingPage } from '../data/seoLandingI18n';
 
 const FALLBACK_COVER =
   'https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-images/site-assets/1773994889396-9i4t1ap.jpg';
@@ -132,6 +134,12 @@ export default function BlogPost() {
     );
   }
 
+  const solutionsUi = getSeoSolutionsUi(lang);
+  const relatedSolutions = recommendSolutionsForProduct({
+    title: post.title,
+    category: `${post.category || ''} ${post.excerpt || ''}`,
+  }).map((page) => localizeSeoLandingPage(page, lang));
+
   const cover = post.cover_image || FALLBACK_COVER;
   const seoTitle = post.seo_title || `${post.title} | BOLEN Mirror`;
   const seoDesc = post.seo_description || post.excerpt;
@@ -249,6 +257,13 @@ export default function BlogPost() {
               <ArrowUpRight className="w-4 h-4" />
             </Link>
             <Link
+              to={lp('/solutions')}
+              className="btn-secondary-on-dark"
+            >
+              {solutionsUi.navLabel}
+              <ArrowUpRight className="w-4 h-4" />
+            </Link>
+            <Link
               to={lp('/rfq')}
               className="btn-secondary-on-dark"
             >
@@ -257,6 +272,29 @@ export default function BlogPost() {
           </div>
         </div>
       </div>
+
+      {relatedSolutions.length > 0 && (
+        <section className="border-t border-stone-200 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
+            <h2 className="font-serif text-3xl md:text-4xl text-stone-900 tracking-tight mb-8">
+              {solutionsUi.relatedSolutions}
+            </h2>
+            <ul className="grid gap-4 md:grid-cols-3">
+              {relatedSolutions.map((solution) => (
+                <li key={solution.slug}>
+                  <Link
+                    to={lp(`/solutions/${solution.slug}`)}
+                    className="block rounded-2xl border border-stone-200 p-5 hover:border-amber-300"
+                  >
+                    <span className="font-medium text-stone-900">{solution.shortTitle || solution.h1}</span>
+                    <span className="mt-2 block text-sm leading-6 text-stone-600">{solution.blurb}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      )}
 
       {/* Related products — internal links to the catalog (SEO + conversion) */}
       {relatedProducts.length > 0 && (

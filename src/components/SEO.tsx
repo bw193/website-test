@@ -11,6 +11,8 @@ interface SEOProps {
   ogType?: string;
   schema?: any | any[];
   noindex?: boolean;
+  /** Languages with a real equivalent route. Defaults to all supported locales. */
+  alternateLanguages?: string[];
 }
 
 const SITE_URL = 'https://bolenmirror.com';
@@ -22,7 +24,8 @@ export default function SEO({
   ogImage = 'https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-images/site-assets/1773994889396-9i4t1ap.jpg',
   ogType = 'website',
   schema,
-  noindex = false
+  noindex = false,
+  alternateLanguages = ['en', 'zh', 'es', 'fr', 'de', 'it']
 }: SEOProps) {
   const currentLang = useCurrentLang();
   // Cloudflare Pages serves directory-style URLs with a trailing slash
@@ -36,6 +39,7 @@ export default function SEO({
   // recurse into nested arrays/expressions, so every alternate link and JSON-LD
   // script must appear as a direct, flat sibling of <Helmet>.
   const schemaArray = schema ? (Array.isArray(schema) ? schema : [schema]) : [];
+  const hasAlternate = (lang: string) => alternateLanguages.includes(lang);
 
   return (
     <Helmet>
@@ -45,13 +49,13 @@ export default function SEO({
       {noindex && <meta name="robots" content="noindex, nofollow" />}
       <link rel="canonical" href={canonicalUrl} />
 
-      <link rel="alternate" hrefLang="en" href={`${SITE_URL}/en${suffix}/`} />
-      <link rel="alternate" hrefLang="zh" href={`${SITE_URL}/zh${suffix}/`} />
-      <link rel="alternate" hrefLang="es" href={`${SITE_URL}/es${suffix}/`} />
-      <link rel="alternate" hrefLang="fr" href={`${SITE_URL}/fr${suffix}/`} />
-      <link rel="alternate" hrefLang="de" href={`${SITE_URL}/de${suffix}/`} />
-      <link rel="alternate" hrefLang="it" href={`${SITE_URL}/it${suffix}/`} />
-      <link rel="alternate" hrefLang="x-default" href={`${SITE_URL}/en${suffix}/`} />
+      {hasAlternate('en') && <link rel="alternate" hrefLang="en" href={`${SITE_URL}/en${suffix}/`} />}
+      {hasAlternate('zh') && <link rel="alternate" hrefLang="zh" href={`${SITE_URL}/zh${suffix}/`} />}
+      {hasAlternate('es') && <link rel="alternate" hrefLang="es" href={`${SITE_URL}/es${suffix}/`} />}
+      {hasAlternate('fr') && <link rel="alternate" hrefLang="fr" href={`${SITE_URL}/fr${suffix}/`} />}
+      {hasAlternate('de') && <link rel="alternate" hrefLang="de" href={`${SITE_URL}/de${suffix}/`} />}
+      {hasAlternate('it') && <link rel="alternate" hrefLang="it" href={`${SITE_URL}/it${suffix}/`} />}
+      {hasAlternate('en') && <link rel="alternate" hrefLang="x-default" href={`${SITE_URL}/en${suffix}/`} />}
 
       <meta property="og:type" content={ogType} />
       <meta property="og:url" content={canonicalUrl} />

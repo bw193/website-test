@@ -3,10 +3,15 @@ import { Mail, Phone, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLocalizedPath } from '../hooks/useLocalizedPath';
+import { getLocalizedSeoLandingPages, getSeoSolutionsUi } from '../data/seoLandingI18n';
 
 export default function Footer() {
-  const { lp } = useLocalizedPath();
+  const { lp, lang } = useLocalizedPath();
+  const solutionsUi = getSeoSolutionsUi(lang);
   const { t } = useTranslation();
+  const footerSolutions = getLocalizedSeoLandingPages(lang).filter((page) =>
+    ['led-bathroom-mirror-manufacturer', 'oem-odm-mirror-manufacturing', 'hotel-bathroom-mirrors'].includes(page.slug)
+  );
 
   return (
     <footer className="bg-stone-900 text-white">
@@ -51,6 +56,14 @@ export default function Footer() {
             <h3 className="text-sm font-semibold uppercase tracking-wider mb-4 text-amber-500">{t('footer.quickLinks', 'Quick Links')}</h3>
             <ul className="space-y-2 text-stone-400 text-sm">
               <li><Link to={lp('/products')} className="hover:text-white transition-colors">{t('navbar.catalog', 'Product Catalog')}</Link></li>
+              <li><Link to={lp('/solutions')} className="hover:text-white transition-colors">{solutionsUi.footerLabel}</Link></li>
+              {footerSolutions.map((page) => (
+                <li key={page.slug}>
+                  <Link to={lp(`/solutions/${page.slug}`)} className="hover:text-white transition-colors">
+                    {page.shortTitle || page.h1}
+                  </Link>
+                </li>
+              ))}
               <li><Link to={lp('/our-story')} className="hover:text-white transition-colors">{t('navbar.ourStory', 'Our Story')}</Link></li>
               <li><Link to={lp('/blog')} className="hover:text-white transition-colors">{t('navbar.blog', 'Journal')}</Link></li>
               <li><Link to={lp('/videos')} className="hover:text-white transition-colors">{t('navbar.videos', 'Videos')}</Link></li>

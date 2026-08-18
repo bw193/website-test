@@ -7,6 +7,7 @@ import type { LocalizedMap } from '../src/types/blog';
 import type { VideoSourceType } from '../src/types/video';
 import { pickLocalized } from '../src/utils/blog';
 import { getVideoPlayback, normalizeVideoSourceType } from '../src/utils/video';
+import { SEO_LANDING_PAGES } from '../src/data/seoLandingPages';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -147,16 +148,19 @@ function buildUrlEntry(
   changefreq: string,
   priority: string,
   lang: string,
-  videoBlock?: string | null
+  videoBlock?: string | null,
+  alternateLanguages: readonly string[] = LANGUAGES
 ): string {
   // Trailing slash matches Cloudflare Pages directory-style serving and the
   // canonical/hreflang URLs the prerender emits, so sitemap URLs resolve
   // 200 directly without a slash-redirect hop.
   const slug = pagePath === '/' ? '' : pagePath;
-  const hreflangs = LANGUAGES.map(
+  const hreflangs = alternateLanguages.map(
     (l) => `    <xhtml:link rel="alternate" hreflang="${l}" href="${DOMAIN}/${l}${slug}/" />`
   ).join('\n');
-  const xDefault = `    <xhtml:link rel="alternate" hreflang="x-default" href="${DOMAIN}/en${slug}/" />`;
+  const xDefault = alternateLanguages.includes('en')
+    ? `    <xhtml:link rel="alternate" hreflang="x-default" href="${DOMAIN}/en${slug}/" />`
+    : '';
 
   return `  <url>
     <loc>${DOMAIN}/${lang}${slug}/</loc>
@@ -249,8 +253,19 @@ async function generateSitemap() {
     };
   });
 
+  const solutionPages: SitemapPage[] = [
+    { loc: '/solutions', changefreq: 'monthly', priority: '0.9', lastmod: today },
+    ...SEO_LANDING_PAGES.map((page) => ({
+      loc: `/solutions/${page.slug}`,
+      changefreq: 'monthly',
+      priority: '0.9',
+      lastmod: today,
+    })),
+  ];
+
   const allPages: SitemapPage[] = [
     ...staticPages.map((p) => ({ ...p, lastmod: today })),
+    ...solutionPages,
     ...productPages,
     ...blogPostPages,
     ...videoPostPages,
@@ -260,7 +275,6 @@ async function generateSitemap() {
   const urls = LANGUAGES.flatMap((lang) =>
     allPages.map((p) => buildUrlEntry(p.loc, p.lastmod, p.changefreq, p.priority, lang, p.videoByLang?.[lang]))
   );
-
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
 ${urls.join('\n')}
@@ -281,7 +295,9 @@ ${urls.join('\n')}
     // dist/ may not exist yet during pre-build
   }
 
-  console.log(`Generated sitemap with ${staticPages.length + productPages.length + blogPostPages.length + videoPostPages.length} URLs`);
+  console.log(
+    `Generated sitemap with ${allPages.length} multilingual page templates, including ${solutionPages.length} solution templates`
+  );
 }
 
 generateSitemap();

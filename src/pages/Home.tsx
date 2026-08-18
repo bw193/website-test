@@ -14,6 +14,8 @@ import { parseFeaturedVideoSlug, toVideoListItem, VIDEO_LIST_COLUMNS } from '../
 import { buildVideoObjectSchema } from '../utils/videoSchema';
 import { runWhenIdle } from '../utils/idle';
 import type { VideoListItem, VideoPost } from '../types/video';
+import { getLocalizedSeoLandingPages, getSeoSolutionsUi } from '../data/seoLandingI18n';
+import { HOME_SOLUTION_SLUGS } from '../data/seoLandingPages';
 
 const GlobalMap = lazy(() => import('../components/GlobalMap'));
 // Lazy so `motion` (used by GlobalMap's animated markers) stays off the home
@@ -61,6 +63,8 @@ const CERTS = [
 export default function Home() {
   const { t } = useTranslation();
   const { lp, lang } = useLocalizedPath();
+  const solutionPages = getLocalizedSeoLandingPages(lang);
+  const solutionsUi = getSeoSolutionsUi(lang);
   const initialData = readInitialHomeData<any>();
   const [heroBgs, setHeroBgs] = useState<string[]>(
     initialData?.heroBgs && initialData.heroBgs.length > 0 ? initialData.heroBgs : DEFAULT_HERO_BGS
@@ -496,13 +500,13 @@ export default function Home() {
           </Reveal>
 
           {isLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
               {[1, 2, 3, 4, 5, 6].map((i) => (
                 <ProductCardSkeleton key={i} />
               ))}
             </div>
           ) : featuredProducts.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
               {featuredProducts.map((product, idx) => (
                 <Reveal key={product.id} delay={idx * 80}>
                   <ProductCard
@@ -523,6 +527,42 @@ export default function Home() {
 
       {/* Featured Video — editor-picked video (site_settings.home_featured_video).
           Click-to-play facade: nothing but the poster loads until asked. */}
+      <section className="border-y border-stone-200 bg-white py-16 sm:py-20" aria-labelledby="sourcing-solutions-title">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+            <div className="max-w-3xl">
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-amber-600">{solutionsUi.homeEyebrow}</p>
+              <h2 id="sourcing-solutions-title" className="mt-3 font-serif text-4xl text-stone-950 sm:text-5xl">
+                {solutionsUi.homeHeading}
+              </h2>
+              <p className="mt-5 leading-7 text-stone-600">
+                {solutionsUi.homeIntro}
+              </p>
+            </div>
+            <Link to={lp('/solutions')} className="inline-flex items-center gap-2 text-sm font-semibold text-stone-900">
+              {solutionsUi.navLabel} <ArrowRight className="h-4 w-4" />
+            </Link>
+            </div>
+            <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {HOME_SOLUTION_SLUGS.map((slug) => solutionPages.find((page) => page.slug === slug))
+                .filter((page): page is NonNullable<typeof page> => Boolean(page))
+                .map((page) => (
+                <Link
+                  key={page.slug}
+                  to={lp(`/solutions/${page.slug}`)}
+                  className="group rounded-2xl border border-stone-200 bg-[#FAF9F6] p-6 transition-all hover:-translate-y-0.5 hover:border-amber-300 hover:shadow-lg"
+                >
+                  <h3 className="text-lg font-medium text-stone-900 group-hover:text-amber-800">{page.shortTitle || page.h1}</h3>
+                  <p className="mt-2 line-clamp-2 text-sm leading-6 text-stone-600">{page.blurb || page.description}</p>
+                  <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-stone-900">
+                    {solutionsUi.homeExplore} <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+
       {featuredVideo && <FeaturedVideo video={featuredVideo} />}
 
       {/* Manufacturing Advantage — 3 bullets (replaces former 4-step Process) */}
