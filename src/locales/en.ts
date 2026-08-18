@@ -160,8 +160,12 @@ export const en = {
     },
     products: {
       catalog: "Product Catalog",
+      kicker: "OEM · ODM · Factory direct",
       desc: "Browse our extensive collection of premium mirrors, featuring smart LED technology, elegant vanity designs, and customizable options.",
       noProducts: "No products found matching your criteria.",
+      emptyTitle: "No products found",
+      emptySearch: "We couldn’t find anything matching “{{query}}”. Try adjusting your search or filters.",
+      clearFilters: "Clear all filters",
       viewDetails: "View Details",
       searchLabel: "Search products",
       searchPlaceholder: "Search products...",

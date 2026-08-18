@@ -160,8 +160,12 @@ export const zh = {
     },
     products: {
       catalog: "产品目录",
+      kicker: "OEM · ODM · 工厂直供",
       desc: "浏览我们丰富的优质镜子系列，包括智能LED技术、优雅的化妆镜设计和可定制选项。",
       noProducts: "没有找到符合您标准的产品。",
+      emptyTitle: "未找到产品",
+      emptySearch: "没有找到与“{{query}}”匹配的产品。请尝试调整搜索或筛选条件。",
+      clearFilters: "清除全部筛选",
       viewDetails: "查看详情",
       searchLabel: "搜索产品",
       searchPlaceholder: "搜索产品...",

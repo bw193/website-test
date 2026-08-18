@@ -160,8 +160,12 @@ export const es = {
     },
     products: {
       catalog: "Catálogo de Productos",
+      kicker: "OEM · ODM · Precio de fábrica",
       desc: "Explore nuestra extensa colección de espejos premium, con tecnología LED inteligente, elegantes diseños de tocador y opciones personalizables.",
       noProducts: "No se encontraron productos que coincidan con sus criterios.",
+      emptyTitle: "No se encontraron productos",
+      emptySearch: "No encontramos nada que coincida con “{{query}}”. Pruebe a ajustar la búsqueda o los filtros.",
+      clearFilters: "Borrar todos los filtros",
       viewDetails: "Ver Detalles",
       searchLabel: "Buscar productos",
       searchPlaceholder: "Buscar productos...",

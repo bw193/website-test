@@ -160,8 +160,12 @@ export const it = {
     },
     products: {
       catalog: "Catalogo Prodotti",
+      kicker: "OEM · ODM · Diretto dalla fabbrica",
       desc: "Sfoglia la nostra vasta collezione di specchi premium, con tecnologia LED intelligente, eleganti design da trucco e opzioni personalizzabili.",
       noProducts: "Nessun prodotto trovato corrispondente ai tuoi criteri.",
+      emptyTitle: "Nessun prodotto trovato",
+      emptySearch: "Nessun risultato per “{{query}}”. Prova a modificare ricerca o filtri.",
+      clearFilters: "Cancella tutti i filtri",
       viewDetails: "Vedi Dettagli",
       searchLabel: "Cerca prodotti",
       searchPlaceholder: "Cerca prodotti...",
