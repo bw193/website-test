@@ -10,6 +10,8 @@ export const fr = {
       homeDesc: "BOLEN Mirror est un fabricant leader de miroirs LED spécialisé dans les miroirs LED OEM, les miroirs intelligents, les miroirs de toilette et les miroirs de salle de bain pour les marques mondiales.",
       catalogTitle: "Catalogue de Produits Miroirs LED | Fabricant BOLEN Mirror",
       catalogDesc: "Explorez notre large gamme de miroirs LED OEM, miroirs intelligents, miroirs de toilette et miroirs de salle de bain d'un fabricant leader de miroirs LED. Fabrication de haute qualité pour les marques mondiales.",
+      categoryTitle: "{{category}} | Fabricant BOLEN Mirror",
+      categoryDesc: "Parcourez {{category}} BOLEN pour la vente en gros OEM/ODM. Miroirs LED, de toilette et de salle de bain en direct d'usine pour marques mondiales et projets hôteliers.",
       storyTitle: "Notre Histoire | Fabricant de Miroirs LED BOLEN",
       storyDesc: "Découvrez l'histoire et le savoir-faire de BOLEN (Jiaxing Chengtai Mirror Co., Ltd.), fabricant de miroirs LED et intelligents OEM fondé en 2005.",
       rfqTitle: "Demande de Devis | Fabricant de Miroirs LED BOLEN",
@@ -172,6 +174,8 @@ export const fr = {
       resultCount: "{{count}} produits trouvés",
       showMore: "Afficher plus",
       allCategories: "Toutes les Catégories",
+      categoriesNav: "Catégories de produits",
+      categoryIntro: "{{category}} en direct d'usine pour projets OEM/ODM et gros — dimensions, éclairage et finitions sur mesure depuis Jiaxing.",
       categories: {
         "New Arrival": "Nouveautés",
         "Hot Sale": "En Promotion",

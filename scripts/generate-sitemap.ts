@@ -8,6 +8,11 @@ import type { VideoSourceType } from '../src/types/video';
 import { pickLocalized } from '../src/utils/blog';
 import { deriveVideoThumbnailUrl, getVideoPlayback, normalizeVideoSourceType } from '../src/utils/video';
 import { SEO_LANDING_PAGES } from '../src/data/seoLandingPages';
+import {
+  categoryPublicPages,
+  DEFAULT_PRODUCT_CATEGORIES,
+  parseCategoriesSetting,
+} from '../src/utils/catalogCategory';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -206,6 +211,27 @@ async function generateSitemap() {
     };
   });
 
+  const { data: categorySetting, error: categoryError } = await supabase
+    .from('site_settings')
+    .select('value')
+    .eq('key', 'categories')
+    .single();
+
+  if (categoryError) {
+    console.warn('Could not fetch catalog categories for sitemap:', categoryError.message);
+  }
+
+  const parsedCategories = parseCategoriesSetting(categorySetting?.value);
+  const categoryPages = categoryPublicPages(
+    parsedCategories.length > 0 ? parsedCategories : [...DEFAULT_PRODUCT_CATEGORIES],
+    today
+  ).map((page) => ({
+    loc: page.path,
+    changefreq: page.changefreq,
+    priority: page.priority,
+    lastmod: page.lastmod,
+  }));
+
   // Published Journal (blog) posts. The table may not exist yet (SQL not run),
   // so a failure here just omits blog URLs instead of breaking the sitemap.
   const { data: blogPosts, error: blogError } = await supabase
@@ -268,6 +294,7 @@ async function generateSitemap() {
     ...staticPages.map((p) => ({ ...p, lastmod: today })),
     ...solutionPages,
     ...productPages,
+    ...categoryPages,
     ...blogPostPages,
     ...videoPostPages,
   ];
@@ -297,7 +324,7 @@ ${urls.join('\n')}
   }
 
   console.log(
-    `Generated sitemap with ${allPages.length} multilingual page templates, including ${solutionPages.length} solution templates`
+    `Generated sitemap with ${allPages.length} multilingual page templates, including ${solutionPages.length} solution templates and ${categoryPages.length} catalog category templates`
   );
 }
 

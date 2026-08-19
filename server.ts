@@ -4,6 +4,11 @@ import path from 'path';
 import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
 import { SEO_LANDING_PAGES } from './src/data/seoLandingPages';
+import {
+  categoryPublicPages,
+  DEFAULT_PRODUCT_CATEGORIES,
+  parseCategoriesSetting,
+} from './src/utils/catalogCategory';
 
 dotenv.config();
 
@@ -80,6 +85,22 @@ ${xDefault}
       return { loc: `/products/${slug}`, changefreq: 'weekly', priority: '0.8', lastmod };
     });
 
+    const { data: categorySetting } = await supabase
+      .from('site_settings')
+      .select('value')
+      .eq('key', 'categories')
+      .single();
+    const parsedCategories = parseCategoriesSetting(categorySetting?.value);
+    const categoryPages = categoryPublicPages(
+      parsedCategories.length > 0 ? parsedCategories : [...DEFAULT_PRODUCT_CATEGORIES],
+      today
+    ).map((page) => ({
+      loc: page.path,
+      changefreq: page.changefreq,
+      priority: page.priority,
+      lastmod: page.lastmod,
+    }));
+
     const { data: blogPosts } = await supabase
       .from('blog_posts')
       .select('slug, updated_at, published_at, created_at')
@@ -115,7 +136,7 @@ ${xDefault}
         lastmod: today,
       })),
     ];
-    const allPages = [...staticPages, ...solutionPages, ...productPages, ...blogPostPages, ...videoPostPages];
+    const allPages = [...staticPages, ...solutionPages, ...productPages, ...categoryPages, ...blogPostPages, ...videoPostPages];
     const urls = LANGUAGES.flatMap((lang) =>
       allPages.map((p) => buildUrlEntry(p.loc, p.lastmod, p.changefreq, p.priority, lang))
     );

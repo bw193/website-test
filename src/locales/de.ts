@@ -10,6 +10,8 @@ export const de = {
       homeDesc: "BOLEN Mirror ist ein führender LED-Spiegelhersteller, spezialisiert auf OEM-LED-Spiegel, Smart-Spiegel, Schminkspiegel und Badspiegel für globale Marken.",
       catalogTitle: "LED-Spiegel Produktkatalog | BOLEN Mirror Hersteller",
       catalogDesc: "Entdecken Sie unser umfangreiches Sortiment an OEM-LED-Spiegeln, Smart-Spiegeln, Schminkspiegeln und Badspiegeln von einem führenden LED-Spiegelhersteller. Hochwertige Fertigung für globale Marken.",
+      categoryTitle: "{{category}} | BOLEN Mirror Hersteller",
+      categoryDesc: "Entdecken Sie BOLEN {{category}} für OEM/ODM-Großhandel. LED-, Schmink- und Badspiegel direkt ab Werk für globale Marken und Hotelprojekte.",
       storyTitle: "Unsere Geschichte | BOLEN LED-Spiegelhersteller",
       storyDesc: "Erfahren Sie mehr über die Geschichte und Fertigungskompetenz von BOLEN (Jiaxing Chengtai Mirror Co., Ltd.), einem 2005 gegründeten Hersteller von LED- und OEM-Smart-Spiegeln.",
       rfqTitle: "Angebotsanfrage | BOLEN LED-Spiegelhersteller",
@@ -172,6 +174,8 @@ export const de = {
       resultCount: "{{count}} Produkte gefunden",
       showMore: "Mehr anzeigen",
       allCategories: "Alle Kategorien",
+      categoriesNav: "Produktkategorien",
+      categoryIntro: "{{category}} direkt ab Werk für OEM/ODM- und Großhandelsprojekte — individuelle Größen, Beleuchtung und Oberflächen aus Jiaxing.",
       categories: {
         "New Arrival": "Neuheiten",
         "Hot Sale": "Im Angebot",

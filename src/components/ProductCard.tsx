@@ -6,6 +6,7 @@ import { optimizeImage, imageSrcSet } from '../utils/optimizeImage';
 import { PRODUCT_IMAGE_PLACEHOLDER, handleImageError } from '../utils/imagePlaceholder';
 import { useLocalizedPath } from '../hooks/useLocalizedPath';
 import { toSlug } from '../utils/slug';
+import { catalogCategoryPath } from '../utils/catalogCategory';
 import { useProductTranslator } from '../utils/productI18n';
 import { polishEnglishProductTitle } from '../utils/productCopy';
 
@@ -88,9 +89,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
       <div className="flex flex-1 flex-col pt-5">
         <div className="mb-2 flex items-center justify-between gap-3">
           {category ? (
-            <span className="min-w-0 truncate text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-700">
+            <Link
+              to={lp(catalogCategoryPath(category))}
+              className="min-w-0 truncate text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-700 hover:text-amber-800"
+            >
               {t(`products.categories.${category}`, category)}
-            </span>
+            </Link>
           ) : (
             <span />
           )}

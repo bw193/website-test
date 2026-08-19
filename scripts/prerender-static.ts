@@ -60,6 +60,28 @@ import {
   getSeoSolutionsUi,
   localizeSeoLandingPage,
 } from '../src/data/seoLandingI18n';
+import {
+  buildCatalogCategorySchema,
+  CATALOG_CATEGORY_PREFIX,
+  DEFAULT_PRODUCT_CATEGORIES,
+  interpolateTemplate,
+  parseCategoriesSetting,
+  productMatchesCategory,
+  toCategorySlug,
+  uniqueCategorySlugs,
+} from '../src/utils/catalogCategory';
+import {
+  buildBlogIndexSchema,
+  buildBlogPostingSchema,
+  buildBlogBreadcrumbSchema,
+} from '../src/utils/blogSchema';
+import {
+  buildVideoBreadcrumbSchema,
+  buildVideoIndexSchema,
+  buildVideoObjectSchema,
+} from '../src/utils/videoSchema';
+import type { BlogPost, BlogListItem, LocalizedBlogPost } from '../src/types/blog';
+import type { LocalizedVideoPost, VideoListItem, VideoPost } from '../src/types/video';
 
 // Single source of truth for the four static routes' <title>/<meta description>.
 // The React pages read the same keys via t('seo.*'), so what gets baked into the
@@ -74,18 +96,24 @@ const LOCALE_SEO = {
   de: deLocale.translation.seo,
   it: itLocale.translation.seo,
 } as const;
-import {
-  buildBlogIndexSchema,
-  buildBlogPostingSchema,
-  buildBlogBreadcrumbSchema,
-} from '../src/utils/blogSchema';
-import {
-  buildVideoBreadcrumbSchema,
-  buildVideoIndexSchema,
-  buildVideoObjectSchema,
-} from '../src/utils/videoSchema';
-import type { BlogPost, BlogListItem, LocalizedBlogPost } from '../src/types/blog';
-import type { LocalizedVideoPost, VideoListItem, VideoPost } from '../src/types/video';
+
+const LOCALE_NAV = {
+  en: enLocale.translation.navbar,
+  zh: zhLocale.translation.navbar,
+  es: esLocale.translation.navbar,
+  fr: frLocale.translation.navbar,
+  de: deLocale.translation.navbar,
+  it: itLocale.translation.navbar,
+} as const;
+
+const LOCALE_PRODUCTS = {
+  en: enLocale.translation.products,
+  zh: zhLocale.translation.products,
+  es: esLocale.translation.products,
+  fr: frLocale.translation.products,
+  de: deLocale.translation.products,
+  it: itLocale.translation.products,
+} as const;
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = resolve(__dirname, '..');
@@ -730,7 +758,8 @@ function homeContent(
   lang: Lang,
   hero?: HeroImage,
   gallery: FactoryGalleryItem[] = [],
-  featuredVideo?: VideoListItem
+  featuredVideo?: VideoListItem,
+  categories: string[] = [...DEFAULT_PRODUCT_CATEGORIES]
 ): string {
   const c = COPY[lang];
   // Bake the LCP hero straight into the static HTML so the browser discovers
@@ -764,6 +793,12 @@ function homeContent(
         <a href="/${lang}/products/">${escapeHtml(c.navCatalog)}</a>
         <a href="/${lang}/our-story/">${escapeHtml(c.navStory)}</a>
         <a href="/${lang}/rfq/">${escapeHtml(c.navRfq)}</a>
+      </nav>
+      <nav aria-label="${escapeAttr(LOCALE_PRODUCTS[lang].categoriesNav)}">
+        <a href="/${lang}/products/">${escapeHtml(LOCALE_PRODUCTS[lang].allCategories)}</a>
+        ${uniqueCategorySlugs(categories.length ? categories : [...DEFAULT_PRODUCT_CATEGORIES]).map(({ name, slug }) =>
+          `<a href="/${lang}${CATALOG_CATEGORY_PREFIX}/${slug}/">${escapeHtml(categoryDisplayName(lang, name))}</a>`
+        ).join('\n        ')}
       </nav>
       ${solutionLinks}
       ${featuredVideoBlock(lang, featuredVideo)}
@@ -863,9 +898,24 @@ function seoLandingContent(
   `.trim();
 }
 
-function catalogContent(lang: Lang, products: Product[], tr: LangTranslations): string {
+function categoryDisplayName(lang: Lang, name: string): string {
+  const map = LOCALE_PRODUCTS[lang].categories as Record<string, string>;
+  return map[name] || name;
+}
+
+function catalogContent(
+  lang: Lang,
+  products: Product[],
+  tr: LangTranslations,
+  opts?: { categoryName?: string; categories?: string[] }
+): string {
   const c = COPY[lang];
-  const items = products
+  const categoryName = opts?.categoryName;
+  const categoryLabel = categoryName ? categoryDisplayName(lang, categoryName) : '';
+  const listed = categoryName
+    ? products.filter((p) => productMatchesCategory(p.category, categoryName))
+    : products;
+  const items = listed
     .map((p) => {
       const slug = toSlug(p.title || ''); // slug from English title
       const href = `/${lang}/products/${slug}/`;
@@ -877,10 +927,37 @@ function catalogContent(lang: Lang, products: Product[], tr: LangTranslations): 
       return `<li><a href="${escapeAttr(href)}">${imgTag}<span>${escapeHtml(title)}</span></a></li>`;
     })
     .join('\n        ');
+  const navCategories = opts?.categories?.length ? opts.categories : [...DEFAULT_PRODUCT_CATEGORIES];
+  const categoryNav = `
+      <nav aria-label="${escapeAttr(LOCALE_PRODUCTS[lang].categoriesNav)}">
+        ${categoryName
+          ? `<a href="/${lang}/products/">${escapeHtml(LOCALE_PRODUCTS[lang].allCategories)}</a>`
+          : `<span>${escapeHtml(LOCALE_PRODUCTS[lang].allCategories)}</span>`}
+        ${uniqueCategorySlugs(navCategories)
+          .map(({ name, slug }) => {
+            const label = categoryDisplayName(lang, name);
+            const href = `/${lang}${CATALOG_CATEGORY_PREFIX}/${slug}/`;
+            return categoryName && toCategorySlug(categoryName) === slug
+              ? `<span>${escapeHtml(label)}</span>`
+              : `<a href="${escapeAttr(href)}">${escapeHtml(label)}</a>`;
+          })
+          .join('\n        ')}
+      </nav>`;
+  const intro = categoryName
+    ? interpolateTemplate(LOCALE_PRODUCTS[lang].categoryIntro, { category: categoryLabel })
+    : c.catalogIntro;
   return `
     <div data-prerender="catalog">
-      <h1>${escapeHtml(c.catalogH1)}</h1>
-      <p>${escapeHtml(c.catalogIntro)}</p>
+      <nav aria-label="Breadcrumb">
+        <a href="/${lang}/">${escapeHtml(c.breadcrumbHome)}</a>
+        &raquo;
+        ${categoryName
+          ? `<a href="/${lang}/products/">${escapeHtml(c.breadcrumbCatalog)}</a> &raquo; <span>${escapeHtml(categoryLabel)}</span>`
+          : `<span>${escapeHtml(c.breadcrumbCatalog)}</span>`}
+      </nav>
+      <h1>${escapeHtml(categoryName ? categoryLabel : c.catalogH1)}</h1>
+      <p>${escapeHtml(intro)}</p>
+      ${categoryNav}
       <ul aria-label="Products">
         ${items}
       </ul>
@@ -932,6 +1009,9 @@ function productDetailContent(lang: Lang, product: Product, tr: LangTranslations
         <a href="/${lang}/">${escapeHtml(c.breadcrumbHome)}</a>
         &raquo;
         <a href="/${lang}/products/">${escapeHtml(c.breadcrumbCatalog)}</a>
+        ${product.category
+          ? `&raquo; <a href="/${lang}${CATALOG_CATEGORY_PREFIX}/${toCategorySlug(product.category)}/">${escapeHtml(categoryDisplayName(lang, product.category))}</a>`
+          : ''}
         &raquo;
         <span>${escapeHtml(localized.title)}</span>
       </nav>
@@ -1323,14 +1403,7 @@ async function fetchAllProducts(): Promise<Product[]> {
 const DEFAULT_HERO_BGS = [
   'https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-images/site-assets/1773994889396-9i4t1ap.jpg',
 ];
-const DEFAULT_CATEGORIES = [
-  'New Arrival',
-  'Hot Sale',
-  'Led Lighted Mirror',
-  'Bathroom Mirror without led',
-  'Full Length Dressing Mirror',
-  'Irregular Mirror',
-];
+const DEFAULT_CATEGORIES = [...DEFAULT_PRODUCT_CATEGORIES];
 
 async function fetchSiteSettings(): Promise<{
   heroBgs: string[];
@@ -1389,12 +1462,8 @@ async function fetchSiteSettings(): Promise<{
       .eq('key', 'categories')
       .single();
     if (catData && catData.value) {
-      try {
-        const parsed = JSON.parse(catData.value);
-        if (Array.isArray(parsed) && parsed.length > 0) categories = parsed;
-      } catch {
-        // ignore — fall back to defaults
-      }
+      const parsed = parseCategoriesSetting(catData.value);
+      if (parsed.length > 0) categories = parsed;
     }
   } catch (err) {
     console.warn('[prerender-static] categories fetch failed; using default.', err);
@@ -1946,7 +2015,7 @@ async function main(): Promise<void> {
       const html = injectIntoTemplate(template, {
         lang,
         headExtras,
-        bodyContent: homeContent(lang, hero, factoryGallery, featuredVideo),
+        bodyContent: homeContent(lang, hero, factoryGallery, featuredVideo, categories),
       });
       await writeRoute(`${lang}`, html);
       routeCount++;
@@ -1976,9 +2045,55 @@ async function main(): Promise<void> {
       const html = injectIntoTemplate(template, {
         lang,
         headExtras,
-        bodyContent: catalogContent(lang, products, translations[lang]),
+        bodyContent: catalogContent(lang, products, translations[lang], { categories }),
       });
       await writeRoute(`${lang}/products`, html);
+      routeCount++;
+    }
+
+    for (const { name: categoryName, slug: categorySlug } of uniqueCategorySlugs(categories)) {
+      const categoryLabel = categoryDisplayName(lang, categoryName);
+      const routePath = `${CATALOG_CATEGORY_PREFIX}/${categorySlug}`;
+      const canonical = `${SITE_URL}/${lang}${routePath}/`;
+      const title = interpolateTemplate(LOCALE_SEO[lang].categoryTitle, { category: categoryLabel });
+      const description = interpolateTemplate(LOCALE_SEO[lang].categoryDesc, { category: categoryLabel });
+      const ogImage =
+        products.find((product) => productMatchesCategory(product.category, categoryName))?.images?.[0] ||
+        DEFAULT_OG_IMAGE;
+      const dataScript = prerenderDataScript({
+        route: 'catalog',
+        lang,
+        products: lightProducts,
+        categories,
+        categorySlug,
+        productTranslations: translations[lang],
+      });
+      const headExtras = `${buildHead({
+        lang,
+        title,
+        description,
+        canonical,
+        ogImage,
+        ogType: 'website',
+        routePath,
+        schema: buildCatalogCategorySchema({
+          lang,
+          slug: categorySlug,
+          name: categoryLabel,
+          description,
+          homeLabel: LOCALE_NAV[lang].home,
+          catalogLabel: LOCALE_NAV[lang].catalog,
+        }),
+      })}\n    ${dataScript}`;
+      const html = injectIntoTemplate(template, {
+        lang,
+        headExtras,
+        bodyContent: catalogContent(lang, products, translations[lang], {
+          categoryName,
+          categories,
+        }),
+      });
+      await writeRoute(`${lang}${routePath}`, html);
       routeCount++;
     }
 

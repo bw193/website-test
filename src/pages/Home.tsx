@@ -16,6 +16,7 @@ import { runWhenIdle } from '../utils/idle';
 import type { VideoListItem, VideoPost } from '../types/video';
 import { getLocalizedSeoLandingPages, getSeoSolutionsUi } from '../data/seoLandingI18n';
 import { HOME_SOLUTION_SLUGS } from '../data/seoLandingPages';
+import { catalogCategoryPath, DEFAULT_PRODUCT_CATEGORIES } from '../utils/catalogCategory';
 
 const GlobalMap = lazy(() => import('../components/GlobalMap'));
 // Lazy so `motion` (used by GlobalMap's animated markers) stays off the home
@@ -42,14 +43,6 @@ const heroSrcSet = (url: string) =>
 // supplies real dimensions; reserving the box prevents layout shift.
 const DEFAULT_HERO_W = 1920;
 const DEFAULT_HERO_H = 750;
-const DEFAULT_CATEGORIES = [
-  "New Arrival",
-  "Hot Sale",
-  "Led Lighted Mirror",
-  "Bathroom Mirror without led",
-  "Full Length Dressing Mirror",
-  "Irregular Mirror",
-];
 
 const CERTS = [
   { url: "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/au.png", alt: "SAA Australia certification" },
@@ -85,18 +78,12 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(initialData === null);
   const [allProducts, setAllProducts] = useState<any[]>(initialData?.products ?? []);
   const [categories, setCategories] = useState<string[]>(
-    initialData?.categories && initialData.categories.length > 0 ? initialData.categories : DEFAULT_CATEGORIES
+    initialData?.categories && initialData.categories.length > 0 ? initialData.categories : [...DEFAULT_PRODUCT_CATEGORIES]
   );
   const [factoryGallery, setFactoryGallery] = useState<FactoryGalleryItem[]>(
     initialData?.factoryGallery ?? []
   );
   const [featuredVideo, setFeaturedVideo] = useState<VideoListItem | null>(initialData?.featuredVideo ?? null);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-
-  const normalizeCategory = (cat: string | undefined | null) => {
-    if (!cat) return '';
-    return cat.toLowerCase().replace(/[^a-z0-9]/g, '');
-  };
 
   useEffect(() => {
     let cancelled = false;
@@ -241,9 +228,7 @@ export default function Home() {
     return () => { cancelled = true; };
   }, [lang]);
 
-  const featuredProducts = allProducts
-    .filter(p => selectedCategory ? normalizeCategory(p.category) === normalizeCategory(selectedCategory) : true)
-    .slice(0, 6);
+  const featuredProducts = allProducts.slice(0, 6);
 
   useEffect(() => {
     if (heroBgs.length <= 1) return;
@@ -472,30 +457,22 @@ export default function Home() {
             </Reveal>
           </div>
 
-          {/* Category Filter */}
+          {/* Category directory — real URLs so crawlers can index each collection. */}
           <Reveal className="flex flex-wrap gap-2 mb-12">
-            <button
-              onClick={() => setSelectedCategory(null)}
-              className={`px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 whitespace-nowrap ${
-                selectedCategory === null
-                  ? 'bg-stone-900 text-white shadow-md scale-105'
-                  : 'bg-stone-100 text-stone-600 hover:bg-stone-200 hover:text-stone-900'
-              }`}
+            <Link
+              to={lp('/products')}
+              className="px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 whitespace-nowrap bg-stone-900 text-white shadow-md"
             >
               {t('products.allCategories', 'All Categories')}
-            </button>
+            </Link>
             {categories.map((category) => (
-              <button
+              <Link
                 key={category}
-                onClick={() => setSelectedCategory(category)}
-                className={`px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 whitespace-nowrap ${
-                  selectedCategory === category
-                    ? 'bg-stone-900 text-white shadow-md scale-105'
-                    : 'bg-stone-100 text-stone-600 hover:bg-stone-200 hover:text-stone-900'
-                }`}
+                to={lp(catalogCategoryPath(category))}
+                className="px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 whitespace-nowrap bg-stone-100 text-stone-600 hover:bg-stone-200 hover:text-stone-900"
               >
-                {category}
-              </button>
+                {t(`products.categories.${category}`, category)}
+              </Link>
             ))}
           </Reveal>
 

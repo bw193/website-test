@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLocalizedPath } from '../hooks/useLocalizedPath';
 import { getLocalizedSeoLandingPages, getSeoSolutionsUi } from '../data/seoLandingI18n';
+import { catalogCategoryPath, DEFAULT_PRODUCT_CATEGORIES } from '../utils/catalogCategory';
 
 export default function Footer() {
   const { lp, lang } = useLocalizedPath();
@@ -16,7 +17,7 @@ export default function Footer() {
   return (
     <footer className="bg-stone-900 text-white">
       <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <div className="flex items-center gap-2 mb-4">
               <img
@@ -53,9 +54,21 @@ export default function Footer() {
             </ul>
           </div>
           <div>
+            <h3 className="text-sm font-semibold uppercase tracking-wider mb-4 text-amber-500">{t('navbar.catalog', 'Product Catalog')}</h3>
+            <ul className="space-y-2 text-stone-400 text-sm">
+              <li><Link to={lp('/products')} className="hover:text-white transition-colors">{t('products.allCategories', 'All Categories')}</Link></li>
+              {DEFAULT_PRODUCT_CATEGORIES.map((category) => (
+                <li key={category}>
+                  <Link to={lp(catalogCategoryPath(category))} className="hover:text-white transition-colors">
+                    {t(`products.categories.${category}`, category)}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
             <h3 className="text-sm font-semibold uppercase tracking-wider mb-4 text-amber-500">{t('footer.quickLinks', 'Quick Links')}</h3>
             <ul className="space-y-2 text-stone-400 text-sm">
-              <li><Link to={lp('/products')} className="hover:text-white transition-colors">{t('navbar.catalog', 'Product Catalog')}</Link></li>
               <li><Link to={lp('/solutions')} className="hover:text-white transition-colors">{solutionsUi.footerLabel}</Link></li>
               {footerSolutions.map((page) => (
                 <li key={page.slug}>

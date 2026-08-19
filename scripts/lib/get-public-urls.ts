@@ -1,6 +1,11 @@
 import { createClient } from '@supabase/supabase-js';
 import 'dotenv/config';
 import { SEO_LANDING_PAGES } from '../../src/data/seoLandingPages';
+import {
+  categoryPublicPages,
+  DEFAULT_PRODUCT_CATEGORIES,
+  parseCategoriesSetting,
+} from '../../src/utils/catalogCategory';
 
 export const LANGUAGES = ['en', 'zh', 'es', 'fr', 'de', 'it'] as const;
 export type Language = (typeof LANGUAGES)[number];
@@ -59,7 +64,18 @@ export async function getPublicPages(): Promise<PublicPage[]> {
     lastmod: (p.updated_at || p.created_at || today).split('T')[0],
   }));
 
-  return [...staticPages, ...productPages];
+  const { data: categorySetting } = await supabase
+    .from('site_settings')
+    .select('value')
+    .eq('key', 'categories')
+    .single();
+  const parsedCategories = parseCategoriesSetting(categorySetting?.value);
+  const categoryPages: PublicPage[] = categoryPublicPages(
+    parsedCategories.length > 0 ? parsedCategories : [...DEFAULT_PRODUCT_CATEGORIES],
+    today
+  );
+
+  return [...staticPages, ...productPages, ...categoryPages];
 }
 
 export function expandToAllLanguageUrls(pages: PublicPage[]): string[] {

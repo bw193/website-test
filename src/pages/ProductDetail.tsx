@@ -13,6 +13,7 @@ import { PRODUCT_IMAGE_PLACEHOLDER, handleImageError } from '../utils/imagePlace
 import { useLocalizedPath } from '../hooks/useLocalizedPath';
 import { readInitialProduct } from '../utils/prerenderData';
 import { toSlug, parseProductParam } from '../utils/slug';
+import { catalogCategoryPath } from '../utils/catalogCategory';
 import { useProductTranslator } from '../utils/productI18n';
 import { recommendVideosForProduct, toVideoListItem } from '../utils/video';
 import type { VideoListItem, VideoPost } from '../types/video';
@@ -368,6 +369,17 @@ export default function ProductDetail() {
           <Link to={lp('/')} className="hover:text-amber-600 transition-colors">{t('navbar.home')}</Link>
           <ChevronRight className="mx-2 h-4 w-4 text-stone-300" />
           <Link to={lp('/products')} className="hover:text-amber-600 transition-colors">{t('productDetail.backToCatalog')}</Link>
+          {product.category && (
+            <>
+              <ChevronRight className="mx-2 h-4 w-4 text-stone-300" />
+              <Link
+                to={lp(catalogCategoryPath(product.category))}
+                className="hover:text-amber-600 transition-colors truncate max-w-[140px] sm:max-w-none"
+              >
+                {t(`products.categories.${product.category}`, product.category)}
+              </Link>
+            </>
+          )}
           <ChevronRight className="mx-2 h-4 w-4 text-stone-300" />
           <span className="text-stone-900 truncate max-w-[200px] sm:max-w-none">{display.title}</span>
         </m.div>
@@ -471,7 +483,9 @@ export default function ProductDetail() {
           >
             {product.category && (
               <m.p variants={fadeInUp} className="text-sm font-bold text-amber-600 uppercase tracking-widest mb-2">
-                {t(`products.categories.${product.category}`, product.category)}
+                <Link to={lp(catalogCategoryPath(product.category))} className="hover:text-amber-700">
+                  {t(`products.categories.${product.category}`, product.category)}
+                </Link>
               </m.p>
             )}
             <m.h1 variants={fadeInUp} className="text-3xl font-serif tracking-tight text-stone-900 sm:text-4xl lg:text-5xl leading-tight">

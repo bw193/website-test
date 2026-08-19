@@ -49,6 +49,7 @@ interface PrerenderPayload {
   videoPosts?: VideoListItem[];
   videoPost?: LocalizedVideoPost;
   landingSlug?: string;
+  categorySlug?: string;
 }
 
 let cache: PrerenderPayload | null | undefined;

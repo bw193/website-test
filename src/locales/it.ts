@@ -10,6 +10,8 @@ export const it = {
       homeDesc: "BOLEN Mirror è un produttore leader di specchi LED specializzato in specchi LED OEM, specchi smart, specchi da toeletta e specchi da bagno per marchi globali.",
       catalogTitle: "Catalogo Prodotti Specchi LED | Produttore BOLEN Mirror",
       catalogDesc: "Esplora la nostra ampia gamma di specchi LED OEM, specchi smart, specchi da toeletta e specchi da bagno da un produttore leader di specchi LED. Produzione di alta qualità per marchi globali.",
+      categoryTitle: "{{category}} | Produttore BOLEN Mirror",
+      categoryDesc: "Sfoglia {{category}} BOLEN per l’ingrosso OEM/ODM. Specchi LED, da toeletta e da bagno diretti dalla fabbrica per marchi globali e progetti alberghieri.",
       storyTitle: "La Nostra Storia | Produttore di Specchi LED BOLEN",
       storyDesc: "Scopri la storia e la capacità produttiva di BOLEN (Jiaxing Chengtai Mirror Co., Ltd.), produttore di specchi LED e smart OEM fondato nel 2005.",
       rfqTitle: "Richiesta di Preventivo | Produttore di Specchi LED BOLEN",
@@ -172,6 +174,8 @@ export const it = {
       resultCount: "{{count}} prodotti trovati",
       showMore: "Mostra altro",
       allCategories: "Tutte le Categorie",
+      categoriesNav: "Categorie di prodotti",
+      categoryIntro: "{{category}} diretti dalla fabbrica per progetti OEM/ODM e all’ingrosso: dimensioni, illuminazione e finiture su misura da Jiaxing.",
       categories: {
         "New Arrival": "Novità",
         "Hot Sale": "In Offerta",

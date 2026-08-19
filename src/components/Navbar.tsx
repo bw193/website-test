@@ -78,8 +78,12 @@ export default function Navbar() {
   // used to hardcode the active styling on Home, so every route claimed to be
   // the homepage.
   const isActive = (path: string) => {
+    const current = location.pathname.replace(/\/$/, '');
     const target = lp(path).replace(/\/$/, '');
-    return location.pathname.replace(/\/$/, '') === target;
+    if (path === '/products') {
+      return current === target || current.startsWith(`${target}/category/`);
+    }
+    return current === target;
   };
 
   const navLinks = [

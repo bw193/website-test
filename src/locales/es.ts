@@ -10,6 +10,8 @@ export const es = {
       homeDesc: "BOLEN Mirror es un fabricante líder de espejos LED especializado en espejos LED OEM, espejos inteligentes, espejos de tocador y espejos de baño para marcas globales.",
       catalogTitle: "Catálogo de Productos de Espejos LED | Fabricante BOLEN Mirror",
       catalogDesc: "Explore nuestra amplia gama de espejos LED OEM, espejos inteligentes, espejos de tocador y espejos de baño de un fabricante líder de espejos LED. Fabricación de alta calidad para marcas globales.",
+      categoryTitle: "{{category}} | Fabricante BOLEN Mirror",
+      categoryDesc: "Explore {{category}} de BOLEN para mayoristas OEM/ODM. Espejos LED, de tocador y de baño de fábrica para marcas globales y proyectos hoteleros.",
       storyTitle: "Nuestra Historia | Fabricante de Espejos LED BOLEN",
       storyDesc: "Conozca la historia y la capacidad de fabricación de BOLEN (Jiaxing Chengtai Mirror Co., Ltd.), fabricante de espejos LED e inteligentes OEM fundado en 2005.",
       rfqTitle: "Solicitud de Cotización | Fabricante de Espejos LED BOLEN",
@@ -172,6 +174,8 @@ export const es = {
       resultCount: "{{count}} productos encontrados",
       showMore: "Mostrar más",
       allCategories: "Todas las Categorías",
+      categoriesNav: "Categorías de productos",
+      categoryIntro: "{{category}} de fábrica para proyectos OEM/ODM y mayoristas: tamaños, iluminación y acabados a medida desde Jiaxing.",
       categories: {
         "New Arrival": "Novedades",
         "Hot Sale": "En Oferta",

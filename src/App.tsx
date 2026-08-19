@@ -4,7 +4,7 @@
  */
 
 import React, { Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -52,6 +52,11 @@ const PageLoader = () => (
   </div>
 );
 
+function RedirectToCatalog() {
+  const { lang } = useParams<{ lang: string }>();
+  return <Navigate to={`/${lang || 'en'}/products/`} replace />;
+}
+
 function AppShell() {
   const { t } = useTranslation();
   const location = useLocation();
@@ -83,6 +88,8 @@ function AppShell() {
             <Route path="/:lang" element={<LanguageLayout />}>
               <Route index element={<Home />} />
               <Route path="products" element={withMotion(<Products />)} />
+              <Route path="products/category" element={<RedirectToCatalog />} />
+              <Route path="products/category/:categorySlug" element={withMotion(<Products />)} />
               <Route path="products/:id" element={withMotion(<ProductDetail />)} />
               <Route path="our-story" element={withMotion(<OurStory />)} />
               <Route path="blog" element={withMotion(<Blog />)} />

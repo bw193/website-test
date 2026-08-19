@@ -10,6 +10,8 @@ export const zh = {
       homeDesc: "BOLEN Mirror 是领先的 LED 镜制造商，专业生产 OEM LED 镜、智能镜、化妆镜和浴室镜，服务全球品牌。",
       catalogTitle: "LED 镜产品目录 | BOLEN 镜业制造商",
       catalogDesc: "探索我们丰富的 OEM LED 镜、智能镜、化妆镜和浴室镜产品系列，来自领先的 LED 镜制造商，为全球品牌提供优质制造。",
+      categoryTitle: "{{category}} | BOLEN 镜业制造商",
+      categoryDesc: "浏览 BOLEN {{category}} OEM/ODM 批发系列。工厂直供 LED 镜、化妆镜与浴室镜，服务全球品牌与酒店项目。",
       storyTitle: "关于我们 | BOLEN LED 镜业制造商",
       storyDesc: "了解 BOLEN（嘉兴诚泰镜业有限公司）的历史与制造实力：公司成立于 2005 年，专注于 OEM 智能镜及 LED 镜生产。",
       rfqTitle: "询价 | BOLEN LED 镜业制造商",
@@ -174,6 +176,8 @@ export const zh = {
       resultCount: "找到 {{count}} 个产品",
       showMore: "加载更多",
       allCategories: "所有类别",
+      categoriesNav: "产品分类",
+      categoryIntro: "工厂直供 {{category}}，面向 OEM/ODM 与批发项目。嘉兴工厂可定制尺寸、灯光与表面处理。",
       categories: {
         "New Arrival": "新品上市",
         "Hot Sale": "热销产品",

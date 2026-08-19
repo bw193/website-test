@@ -1,13 +1,22 @@
 import { m, AnimatePresence } from 'motion/react';
-import React, { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Link, NavLink, useParams, useSearchParams } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import ProductCardSkeleton from '../components/ProductCardSkeleton';
 import { Search, PackageX } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import SEO from '../components/SEO';
-import { useCurrentLang } from '../hooks/useLocalizedPath';
+import { useCurrentLang, useLocalizedPath } from '../hooks/useLocalizedPath';
 import { readInitialCatalogData } from '../utils/prerenderData';
+import {
+  buildCatalogCategorySchema,
+  CATALOG_CATEGORY_PREFIX,
+  catalogCategoryPath,
+  DEFAULT_PRODUCT_CATEGORIES,
+  findCategoryBySlug,
+  productMatchesCategory,
+  toCategorySlug,
+} from '../utils/catalogCategory';
 
 interface Product {
   id: string;
@@ -24,15 +33,6 @@ interface Product {
 const CATALOG_BACKDROP =
   'https://mxmmffwntosvwaviippd.supabase.co/storage/v1/render/image/public/comp%20image/factory4.jpg?width=2000&resize=contain';
 
-const DEFAULT_CATEGORIES = [
-  "New Arrival",
-  "Hot Sale",
-  "Led Lighted Mirror",
-  "Bathroom Mirror without led",
-  "Full Length Dressing Mirror",
-  "Irregular Mirror"
-];
-
 const PAGE_SIZE = 12;
 const GRID_CLASS = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-10';
 
@@ -42,15 +42,16 @@ export default function Products() {
   const [categories, setCategories] = useState<string[]>(
     initialCatalog?.categories && initialCatalog.categories.length > 0
       ? initialCatalog.categories
-      : DEFAULT_CATEGORIES
+      : [...DEFAULT_PRODUCT_CATEGORIES]
   );
   const [loading, setLoading] = useState(initialCatalog === null);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [searchParams, setSearchParams] = useSearchParams();
+  const { categorySlug } = useParams<{ categorySlug?: string }>();
   const searchQuery = searchParams.get('q') || '';
   const { t } = useTranslation();
   const lang = useCurrentLang();
+  const { lp } = useLocalizedPath();
 
   const updateSearchQuery = (value: string) => {
     const next = new URLSearchParams(searchParams);
@@ -59,10 +60,23 @@ export default function Products() {
     setSearchParams(next, { replace: true });
   };
 
-  const normalizeCategory = (cat: string | undefined | null) => {
-    if (!cat) return '';
-    return cat.toLowerCase().replace(/[^a-z0-9]/g, '');
+  const withSearch = (path: string) => {
+    const base = lp(path);
+    const query = searchParams.toString();
+    return query ? `${base}?${query}` : base;
   };
+
+  const selectedCategory = useMemo(() => {
+    if (!categorySlug) return null;
+    return (
+      findCategoryBySlug(categories, categorySlug) ||
+      findCategoryBySlug(
+        products.map((product) => product.category),
+        categorySlug
+      ) ||
+      null
+    );
+  }, [categorySlug, categories, products]);
 
   useEffect(() => {
     let active = true;
@@ -109,8 +123,33 @@ export default function Products() {
     };
   }, []);
 
+  const categoryUnresolved = Boolean(categorySlug) && !selectedCategory;
+  const unknownCategory = categoryUnresolved && !loading;
+  const categoryLabel = selectedCategory
+    ? t(`products.categories.${selectedCategory}`, selectedCategory)
+    : '';
+  const catalogPath = selectedCategory
+    ? catalogCategoryPath(selectedCategory)
+    : categorySlug
+      ? `${CATALOG_CATEGORY_PREFIX}/${categorySlug}`
+      : '/products';
+  const seoTitle = selectedCategory
+    ? t('seo.categoryTitle', '{{category}} | BOLEN Mirror Manufacturer', { category: categoryLabel })
+    : t('seo.catalogTitle');
+  const seoDescription = selectedCategory
+    ? t(
+        'seo.categoryDesc',
+        'Browse BOLEN {{category}} for OEM/ODM wholesale. Factory-direct LED, vanity, and bath mirrors for global brands and hotel projects.',
+        { category: categoryLabel }
+      )
+    : t('seo.catalogDesc');
+
   const filteredProducts = products.filter(p => {
-    const matchesCategory = selectedCategory ? normalizeCategory(p.category) === normalizeCategory(selectedCategory) : true;
+    const matchesCategory = categoryUnresolved
+      ? false
+      : selectedCategory
+        ? productMatchesCategory(p.category, selectedCategory)
+        : true;
     const matchesSearch = p.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           (p.description && p.description.toLowerCase().includes(searchQuery.toLowerCase()));
     return matchesCategory && matchesSearch;
@@ -121,7 +160,7 @@ export default function Products() {
   // remain reachable through the incremental Show more control below.
   useEffect(() => {
     setVisibleCount(PAGE_SIZE);
-  }, [searchQuery, selectedCategory]);
+  }, [searchQuery, categorySlug]);
 
   const categoryChip = (active: boolean) =>
     `relative pb-3 text-sm font-medium tracking-wide transition-colors whitespace-nowrap ${
@@ -131,21 +170,33 @@ export default function Products() {
   return (
     <div className="bg-[#FAF9F6] min-h-screen pb-24 selection:bg-amber-200/60 selection:text-stone-900">
       <SEO
-        title={t('seo.catalogTitle')}
-        description={t('seo.catalogDesc')}
-        path="/products"
-        schema={{
-          "@context": "https://schema.org",
-          "@type": "CollectionPage",
-          "name": "BOLEN LED Mirror Products Catalog",
-          "description": "Explore our wide range of OEM LED mirrors, smart mirrors, vanity mirrors, and bath mirrors from a leading LED mirror manufacturer.",
-          "url": `https://bolenmirror.com/${lang}/products/`,
-          "isPartOf": {
-            "@type": "WebSite",
-            "name": "BOLEN Mirror",
-            "url": "https://bolenmirror.com"
-          }
-        }}
+        title={seoTitle}
+        description={seoDescription}
+        path={catalogPath}
+        noindex={unknownCategory}
+        schema={
+          selectedCategory && categorySlug
+            ? buildCatalogCategorySchema({
+                lang,
+                slug: categorySlug,
+                name: categoryLabel,
+                description: seoDescription,
+                homeLabel: t('navbar.home'),
+                catalogLabel: t('navbar.catalog'),
+              })
+            : {
+                "@context": "https://schema.org",
+                "@type": "CollectionPage",
+                "name": "BOLEN LED Mirror Products Catalog",
+                "description": "Explore our wide range of OEM LED mirrors, smart mirrors, vanity mirrors, and bath mirrors from a leading LED mirror manufacturer.",
+                "url": `https://bolenmirror.com/${lang}/products/`,
+                "isPartOf": {
+                  "@type": "WebSite",
+                  "name": "BOLEN Mirror",
+                  "url": "https://bolenmirror.com"
+                }
+              }
+        }
       />
       {/* Hero Section */}
       <div className="bg-stone-950 text-white pt-24 pb-28 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
@@ -172,7 +223,7 @@ export default function Products() {
             transition={{ duration: 0.7, delay: 0.08 }}
             className="font-serif text-5xl leading-[0.95] tracking-tight sm:text-6xl md:text-7xl"
           >
-            {t('products.catalog')}
+            {selectedCategory ? categoryLabel : t('products.catalog')}
           </m.h1>
           <div className="mx-auto mt-8 h-px w-24 bg-gradient-to-r from-transparent via-amber-500 to-transparent" />
           <m.p 
@@ -181,7 +232,13 @@ export default function Products() {
             transition={{ duration: 0.7, delay: 0.18 }}
             className="mx-auto mt-8 max-w-2xl text-lg font-light leading-relaxed text-stone-300"
           >
-            {t('products.desc')}
+            {selectedCategory
+              ? t(
+                  'products.categoryIntro',
+                  'Factory-direct {{category}} for OEM/ODM and wholesale projects — custom sizes, lighting, and finishes from our Jiaxing factory.',
+                  { category: categoryLabel }
+                )
+              : t('products.desc')}
           </m.p>
         </div>
       </div>
@@ -212,32 +269,37 @@ export default function Products() {
 
             {/* Categories */}
             <div className="w-full">
-              {/* aria-pressed carries the filter state — it was previously
-                  conveyed by background colour alone. */}
-              <div className="flex flex-wrap items-center gap-x-7 gap-y-2 border-b border-stone-200" role="group" aria-label={t('products.searchLabel', 'Search products')}>
-                <button
-                  onClick={() => setSelectedCategory(null)}
-                  aria-pressed={selectedCategory === null}
-                  className={categoryChip(selectedCategory === null)}
+              <div
+                className="flex flex-wrap items-center gap-x-7 gap-y-2 border-b border-stone-200"
+                role="navigation"
+                aria-label={t('products.categoriesNav', 'Product categories')}
+              >
+                <NavLink
+                  to={withSearch('/products')}
+                  end
+                  className={({ isActive }) => categoryChip(isActive)}
                 >
                   {t('products.allCategories')}
-                  {selectedCategory === null && (
+                  {!categorySlug && (
                     <span className="absolute inset-x-0 bottom-0 h-[2px] bg-amber-500" />
                   )}
-                </button>
-                {categories.map(cat => (
-                  <button
-                    key={cat}
-                    onClick={() => setSelectedCategory(cat)}
-                    aria-pressed={selectedCategory === cat}
-                    className={categoryChip(selectedCategory === cat)}
-                  >
-                    {t(`products.categories.${cat}`, cat)}
-                    {selectedCategory === cat && (
-                      <span className="absolute inset-x-0 bottom-0 h-[2px] bg-amber-500" />
-                    )}
-                  </button>
-                ))}
+                </NavLink>
+                {categories.map(cat => {
+                  const active = Boolean(categorySlug) && toCategorySlug(cat) === categorySlug;
+                  return (
+                    <NavLink
+                      key={cat}
+                      to={withSearch(catalogCategoryPath(cat))}
+                      end
+                      className={({ isActive }) => categoryChip(isActive)}
+                    >
+                      {t(`products.categories.${cat}`, cat)}
+                      {active && (
+                        <span className="absolute inset-x-0 bottom-0 h-[2px] bg-amber-500" />
+                      )}
+                    </NavLink>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -282,16 +344,13 @@ export default function Products() {
                       ? t('products.emptySearch', 'We couldn’t find anything matching “{{query}}”. Try adjusting your search or filters.', { query: searchQuery })
                       : t('products.noProducts')}
                   </p>
-                  {(searchQuery || selectedCategory) && (
-                    <button
-                      onClick={() => {
-                        updateSearchQuery('');
-                        setSelectedCategory(null);
-                      }}
+                  {(searchQuery || categorySlug) && (
+                    <Link
+                      to={lp('/products')}
                       className="mt-8 rounded-full border border-stone-300 px-6 py-2.5 text-sm font-medium text-stone-800 transition-colors hover:border-stone-900 hover:text-stone-900"
                     >
                       {t('products.clearFilters', 'Clear all filters')}
-                    </button>
+                    </Link>
                   )}
                 </div>
               </m.div>

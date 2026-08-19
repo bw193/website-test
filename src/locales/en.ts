@@ -10,6 +10,8 @@ export const en = {
       homeDesc: "BOLEN Mirror is a leading LED mirror manufacturer specializing in OEM LED mirrors, smart mirrors, vanity mirrors, and bath mirrors for global brands.",
       catalogTitle: "LED Mirror Products Catalog | BOLEN Mirror Manufacturer",
       catalogDesc: "Explore our wide range of OEM LED mirrors, smart mirrors, vanity mirrors, and bath mirrors from a leading LED mirror manufacturer. High-quality manufacturing for global brands.",
+      categoryTitle: "{{category}} | BOLEN Mirror Manufacturer",
+      categoryDesc: "Browse BOLEN {{category}} for OEM/ODM wholesale. Factory-direct LED, vanity, and bath mirrors for global brands and hotel projects.",
       storyTitle: "Our Story | BOLEN LED Mirror Manufacturer",
       storyDesc: "Learn about the history and manufacturing excellence of BOLEN (Jiaxing Chengtai Mirror Co., Ltd.), an LED mirror manufacturer established in 2005 and specializing in OEM smart mirrors.",
       rfqTitle: "Request for Quote | BOLEN LED Mirror Manufacturer",
@@ -174,6 +176,8 @@ export const en = {
       resultCount: "{{count}} products found",
       showMore: "Show more",
       allCategories: "All Categories",
+      categoriesNav: "Product categories",
+      categoryIntro: "Factory-direct {{category}} for OEM/ODM and wholesale projects — custom sizes, lighting, and finishes from our Jiaxing factory.",
       categories: {
         "New Arrival": "New Arrival",
         "Hot Sale": "Hot Sale",
