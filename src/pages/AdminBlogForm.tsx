@@ -173,7 +173,7 @@ export default function AdminBlogForm() {
       } = supabase.storage.from('product-images').getPublicUrl(filePath);
       setValue('cover_image', publicUrl, { shouldDirty: true });
     } catch (err: any) {
-      let message = err?.message || 'Unknown error';
+      let message = err?.message || t('admin.productForm.unknownError', 'Unknown error');
       if (message.includes('Bucket not found')) message = t('admin.productForm.alerts.bucketNotFound');
       alert(t('admin.productForm.alerts.uploadFailed', { message }));
     } finally {
@@ -244,7 +244,7 @@ export default function AdminBlogForm() {
 
   return (
     <div className="pb-16">
-      <SEO title="Admin Journal | BOLEN Mirror" noindex={true} />
+      <SEO title={t('admin.seo.blogForm', 'Admin Journal | BOLEN Mirror')} noindex={true} />
       <header className="sticky top-0 z-20 border-b border-stone-200 bg-white/95 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
@@ -329,7 +329,7 @@ export default function AdminBlogForm() {
                     type="text"
                     {...register(`title.${activeLang}`)}
                     className="block w-full rounded-xl border-stone-200 py-2.5 px-4 text-stone-900 focus:border-stone-900 focus:ring-1 focus:ring-stone-900 bg-stone-50 transition-colors"
-                    placeholder="How to Choose an LED Bathroom Mirror"
+                    placeholder={t('admin.blog.placeholderTitle', 'How to Choose an LED Bathroom Mirror')}
                   />
                 </div>
                 <div>
@@ -340,7 +340,7 @@ export default function AdminBlogForm() {
                     rows={3}
                     {...register(`excerpt.${activeLang}`)}
                     className="block w-full rounded-xl border-stone-200 py-2.5 px-4 text-stone-900 focus:border-stone-900 focus:ring-1 focus:ring-stone-900 bg-stone-50 transition-colors resize-none"
-                    placeholder="One or two sentences for cards and search results."
+                    placeholder={t('admin.blog.placeholderExcerpt', 'One or two sentences for cards and search results.')}
                   />
                 </div>
                 <div>
@@ -472,7 +472,7 @@ export default function AdminBlogForm() {
                     type="text"
                     {...register('slug')}
                     className="block w-full rounded-xl border-stone-200 py-2.5 px-4 text-sm focus:border-stone-900 focus:ring-1 focus:ring-stone-900 bg-stone-50"
-                    placeholder="auto-from-title"
+                    placeholder={t('admin.blog.slugPlaceholder', 'auto-from-title')}
                   />
                   <p className="mt-1.5 text-xs text-stone-500">{t('admin.blog.slugHelp')}</p>
                 </div>
@@ -485,7 +485,7 @@ export default function AdminBlogForm() {
                     <option value="">—</option>
                     {categories.map((c) => (
                       <option key={c} value={c}>
-                        {c}
+                        {t(`blog.categories.${c}`, c)}
                       </option>
                     ))}
                   </select>
@@ -514,7 +514,7 @@ export default function AdminBlogForm() {
                       min={1}
                       {...register('reading_minutes')}
                       className="block w-full rounded-xl border-stone-200 py-2.5 px-3 text-sm focus:border-stone-900 focus:ring-1 focus:ring-stone-900 bg-stone-50"
-                      placeholder="auto"
+                      placeholder={t('admin.blog.readingPlaceholder', 'auto')}
                     />
                   </div>
                 </div>
@@ -546,7 +546,7 @@ export default function AdminBlogForm() {
                   <p className="text-sm font-medium text-stone-900">
                     {uploading ? t('admin.blog.uploading') : t('admin.blog.uploadCover')}
                   </p>
-                  <p className="text-xs text-stone-500 mt-1">PNG, JPG, WEBP</p>
+                  <p className="text-xs text-stone-500 mt-1">{t('admin.blog.coverTypes', 'PNG, JPG, WEBP')}</p>
                 </div>
                 <input
                   type="text"

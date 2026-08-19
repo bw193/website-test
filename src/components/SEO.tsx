@@ -1,5 +1,6 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
+import { useTranslation } from 'react-i18next';
 import { useCurrentLang } from '../hooks/useLocalizedPath';
 
 interface SEOProps {
@@ -28,6 +29,8 @@ export default function SEO({
   alternateLanguages = ['en', 'zh', 'es', 'fr', 'de', 'it']
 }: SEOProps) {
   const currentLang = useCurrentLang();
+  const { i18n } = useTranslation();
+  const htmlLang = (i18n.language || currentLang).split('-')[0] || currentLang;
   // Cloudflare Pages serves directory-style URLs with a trailing slash
   // (dist/en/products/index.html -> /en/products/). Canonical, hreflang,
   // OG/Twitter URLs, and JSON-LD URLs all use trailing slash so they match
@@ -43,7 +46,7 @@ export default function SEO({
 
   return (
     <Helmet>
-      <html lang={currentLang} />
+      <html lang={htmlLang} />
       <title>{title}</title>
       <meta name="description" content={description} />
       {noindex && <meta name="robots" content="noindex, nofollow" />}

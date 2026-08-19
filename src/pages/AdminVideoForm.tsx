@@ -13,6 +13,7 @@ import {
   Wand2,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import * as tus from 'tus-js-client';
 import SEO from '../components/SEO';
 import { supabase, hasSupabaseConfig } from '../supabase';
@@ -82,15 +83,14 @@ function formatFileSize(bytes: number): string {
   return `${(bytes / 1024 / 1024).toFixed(bytes >= 100 * 1024 * 1024 ? 0 : 1)}MB`;
 }
 
-function formatUploadError(error: unknown): Error {
+function formatUploadError(error: unknown, t: TFunction): Error {
   const message = error instanceof Error ? error.message : String(error);
   if (/413|content too large|maximum size exceeded/i.test(message)) {
     return new Error(
-      [
-        'Supabase rejected this file as larger than the active upload limit.',
-        'Your product-videos bucket may be 500MB, but Storage > Settings > Global file size limit can still be 50MB and takes precedence.',
-        'Set the global Storage file size limit above this video size, then try again.',
-      ].join(' ')
+      t(
+        'admin.videos.uploadRejected',
+        'Supabase rejected this file as larger than the active upload limit. Your product-videos bucket may be 500MB, but Storage > Settings > Global file size limit can still be 50MB and takes precedence. Set the global Storage file size limit above this video size, then try again.'
+      )
     );
   }
   return error instanceof Error ? error : new Error(message);
@@ -244,7 +244,7 @@ export default function AdminVideoForm() {
 
     const { data: { session } } = await supabase.auth.getSession();
     if (!session?.access_token) {
-      throw new Error('Please sign in again before uploading large videos.');
+      throw new Error(t('admin.videos.signInToUpload', 'Please sign in again before uploading large videos.'));
     }
 
     const projectRef = new URL(supabaseConfig.url).hostname.split('.')[0];
@@ -271,7 +271,7 @@ export default function AdminVideoForm() {
         onProgress: (bytesUploaded, bytesTotal) => {
           setUploadProgress(bytesTotal > 0 ? Math.round((bytesUploaded / bytesTotal) * 100) : null);
         },
-        onError: (error) => reject(formatUploadError(error)),
+        onError: (error) => reject(formatUploadError(error, t)),
         onSuccess: () => resolve(),
       });
 
@@ -341,7 +341,7 @@ export default function AdminVideoForm() {
         setValue('source_type', 'embed', { shouldDirty: true });
         setValue('embed_url', embedUrl, { shouldDirty: true });
         const thumbnail = await deriveEmbedThumbnail(url);
-        if (!thumbnail) throw new Error('Could not derive a thumbnail for this embedded video.');
+        if (!thumbnail) throw new Error(t('admin.videos.thumbnailDeriveError', 'Could not derive a thumbnail for this embedded video.'));
         setValue('thumbnail_url', thumbnail, { shouldDirty: true });
         return;
       }
@@ -448,7 +448,7 @@ export default function AdminVideoForm() {
 
   return (
     <div className="pb-16">
-      <SEO title="Admin Videos | BOLEN Mirror" noindex={true} />
+      <SEO title={t('admin.seo.videoForm', 'Admin Videos | BOLEN Mirror')} noindex={true} />
       <header className="sticky top-0 z-20 border-b border-stone-200 bg-white/95 backdrop-blur-sm">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
@@ -513,7 +513,7 @@ export default function AdminVideoForm() {
                   type="text"
                   {...register('title')}
                   className="block w-full rounded-xl border-stone-200 bg-stone-50 px-4 py-2.5 text-stone-900 transition-colors focus:border-stone-900 focus:ring-1 focus:ring-stone-900"
-                  placeholder="Anti-fog LED bathroom mirror demo"
+                  placeholder={t('admin.videos.placeholderTitle', 'Anti-fog LED bathroom mirror demo')}
                 />
               </div>
               <div className="md:col-span-2">
@@ -522,7 +522,7 @@ export default function AdminVideoForm() {
                   rows={3}
                   {...register('excerpt')}
                   className="block w-full resize-none rounded-xl border-stone-200 bg-stone-50 px-4 py-2.5 text-stone-900 transition-colors focus:border-stone-900 focus:ring-1 focus:ring-stone-900"
-                  placeholder="Short summary for cards and search results."
+                  placeholder={t('admin.videos.placeholderExcerpt', 'Short summary for cards and search results.')}
                 />
               </div>
               <div className="md:col-span-2">
@@ -531,7 +531,7 @@ export default function AdminVideoForm() {
                   rows={5}
                   {...register('body')}
                   className="block w-full resize-y rounded-xl border-stone-200 bg-stone-50 px-4 py-2.5 text-stone-900 transition-colors focus:border-stone-900 focus:ring-1 focus:ring-stone-900"
-                  placeholder="Optional notes shown on the video page."
+                  placeholder={t('admin.videos.placeholderBody', 'Optional notes shown on the video page.')}
                 />
               </div>
             </div>
@@ -568,7 +568,11 @@ export default function AdminVideoForm() {
                     type="url"
                     {...register('video_url')}
                     className="block w-full rounded-xl border-stone-200 bg-stone-50 px-4 py-2.5 text-sm focus:border-stone-900 focus:ring-1 focus:ring-stone-900"
-                    placeholder={sourceType === 'embed' ? 'https://www.youtube.com/watch?v=...' : 'https://example.com/video.mp4'}
+                    placeholder={
+                      sourceType === 'embed'
+                        ? t('admin.videos.embedPlaceholder', 'https://www.youtube.com/watch?v=...')
+                        : t('admin.videos.directPlaceholder', 'https://example.com/video.mp4')
+                    }
                   />
                 </div>
 
@@ -670,7 +674,7 @@ export default function AdminVideoForm() {
                   type="text"
                   {...register('slug')}
                   className="block w-full rounded-xl border-stone-200 bg-stone-50 px-4 py-2.5 text-sm focus:border-stone-900 focus:ring-1 focus:ring-stone-900"
-                  placeholder="auto-from-title"
+                  placeholder={t('admin.videos.slugPlaceholder', 'auto-from-title')}
                 />
               </div>
               <div>
@@ -682,7 +686,7 @@ export default function AdminVideoForm() {
                   <option value="">-</option>
                   {categories.map((cat) => (
                     <option key={cat} value={cat}>
-                      {cat}
+                      {t(`videos.categories.${cat}`, cat)}
                     </option>
                   ))}
                 </select>
@@ -693,7 +697,7 @@ export default function AdminVideoForm() {
                   type="text"
                   {...register('tags')}
                   className="block w-full rounded-xl border-stone-200 bg-stone-50 px-4 py-2.5 text-sm focus:border-stone-900 focus:ring-1 focus:ring-stone-900"
-                  placeholder="anti-fog, touch switch, bathroom"
+                  placeholder={t('admin.videos.tagsPlaceholder', 'anti-fog, touch switch, bathroom')}
                 />
                 <p className="mt-1.5 text-xs text-stone-500">{t('admin.videos.tagsHelp', 'Comma-separated tags drive automatic product recommendations.')}</p>
               </div>
@@ -703,7 +707,12 @@ export default function AdminVideoForm() {
 
         {FREE_PLAN_LIMIT_BYTES < TARGET_UPLOAD_LIMIT_BYTES && (
           <p className="mt-5 text-xs leading-relaxed text-stone-500">
-            Supabase note: a {formatFileSize(53.5 * 1024 * 1024)} file needs the project global Storage upload limit raised above {formatFileSize(FREE_PLAN_LIMIT_BYTES)}.
+            {t('admin.videos.freePlanNote', {
+              size: formatFileSize(53.5 * 1024 * 1024),
+              limit: formatFileSize(FREE_PLAN_LIMIT_BYTES),
+              defaultValue:
+                'Supabase note: a {{size}} file needs the project global Storage upload limit raised above {{limit}}.',
+            })}
           </p>
         )}
       </div>

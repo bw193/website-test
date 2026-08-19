@@ -535,30 +535,31 @@ NOTIFY pgrst, 'reload schema';`}
         <div className="px-6 py-5 border-b border-stone-100 bg-stone-50/50 flex items-center justify-between gap-3">
           <h3 className="text-base font-semibold text-stone-900 flex items-center gap-2">
             <Film className="h-5 w-5 text-stone-400" />
-            Home Featured Video
+            {t('admin.dashboard.settings.featuredTitle', 'Home Featured Video')}
           </h3>
           {featuredVideoSlug ? (
             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-50 text-amber-700 text-xs font-semibold">
               <Check className="h-3.5 w-3.5" />
-              1 selected
+              {t('admin.dashboard.settings.featuredSelected', '1 selected')}
             </span>
           ) : (
             <span className="px-3 py-1.5 rounded-lg bg-stone-100 text-stone-500 text-xs font-semibold">
-              Section hidden
+              {t('admin.dashboard.settings.featuredHidden', 'Section hidden')}
             </span>
           )}
         </div>
         <div className="p-6">
           <p className="text-sm text-stone-500 mb-2">
-            Pick the video shown in the homepage video section. Only published videos appear here — publish a
-            video under the <span className="font-medium text-stone-700">Videos</span> tab first. Choose{' '}
-            <span className="font-medium text-stone-700">No video</span> to hide the section entirely, then hit
-            Save Settings below.
+            {t(
+              'admin.dashboard.settings.featuredHelp1',
+              'Pick the video shown in the homepage video section. Only published videos appear here — publish a video under the Videos tab first. Choose No video to hide the section entirely, then hit Save Settings below.'
+            )}
           </p>
           <p className="text-sm text-stone-500 mb-6">
-            The video autoplays silently when the section approaches the viewport. Long films loop a short excerpt;
-            large files still autoplay but are flagged below so they can be optimized before publishing. Visitors
-            using data saver or reduced motion keep the poster until they press play.
+            {t(
+              'admin.dashboard.settings.featuredHelp2',
+              'The video autoplays silently when the section approaches the viewport. Long films loop a short excerpt; large files still autoplay but are flagged below so they can be optimized before publishing. Visitors using data saver or reduced motion keep the poster until they press play.'
+            )}
           </p>
 
           {videosLoading ? (
@@ -567,8 +568,10 @@ NOTIFY pgrst, 'reload schema';`}
             </div>
           ) : videoOptions.length === 0 ? (
             <div className="text-center py-10 border-2 border-dashed border-stone-200 rounded-xl text-sm text-stone-500">
-              No published videos yet. Add one under the <span className="font-medium text-stone-700">Videos</span> tab,
-              publish it, then come back to feature it here.
+              {t(
+                'admin.dashboard.settings.featuredEmpty',
+                'No published videos yet. Add one under the Videos tab, publish it, then come back to feature it here.'
+              )}
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -583,9 +586,9 @@ NOTIFY pgrst, 'reload schema';`}
                 }`}
               >
                 <CircleSlash className="h-6 w-6" />
-                No video
+                {t('admin.dashboard.settings.featuredNone', 'No video')}
                 <span className={`text-xs font-normal ${featuredVideoSlug === '' ? 'text-stone-300' : 'text-stone-400'}`}>
-                  Hide the section
+                  {t('admin.dashboard.settings.featuredHide', 'Hide the section')}
                 </span>
               </button>
 
@@ -654,10 +657,15 @@ NOTIFY pgrst, 'reload schema';`}
                           { start: 0, seconds: 0, full: true, bytes: null };
                         const isLargeFile = !budgetPlan;
                         const label = autoplayPlan.full
-                          ? 'autoplays in full'
-                          : `loops a ${Math.round(autoplayPlan.seconds)}s excerpt${
-                              autoplayPlan.bytes ? ` (~${formatMediaSize(autoplayPlan.bytes)})` : ''
-                            }`;
+                          ? t('admin.dashboard.settings.autoplayFull', 'autoplays in full')
+                          : autoplayPlan.bytes
+                            ? t('admin.dashboard.settings.autoplayExcerptSize', 'loops a {{seconds}}s excerpt (~{{size}})', {
+                                seconds: Math.round(autoplayPlan.seconds),
+                                size: formatMediaSize(autoplayPlan.bytes),
+                              })
+                            : t('admin.dashboard.settings.autoplayExcerpt', 'loops a {{seconds}}s excerpt', {
+                                seconds: Math.round(autoplayPlan.seconds),
+                              });
                         return (
                           <p
                             className={`mt-2 inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[11px] font-semibold ${
@@ -669,7 +677,8 @@ NOTIFY pgrst, 'reload schema';`}
                             ) : (
                               <Zap className="h-3 w-3 shrink-0" />
                             )}
-                            {formatMediaSize(option.bytes)} — {label}{isLargeFile ? ' (large file)' : ''}
+                            {formatMediaSize(option.bytes)} — {label}
+                            {isLargeFile ? ` ${t('admin.dashboard.settings.largeFile', '(large file)')}` : ''}
                           </p>
                         );
                       })()}
@@ -682,8 +691,11 @@ NOTIFY pgrst, 'reload schema';`}
 
           {featuredVideoSlug && !videosLoading && !videoOptions.some(v => v.slug === featuredVideoSlug) && (
             <p className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-              The saved video <span className="font-mono font-semibold">{featuredVideoSlug}</span> is no longer
-              published, so the homepage section is hidden. Pick another video or republish it.
+              {t('admin.dashboard.settings.featuredMissing', {
+                slug: featuredVideoSlug,
+                defaultValue:
+                  'The saved video {{slug}} is no longer published, so the homepage section is hidden. Pick another video or republish it.',
+              })}
             </p>
           )}
         </div>
@@ -695,7 +707,7 @@ NOTIFY pgrst, 'reload schema';`}
         <div className="px-6 py-5 border-b border-stone-100 bg-stone-50/50 flex items-center justify-between">
           <h3 className="text-base font-semibold text-stone-900 flex items-center gap-2">
             <Factory className="h-5 w-5 text-stone-400" />
-            Factory Showcase Gallery
+            {t('admin.dashboard.settings.factoryTitle', 'Factory Showcase Gallery')}
           </h3>
           <button
             type="button"
@@ -703,18 +715,20 @@ NOTIFY pgrst, 'reload schema';`}
             className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg text-stone-700 bg-stone-100 hover:bg-stone-200 transition-colors"
           >
             <Plus className="h-3.5 w-3.5 mr-1" />
-            Add Photo
+            {t('admin.dashboard.settings.addPhoto', 'Add Photo')}
           </button>
         </div>
         <div className="p-6">
           <p className="text-sm text-stone-500 mb-6">
-            Photos shown in the homepage "Inside the Factory" section. Each photo needs descriptive alt text
-            (used by Google Image Search and screen readers) — keep it specific to what the image actually shows.
+            {t(
+              'admin.dashboard.settings.factoryHelp',
+              'Photos shown in the homepage “Inside the Factory” section. Each photo needs descriptive alt text (used by Google Image Search and screen readers) — keep it specific to what the image actually shows.'
+            )}
           </p>
 
           {factoryGallery.length === 0 ? (
             <div className="text-center py-10 border-2 border-dashed border-stone-200 rounded-xl text-sm text-stone-500">
-              No factory photos yet. Click <span className="font-medium text-stone-700">Add Photo</span> to upload your first image.
+              {t('admin.dashboard.settings.factoryEmpty', 'No factory photos yet. Click Add Photo to upload your first image.')}
             </div>
           ) : (
             <ul className="space-y-4">
@@ -725,7 +739,7 @@ NOTIFY pgrst, 'reload schema';`}
                       {item.url ? (
                         <img
                           src={item.url}
-                          alt={item.alt || `Factory photo ${index + 1} preview`}
+                          alt={item.alt || t('admin.dashboard.settings.factoryPhotoAlt', { n: index + 1, defaultValue: 'Factory photo {{n}} preview' })}
                           className="w-full h-full object-cover"
                           referrerPolicy="no-referrer"
                         />
@@ -745,7 +759,7 @@ NOTIFY pgrst, 'reload schema';`}
                           type="text"
                           value={item.url}
                           onChange={(e) => handleGalleryField(index, 'url', e.target.value)}
-                          placeholder="Image URL"
+                          placeholder={t('admin.dashboard.settings.imageUrl', 'Image URL')}
                           className="block w-full pl-10 rounded-xl border-stone-200 py-2 text-sm focus:border-stone-900 focus:ring-1 focus:ring-stone-900 bg-white"
                         />
                       </div>
@@ -753,14 +767,17 @@ NOTIFY pgrst, 'reload schema';`}
                         type="text"
                         value={item.alt}
                         onChange={(e) => handleGalleryField(index, 'alt', e.target.value)}
-                        placeholder="Alt text (e.g. 'BOLEN LED mirror assembly line in Jiaxing factory') — required for SEO"
+                        placeholder={t(
+                          'admin.dashboard.settings.altPlaceholder',
+                          "Alt text (e.g. “BOLEN LED mirror assembly line in Jiaxing factory”) — required for SEO"
+                        )}
                         className="block w-full rounded-xl border-stone-200 py-2 px-3 text-sm focus:border-stone-900 focus:ring-1 focus:ring-stone-900 bg-white"
                       />
                       <input
                         type="text"
                         value={item.caption}
                         onChange={(e) => handleGalleryField(index, 'caption', e.target.value)}
-                        placeholder="Caption (optional, shown under the photo)"
+                        placeholder={t('admin.dashboard.settings.captionPlaceholder', 'Caption (optional, shown under the photo)')}
                         className="block w-full rounded-xl border-stone-200 py-2 px-3 text-sm focus:border-stone-900 focus:ring-1 focus:ring-stone-900 bg-white"
                       />
                     </div>
@@ -782,7 +799,7 @@ NOTIFY pgrst, 'reload schema';`}
                         {galleryUploading === index
                           ? <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
                           : <Upload className="h-3.5 w-3.5 mr-1.5 text-stone-400" />}
-                        Upload
+                        {t('admin.dashboard.settings.upload', 'Upload')}
                       </button>
                       <div className="flex gap-1">
                         <button
@@ -790,7 +807,7 @@ NOTIFY pgrst, 'reload schema';`}
                           onClick={() => handleGalleryMove(index, -1)}
                           disabled={index === 0}
                           className="p-2 text-stone-400 hover:text-stone-700 hover:bg-stone-100 rounded-lg transition-colors disabled:opacity-30 disabled:hover:bg-transparent"
-                          title="Move up"
+                          title={t('admin.dashboard.settings.moveUp', 'Move up')}
                         >
                           <ArrowUp className="h-4 w-4" />
                         </button>
@@ -799,7 +816,7 @@ NOTIFY pgrst, 'reload schema';`}
                           onClick={() => handleGalleryMove(index, 1)}
                           disabled={index === factoryGallery.length - 1}
                           className="p-2 text-stone-400 hover:text-stone-700 hover:bg-stone-100 rounded-lg transition-colors disabled:opacity-30 disabled:hover:bg-transparent"
-                          title="Move down"
+                          title={t('admin.dashboard.settings.moveDown', 'Move down')}
                         >
                           <ArrowDown className="h-4 w-4" />
                         </button>
@@ -807,7 +824,7 @@ NOTIFY pgrst, 'reload schema';`}
                           type="button"
                           onClick={() => handleGalleryRemove(index)}
                           className="p-2 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                          title="Remove photo"
+                          title={t('admin.dashboard.settings.removePhoto', 'Remove photo')}
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
@@ -828,7 +845,7 @@ NOTIFY pgrst, 'reload schema';`}
         <div className="px-6 py-5 border-b border-stone-100 bg-stone-50/50 flex items-center justify-between">
           <h3 className="text-base font-semibold text-stone-900 flex items-center gap-2">
             <Tags className="h-5 w-5 text-stone-400" />
-            Product Categories
+            {t('admin.dashboard.settings.productCategories', 'Product Categories')}
           </h3>
           <button
             type="button"
@@ -836,12 +853,12 @@ NOTIFY pgrst, 'reload schema';`}
             className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg text-stone-700 bg-stone-100 hover:bg-stone-200 transition-colors"
           >
             <Plus className="h-3.5 w-3.5 mr-1" />
-            Add Category
+            {t('admin.dashboard.settings.addCategory', 'Add Category')}
           </button>
         </div>
         <div className="p-6">
           <p className="text-sm text-stone-500 mb-6">
-            Manage product categories shown in the catalog and product form.
+            {t('admin.dashboard.settings.productCategoriesHelp', 'Manage product categories shown in the catalog and product form.')}
           </p>
           
           <div className="grid grid-cols-1 gap-3">
@@ -851,14 +868,14 @@ NOTIFY pgrst, 'reload schema';`}
                   type="text"
                   value={cat}
                   onChange={(e) => handleCategoryChange(index, e.target.value)}
-                  placeholder="Category Name"
+                  placeholder={t('admin.dashboard.settings.categoryName', 'Category Name')}
                   className="block w-full rounded-lg border-transparent py-1.5 px-3 text-sm focus:border-stone-900 focus:ring-1 focus:ring-stone-900 bg-white shadow-sm"
                 />
                 <button
                   type="button"
                   onClick={() => handleRemoveCategory(index)}
                   className="p-1.5 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors shrink-0"
-                  title="Remove Category"
+                  title={t('admin.dashboard.settings.removeCategory', 'Remove Category')}
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
@@ -872,7 +889,7 @@ NOTIFY pgrst, 'reload schema';`}
         <div className="px-6 py-5 border-b border-stone-100 bg-stone-50/50 flex items-center justify-between">
           <h3 className="text-base font-semibold text-stone-900 flex items-center gap-2">
             <Tags className="h-5 w-5 text-stone-400" />
-            Journal Categories
+            {t('admin.dashboard.settings.journalCategories', 'Journal Categories')}
           </h3>
           <button
             type="button"
@@ -880,12 +897,12 @@ NOTIFY pgrst, 'reload schema';`}
             className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg text-stone-700 bg-stone-100 hover:bg-stone-200 transition-colors"
           >
             <Plus className="h-3.5 w-3.5 mr-1" />
-            Add Category
+            {t('admin.dashboard.settings.addCategory', 'Add Category')}
           </button>
         </div>
         <div className="p-6">
           <p className="text-sm text-stone-500 mb-6">
-            Manage the categories available when writing Journal articles.
+            {t('admin.dashboard.settings.journalCategoriesHelp', 'Manage the categories available when writing Journal articles.')}
           </p>
 
           <div className="grid grid-cols-1 gap-3">
@@ -895,14 +912,14 @@ NOTIFY pgrst, 'reload schema';`}
                   type="text"
                   value={cat}
                   onChange={(e) => handleBlogCategoryChange(index, e.target.value)}
-                  placeholder="Category Name"
+                  placeholder={t('admin.dashboard.settings.categoryName', 'Category Name')}
                   className="block w-full rounded-lg border-transparent py-1.5 px-3 text-sm focus:border-stone-900 focus:ring-1 focus:ring-stone-900 bg-white shadow-sm"
                 />
                 <button
                   type="button"
                   onClick={() => handleRemoveBlogCategory(index)}
                   className="p-1.5 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors shrink-0"
-                  title="Remove Category"
+                  title={t('admin.dashboard.settings.removeCategory', 'Remove Category')}
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>

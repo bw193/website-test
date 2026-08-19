@@ -78,9 +78,14 @@ export default function Footer() {
           {/* Moved out of the public header, where it sat beside the nav links
               and gave an internal staff entry point the same prominence as the
               RFQ call to action. */}
-          <Link to="/admin/login" className="text-stone-600 hover:text-stone-400 transition-colors">
-            {t('navbar.employeeLogin')}
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link to={lp('/terms-and-conditions')} className="text-stone-500 hover:text-white transition-colors">
+              {t('footer.terms', 'Terms and Conditions')}
+            </Link>
+            <Link to="/admin/login" className="text-stone-600 hover:text-stone-400 transition-colors">
+              {t('navbar.employeeLogin')}
+            </Link>
+          </div>
         </div>
       </div>
     </footer>

@@ -15,6 +15,7 @@ import {
   Package,
   Plus,
   RefreshCw,
+  ScanSearch,
   Users,
   X,
 } from 'lucide-react';
@@ -38,6 +39,8 @@ import {
   adminPrimaryBtn,
   adminSecondaryBtn,
 } from '../components/admin/AdminUi';
+import { ProductSimilarityPanel } from '../components/admin/ProductSimilarityPanel';
+import { DEFAULT_SIMILARITY_THRESHOLD } from '../utils/productSimilarity';
 
 const PRODUCT_VIDEO_BUCKET = 'product-videos';
 const AdminSettings = React.lazy(() => import('./AdminSettings'));
@@ -47,6 +50,8 @@ interface Product {
   title: string;
   category?: string;
   images?: unknown;
+  description?: string | null;
+  specifications?: Array<{ key?: string | null; value?: string | null }> | Record<string, string> | null;
 }
 
 interface RFQ {
@@ -111,8 +116,8 @@ function initialsFromEmail(email: string) {
   return (email.split('@')[0] || 'B').slice(0, 2).toUpperCase();
 }
 
-function formatShortDate(value: string) {
-  return new Date(value).toLocaleDateString(undefined, {
+function formatShortDate(value: string, locale?: string) {
+  return new Date(value).toLocaleDateString(locale || undefined, {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
@@ -125,7 +130,7 @@ function localizedTitle(title: Record<string, string> | null | undefined, slug: 
 
 export default function AdminDashboard() {
   const { isMasterAdmin, role, user } = useAuth();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { setNewRfqCount } = useOutletContext<AdminShellContext>();
   const [searchParams, setSearchParams] = useSearchParams();
   const canManageTeam = role === 'admin' || isMasterAdmin;
@@ -155,6 +160,9 @@ export default function AdminDashboard() {
   const [selectedRfqId, setSelectedRfqId] = useState<string | null>(null);
   const [productCategoryFilter, setProductCategoryFilter] = useState<string>('all');
   const [productSearch, setProductSearch] = useState('');
+  const [similarityOpen, setSimilarityOpen] = useState(false);
+  const [similarityThreshold, setSimilarityThreshold] = useState(DEFAULT_SIMILARITY_THRESHOLD);
+  const [focusProductId, setFocusProductId] = useState<string | null>(null);
   const [blogSearch, setBlogSearch] = useState('');
   const [blogStatusFilter, setBlogStatusFilter] = useState<PublishFilter>('all');
   const [videoSearch, setVideoSearch] = useState('');
@@ -177,6 +185,19 @@ export default function AdminDashboard() {
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
+
+  useEffect(() => {
+    if (activeTab !== 'products') return;
+    const shouldOpen = searchParams.get('similar') === '1';
+    const focusId = searchParams.get('similarId');
+    if (!shouldOpen && !focusId) return;
+    if (shouldOpen) setSimilarityOpen(true);
+    if (focusId) setFocusProductId(focusId);
+    const next = new URLSearchParams(searchParams);
+    next.delete('similar');
+    next.delete('similarId');
+    setSearchParams(next, { replace: true });
+  }, [activeTab, searchParams, setSearchParams]);
 
   const fetchData = async () => {
     setLoading(true);
@@ -234,7 +255,7 @@ export default function AdminDashboard() {
       } else if (activeTab === 'products') {
         const { data, error } = await supabase
           .from('products')
-          .select('id, title, category, images')
+          .select('id, title, category, images, description, specifications')
           .order('created_at', { ascending: false });
         if (error) throw error;
         setProducts(data || []);
@@ -285,14 +306,14 @@ export default function AdminDashboard() {
 
   const regenerateVideoThumbnail = async (post: VideoPostRow): Promise<void> => {
     const sourceUrl = post.video_url || post.embed_url || '';
-    if (!sourceUrl) throw new Error('This video has no source URL.');
+    if (!sourceUrl) throw new Error(t('admin.videos.noSourceUrl', 'This video has no source URL.'));
 
     let thumbnailUrl = '';
     let durationSeconds = post.duration_seconds ?? null;
 
     if (post.source_type === 'embed' || buildEmbedUrl(sourceUrl)) {
       thumbnailUrl = await deriveEmbedThumbnail(sourceUrl);
-      if (!thumbnailUrl) throw new Error('Could not derive a thumbnail for this embedded video.');
+      if (!thumbnailUrl) throw new Error(t('admin.videos.thumbnailDeriveError', 'Could not derive a thumbnail for this embedded video.'));
     } else {
       const snapshot = await captureVideoFrame(sourceUrl);
       thumbnailUrl = await uploadVideoThumbnail(snapshot.thumbnail, post.slug);
@@ -337,7 +358,8 @@ export default function AdminDashboard() {
       !window.confirm(
         t(
           'admin.videos.regenerateAllConfirm',
-          `Regenerate thumbnails for ${candidates.length} videos? This uploads new JPG thumbnails and updates the video records.`
+          'Regenerate thumbnails for {{count}} videos? This uploads new JPG thumbnails and updates the video records.',
+          { count: candidates.length }
         )
       )
     ) {
@@ -361,7 +383,8 @@ export default function AdminDashboard() {
       alert(
         t(
           'admin.videos.regenerateAllDone',
-          `Thumbnail regeneration finished. Success: ${successCount}. Failed: ${failureCount}.`
+          'Thumbnail regeneration finished. Success: {{success}}. Failed: {{failed}}.',
+          { success: successCount, failed: failureCount }
         )
       );
     } finally {
@@ -402,7 +425,7 @@ export default function AdminDashboard() {
       }
     } catch (error) {
       console.error('Error updating RFQ status:', error);
-      alert('Failed to update RFQ status.');
+      alert(t('admin.dashboard.rfqs.updateError', 'Failed to update RFQ status.'));
     }
   };
 
@@ -529,7 +552,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-      <SEO title="Employee Portal | BOLEN Mirror" noindex={true} />
+      <SEO title={t('admin.seo.portal', 'Employee Portal | BOLEN Mirror')} noindex={true} />
       <PageCanvas>
         {loading && activeTab !== 'settings' ? (
           <DashboardSkeleton />
@@ -552,11 +575,31 @@ export default function AdminDashboard() {
               title={t('admin.dashboard.tabs.products')}
               subtitle={t('admin.dashboard.section.productsHint', '{{count}} products in the catalog.', { count: stats.products })}
               action={
-                <Link to="/admin/products/new" className={adminPrimaryBtn}>
-                  <Plus className="mr-2 h-4 w-4" />
-                  {t('admin.dashboard.addProduct')}
-                </Link>
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setSimilarityOpen((open) => !open)}
+                    className={adminSecondaryBtn}
+                    aria-expanded={similarityOpen}
+                  >
+                    <ScanSearch className="mr-2 h-4 w-4" />
+                    {t('admin.dashboard.similarity.action', 'Detect similar')}
+                  </button>
+                  <Link to="/admin/products/new" className={adminPrimaryBtn}>
+                    <Plus className="mr-2 h-4 w-4" />
+                    {t('admin.dashboard.addProduct')}
+                  </Link>
+                </>
               }
+            />
+            <ProductSimilarityPanel
+              products={products}
+              uncategorized={uncategorized}
+              open={similarityOpen}
+              onOpenChange={setSimilarityOpen}
+              threshold={similarityThreshold}
+              onThresholdChange={setSimilarityThreshold}
+              focusProductId={focusProductId}
             />
             <Toolbar>
               <SearchField
@@ -571,7 +614,7 @@ export default function AdminDashboard() {
                   { id: 'all', label: t('admin.dashboard.allCategories', 'All categories'), count: products.length },
                   ...categories.map((cat) => ({
                     id: cat,
-                    label: cat,
+                    label: t(`products.categories.${cat}`, cat),
                     count: products.filter((p) => p.category === cat).length,
                   })),
                   {
@@ -640,7 +683,7 @@ export default function AdminDashboard() {
                       className="grid items-center gap-1 px-5 py-4 transition-colors hover:bg-stone-50 md:grid-cols-[1fr_10rem_7rem_2.5rem] md:gap-4"
                     >
                       <p className="truncate font-semibold text-stone-900">{localizedTitle(post.title, post.slug)}</p>
-                      <p className="text-sm text-stone-500">{post.category || uncategorized}</p>
+                      <p className="text-sm text-stone-500">{post.category ? t(`blog.categories.${post.category}`, post.category) : uncategorized}</p>
                       <div>
                         <StatusPill tone={post.status === 'published' ? 'emerald' : 'stone'}>
                           {post.status === 'published' ? t('admin.blog.published') : t('admin.blog.draft')}
@@ -729,9 +772,19 @@ export default function AdminDashboard() {
                               {post.status === 'published' ? t('admin.blog.published') : t('admin.blog.draft')}
                             </StatusPill>
                             {post.source_type && (
-                              <span className="text-[11px] font-medium uppercase tracking-wide text-stone-400">{post.source_type}</span>
+                              <span className="text-[11px] font-medium uppercase tracking-wide text-stone-400">
+                                {post.source_type === 'upload'
+                                  ? t('admin.videos.sourceUpload')
+                                  : post.source_type === 'embed'
+                                    ? t('admin.videos.sourceEmbed')
+                                    : t('admin.videos.sourceDirect')}
+                              </span>
                             )}
-                            {post.category && <span className="text-xs text-stone-500">{post.category}</span>}
+                            {post.category && (
+                              <span className="text-xs text-stone-500">
+                                {t(`videos.categories.${post.category}`, post.category)}
+                              </span>
+                            )}
                           </div>
                         </div>
                         <div className="flex items-center gap-2 border-t border-stone-100 pt-3">
@@ -834,7 +887,7 @@ export default function AdminDashboard() {
                               <RfqStatusBadge status={rfq.status} newLabel={t('admin.dashboard.rfqs.new')} />
                             </div>
                             <p className="mt-1 truncate text-sm text-stone-500">{rfq.product_name}</p>
-                            <p className="mt-1 text-[11px] text-stone-400">{formatShortDate(rfq.created_at)}</p>
+                            <p className="mt-1 text-[11px] text-stone-400">{formatShortDate(rfq.created_at, i18n.language)}</p>
                           </button>
                         </li>
                       );
@@ -1015,7 +1068,7 @@ function OverviewTab({
   uncategorized: string;
   onOpenTab: (tab: AdminTab) => void;
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   return (
     <div className="space-y-8">
@@ -1092,7 +1145,7 @@ function OverviewTab({
                     </div>
                     <div className="flex shrink-0 flex-col items-end gap-1">
                       <RfqStatusBadge status={rfq.status} newLabel={t('admin.dashboard.rfqs.new')} />
-                      <span className="text-[11px] text-stone-400">{formatShortDate(rfq.created_at)}</span>
+                      <span className="text-[11px] text-stone-400">{formatShortDate(rfq.created_at, i18n.language)}</span>
                     </div>
                   </div>
                 </li>
@@ -1227,7 +1280,7 @@ function RfqDetail({
   rfq: RFQ;
   onUpdateStatus: (id: string, newStatus: string, currentStatus: string) => void;
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   return (
     <div>
@@ -1243,7 +1296,7 @@ function RfqDetail({
               {rfq.customer_email}
             </a>
           </p>
-          <p className="mt-1 font-mono text-xs text-stone-400">{new Date(rfq.created_at).toLocaleString()}</p>
+          <p className="mt-1 font-mono text-xs text-stone-400">{new Date(rfq.created_at).toLocaleString(i18n.language)}</p>
         </div>
         <div className="flex flex-wrap gap-2">
           {rfq.status === 'new' ? (
@@ -1277,7 +1330,9 @@ function RfqDetail({
         {rfq.message}
       </div>
       <a
-        href={`mailto:${rfq.customer_email}?subject=Re: RFQ for ${rfq.product_name}`}
+        href={`mailto:${rfq.customer_email}?subject=${encodeURIComponent(
+          t('admin.dashboard.rfqs.replySubject', { product: rfq.product_name, defaultValue: 'Re: RFQ for {{product}}' })
+        )}`}
         className={`${adminPrimaryBtn} mt-5`}
       >
         <Mail className="mr-2 h-4 w-4" />
@@ -1344,7 +1399,11 @@ function QuickAction({ to, icon: Icon, label }: { to: string; icon: React.Compon
 }
 
 function ProductCard({ product, uncategorized, compact }: { product: Product; uncategorized: string; compact?: boolean }) {
+  const { t } = useTranslation();
   const src = firstImage(product.images) || PRODUCT_IMAGE_PLACEHOLDER;
+  const categoryLabel = product.category
+    ? t(`products.categories.${product.category}`, product.category)
+    : uncategorized;
   return (
     <Link
       to={`/admin/products/${product.id}`}
@@ -1356,7 +1415,7 @@ function ProductCard({ product, uncategorized, compact }: { product: Product; un
       <div className={compact ? 'p-3' : 'flex items-start justify-between gap-2 p-4'}>
         <div className="min-w-0">
           <p className="truncate text-sm font-semibold text-stone-900 group-hover:text-amber-800">{product.title}</p>
-          <p className="mt-1 truncate text-[11px] font-medium uppercase tracking-wide text-stone-400">{product.category || uncategorized}</p>
+          <p className="mt-1 truncate text-[11px] font-medium uppercase tracking-wide text-stone-400">{categoryLabel}</p>
         </div>
         {!compact && <Edit className="mt-0.5 h-4 w-4 shrink-0 text-stone-300 group-hover:text-stone-500" />}
       </div>

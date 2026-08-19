@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { LogIn, UserPlus, ArrowLeft, Clock, ShieldOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import SEO from '../components/SEO';
+import AdminLanguageSwitch from '../components/admin/AdminLanguageSwitch';
 
 const LOGO_URL =
   'https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/logo.png';
@@ -11,7 +12,7 @@ const LOGO_URL =
 export default function AdminLogin() {
   const { user, isAdmin, isPending, loginWithEmail, registerWithEmail, loading, logout } = useAuth();
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [error, setError] = useState<string | null>(null);
   const [isRegistering, setIsRegistering] = useState(false);
   const [email, setEmail] = useState('');
@@ -44,19 +45,26 @@ export default function AdminLogin() {
     }
   };
 
+  const publicLang = ['en', 'zh', 'es', 'fr', 'de', 'it'].includes(i18n.language.split('-')[0])
+    ? i18n.language.split('-')[0]
+    : 'en';
+
   return (
     <div className="flex min-h-[100dvh] bg-stone-50">
-      <SEO title="Employee Portal | BOLEN Mirror" noindex={true} />
+      <SEO title={t('admin.seo.portal', 'Employee Portal | BOLEN Mirror')} noindex={true} />
 
       <div className="relative flex flex-1 flex-col justify-center px-6 py-12 sm:px-10 lg:flex-none lg:w-[520px] lg:px-16 xl:px-20">
         <div className="mx-auto w-full max-w-sm">
-          <Link
-            to="/en/"
-            className="inline-flex items-center text-sm font-medium text-stone-500 transition-colors hover:text-stone-900"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            {t('admin.login.backToWebsite', 'Back to website')}
-          </Link>
+          <div className="flex items-center justify-between gap-3">
+            <Link
+              to={`/${publicLang}/`}
+              className="inline-flex items-center text-sm font-medium text-stone-500 transition-colors hover:text-stone-900"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              {t('admin.login.backToWebsite', 'Back to website')}
+            </Link>
+            <AdminLanguageSwitch variant="light" />
+          </div>
 
           <div className="mt-10 flex items-center gap-3">
             <img src={LOGO_URL} alt="" className="h-11 w-11 rounded-xl bg-white object-contain shadow-sm ring-1 ring-stone-200" width="44" height="44" />

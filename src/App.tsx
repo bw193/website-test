@@ -43,6 +43,7 @@ const VideoDetail = lazy(() => import('./pages/VideoDetail'));
 const AdminVideoForm = lazy(() => import('./pages/AdminVideoForm'));
 const SeoSolutions = lazy(() => import('./pages/SeoSolutions'));
 const SeoLandingPage = lazy(() => import('./pages/SeoLandingPage'));
+const TermsAndConditions = lazy(() => import('./pages/TermsAndConditions'));
 
 // Loading fallback
 const PageLoader = () => (
@@ -65,7 +66,10 @@ function AppShell() {
       )}
       {!hasSupabaseConfig && (
         <div className="bg-amber-600 text-white text-center py-2 px-4 text-sm font-medium">
-          Supabase Setup Required: Add <code className="bg-amber-700 px-1 rounded">VITE_SUPABASE_URL</code> and <code className="bg-amber-700 px-1 rounded">VITE_SUPABASE_ANON_KEY</code> to your Environment Variables (or AI Studio Secrets) and rebuild the app.
+          {t(
+            'admin.supabaseSetupBanner',
+            'Supabase Setup Required: Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to your Environment Variables (or AI Studio Secrets) and rebuild the app.'
+          )}
         </div>
       )}
       {!isAdminRoute && <Navbar />}
@@ -88,6 +92,7 @@ function AppShell() {
               <Route path="solutions" element={<SeoSolutions />} />
               <Route path="solutions/:slug" element={<SeoLandingPage />} />
               <Route path="rfq" element={withMotion(<RFQ />)} />
+              <Route path="terms-and-conditions" element={<TermsAndConditions />} />
             </Route>
 
             {/* Admin routes (no language prefix) — own chrome, no public nav/footer */}

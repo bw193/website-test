@@ -23,7 +23,9 @@ export const en = {
       videos: "Videos",
       adminDashboard: "Admin Dashboard",
       logout: "Logout",
-      employeeLogin: "Employee Login"
+      employeeLogin: "Employee Login",
+      changeLanguage: "Change language",
+      openMenu: "Open main menu"
     },
     footer: {
       description: "Premium mirror manufacturer and exporter. Supplying high-quality, modern vanity mirrors to businesses worldwide.",
@@ -273,7 +275,13 @@ export const en = {
       viewAll: "View all",
       notFound: "Article not found",
       backToJournal: "Back to the Journal",
-      relatedProducts: "Featured in this article"
+      relatedProducts: "Featured in this article",
+      categories: {
+        "Buying Guide": "Buying Guide",
+        "Technology": "Technology",
+        "Manufacturing": "Manufacturing",
+        "Design": "Design"
+      }
     },
     videos: {
       metaTitle: "BOLEN Mirror Videos | Product Demos & Factory Walkthroughs",
@@ -300,10 +308,19 @@ export const en = {
         "Factory Tour": "Factory Tour",
         "Product Demo": "Product Demo",
         "Installation": "Installation",
-        "Smart Features": "Smart Features"
+        "Smart Features": "Smart Features",
+        "Technology": "Technology",
+        "Quality Control": "Quality Control"
       }
     },
     admin: {
+      supabaseSetupBanner: "Supabase Setup Required: Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to your Environment Variables (or AI Studio Secrets) and rebuild the app.",
+      seo: {
+        portal: "Employee Portal | BOLEN Mirror",
+        productForm: "Admin Product Form | BOLEN Mirror",
+        blogForm: "Admin Journal | BOLEN Mirror",
+        videoForm: "Admin Videos | BOLEN Mirror"
+      },
       blog: {
         tab: "Journal",
         addPost: "Add Post",
@@ -344,7 +361,12 @@ export const en = {
         fieldProducts: "Related Products",
         productsHelp: "Link products mentioned in this article — they appear at the bottom of the post.",
         searchProducts: "Search products...",
-        productsSelected: "{{n}} selected"
+        productsSelected: "{{n}} selected",
+        placeholderTitle: "How to Choose an LED Bathroom Mirror",
+        placeholderExcerpt: "One or two sentences for cards and search results.",
+        coverTypes: "PNG, JPG, WEBP",
+        slugPlaceholder: "auto-from-title",
+        readingPlaceholder: "auto"
       },
       videos: {
         tab: "Videos",
@@ -382,7 +404,26 @@ export const en = {
           videoUrlRequired: "A video URL is required for this source type.",
           embedUrlRequired: "A supported embed URL is required.",
           uploadError: "Failed to upload video.",
-          saveError: "Failed to save the video."
+          saveError: "Failed to save the video.",
+          regenerateAllThumbnails: "Regenerate thumbnails",
+          regenerateThumbnail: "Cover",
+          thumbnailRegenerated: "Thumbnail regenerated.",
+          thumbnailRegenerateError: "Failed to regenerate thumbnail.",
+          noRegeneratableVideos: "No videos with source URLs found.",
+          regenerateAllConfirm: "Regenerate thumbnails for {{count}} videos? This uploads new JPG thumbnails and updates the video records.",
+          regenerateAllDone: "Thumbnail regeneration finished. Success: {{success}}. Failed: {{failed}}.",
+          noSourceUrl: "This video has no source URL.",
+          thumbnailDeriveError: "Could not derive a thumbnail for this embedded video.",
+          signInToUpload: "Please sign in again before uploading large videos.",
+          uploadRejected: "Supabase rejected this file as larger than the active upload limit. Your product-videos bucket may be 500MB, but Storage > Settings > Global file size limit can still be 50MB and takes precedence. Set the global Storage file size limit above this video size, then try again.",
+          freePlanNote: "Supabase note: a {{size}} file needs the project global Storage upload limit raised above {{limit}}.",
+          placeholderTitle: "Anti-fog LED bathroom mirror demo",
+          placeholderExcerpt: "Short summary for cards and search results.",
+          placeholderBody: "Optional notes shown on the video page.",
+          slugPlaceholder: "auto-from-title",
+          tagsPlaceholder: "anti-fog, touch switch, bathroom",
+          embedPlaceholder: "https://www.youtube.com/watch?v=...",
+          directPlaceholder: "https://example.com/video.mp4"
         },
       dashboard: {
         title: "Admin Dashboard",
@@ -424,6 +465,8 @@ export const en = {
         editItem: "Edit",
         roleEmployee: "Employee",
         roleAdmin: "Admin",
+        changeLanguage: "Change language",
+        seoTitle: "Employee Portal | BOLEN Mirror",
         stats: {
           products: "Products",
           rfqs: "RFQs",
@@ -457,6 +500,27 @@ export const en = {
           deleteConfirm: "Are you sure you want to delete this product?",
           deleteError: "Failed to delete product."
         },
+        similarity: {
+          action: "Detect similar",
+          title: "Similar product detection",
+          subtitle: "Compares titles, specifications, and categories to flag duplicate or near-match listings.",
+          threshold: "Minimum match",
+          pairs: "{{count}} similar groups",
+          duplicateCount: "{{count}} likely duplicates",
+          clear: "No close matches",
+          noMatches: "No similar products found at this threshold.",
+          needMore: "Add at least two products to compare the catalog.",
+          score: "{{score}}% match",
+          duplicate: "Likely duplicate",
+          similar: "Similar",
+          related: "Related",
+          reasonTitle: "Title",
+          reasonSpecs: "Specifications",
+          reasonCategory: "Category",
+          justSaved: "Just saved",
+          scanAfterSave: "Catalog re-scanned after save.",
+          savedNoMatch: "The product you just saved has no close matches at this threshold."
+        },
         rfqs: {
           new: "New",
           replyEmail: "Reply via Email",
@@ -469,7 +533,9 @@ export const en = {
           markUnread: "Mark unread",
           archive: "Archive",
           unarchive: "Unarchive",
-          selectPrompt: "Select an inquiry to read the message."
+          selectPrompt: "Select an inquiry to read the message.",
+          updateError: "Failed to update RFQ status.",
+          replySubject: "Re: RFQ for {{product}}"
         },
         employees: {
           status: "Status:",
@@ -503,7 +569,38 @@ export const en = {
           navHero: "Homepage images",
           navVideo: "Featured video",
           navFactory: "Factory",
-          navCategories: "Categories"
+          navCategories: "Categories",
+          featuredTitle: "Home Featured Video",
+          featuredSelected: "1 selected",
+          featuredHidden: "Section hidden",
+          featuredHelp1: "Pick the video shown in the homepage video section. Only published videos appear here — publish a video under the Videos tab first. Choose No video to hide the section entirely, then hit Save Settings below.",
+          featuredHelp2: "The video autoplays silently when the section approaches the viewport. Long films loop a short excerpt; large files still autoplay but are flagged below so they can be optimized before publishing. Visitors using data saver or reduced motion keep the poster until they press play.",
+          featuredEmpty: "No published videos yet. Add one under the Videos tab, publish it, then come back to feature it here.",
+          featuredNone: "No video",
+          featuredHide: "Hide the section",
+          autoplayFull: "autoplays in full",
+          autoplayExcerpt: "loops a {{seconds}}s excerpt",
+          autoplayExcerptSize: "loops a {{seconds}}s excerpt (~{{size}})",
+          largeFile: "(large file)",
+          featuredMissing: "The saved video {{slug}} is no longer published, so the homepage section is hidden. Pick another video or republish it.",
+          factoryTitle: "Factory Showcase Gallery",
+          addPhoto: "Add Photo",
+          factoryHelp: "Photos shown in the homepage “Inside the Factory” section. Each photo needs descriptive alt text (used by Google Image Search and screen readers) — keep it specific to what the image actually shows.",
+          factoryEmpty: "No factory photos yet. Click Add Photo to upload your first image.",
+          imageUrl: "Image URL",
+          altPlaceholder: "Alt text (e.g. “BOLEN LED mirror assembly line in Jiaxing factory”) — required for SEO",
+          captionPlaceholder: "Caption (optional, shown under the photo)",
+          moveUp: "Move up",
+          moveDown: "Move down",
+          removePhoto: "Remove photo",
+          factoryPhotoAlt: "Factory photo {{n}} preview",
+          productCategories: "Product Categories",
+          addCategory: "Add Category",
+          productCategoriesHelp: "Manage product categories shown in the catalog and product form.",
+          categoryName: "Category Name",
+          removeCategory: "Remove Category",
+          journalCategories: "Journal Categories",
+          journalCategoriesHelp: "Manage the categories available when writing Journal articles."
         }
       },
       login: {
@@ -556,6 +653,28 @@ export const en = {
         addSpec: "Add Spec",
         cancel: "Cancel",
         saveProduct: "Save Product",
+        basicInfo: "Basic Information",
+        addRow: "Add Row",
+        removeSpec: "Remove specification",
+        noSpecs: "No specifications added yet.",
+        addFirstSpec: "Add your first specification",
+        organization: "Organization",
+        pricing: "Pricing",
+        shownToB2b: "Shown to B2B customers",
+        msrpHelp: "Manufacturer's Suggested Retail Price",
+        clickToUpload: "Click to upload images",
+        imageTypes: "PNG, JPG, WEBP up to 5MB",
+        imageUrl: "Image URL",
+        setAsMain: "Set as main image",
+        removeImage: "Remove image",
+        addImageUrl: "+ Add image from URL",
+        mainBadge: "MAIN",
+        titlePlaceholder: "e.g. Premium LED Vanity Mirror",
+        descPlaceholder: "A brief description of the product for catalog views...",
+        detailsPlaceholder: "Detailed product description, features, and installation guide...",
+        pricePlaceholder: "e.g. $20 - $40",
+        msrpPlaceholder: "e.g. $59.99",
+        unknownError: "Unknown error",
         errors: {
           titleRequired: "Title is required",
           descRequired: "Description is required",
@@ -570,6 +689,14 @@ export const en = {
           bucketNotFound: "Storage bucket \"product-images\" not found. Please create it in your Supabase dashboard and set it to Public.",
           uploadFailed: "Failed to upload images: {{message}}",
           saveFailed: "Failed to save product. Check console for details."
+        },
+        similarity: {
+          title: "Similar products",
+          hint: "Checked against the catalog using title, specifications, and category.",
+          none: "No close matches yet. Keep typing a title to check.",
+          match: "{{score}}% similar",
+          likelyDuplicate: "Possible duplicate",
+          saveConfirm: "This looks similar to “{{title}}” ({{score}}% match). Save anyway?"
         }
       }
     }

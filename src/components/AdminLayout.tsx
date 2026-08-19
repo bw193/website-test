@@ -16,6 +16,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../supabase';
+import AdminLanguageSwitch from './admin/AdminLanguageSwitch';
 
 const LOGO_URL =
   'https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/logo.png';
@@ -64,7 +65,7 @@ type NavItem = {
 };
 
 export default function AdminLayout() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user, role, isMasterAdmin, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
@@ -72,6 +73,10 @@ export default function AdminLayout() {
   const [newRfqCount, setNewRfqCount] = useState(0);
 
   const canManageTeam = role === 'admin' || isMasterAdmin;
+  const publicLang = ['en', 'zh', 'es', 'fr', 'de', 'it'].includes(i18n.language.split('-')[0])
+    ? i18n.language.split('-')[0]
+    : 'en';
+  const websiteHref = `/${publicLang}/`;
   const activeTab = tabFromLocation(location.pathname, location.search);
 
   useEffect(() => {
@@ -182,6 +187,7 @@ export default function AdminLayout() {
     activeTab,
     email: user?.email,
     roleLabel,
+    websiteHref,
     onLogout: handleLogout,
   };
 
@@ -253,12 +259,14 @@ function SidebarPanel({
   activeTab,
   email,
   roleLabel,
+  websiteHref,
   onLogout,
 }: {
   groups: NavGroup[];
   activeTab: AdminTab;
   email?: string | null;
   roleLabel: string;
+  websiteHref: string;
   onLogout: () => void;
 }) {
   const { t } = useTranslation();
@@ -322,8 +330,11 @@ function SidebarPanel({
             <p className="truncate text-[11px] uppercase tracking-wider text-stone-500">{roleLabel}</p>
           </div>
         </div>
+        <div className="mb-2 px-2">
+          <AdminLanguageSwitch variant="dark" />
+        </div>
         <Link
-          to="/en/"
+          to={websiteHref}
           className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-stone-400 transition-colors hover:bg-white/5 hover:text-white"
         >
           <ExternalLink className="h-4 w-4" />
