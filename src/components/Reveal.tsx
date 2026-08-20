@@ -1,10 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 
+export type RevealVariant = 'up' | 'left' | 'right' | 'scale' | 'blur';
+
 type RevealProps = {
   /** Element tag to render. Defaults to a div. */
   as?: React.ElementType;
-  /** Stagger delay in milliseconds, applied as transition-delay. */
+  /** Stagger delay in milliseconds, applied as animation-delay. */
   delay?: number;
+  /** Entry direction/style. Defaults to 'up' (fade + rise). */
+  variant?: RevealVariant;
   className?: string;
   children?: React.ReactNode;
 } & React.HTMLAttributes<HTMLElement>;
@@ -15,7 +19,7 @@ type RevealProps = {
  * out of `motion` lets the home route ship without the ~30KB motion runtime on
  * its critical path. Animates once, then disconnects the observer.
  */
-export default function Reveal({ as: Tag = 'div', delay = 0, className = '', children, style, ...rest }: RevealProps) {
+export default function Reveal({ as: Tag = 'div', delay = 0, variant = 'up', className = '', children, style, ...rest }: RevealProps) {
   const ref = useRef<HTMLElement | null>(null);
   const [visible, setVisible] = useState(false);
 
@@ -40,11 +44,13 @@ export default function Reveal({ as: Tag = 'div', delay = 0, className = '', chi
     return () => io.disconnect();
   }, []);
 
+  const variantClass = variant === 'up' ? '' : ` reveal-${variant}`;
+
   return (
     <Tag
       ref={ref as any}
-      className={`reveal ${visible ? 'reveal-in' : ''} ${className}`.trim()}
-      style={delay ? { ...style, transitionDelay: `${delay}ms` } : style}
+      className={`reveal${variantClass} ${visible ? 'reveal-in' : ''} ${className}`.trim()}
+      style={delay ? { ...style, animationDelay: `${delay}ms` } : style}
       {...rest}
     >
       {children}

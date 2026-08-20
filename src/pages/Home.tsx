@@ -1,6 +1,6 @@
-import React, { useEffect, useState, lazy, Suspense } from 'react';
+import React, { useEffect, useRef, useState, lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Globe, ShieldCheck, Truck, Factory, Lightbulb, Users, Clock, CheckCircle2, ChevronRight, ChevronLeft, Settings, Palette, DollarSign } from 'lucide-react';
+import { ArrowRight, Globe, ShieldCheck, Truck, Factory, Lightbulb, Users, ChevronRight, ChevronLeft, Palette, DollarSign } from 'lucide-react';
 import { useTranslation, Trans } from 'react-i18next';
 import ProductCard from '../components/ProductCard';
 import ProductCardSkeleton from '../components/ProductCardSkeleton';
@@ -52,6 +52,75 @@ const CERTS = [
   { url: "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/UL2.jpg", alt: "UL safety certification" },
   { url: "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/ctce.png", alt: "CCC China compulsory certification" },
 ];
+
+/**
+ * Editorial kicker used above every section heading — the amber hairline gives
+ * each band the same entry point, so the page reads as one continuous document
+ * rather than stacked blocks.
+ */
+function SectionKicker({ children, centered = false }: { children: React.ReactNode; centered?: boolean }) {
+  return (
+    <span
+      className={`flex items-center gap-3 text-amber-600 font-semibold tracking-wider uppercase text-sm mb-3 ${
+        centered ? 'justify-center' : ''
+      }`}
+    >
+      <span aria-hidden="true" className="h-px w-8 bg-amber-500/70" />
+      {children}
+      {centered && <span aria-hidden="true" className="h-px w-8 bg-amber-500/70" />}
+    </span>
+  );
+}
+
+/**
+ * Count-up for the stats band. Parses a leading number out of values like
+ * "46,800 m²" or "200+" and eases it in when the card scrolls into view;
+ * non-numeric values ("Global") render untouched. Reduced-motion visitors get
+ * the final value immediately.
+ */
+function StatValue({ value, className }: { value: string; className?: string }) {
+  const ref = useRef<HTMLParagraphElement | null>(null);
+  const match = value.match(/^([\d,]+)([\s\S]*)$/);
+  const target = match ? parseInt(match[1].replace(/,/g, ''), 10) : null;
+  const suffix = match ? match[2] : '';
+  const [display, setDisplay] = useState(value);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || target === null || typeof IntersectionObserver === 'undefined') return;
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+    setDisplay(`0${suffix}`);
+    let raf = 0;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        io.disconnect();
+        const start = performance.now();
+        const duration = 1600;
+        const tick = (now: number) => {
+          const p = Math.min((now - start) / duration, 1);
+          const eased = 1 - Math.pow(1 - p, 3);
+          setDisplay(`${Math.round(target * eased).toLocaleString('en-US')}${suffix}`);
+          if (p < 1) raf = requestAnimationFrame(tick);
+        };
+        raf = requestAnimationFrame(tick);
+      },
+      { threshold: 0.4 }
+    );
+    io.observe(el);
+    return () => {
+      io.disconnect();
+      cancelAnimationFrame(raf);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value]);
+
+  return (
+    <p ref={ref} className={className}>
+      {display}
+    </p>
+  );
+}
 
 export default function Home() {
   const { t } = useTranslation();
@@ -319,7 +388,7 @@ export default function Home() {
           {heroBgs.length > 0 && (
             <img
               key={currentBgIndex}
-              className={`w-full h-auto block ${animateSlides ? 'hero-fade' : ''}`}
+              className={`w-full h-auto block ${animateSlides ? 'hero-zoom' : ''}`}
               src={heroImgSrc(currentBgIndex)}
               srcSet={heroImgSrcSet(currentBgIndex)}
               sizes="100vw"
@@ -337,14 +406,14 @@ export default function Home() {
           <>
             <button
               onClick={prevBg}
-              className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-black/20 text-white/70 hover:bg-black/40 hover:text-white transition-all backdrop-blur-sm opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
+              className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-black/20 text-white/70 hover:bg-black/40 hover:text-white hover:scale-110 active:scale-95 transition-all duration-300 backdrop-blur-sm opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
               aria-label="Previous image"
             >
               <ChevronLeft className="w-8 h-8" />
             </button>
             <button
               onClick={nextBg}
-              className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-black/20 text-white/70 hover:bg-black/40 hover:text-white transition-all backdrop-blur-sm opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
+              className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-black/20 text-white/70 hover:bg-black/40 hover:text-white hover:scale-110 active:scale-95 transition-all duration-300 backdrop-blur-sm opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
               aria-label="Next image"
             >
               <ChevronRight className="w-8 h-8" />
@@ -353,14 +422,14 @@ export default function Home() {
                 the certification badges baked into the banner artwork, which
                 was hidden while the hero carried a heavy scrim and obvious once
                 it didn't. */}
-            <div className="absolute bottom-3 sm:bottom-5 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+            <div className="absolute bottom-3 sm:bottom-5 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1 rounded-full bg-black/25 px-2 py-0.5 backdrop-blur-sm">
               {heroBgs.map((_, idx) => (
                 <button
                   key={idx}
                   onClick={() => { setAnimateSlides(true); setCurrentBgIndex(idx); }}
-                  className="p-3"
+                  className="p-2"
                   aria-label={`Go to image ${idx + 1}`}
-                ><span className={`block w-2.5 h-2.5 rounded-full transition-all ${idx === currentBgIndex ? 'bg-amber-400 w-8' : 'bg-white/50 hover:bg-white/80'}`} /></button>
+                ><span className={`block h-2 rounded-full transition-all duration-500 ${idx === currentBgIndex ? 'bg-amber-400 w-7' : 'w-2 bg-white/50 hover:bg-white/80'}`} /></button>
               ))}
             </div>
           </>
@@ -389,26 +458,26 @@ export default function Home() {
                 left it pinned to the top while the h1 dropped to meet the right
                 column, opening a dead gap between them. */}
             <div>
-              <Reveal as="p" className="text-[10px] sm:text-xs font-semibold uppercase tracking-[0.2em] text-amber-600">
+              <Reveal as="p" variant="left" className="text-[10px] sm:text-xs font-semibold uppercase tracking-[0.2em] text-amber-600">
                 {t('home.heroKicker')}
               </Reveal>
-              <Reveal as="h1" delay={90} className="mt-2 font-serif text-3xl sm:text-4xl lg:text-[2.6rem] leading-[1.08]">
+              <Reveal as="h1" variant="left" delay={90} className="mt-2 font-serif text-3xl sm:text-4xl lg:text-[2.6rem] leading-[1.08]">
                 {t('home.heroTitle1')}
                 <span className="block italic text-sheen">{t('home.heroTitle2')}</span>
               </Reveal>
             </div>
             <div className="lg:border-l lg:border-stone-300/70 lg:pl-10">
-              <Reveal as="p" delay={180} className="text-sm text-stone-600 font-light">
+              <Reveal as="p" variant="right" delay={180} className="text-sm text-stone-600 font-light">
                 {/* heroDesc contains <1>BOLEN</1>, so it must go through Trans
                     rather than t() or the markup renders as literal text. */}
                 <Trans i18nKey="home.heroDesc" components={[<span key="0" />, <strong key="1" className="font-medium text-stone-900" />]} />
               </Reveal>
-              <Reveal delay={270} className="mt-4 flex flex-wrap gap-3">
-                <Link to={lp('/rfq')} className="btn-primary">
+              <Reveal variant="right" delay={270} className="mt-4 flex flex-wrap gap-3">
+                <Link to={lp('/rfq')} className="btn-primary transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-amber-500/25">
                   {t('home.heroPrimaryCta')}
                   <ArrowRight className="w-4 h-4" />
                 </Link>
-                <Link to={lp('/products')} className="btn-secondary">
+                <Link to={lp('/products')} className="btn-secondary transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md">
                   {t('home.heroSecondaryCta')}
                 </Link>
               </Reveal>
@@ -420,7 +489,7 @@ export default function Home() {
       {/* Stats Section */}
       <div className="relative -mt-8 sm:-mt-10 z-10 max-w-5xl mx-auto px-3 sm:px-6 lg:px-8">
         <div
-          className="bg-white rounded-xl sm:rounded-2xl shadow-xl border border-stone-100 py-3 px-2 sm:py-5 sm:px-6 lg:py-6 lg:px-8 flex overflow-x-auto sm:grid sm:grid-cols-4 sm:overflow-visible gap-0 sm:gap-4 lg:gap-6"
+          className="bg-white rounded-xl sm:rounded-2xl shadow-xl shadow-stone-900/5 border border-stone-100 py-3 px-2 sm:py-5 sm:px-6 lg:py-6 lg:px-8 flex overflow-x-auto sm:grid sm:grid-cols-4 sm:overflow-visible gap-0 sm:gap-4 lg:gap-6 sm:divide-x sm:divide-stone-100"
         >
           {[
             { icon: Factory, value: "46,800 m²", label: t('home.stats.sqMeters') },
@@ -428,11 +497,14 @@ export default function Home() {
             { icon: Lightbulb, value: "200+", label: t('home.stats.styles') },
             { icon: Globe, value: "Global", label: t('home.stats.global') }
           ].map((stat, idx) => (
-            <Reveal key={idx} delay={idx * 100} className="flex-1 min-w-0 flex flex-col items-center text-center group">
-              <div className="hidden sm:flex h-10 w-10 rounded-full bg-stone-50 group-hover:bg-amber-50 items-center justify-center mb-2 transition-colors duration-300">
+            <Reveal key={idx} variant="scale" delay={idx * 100} className="flex-1 min-w-0 flex flex-col items-center text-center group">
+              <div className="hidden sm:flex h-10 w-10 rounded-full bg-stone-50 group-hover:bg-amber-50 group-hover:scale-110 items-center justify-center mb-2 transition-all duration-300">
                 <stat.icon className="h-5 w-5 text-amber-600" />
               </div>
-              <p className="text-base sm:text-2xl font-bold text-stone-900 mb-0.5 font-serif whitespace-nowrap">{stat.value}</p>
+              <StatValue
+                value={stat.value}
+                className="text-base sm:text-2xl font-bold text-stone-900 mb-0.5 font-serif whitespace-nowrap tabular-nums"
+              />
               <p className="text-[10px] sm:text-[11px] text-stone-500 uppercase tracking-wide sm:tracking-wider font-semibold leading-tight">{stat.label}</p>
             </Reveal>
           ))}
@@ -440,17 +512,17 @@ export default function Home() {
       </div>
 
       {/* Featured Collections (Versatile & Custom — products) */}
-      <div className="py-24 bg-stone-50 text-stone-900 border-t border-stone-200">
+      <section aria-labelledby="home-collections-title" className="py-24 bg-stone-50 text-stone-900 border-t border-stone-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-6">
-            <Reveal className="max-w-2xl">
-              <span className="text-amber-600 font-semibold tracking-wider uppercase text-sm mb-2 block">{t('home.collections.subtitle')}</span>
-              <h2 className="text-4xl font-serif sm:text-5xl mb-4">{t('home.collections.title')}</h2>
+            <Reveal variant="left" className="max-w-2xl">
+              <SectionKicker>{t('home.collections.subtitle')}</SectionKicker>
+              <h2 id="home-collections-title" className="text-4xl font-serif sm:text-5xl mb-4">{t('home.collections.title')}</h2>
               <p className="text-lg text-stone-600 font-light">
                 {t('home.collections.desc')}
               </p>
             </Reveal>
-            <Reveal delay={150}>
+            <Reveal variant="right" delay={150}>
               <Link to={lp('/products')} className="inline-flex items-center text-amber-600 hover:text-amber-700 font-medium transition-colors group">
                 {t('home.collections.viewAll')} <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Link>
@@ -458,10 +530,10 @@ export default function Home() {
           </div>
 
           {/* Category directory — real URLs so crawlers can index each collection. */}
-          <Reveal className="flex flex-wrap gap-2 mb-12">
+          <Reveal variant="blur" className="flex flex-wrap gap-2 mb-12">
             <Link
               to={lp('/products')}
-              className="px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 whitespace-nowrap bg-stone-900 text-white shadow-md"
+              className="px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 whitespace-nowrap bg-stone-900 text-white shadow-md hover:shadow-lg"
             >
               {t('products.allCategories', 'All Categories')}
             </Link>
@@ -469,7 +541,7 @@ export default function Home() {
               <Link
                 key={category}
                 to={lp(catalogCategoryPath(category))}
-                className="px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 whitespace-nowrap bg-stone-100 text-stone-600 hover:bg-stone-200 hover:text-stone-900"
+                className="px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 whitespace-nowrap bg-stone-100 text-stone-600 hover:bg-stone-200 hover:text-stone-900 hover:-translate-y-0.5 hover:shadow-sm"
               >
                 {t(`products.categories.${category}`, category)}
               </Link>
@@ -485,7 +557,7 @@ export default function Home() {
           ) : featuredProducts.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
               {featuredProducts.map((product, idx) => (
-                <Reveal key={product.id} delay={idx * 80}>
+                <Reveal key={product.id} variant="blur" delay={idx * 80} className="transition-transform duration-500 hover:-translate-y-1.5">
                   <ProductCard
                     id={product.id}
                     title={product.title}
@@ -500,41 +572,45 @@ export default function Home() {
             </div>
           ) : null}
         </div>
-      </div>
+      </section>
 
       {/* Featured Video — editor-picked video (site_settings.home_featured_video).
           Click-to-play facade: nothing but the poster loads until asked. */}
       <section className="border-y border-stone-200 bg-white py-16 sm:py-20" aria-labelledby="sourcing-solutions-title">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-            <div className="max-w-3xl">
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-amber-600">{solutionsUi.homeEyebrow}</p>
-              <h2 id="sourcing-solutions-title" className="mt-3 font-serif text-4xl text-stone-950 sm:text-5xl">
+            <Reveal variant="left" className="max-w-3xl">
+              <SectionKicker>{solutionsUi.homeEyebrow}</SectionKicker>
+              <h2 id="sourcing-solutions-title" className="mt-1 font-serif text-4xl text-stone-950 sm:text-5xl">
                 {solutionsUi.homeHeading}
               </h2>
               <p className="mt-5 leading-7 text-stone-600">
                 {solutionsUi.homeIntro}
               </p>
-            </div>
-            <Link to={lp('/solutions')} className="inline-flex items-center gap-2 text-sm font-semibold text-stone-900">
-              {solutionsUi.navLabel} <ArrowRight className="h-4 w-4" />
+            </Reveal>
+            <Reveal variant="right" delay={120}>
+            <Link to={lp('/solutions')} className="group inline-flex items-center gap-2 text-sm font-semibold text-stone-900 transition-colors hover:text-amber-700">
+              {solutionsUi.navLabel} <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Link>
+            </Reveal>
             </div>
             <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {HOME_SOLUTION_SLUGS.map((slug) => solutionPages.find((page) => page.slug === slug))
                 .filter((page): page is NonNullable<typeof page> => Boolean(page))
-                .map((page) => (
+                .map((page, idx) => (
+                <Reveal key={page.slug} delay={(idx % 3) * 90}>
                 <Link
-                  key={page.slug}
                   to={lp(`/solutions/${page.slug}`)}
-                  className="group rounded-2xl border border-stone-200 bg-[#FAF9F6] p-6 transition-all hover:-translate-y-0.5 hover:border-amber-300 hover:shadow-lg"
+                  className="group relative block h-full overflow-hidden rounded-2xl border border-stone-200 bg-[#FAF9F6] p-6 transition-all duration-300 hover:-translate-y-1 hover:border-amber-300 hover:shadow-xl hover:shadow-stone-900/5"
                 >
-                  <h3 className="text-lg font-medium text-stone-900 group-hover:text-amber-800">{page.shortTitle || page.h1}</h3>
+                  <span aria-hidden="true" className="absolute inset-x-0 top-0 h-0.5 origin-left scale-x-0 bg-gradient-to-r from-amber-500 to-amber-300 transition-transform duration-500 group-hover:scale-x-100" />
+                  <h3 className="text-lg font-medium text-stone-900 transition-colors group-hover:text-amber-800">{page.shortTitle || page.h1}</h3>
                   <p className="mt-2 line-clamp-2 text-sm leading-6 text-stone-600">{page.blurb || page.description}</p>
                   <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-stone-900">
                     {solutionsUi.homeExplore} <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                   </span>
                 </Link>
+                </Reveal>
               ))}
             </div>
           </div>
@@ -543,11 +619,11 @@ export default function Home() {
       {featuredVideo && <FeaturedVideo video={featuredVideo} />}
 
       {/* Manufacturing Advantage — 3 bullets (replaces former 4-step Process) */}
-      <div className="py-24 bg-white border-t border-stone-100">
+      <section aria-labelledby="home-advantage-title" className="py-24 bg-white border-t border-stone-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Reveal className="text-center max-w-3xl mx-auto mb-16">
-            <span className="text-amber-600 font-semibold tracking-wider uppercase text-sm mb-2 block">{t('home.advantage.subtitle')}</span>
-            <h2 className="text-4xl font-serif text-stone-900 sm:text-5xl mb-4">{t('home.advantage.title')}</h2>
+            <SectionKicker centered>{t('home.advantage.subtitle')}</SectionKicker>
+            <h2 id="home-advantage-title" className="text-4xl font-serif text-stone-900 sm:text-5xl mb-4">{t('home.advantage.title')}</h2>
             <p className="text-lg text-stone-600 font-light leading-relaxed">{t('home.advantage.desc')}</p>
           </Reveal>
 
@@ -560,9 +636,10 @@ export default function Home() {
               <Reveal
                 key={item.key}
                 delay={i * 100}
-                className="bg-stone-50 p-8 rounded-2xl border border-stone-200 hover:shadow-md transition-shadow group"
+                className="group relative overflow-hidden bg-stone-50 p-8 rounded-2xl border border-stone-200 transition-all duration-300 hover:-translate-y-1.5 hover:border-amber-200 hover:shadow-xl hover:shadow-stone-900/5"
               >
-                <div className="w-14 h-14 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                <span aria-hidden="true" className="absolute inset-x-0 top-0 h-0.5 origin-left scale-x-0 bg-gradient-to-r from-amber-500 to-amber-300 transition-transform duration-500 group-hover:scale-x-100" />
+                <div className="w-14 h-14 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center mb-6 transition-all duration-300 group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white group-hover:shadow-lg group-hover:shadow-amber-500/30">
                   {item.icon}
                 </div>
                 <h3 className="text-xl font-semibold text-stone-900 mb-3">{t(`home.advantage.features.${item.key}.title`)}</h3>
@@ -571,7 +648,7 @@ export default function Home() {
             ))}
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Factory Showcase — editor-managed gallery (site_settings.factory_gallery).
           Lazy/responsive imgs, explicit dims => no LCP/CLS hit. */}
@@ -579,13 +656,13 @@ export default function Home() {
         <section
           id="factory-showcase"
           aria-labelledby="factory-showcase-title"
-          className="py-24 bg-stone-50 border-t border-stone-100"
+          className="py-24 bg-stone-50 border-t border-stone-100 scroll-mt-20"
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <Reveal className="text-center max-w-3xl mx-auto mb-12">
-              <span className="text-amber-600 font-semibold tracking-wider uppercase text-sm mb-2 block">
+              <SectionKicker centered>
                 {t('home.factoryShowcase.subtitle')}
-              </span>
+              </SectionKicker>
               <h2 id="factory-showcase-title" className="text-4xl font-serif text-stone-900 sm:text-5xl mb-4">
                 {t('home.factoryShowcase.title')}
               </h2>
@@ -599,8 +676,8 @@ export default function Home() {
               aria-label={t('home.factoryShowcase.title') as string}
             >
               {factoryGallery.map((item, idx) => (
-                <Reveal as="li" key={`${item.url}-${idx}`} delay={(idx % 3) * 80}>
-                  <figure className="group relative bg-white rounded-2xl overflow-hidden shadow-sm border border-stone-200 hover:shadow-md transition-shadow">
+                <Reveal as="li" variant="blur" key={`${item.url}-${idx}`} delay={(idx % 3) * 80}>
+                  <figure className="group relative bg-white rounded-2xl overflow-hidden shadow-sm border border-stone-200 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-stone-900/10 hover:border-amber-200">
                     <div className="relative w-full aspect-[4/3] overflow-hidden bg-stone-200">
                       <img
                         src={optimizeImage(item.url, { width: 800 })}
@@ -612,11 +689,12 @@ export default function Home() {
                         loading="lazy"
                         decoding="async"
                         referrerPolicy="no-referrer"
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
                       />
+                      <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-gradient-to-t from-stone-950/30 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
                     </div>
                     {item.caption && (
-                      <figcaption className="px-5 py-4 text-sm text-stone-700 font-medium leading-snug border-t border-stone-100">
+                      <figcaption className="px-5 py-4 text-sm text-stone-700 font-medium leading-snug border-t border-stone-100 transition-colors duration-300 group-hover:text-stone-900">
                         {item.caption}
                       </figcaption>
                     )}
@@ -629,20 +707,21 @@ export default function Home() {
       )}
 
       {/* Manufacturing Process — new 6-step block */}
-      <div className="py-24 bg-stone-100">
+      <section aria-labelledby="home-process-title" className="py-24 bg-stone-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Reveal className="text-center max-w-3xl mx-auto mb-16">
-            <span className="text-amber-600 font-semibold tracking-wider uppercase text-sm mb-2 block">{t('home.manufacturingProcess.subtitle')}</span>
-            <h2 className="text-4xl font-serif text-stone-900 sm:text-5xl mb-4">{t('home.manufacturingProcess.title')}</h2>
+            <SectionKicker centered>{t('home.manufacturingProcess.subtitle')}</SectionKicker>
+            <h2 id="home-process-title" className="text-4xl font-serif text-stone-900 sm:text-5xl mb-4">{t('home.manufacturingProcess.title')}</h2>
             <p className="text-lg text-stone-600 font-light">{t('home.manufacturingProcess.desc')}</p>
           </Reveal>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {(['s1','s2','s3','s4','s5','s6'] as const).map((key, idx) => (
-              <Reveal key={key} delay={(idx % 3) * 100} className="bg-white p-8 rounded-2xl border border-stone-200 shadow-sm hover:shadow-md transition-shadow">
+              <Reveal key={key} variant="blur" delay={(idx % 3) * 100} className="group relative overflow-hidden bg-white p-8 rounded-2xl border border-stone-200 shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-amber-200 hover:shadow-xl hover:shadow-stone-900/5">
+                <span aria-hidden="true" className="absolute inset-x-0 top-0 h-0.5 origin-left scale-x-0 bg-gradient-to-r from-amber-500 to-amber-300 transition-transform duration-500 group-hover:scale-x-100" />
                 <div className="flex items-start gap-4">
-                  <div className="shrink-0 w-12 h-12 rounded-full bg-amber-50 border-2 border-amber-200 flex items-center justify-center">
-                    <span className="text-base font-serif font-bold text-amber-700">{String(idx + 1).padStart(2, '0')}</span>
+                  <div className="shrink-0 w-12 h-12 rounded-full bg-amber-50 border-2 border-amber-200 flex items-center justify-center transition-all duration-300 group-hover:border-amber-500 group-hover:bg-amber-500 group-hover:shadow-lg group-hover:shadow-amber-500/30">
+                    <span className="text-base font-serif font-bold text-amber-700 transition-colors duration-300 group-hover:text-white">{String(idx + 1).padStart(2, '0')}</span>
                   </div>
                   <div className="min-w-0">
                     <h3 className="text-lg font-bold text-stone-900 mb-2">{t(`home.manufacturingProcess.steps.${key}.title`)}</h3>
@@ -653,13 +732,13 @@ export default function Home() {
             ))}
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Why Partner With Bolen */}
-      <div className="py-24 bg-stone-50">
+      <section aria-labelledby="home-whyus-title" className="py-24 bg-stone-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Reveal className="text-center mb-16">
-            <h2 className="text-4xl font-serif text-stone-900 sm:text-5xl leading-tight">
+            <h2 id="home-whyus-title" className="text-4xl font-serif text-stone-900 sm:text-5xl leading-tight">
               {t('home.whyUs.title1')} <span className="italic text-amber-700">{t('home.whyUs.title2')}</span>
             </h2>
           </Reveal>
@@ -673,10 +752,12 @@ export default function Home() {
             ].map((item, i) => (
               <Reveal
                 key={i}
+                variant="scale"
                 delay={i * 80}
-                className="bg-white p-8 rounded-2xl shadow-sm border border-stone-100 hover:shadow-md transition-shadow group"
+                className="group relative overflow-hidden bg-white p-8 rounded-2xl shadow-sm border border-stone-100 transition-all duration-300 hover:-translate-y-1.5 hover:border-amber-200 hover:shadow-xl hover:shadow-stone-900/5"
               >
-                <div className="w-14 h-14 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                <span aria-hidden="true" className="absolute inset-x-0 top-0 h-0.5 origin-left scale-x-0 bg-gradient-to-r from-amber-500 to-amber-300 transition-transform duration-500 group-hover:scale-x-100" />
+                <div className="w-14 h-14 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center mb-6 transition-all duration-300 group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white group-hover:shadow-lg group-hover:shadow-amber-500/30">
                   {item.icon}
                 </div>
                 <h3 className="text-xl font-semibold text-stone-900 mb-4">
@@ -689,10 +770,10 @@ export default function Home() {
             ))}
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Global Reach (About) */}
-      <div id="about" className="py-24 overflow-hidden bg-white">
+      <div id="about" className="py-24 overflow-hidden bg-white scroll-mt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Reveal className="text-center mb-12 max-w-4xl mx-auto">
             <h2 className="text-4xl font-serif text-stone-900 sm:text-5xl leading-tight mb-6">
@@ -703,7 +784,7 @@ export default function Home() {
             </p>
           </Reveal>
 
-          <Reveal delay={150} className="relative w-full">
+          <Reveal variant="scale" delay={150} className="relative w-full">
             <div className="aspect-[16/9] lg:aspect-[21/9] rounded-3xl overflow-hidden shadow-xl relative border border-stone-200">
               <Suspense fallback={<div className="w-full h-full bg-stone-200 animate-pulse rounded-3xl" />}>
                 <MotionProvider>
@@ -720,13 +801,13 @@ export default function Home() {
       </div>
 
       {/* Certificates Section */}
-      <div className="py-16 bg-white border-t border-stone-100 overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-10 text-center">
-          <span className="text-amber-600 font-semibold tracking-wider uppercase text-sm mb-2 block">{t('home.certificates.subtitle')}</span>
-          <h2 className="text-3xl font-serif text-stone-900">{t('home.certificates.title')}</h2>
-        </div>
+      <section aria-labelledby="home-certificates-title" className="py-16 bg-white border-t border-stone-100 overflow-hidden">
+        <Reveal className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-10 text-center">
+          <SectionKicker centered>{t('home.certificates.subtitle')}</SectionKicker>
+          <h2 id="home-certificates-title" className="text-3xl font-serif text-stone-900">{t('home.certificates.title')}</h2>
+        </Reveal>
 
-        <div className="relative w-full overflow-hidden flex group">
+        <div className="relative w-full overflow-hidden flex group marquee-mask">
           <style>
             {`
               @keyframes marquee {
@@ -745,45 +826,50 @@ export default function Home() {
           <div className="flex animate-marquee whitespace-nowrap w-max">
             {/* First set of images */}
             {CERTS.map((cert, idx) => (
-              <div key={`cert-1-${idx}`} className="mx-8 flex-none w-48 h-32 flex items-center justify-center grayscale hover:grayscale-0 transition-all duration-300">
+              <div key={`cert-1-${idx}`} className="mx-8 flex-none w-48 h-32 flex items-center justify-center grayscale opacity-70 hover:grayscale-0 hover:opacity-100 hover:scale-105 transition-all duration-300">
                 <img src={cert.url} alt={cert.alt} className="max-w-full max-h-full object-contain" width="192" height="128" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
               </div>
             ))}
             {/* Duplicate set for seamless scrolling */}
             {CERTS.map((cert, idx) => (
-              <div key={`cert-2-${idx}`} className="mx-8 flex-none w-48 h-32 flex items-center justify-center grayscale hover:grayscale-0 transition-all duration-300">
+              <div key={`cert-2-${idx}`} className="mx-8 flex-none w-48 h-32 flex items-center justify-center grayscale opacity-70 hover:grayscale-0 hover:opacity-100 hover:scale-105 transition-all duration-300">
                 <img src={cert.url} alt={cert.alt} className="max-w-full max-h-full object-contain" width="192" height="128" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
               </div>
             ))}
           </div>
         </div>
-      </div>
+      </section>
 
       {/* CTA Section */}
-      <div className="relative bg-stone-900 py-24 overflow-hidden">
+      <section aria-labelledby="home-cta-title" className="relative bg-stone-900 py-24 overflow-hidden">
         <div className="absolute inset-0">
           {/* Decorative — the CTA copy sits on top, so this carries no meaning
               for screen readers. Was a random picsum.photos placeholder. */}
-          <img src={optimizeImage(CTA_BACKDROP, { width: 1600 })} alt="" aria-hidden="true" className="w-full h-full object-cover opacity-20" width="1200" height="400" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
+          <img src={optimizeImage(CTA_BACKDROP, { width: 1600 })} alt="" aria-hidden="true" className="cta-drift w-full h-full object-cover opacity-20" width="1200" height="400" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
           <div className="absolute inset-0 bg-stone-900/80" />
+          {/* Warm glow behind the copy so the band doesn't read as flat dark. */}
+          <div aria-hidden="true" className="absolute left-1/2 top-1/2 h-[420px] w-[720px] max-w-full -translate-x-1/2 -translate-y-1/2 rounded-full bg-amber-500/10 blur-3xl" />
         </div>
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <Reveal as="h2" className="text-4xl font-serif text-white sm:text-5xl mb-6">
+          <Reveal variant="blur" className="mb-6 flex justify-center">
+            <span aria-hidden="true" className="h-px w-16 bg-gradient-to-r from-transparent via-amber-400 to-transparent" />
+          </Reveal>
+          <Reveal as="h2" id="home-cta-title" variant="blur" delay={60} className="text-4xl font-serif text-white sm:text-5xl mb-6">
             {t('home.cta.title')}
           </Reveal>
-          <Reveal as="p" delay={100} className="text-xl text-stone-300 font-light mb-10">
+          <Reveal as="p" variant="blur" delay={140} className="text-xl text-stone-300 font-light mb-10">
             {t('home.cta.desc')}
           </Reveal>
-          <Reveal delay={150} className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link to={lp('/products')} className="btn-primary px-8 py-4 text-base">
+          <Reveal variant="blur" delay={220} className="flex flex-col sm:flex-row justify-center gap-4">
+            <Link to={lp('/products')} className="btn-primary px-8 py-4 text-base transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-amber-500/30">
               {t('home.cta.viewCatalog')}
             </Link>
-            <Link to={lp('/rfq')} className="btn-secondary-on-dark px-8 py-4 text-base">
+            <Link to={lp('/rfq')} className="btn-secondary-on-dark px-8 py-4 text-base transition-all duration-300 hover:-translate-y-0.5">
               {t('home.cta.contactSales')}
             </Link>
           </Reveal>
         </div>
-      </div>
+      </section>
     </div>
   );
 }

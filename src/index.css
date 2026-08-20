@@ -46,25 +46,60 @@
 
 /* Scroll-reveal — lightweight replacement for motion's whileInView on the
    homepage, so `motion` no longer sits on the critical-path bundle. The
-   <Reveal> component toggles `reveal-in` via IntersectionObserver. */
-.reveal {
-  opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.6s ease, transform 0.6s ease;
-}
+   <Reveal> component toggles `reveal-in` via IntersectionObserver.
+   Keyframe-based (not transition) on purpose: once the entrance finishes, the
+   element carries no transform/transition declarations of its own, so Tailwind
+   hover utilities (hover:-translate-y-*, hover:shadow-*, transition-all) on
+   the same node keep working — unlayered author CSS would otherwise win the
+   cascade over Tailwind's layered utilities. The `backwards` fill keeps the
+   from-frame applied while a stagger animation-delay is pending. */
+.reveal { opacity: 0; }
 .reveal-in {
   opacity: 1;
-  transform: none;
+  animation: revealUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+.reveal-left.reveal-in  { animation-name: revealLeft; }
+.reveal-right.reveal-in { animation-name: revealRight; }
+.reveal-scale.reveal-in { animation-name: revealScale; }
+.reveal-blur.reveal-in  { animation-name: revealBlur; }
+@keyframes revealUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes revealLeft {
+  from { opacity: 0; transform: translateX(-28px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes revealRight {
+  from { opacity: 0; transform: translateX(28px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes revealScale {
+  from { opacity: 0; transform: scale(0.94); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes revealBlur {
+  from { opacity: 0; transform: translateY(16px) scale(0.985); filter: blur(6px); }
+  to   { opacity: 1; transform: none; filter: blur(0); }
 }
 
-/* Hero carousel crossfade — applied only to non-initial slides so the LCP
-   image paints instantly (no entrance fade gating LCP). */
+/* Hero carousel crossfade + settle-zoom — applied only to non-initial slides
+   so the LCP image paints instantly (no entrance animation gating LCP). The
+   zoom settles from 1.06 to 1 over 1.6s: a cinematic "breath" as each slide
+   arrives, without the endless drift of a Ken Burns loop. */
 @keyframes heroFade {
   from { opacity: 0; }
   to { opacity: 1; }
 }
+@keyframes heroZoom {
+  from { transform: scale(1.06); }
+  to { transform: scale(1); }
+}
 .hero-fade {
   animation: heroFade 1s ease;
+}
+.hero-zoom {
+  animation: heroFade 1s ease, heroZoom 1.8s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* Featured video band (home). The section leans on the footage itself, so the
@@ -122,10 +157,26 @@
   }
 }
 
+/* Certificate/logo marquee — soft edge fade so logos melt in and out of the
+   frame instead of hard-clipping at the viewport edge. */
+.marquee-mask {
+  -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+
+/* CTA backdrop — an ultra-slow breathe so the closing band feels alive behind
+   the copy without distracting from it. */
+@keyframes ctaDrift {
+  from { transform: scale(1.02) translate3d(0, 0, 0); }
+  to   { transform: scale(1.12) translate3d(-1%, -1%, 0); }
+}
+.cta-drift { animation: ctaDrift 36s ease-in-out infinite alternate; will-change: transform; }
+
 @media (prefers-reduced-motion: reduce) {
-  .reveal { opacity: 1; transform: none; transition: none; }
-  .hero-fade { animation: none; }
+  .reveal, .reveal-in { opacity: 1; animation: none; }
+  .hero-fade, .hero-zoom { animation: none; }
   .fv-kenburns { animation: none; }
+  .cta-drift { animation: none; }
   /* Keep the gradient, drop the movement. */
   .band-aurora::before { animation: none; }
   .text-sheen { animation: none; }
