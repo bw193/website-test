@@ -224,6 +224,9 @@ export const zh = {
       globalShipping: "全球发货",
       fastTurnaround: "快速交付",
       oemAvailable: "支持 OEM/ODM",
+      keySpecs: "核心参数",
+      viewAllSpecs: "查看完整规格",
+      quotingFor: "询价产品",
       brandSuffix: "| BOLEN 镜业",
       descTemplate: "{title} — 嘉兴诚泰镜业有限公司（BOLEN）优质出品，专业提供 OEM/ODM LED 镜、智能镜、化妆镜和浴室镜。欢迎询价获取批发价格。"
     },

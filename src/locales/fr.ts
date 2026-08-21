@@ -222,6 +222,9 @@ export const fr = {
       globalShipping: "Expédition mondiale",
       fastTurnaround: "Production rapide",
       oemAvailable: "OEM/ODM disponible",
+      keySpecs: "En bref",
+      viewAllSpecs: "Voir toutes les spécifications",
+      quotingFor: "Demande de devis pour",
       brandSuffix: "| BOLEN Mirror",
       descTemplate: "{title} haut de gamme, fabriqué par BOLEN Mirror (Jiaxing Chengtai Mirror Co., Ltd.) — miroirs LED, intelligents, de toilette et de salle de bain OEM/ODM. Demandez un devis pour les tarifs en gros."
     },

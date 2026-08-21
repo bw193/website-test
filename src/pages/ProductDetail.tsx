@@ -2,13 +2,13 @@ import { m, AnimatePresence } from 'motion/react';
 import React, { useEffect, useRef, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { Loader2, CheckCircle2, ChevronLeft, ChevronRight, Send, ShieldCheck, Truck, Clock } from 'lucide-react';
+import { Loader2, CheckCircle2, ChevronLeft, ChevronRight, Send, ShieldCheck, Truck, Clock, Check } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import Markdown from '../components/Markdown';
 import SEO from '../components/SEO';
 import { buildProductDescription, buildProductSeoTitle, normalizeSpecs } from '../utils/productSeo';
 import VideoCard from '../components/VideoCard';
-import { optimizeImage } from '../utils/optimizeImage';
+import { optimizeImage, imageSrcSet } from '../utils/optimizeImage';
 import { PRODUCT_IMAGE_PLACEHOLDER, handleImageError } from '../utils/imagePlaceholder';
 import { useLocalizedPath } from '../hooks/useLocalizedPath';
 import { readInitialProduct } from '../utils/prerenderData';
@@ -56,6 +56,20 @@ interface RFQForm {
 
 const VIDEO_LIST_COLUMNS =
   'id, slug, source_type, video_url, embed_url, thumbnail_url, category, tags, duration_seconds, published_at, title, excerpt';
+
+/** Number of specs surfaced next to the gallery before the full table below. */
+const HERO_SPEC_COUNT = 4;
+
+function SectionHeading({ children }: { children: React.ReactNode }) {
+  return (
+    <h2 className="flex items-start gap-3 font-serif text-2xl leading-tight text-stone-900 sm:text-3xl">
+      {/* items-start, not center: these headings wrap on narrow screens and a
+          centred bar then floats away from the first line. */}
+      <span className="mt-0.5 h-7 w-1 shrink-0 rounded-full bg-amber-500" aria-hidden="true" />
+      {children}
+    </h2>
+  );
+}
 
 export default function ProductDetail() {
   const { id: routeParam } = useParams<{ id: string }>();
@@ -263,6 +277,23 @@ export default function ProductDetail() {
   const relatedSolutions = recommendSolutionsForProduct(product).map((page) =>
     localizeSeoLandingPage(page, lang)
   );
+  const specs = normalizeSpecs(display.specifications);
+  const heroSpecs = specs.slice(0, HERO_SPEC_COUNT);
+  const hasDetails = Boolean(display.details);
+  // Specs and long-form details share one band below the hero. When both exist
+  // they sit side by side; a lone block spans the full width instead.
+  const splitInfoBand = specs.length > 0 && hasDetails;
+  const trustPoints = [
+    { Icon: ShieldCheck, label: t('productDetail.premiumQuality', 'Premium quality') },
+    { Icon: Truck, label: t('productDetail.globalShipping', 'Global shipping') },
+    { Icon: Clock, label: t('productDetail.fastTurnaround', 'Fast turnaround') },
+    { Icon: CheckCircle2, label: t('productDetail.oemAvailable', 'OEM/ODM available') },
+  ];
+  const quoteIncludes = [
+    t('rfq.quoteIncludesMoq', 'MOQ and unit-price basis'),
+    t('rfq.quoteIncludesLeadTime', 'Sample and production lead times'),
+    t('rfq.quoteIncludesOptions', 'Customization and target-market compliance options'),
+  ];
 
   const nextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % product.images.length);
@@ -350,7 +381,7 @@ export default function ProductDetail() {
   ] : undefined;
 
   return (
-    <div className="bg-[#FAF9F6] min-h-screen pt-12 pb-28 lg:pb-12">
+    <div className="bg-[#FAF9F6] min-h-screen pb-24 lg:pb-0">
       <SEO
         title={seoTitle}
         description={richDescription}
@@ -359,39 +390,50 @@ export default function ProductDetail() {
         ogType="product"
         schema={productSchema}
       />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Breadcrumb Navigation */}
-        <m.div 
+
+      {/* The hero carries only what a buyer needs to decide: gallery, identity,
+          price basis and the quote action. Specs, long-form details, solutions
+          and videos each get their own full-width band below, instead of being
+          stacked inside this column. */}
+      <section className="border-b border-stone-200 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-12 lg:pt-10 lg:pb-20">
+        <m.nav
+          aria-label="Breadcrumb"
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          className="mb-8 flex items-center text-sm font-medium text-stone-500"
+          className="hide-scrollbar flex items-center overflow-x-auto whitespace-nowrap text-xs font-medium text-stone-500 sm:text-sm"
         >
           <Link to={lp('/')} className="hover:text-amber-600 transition-colors">{t('navbar.home')}</Link>
-          <ChevronRight className="mx-2 h-4 w-4 text-stone-300" />
+          <ChevronRight className="mx-1.5 h-3.5 w-3.5 shrink-0 text-stone-300 sm:mx-2 sm:h-4 sm:w-4" />
           <Link to={lp('/products')} className="hover:text-amber-600 transition-colors">{t('productDetail.backToCatalog')}</Link>
           {product.category && (
             <>
-              <ChevronRight className="mx-2 h-4 w-4 text-stone-300" />
+              <ChevronRight className="mx-1.5 h-3.5 w-3.5 shrink-0 text-stone-300 sm:mx-2 sm:h-4 sm:w-4" />
               <Link
                 to={lp(catalogCategoryPath(product.category))}
-                className="hover:text-amber-600 transition-colors truncate max-w-[140px] sm:max-w-none"
+                className="hover:text-amber-600 transition-colors truncate max-w-[120px] sm:max-w-none"
               >
                 {t(`products.categories.${product.category}`, product.category)}
               </Link>
             </>
           )}
-          <ChevronRight className="mx-2 h-4 w-4 text-stone-300" />
-          <span className="text-stone-900 truncate max-w-[200px] sm:max-w-none">{display.title}</span>
-        </m.div>
+          <ChevronRight className="mx-1.5 h-3.5 w-3.5 shrink-0 text-stone-300 sm:mx-2 sm:h-4 sm:w-4" />
+          <span className="text-stone-900 truncate max-w-[140px] sm:max-w-none">{display.title}</span>
+        </m.nav>
 
-        <div className="lg:grid lg:grid-cols-2 lg:gap-x-12 xl:gap-x-16">
-          {/* Left Column: Image Gallery (Sticky) */}
-          <div className="flex flex-col lg:sticky lg:top-24 lg:self-start">
+        {/* Product titles here run past 100 characters, so the right column is
+            always the taller of the two. Explicit placement lets the spec
+            summary sit under the gallery on desktop (filling that gap) while
+            staying last in DOM order, so phones still get image → title →
+            price → CTA before any spec table. */}
+        <div className="mt-6 lg:mt-10 lg:grid lg:grid-cols-2 lg:gap-x-14 lg:gap-y-8 xl:gap-x-20">
+          {/* Left Column: Image Gallery */}
+          <div className="flex flex-col lg:col-start-1 lg:row-start-1">
             <m.div 
-              initial={{ opacity: 0, scale: 0.95 }}
+              initial={{ opacity: 0, scale: 0.97 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5 }}
-              className="relative aspect-[4/5] sm:aspect-square w-full rounded-2xl overflow-hidden bg-white shadow-sm border border-stone-200 group"
+              className="relative aspect-square w-full rounded-3xl overflow-hidden bg-gradient-to-br from-stone-50 via-white to-stone-100 border border-stone-200 group"
             >
               <AnimatePresence mode="wait">
                 <m.div
@@ -402,13 +444,17 @@ export default function ProductDetail() {
                   transition={{ duration: 0.3 }}
                   className="h-full w-full"
                 >
+                  {/* object-contain, matching ProductCard: a square crop would
+                      cut the top off arch and full-length mirrors. */}
                   <img
-                    src={optimizeImage(product.images[currentImageIndex], { width: 800 }) || PRODUCT_IMAGE_PLACEHOLDER}
+                    src={optimizeImage(product.images[currentImageIndex], { width: 900 }) || PRODUCT_IMAGE_PLACEHOLDER}
+                    srcSet={imageSrcSet(product.images[currentImageIndex], [600, 900, 1200])}
+                    sizes="(max-width: 1024px) 100vw, 45vw"
                     onError={handleImageError}
                     alt={display.title}
-                    className="h-full w-full object-cover object-center"
-                    width="800"
-                    height="800"
+                    className="h-full w-full object-contain object-center p-5 sm:p-8"
+                    width="900"
+                    height="900"
                     referrerPolicy="no-referrer"
                     decoding="async"
                   />
@@ -431,26 +477,30 @@ export default function ProductDetail() {
                   >
                     <ChevronRight className="w-5 h-5" />
                   </button>
+                  <span className="pointer-events-none absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-stone-950/70 px-3 py-1 text-xs font-semibold tabular-nums text-white backdrop-blur-sm">
+                    {currentImageIndex + 1} / {product.images.length}
+                  </span>
                 </>
               )}
             </m.div>
             
-            {/* Thumbnails */}
+            {/* Thumbnails — a swipeable rail on phones, a grid from sm up. */}
             {product.images.length > 1 && (
               <m.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="mt-4 grid grid-cols-5 gap-3"
+                className="hide-scrollbar mt-4 flex gap-3 overflow-x-auto pb-1 sm:grid sm:grid-cols-5 sm:overflow-visible sm:pb-0"
               >
                 {product.images.map((img, idx) => (
                   <button
                     key={idx}
                     onClick={() => setCurrentImageIndex(idx)}
-                    className={`relative aspect-square rounded-xl overflow-hidden transition-all duration-200 ${
+                    aria-current={currentImageIndex === idx || undefined}
+                    className={`relative aspect-square w-[4.5rem] shrink-0 rounded-xl overflow-hidden bg-white transition-all duration-200 sm:w-auto ${
                       currentImageIndex === idx 
-                        ? 'ring-2 ring-amber-500 ring-offset-2 scale-95' 
-                        : 'border border-stone-200 hover:border-amber-300 hover:shadow-md'
+                        ? 'ring-2 ring-amber-500 ring-offset-2' 
+                        : 'border border-stone-200 opacity-70 hover:opacity-100 hover:border-amber-300 hover:shadow-md'
                     }`}
                   >
                     <img
@@ -461,7 +511,7 @@ export default function ProductDetail() {
                         defaultValue: '{{title}} — view {{index}}',
                       })}
                       onError={handleImageError}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain p-1"
                       width="160"
                       height="160"
                       referrerPolicy="no-referrer"
@@ -474,100 +524,234 @@ export default function ProductDetail() {
             )}
           </div>
 
-          {/* Right Column: Product Info & RFQ */}
+          {/* Right Column: identity, price basis and the quote action */}
           <m.div 
             variants={staggerContainer}
             initial="hidden"
             animate="visible"
-            className="mt-10 px-4 sm:px-0 lg:mt-0"
+            className="mt-8 lg:col-start-2 lg:row-start-1 lg:row-span-2 lg:mt-0"
           >
-            {product.category && (
-              <m.p variants={fadeInUp} className="text-sm font-bold text-amber-600 uppercase tracking-widest mb-2">
-                <Link to={lp(catalogCategoryPath(product.category))} className="hover:text-amber-700">
+            <m.div variants={fadeInUp} className="flex flex-wrap items-center gap-x-3 gap-y-2">
+              {product.category && (
+                <Link
+                  to={lp(catalogCategoryPath(product.category))}
+                  className="inline-flex items-center rounded-full bg-amber-50 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-amber-700 ring-1 ring-inset ring-amber-200 transition-colors hover:bg-amber-100"
+                >
                   {t(`products.categories.${product.category}`, product.category)}
                 </Link>
-              </m.p>
-            )}
-            <m.h1 variants={fadeInUp} className="text-3xl font-serif tracking-tight text-stone-900 sm:text-4xl lg:text-5xl leading-tight">
+              )}
+              {productReference && (
+                <span className="text-xs font-medium tracking-wide text-stone-400">
+                  {t('productDetail.productReference', 'Product reference')}:{' '}
+                  <span className="text-stone-600">{productReference}</span>
+                </span>
+              )}
+            </m.div>
+
+            <m.h1 variants={fadeInUp} className="mt-4 font-serif text-3xl tracking-tight text-stone-900 sm:text-4xl lg:text-[2.75rem] leading-[1.15]">
               {display.title}
             </m.h1>
-            
+
+            <m.p variants={fadeInUp} className="mt-5 text-base leading-relaxed text-stone-600 sm:text-lg">
+              {visibleDescription}
+            </m.p>
+
             {(product.price_range || product.msrp) && (
-              <m.div variants={fadeInUp} className="mt-6 flex flex-wrap items-end gap-x-4 gap-y-2">
-                {product.price_range && (
-                  <div>
-                    <p className="text-[11px] font-semibold uppercase tracking-wide text-stone-500">
-                      {t('products.priceRangeLabel', 'Indicative factory range')}
+              <m.div variants={fadeInUp} className="mt-7 rounded-2xl border border-stone-200 bg-stone-50/70 p-5">
+                <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
+                  {product.price_range && (
+                    <div>
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-stone-500">
+                        {t('products.priceRangeLabel', 'Indicative factory range')}
+                      </p>
+                      <p className="mt-1 text-3xl font-semibold tabular-nums tracking-tight text-stone-900 sm:text-4xl">
+                        {formatPrice(product.price_range)}
+                      </p>
+                    </div>
+                  )}
+                  {product.msrp && (
+                    <p className="pb-1.5 text-sm text-stone-500">
+                      {t('products.msrp')}:{' '}
+                      <span className="line-through decoration-stone-300">{formatPrice(product.msrp)}</span>
                     </p>
-                    <div className="text-3xl font-bold text-stone-900">{formatPrice(product.price_range)}</div>
-                  </div>
-                )}
-                {product.msrp && <div className="text-lg text-stone-500 line-through decoration-stone-300">{t('products.msrp')}: {formatPrice(product.msrp)}</div>}
+                  )}
+                </div>
                 {product.price_range && (
-                  <p className="basis-full text-xs text-stone-500">
+                  <p className="mt-4 border-t border-stone-200 pt-3 text-xs leading-relaxed text-stone-500">
                     {t('products.priceQualifier', 'Final pricing depends on quantity and specifications')}
                   </p>
                 )}
               </m.div>
             )}
 
-            <m.div variants={fadeInUp} className="mt-6">
-              <a href="#product-rfq" className="btn-primary w-full sm:w-auto px-7 py-3.5 text-base">
-                {t('productDetail.factoryQuoteCta', 'Get factory quote')}
-                <Send className="h-4 w-4" aria-hidden="true" />
-              </a>
+            <m.div variants={fadeInUp} className="mt-7">
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <a href="#product-rfq" className="btn-primary px-7 py-4 text-base sm:flex-1">
+                  {t('productDetail.factoryQuoteCta', 'Get factory quote')}
+                  <Send className="h-4 w-4" aria-hidden="true" />
+                </a>
+                {specs.length > 0 && (
+                  <a href="#product-specs" className="btn-secondary px-6 py-4 text-base">
+                    {t('productDetail.specifications')}
+                  </a>
+                )}
+              </div>
               <p className="mt-3 text-sm leading-relaxed text-stone-500">
                 {t('productDetail.quoteBasis', 'Specification-based pricing · Ask about MOQ, samples and production lead time.')}
               </p>
             </m.div>
 
-            <m.div variants={fadeInUp} className="mt-8">
-              <h3 className="sr-only">{t('productDetail.description', 'Description')}</h3>
-              <p className="text-lg text-stone-600 leading-relaxed font-light">{visibleDescription}</p>
-              {productReference && (
-                <p className="mt-3 text-sm font-medium text-stone-500">
-                  {t('productDetail.productReference', 'Product reference')}: <span className="text-stone-700">{productReference}</span>
-                </p>
-              )}
-            </m.div>
-
             {/* Value Props */}
-            <m.div variants={fadeInUp} className="mt-8 grid grid-cols-2 gap-4 py-6 border-y border-stone-200">
-              <div className="flex items-center gap-3 text-stone-700">
-                <ShieldCheck className="w-5 h-5 text-amber-600" />
-                <span className="text-sm font-medium">{t('productDetail.premiumQuality', 'Premium quality')}</span>
-              </div>
-              <div className="flex items-center gap-3 text-stone-700">
-                <Truck className="w-5 h-5 text-amber-600" />
-                <span className="text-sm font-medium">{t('productDetail.globalShipping', 'Global shipping')}</span>
-              </div>
-              <div className="flex items-center gap-3 text-stone-700">
-                <Clock className="w-5 h-5 text-amber-600" />
-                <span className="text-sm font-medium">{t('productDetail.fastTurnaround', 'Fast turnaround')}</span>
-              </div>
-              <div className="flex items-center gap-3 text-stone-700">
-                <CheckCircle2 className="w-5 h-5 text-amber-600" />
-                <span className="text-sm font-medium">{t('productDetail.oemAvailable', 'OEM/ODM available')}</span>
-              </div>
-            </m.div>
+            <m.ul variants={fadeInUp} className="mt-8 grid grid-cols-2 gap-3 border-t border-stone-200 pt-7">
+              {trustPoints.map(({ Icon, label }) => (
+                <li key={label} className="flex items-center gap-2.5 rounded-xl bg-stone-50 px-3 py-2.5 text-stone-700">
+                  <Icon className="h-4 w-4 shrink-0 text-amber-600" aria-hidden="true" />
+                  <span className="text-[13px] font-medium leading-snug">{label}</span>
+                </li>
+              ))}
+            </m.ul>
+          </m.div>
 
-            {/* Keep the quote action close to the buying decision. Product
-                specifications, long-form details and videos remain below. */}
-            <m.section
-              id="product-rfq"
-              variants={fadeInUp}
-              className="scroll-mt-24 mt-10 bg-white rounded-3xl p-6 sm:p-8 border border-stone-200 shadow-xl shadow-stone-200/50 relative overflow-hidden"
-              aria-labelledby="product-rfq-title"
+          {/* The headline specs a buyer scans before scrolling. Desktop only:
+              on a phone the full table below is already the next thing on
+              screen, so a preview here would just repeat it. */}
+          {heroSpecs.length > 0 && (
+            <m.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="hidden lg:col-start-1 lg:row-start-2 lg:block"
             >
-              <div className="absolute top-0 right-0 w-32 h-32 bg-amber-100 rounded-bl-full -z-10 opacity-50"></div>
-              <h2 id="product-rfq-title" className="text-2xl font-bold text-stone-900 mb-3">{t('productDetail.requestQuote')}</h2>
-              <p className="text-stone-500 mb-8 text-sm leading-relaxed max-w-md">
+              <div className="mb-2 flex items-baseline justify-between gap-4">
+                <h2 className="text-[11px] font-bold uppercase tracking-[0.16em] text-stone-500">
+                  {t('productDetail.keySpecs', 'At a glance')}
+                </h2>
+                {specs.length > heroSpecs.length && (
+                  <a href="#product-specs" className="text-xs font-semibold text-amber-700 hover:text-amber-800">
+                    {t('productDetail.viewAllSpecs', 'View full specifications')}
+                  </a>
+                )}
+              </div>
+              <dl>
+                {heroSpecs.map((spec) => (
+                  <div key={spec.key} className="flex items-baseline justify-between gap-6 border-b border-stone-200/80 py-2.5">
+                    <dt className="text-xs text-stone-500">{spec.key}</dt>
+                    <dd className="text-right text-xs font-semibold text-stone-900">{spec.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            </m.div>
+          )}
+        </div>
+        </div>
+      </section>
+
+      {/* ── Specifications + long-form details ── */}
+      {(specs.length > 0 || hasDetails) && (
+        <section id="product-specs" className="scroll-mt-20 border-b border-stone-200">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 lg:py-20">
+            {/* A lone block keeps a readable measure rather than stretching a
+                key/value list or a paragraph across the full container. */}
+            <div className={splitInfoBand ? 'lg:grid lg:grid-cols-12 lg:gap-x-12 xl:gap-x-16' : 'max-w-3xl'}>
+              {specs.length > 0 && (
+                <m.div
+                  variants={fadeInUp}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, amount: 0.1 }}
+                  className={splitInfoBand ? 'lg:col-span-5 lg:order-2 lg:sticky lg:top-24 lg:self-start' : ''}
+                >
+                  <SectionHeading>{t('productDetail.specifications')}</SectionHeading>
+                  <dl className="mt-6 overflow-hidden rounded-2xl border border-stone-200 bg-white">
+                    {specs.map((spec, idx) => (
+                      <div
+                        key={spec.key}
+                        className={`flex items-baseline justify-between gap-6 px-5 py-3.5 sm:px-6 ${
+                          idx % 2 === 0 ? 'bg-stone-50/60' : 'bg-white'
+                        }`}
+                      >
+                        <dt className="text-sm text-stone-500">{spec.key}</dt>
+                        <dd className="text-right text-sm font-semibold text-stone-900">{spec.value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </m.div>
+              )}
+
+              {hasDetails && (
+                <m.div
+                  variants={fadeInUp}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, amount: 0.1 }}
+                  className={splitInfoBand ? 'mt-12 lg:col-span-7 lg:order-1 lg:mt-0' : 'mt-14'}
+                >
+                  <SectionHeading>{t('productDetail.productDetails')}</SectionHeading>
+                  <Markdown className="prose prose-amber prose-stone mt-6 max-w-none rounded-2xl border border-stone-200 bg-white p-6 leading-relaxed text-stone-600 sm:p-8">
+                    {display.details}
+                  </Markdown>
+                </m.div>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ── Quote band. Given the page's full width the form can sit beside the
+             reasons to send it, instead of being squeezed into a column. ── */}
+      <section
+        id="product-rfq"
+        className="scroll-mt-20 bg-stone-900"
+        aria-labelledby="product-rfq-title"
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 lg:py-20">
+          <div className="lg:grid lg:grid-cols-12 lg:gap-x-16">
+            <div className="lg:col-span-5">
+              <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-amber-400">
+                {solutionsUi.quoteEyebrow}
+              </p>
+              <h2 id="product-rfq-title" className="mt-3 font-serif text-3xl leading-tight text-white sm:text-4xl">
+                {t('productDetail.requestQuote')}
+              </h2>
+              <p className="mt-5 text-base leading-relaxed text-stone-300">
                 {t(
                   'productDetail.rfqIntro',
                   'Tell us the quantity and specifications you need. We will confirm factory pricing, MOQ, sample options and production lead time within 24 hours.'
                 )}
               </p>
+              <ul className="mt-8 space-y-3">
+                {quoteIncludes.map((item) => (
+                  <li key={item} className="flex items-start gap-3 text-sm leading-relaxed text-stone-200">
+                    <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber-500/20 text-amber-400">
+                      <Check className="h-3 w-3" aria-hidden="true" />
+                    </span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-8 flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-4">
+                <img
+                  src={optimizeImage(product.images[0], { width: 120 }) || PRODUCT_IMAGE_PLACEHOLDER}
+                  onError={handleImageError}
+                  alt=""
+                  className="h-14 w-14 shrink-0 rounded-xl bg-white object-contain p-1"
+                  width="120"
+                  height="120"
+                  referrerPolicy="no-referrer"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <div className="min-w-0">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-stone-400">
+                    {t('productDetail.quotingFor', 'Requesting a quote for')}
+                  </p>
+                  <p className="mt-1 line-clamp-2 text-sm font-semibold leading-snug text-white">{display.title}</p>
+                </div>
+              </div>
+            </div>
 
+            <div className="mt-10 lg:col-span-7 lg:mt-0">
+              <div className="rounded-3xl bg-white p-6 shadow-2xl shadow-stone-950/40 sm:p-8">
               {rfqStatus === 'success' ? (
                 <m.div
                   initial={{ opacity: 0, scale: 0.9 }}
@@ -687,89 +871,67 @@ export default function ProductDetail() {
                   </button>
                 </form>
               )}
-            </m.section>
-
-            {display.specifications && (Array.isArray(display.specifications) ? display.specifications.length > 0 : Object.keys(display.specifications).length > 0) && (
-              <m.div variants={fadeInUp} className="mt-10">
-                <h3 className="text-xl font-bold text-stone-900 mb-6 flex items-center gap-2">
-                  <span className="w-1.5 h-6 bg-amber-600 rounded-full"></span>
-                  {t('productDetail.specifications')}
-                </h3>
-                <div className="bg-white rounded-2xl border border-stone-200 overflow-hidden shadow-sm">
-                  <ul className="divide-y divide-stone-100">
-                    {(Array.isArray(display.specifications)
-                      ? display.specifications
-                      : Object.entries(display.specifications).map(([key, value]) => ({ key, value }))
-                    ).map((spec, idx) => (
-                      <li key={spec.key} className={`flex px-6 py-4 ${idx % 2 === 0 ? 'bg-stone-50/50' : 'bg-white'}`}>
-                        <span className="w-1/3 font-medium text-stone-900">{spec.key}</span>
-                        <span className="w-2/3 text-stone-600">{spec.value}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </m.div>
-            )}
-
-            {display.details && (
-              <m.div variants={fadeInUp} className="mt-10">
-                <h3 className="text-xl font-bold text-stone-900 mb-6 flex items-center gap-2">
-                  <span className="w-1.5 h-6 bg-amber-600 rounded-full"></span>
-                  {t('productDetail.productDetails')}
-                </h3>
-                <Markdown className="prose prose-amber prose-stone max-w-none text-stone-600 leading-relaxed bg-white p-6 rounded-2xl border border-stone-200 shadow-sm">
-                  {display.details}
-                </Markdown>
-              </m.div>
-            )}
-
-            {relatedSolutions.length > 0 && (
-              <m.div variants={fadeInUp} className="mt-10">
-                <h3 className="text-xl font-bold text-stone-900 mb-6 flex items-center gap-2">
-                  <span className="w-1.5 h-6 bg-amber-600 rounded-full"></span>
-                  {solutionsUi.relatedSolutions}
-                </h3>
-                <ul className="space-y-3 rounded-2xl border border-stone-200 bg-white p-5">
-                  {relatedSolutions.map((solution) => (
-                    <li key={solution.slug}>
-                      <Link
-                        to={lp(`/solutions/${solution.slug}`)}
-                        className="flex items-start justify-between gap-3 text-stone-900 hover:text-amber-800"
-                      >
-                        <span>
-                          <span className="block font-medium">{solution.shortTitle || solution.h1}</span>
-                          <span className="mt-1 block text-sm leading-6 text-stone-600">{solution.blurb}</span>
-                        </span>
-                        <ChevronRight className="mt-1 h-4 w-4 shrink-0 text-stone-400" />
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </m.div>
-            )}
-
-            {relatedVideos.length > 0 && (
-              <m.div variants={fadeInUp} className="mt-10">
-                <div className="mb-6 flex items-end justify-between gap-4">
-                  <h3 className="text-xl font-bold text-stone-900 flex items-center gap-2">
-                    <span className="w-1.5 h-6 bg-amber-600 rounded-full"></span>
-                    {t('productDetail.relatedVideos', 'Related videos')}
-                  </h3>
-                  <Link to={lp('/videos')} className="text-sm font-semibold text-amber-700 hover:text-amber-800">
-                    {t('videos.viewAll', 'View all')}
-                  </Link>
-                </div>
-                <div className="grid grid-cols-1 gap-3">
-                  {relatedVideos.map((video, index) => (
-                    <VideoCard key={video.id} video={video} index={index + 4} variant="compact" />
-                  ))}
-                </div>
-              </m.div>
-            )}
-
-          </m.div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      </section>
+
+      {/* ── Related solutions and videos, now with room for real cards ── */}
+      {(relatedSolutions.length > 0 || relatedVideos.length > 0) && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 lg:py-20 space-y-14 lg:space-y-20">
+          {relatedSolutions.length > 0 && (
+            <m.section
+              variants={fadeInUp}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.1 }}
+            >
+              <SectionHeading>{solutionsUi.relatedSolutions}</SectionHeading>
+              <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {relatedSolutions.map((solution) => (
+                  <li key={solution.slug}>
+                    <Link
+                      to={lp(`/solutions/${solution.slug}`)}
+                      className="group flex h-full flex-col rounded-2xl border border-stone-200 bg-white p-6 transition-all duration-300 hover:-translate-y-1 hover:border-amber-300 hover:shadow-lg"
+                    >
+                      <span className="font-serif text-lg leading-snug text-stone-900 transition-colors group-hover:text-amber-800">
+                        {solution.shortTitle || solution.h1}
+                      </span>
+                      <span className="mt-3 flex-1 text-sm leading-relaxed text-stone-600">{solution.blurb}</span>
+                      <span className="mt-5 inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-amber-700">
+                        {solutionsUi.exploreSolution}
+                        <ChevronRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true" />
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </m.section>
+          )}
+
+          {relatedVideos.length > 0 && (
+            <m.section
+              variants={fadeInUp}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.1 }}
+            >
+              <div className="flex flex-wrap items-end justify-between gap-4">
+                <SectionHeading>{t('productDetail.relatedVideos', 'Related videos')}</SectionHeading>
+                <Link to={lp('/videos')} className="text-sm font-semibold text-amber-700 hover:text-amber-800">
+                  {t('videos.viewAll', 'View all')}
+                </Link>
+              </div>
+              <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                {relatedVideos.map((video, index) => (
+                  <VideoCard key={video.id} video={video} index={index + 4} />
+                ))}
+              </div>
+            </m.section>
+          )}
+        </div>
+      )}
 
       {!hasReachedProductRfq && (
         <div

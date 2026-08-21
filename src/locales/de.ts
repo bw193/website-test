@@ -222,6 +222,9 @@ export const de = {
       globalShipping: "Weltweiter Versand",
       fastTurnaround: "Schnelle Abwicklung",
       oemAvailable: "OEM/ODM verfügbar",
+      keySpecs: "Auf einen Blick",
+      viewAllSpecs: "Alle Spezifikationen ansehen",
+      quotingFor: "Angebotsanfrage für",
       brandSuffix: "| BOLEN Mirror",
       descTemplate: "Hochwertiger {title} von BOLEN Mirror (Jiaxing Chengtai Mirror Co., Ltd.) — OEM/ODM-LED-, Smart-, Schmink- und Badspiegel. Fordern Sie ein Angebot für Großhandelspreise an."
     },

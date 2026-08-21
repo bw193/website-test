@@ -222,6 +222,9 @@ export const it = {
       globalShipping: "Spedizione globale",
       fastTurnaround: "Tempi rapidi",
       oemAvailable: "OEM/ODM disponibile",
+      keySpecs: "In sintesi",
+      viewAllSpecs: "Vedi tutte le specifiche",
+      quotingFor: "Richiesta di preventivo per",
       brandSuffix: "| BOLEN Mirror",
       descTemplate: "{title} di alta qualità, prodotto da BOLEN Mirror (Jiaxing Chengtai Mirror Co., Ltd.) — specchi LED, smart, da toeletta e da bagno OEM/ODM. Richiedi un preventivo per i prezzi all'ingrosso."
     },

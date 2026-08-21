@@ -224,6 +224,9 @@ export const en = {
       globalShipping: "Global shipping",
       fastTurnaround: "Fast turnaround",
       oemAvailable: "OEM/ODM available",
+      keySpecs: "At a glance",
+      viewAllSpecs: "View full specifications",
+      quotingFor: "Requesting a quote for",
       // SEO. brandSuffix is appended to every product <title>; descTemplate is
       // the last-resort <meta description> when a product has no `details`.
       // Keep {title} in place — it is substituted with the localized title.
