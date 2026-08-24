@@ -235,8 +235,12 @@ export default function Home() {
   // never competes with the hero for bandwidth.
   useEffect(() => {
     let cancelled = false;
+    let refreshInFlight = false;
+    let cancelIdle: (() => void) | undefined;
 
     const refreshEditorContent = async () => {
+      if (refreshInFlight) return;
+      refreshInFlight = true;
       try {
         const { supabase } = await import('../supabase');
         const { data, error } = await supabase
@@ -282,19 +286,33 @@ export default function Home() {
         setFeaturedVideo(videoRow ? toVideoListItem(videoRow as VideoPost, lang) : null);
       } catch (e) {
         console.error('Could not fetch editor-managed home content:', e);
+      } finally {
+        refreshInFlight = false;
       }
     };
 
+    const refreshWhenVisible = () => {
+      if (document.visibilityState === 'visible') void refreshEditorContent();
+    };
+
     if (initialData) {
-      const cancelIdle = runWhenIdle(refreshEditorContent, 2500);
-      return () => {
-        cancelled = true;
-        cancelIdle();
-      };
+      cancelIdle = runWhenIdle(refreshEditorContent, 2500);
+    } else {
+      void refreshEditorContent();
     }
 
-    refreshEditorContent();
-    return () => { cancelled = true; };
+    // Editors commonly keep the homepage open in another tab. Refresh the
+    // managed content when that tab becomes active so a newly uploaded factory
+    // photo appears without a rebuild or a hard reload.
+    window.addEventListener('focus', refreshEditorContent);
+    document.addEventListener('visibilitychange', refreshWhenVisible);
+
+    return () => {
+      cancelled = true;
+      cancelIdle?.();
+      window.removeEventListener('focus', refreshEditorContent);
+      document.removeEventListener('visibilitychange', refreshWhenVisible);
+    };
   }, [lang]);
 
   const featuredProducts = allProducts.slice(0, 6);

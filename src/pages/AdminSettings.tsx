@@ -17,6 +17,27 @@ import { optimizeImage } from '../utils/optimizeImage';
 import type { VideoPost } from '../types/video';
 
 type FactoryGalleryItem = { url: string; alt: string; caption: string };
+type FactoryGalleryNotice = { type: 'success' | 'error'; message: string } | null;
+
+const DEFAULT_FACTORY_ALT = 'BOLEN mirror factory production line';
+
+function normalizeFactoryGallery(items: FactoryGalleryItem[]): FactoryGalleryItem[] {
+  return items
+    .filter(item => item.url.trim() !== '')
+    .map(item => ({
+      url: item.url.trim(),
+      alt: item.alt.trim() || DEFAULT_FACTORY_ALT,
+      caption: item.caption.trim(),
+    }));
+}
+
+function errorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  if (error && typeof error === 'object' && 'message' in error) {
+    return String((error as { message: unknown }).message);
+  }
+  return String(error);
+}
 
 /** Published videos offered in the home "featured video" picker. */
 type FeaturedVideoOption = {
@@ -53,6 +74,7 @@ export default function AdminSettings() {
   ]);
   const [factoryGallery, setFactoryGallery] = useState<FactoryGalleryItem[]>([]);
   const [galleryUploading, setGalleryUploading] = useState<number | null>(null);
+  const [galleryNotice, setGalleryNotice] = useState<FactoryGalleryNotice>(null);
   const [featuredVideoSlug, setFeaturedVideoSlug] = useState<string>('');
   const [videoOptions, setVideoOptions] = useState<FeaturedVideoOption[]>([]);
   const [videosLoading, setVideosLoading] = useState(true);
@@ -194,15 +216,7 @@ export default function AdminSettings() {
       const validCategories = categories.filter(cat => cat.trim() !== '');
       const validBlogCategories = blogCategories.filter(cat => cat.trim() !== '');
       
-      const validGallery = factoryGallery
-        .filter(it => it.url.trim() !== '')
-        .map(it => ({
-          url: it.url.trim(),
-          // Default alt is non-empty even if the editor left it blank: SEO + a11y
-          // require it, and an empty alt would silently regress page audits.
-          alt: it.alt.trim() || 'BOLEN mirror factory production line',
-          caption: it.caption.trim(),
-        }));
+      const validGallery = normalizeFactoryGallery(factoryGallery);
 
       const { error } = await supabase
         .from('site_settings')
@@ -215,6 +229,14 @@ export default function AdminSettings() {
         ]);
 
       if (error) throw error;
+      setFactoryGallery(validGallery);
+      setGalleryNotice({
+        type: 'success',
+        message: t(
+          'admin.dashboard.settings.factorySaved',
+          'Factory gallery saved. The homepage will refresh when it is opened or focused.'
+        ),
+      });
       alert(t('admin.dashboard.settings.saveSuccess'));
     } catch (err: any) {
       console.error("Error saving settings:", err);
@@ -264,32 +286,86 @@ export default function AdminSettings() {
   };
 
   const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
-    const file = e.target.files?.[0];
+    const input = e.currentTarget;
+    const file = input.files?.[0];
     if (!file) return;
     setGalleryUploading(index);
+    setGalleryNotice(null);
     setError(null);
     try {
+      if (!file.type.startsWith('image/')) {
+        throw new Error(t('admin.dashboard.settings.factoryImageOnly', 'Please choose an image file.'));
+      }
+
+      const { data: userData, error: userError } = await supabase.auth.getUser();
+      if (userError || !userData.user) {
+        throw new Error(
+          t(
+            'admin.dashboard.settings.factorySignInAgain',
+            'Your admin session has expired. Sign in again, then retry the upload.'
+          )
+        );
+      }
+
       const fileExt = file.name.split('.').pop();
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
       const filePath = `site-assets/factory/${fileName}`;
       const { error: uploadError } = await supabase.storage
         .from('product-images')
-        .upload(filePath, file, { cacheControl: '31536000', upsert: true });
+        // The path is unique, so this is an INSERT. `upsert: true` needlessly
+        // requires Storage SELECT + UPDATE policies and can make a valid staff
+        // upload fail after an RLS policy is tightened.
+        .upload(filePath, file, { cacheControl: '31536000', upsert: false });
       if (uploadError) throw uploadError;
       const { data: { publicUrl } } = supabase.storage
         .from('product-images')
         .getPublicUrl(filePath);
-      setFactoryGallery(prev => {
-        const next = [...prev];
-        next[index] = { ...next[index], url: publicUrl };
-        return next;
+
+      const nextGallery = factoryGallery.map((item, itemIndex) =>
+        itemIndex === index
+          ? { ...item, url: publicUrl, alt: item.alt.trim() || DEFAULT_FACTORY_ALT }
+          : item
+      );
+      const persistedGallery = normalizeFactoryGallery(nextGallery);
+      const serializedGallery = JSON.stringify(persistedGallery);
+      const { data: savedSetting, error: saveError } = await supabase
+        .from('site_settings')
+        .upsert(
+          { key: 'factory_gallery', value: serializedGallery },
+          { onConflict: 'key' }
+        )
+        .select('value')
+        .single();
+      if (saveError) throw saveError;
+      if (savedSetting.value !== serializedGallery) {
+        throw new Error(
+          t(
+            'admin.dashboard.settings.factoryVerifyFailed',
+            'The image uploaded, but the homepage setting could not be verified. Please retry.'
+          )
+        );
+      }
+
+      setFactoryGallery(nextGallery);
+      setGalleryNotice({
+        type: 'success',
+        message: t(
+          'admin.dashboard.settings.factoryUploadPublished',
+          'Uploaded and published. Switch to or refresh the homepage to see the new photo.'
+        ),
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Error uploading factory image:", err);
-      setError(err.message);
+      setGalleryNotice({
+        type: 'error',
+        message: t('admin.dashboard.settings.factoryUploadFailed', {
+          message: errorMessage(err),
+          defaultValue: 'Upload failed: {{message}}',
+        }),
+      });
     } finally {
       setGalleryUploading(null);
-      e.target.value = '';
+      input.value = '';
     }
   };
 
@@ -419,7 +495,7 @@ NOTIFY pgrst, 'reload schema';`}
   }
 
   const saveButton = (
-    <button onClick={handleSave} disabled={saving} className={adminPrimaryBtn}>
+    <button onClick={handleSave} disabled={saving || galleryUploading !== null} className={adminPrimaryBtn}>
       {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
       {saving ? t('admin.dashboard.settings.saving') : t('admin.dashboard.settings.save')}
     </button>
@@ -712,6 +788,7 @@ NOTIFY pgrst, 'reload schema';`}
           <button
             type="button"
             onClick={handleGalleryAdd}
+            disabled={galleryUploading !== null}
             className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg text-stone-700 bg-stone-100 hover:bg-stone-200 transition-colors"
           >
             <Plus className="h-3.5 w-3.5 mr-1" />
@@ -725,6 +802,22 @@ NOTIFY pgrst, 'reload schema';`}
               'Photos shown in the homepage “Inside the Factory” section. Each photo needs descriptive alt text (used by Google Image Search and screen readers) — keep it specific to what the image actually shows.'
             )}
           </p>
+
+          {galleryNotice && (
+            <div
+              role={galleryNotice.type === 'error' ? 'alert' : 'status'}
+              className={`mb-6 flex items-start gap-2 rounded-xl border px-4 py-3 text-sm font-medium ${
+                galleryNotice.type === 'error'
+                  ? 'border-red-200 bg-red-50 text-red-700'
+                  : 'border-emerald-200 bg-emerald-50 text-emerald-800'
+              }`}
+            >
+              {galleryNotice.type === 'error'
+                ? <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+                : <Check className="mt-0.5 h-4 w-4 shrink-0" />}
+              <span>{galleryNotice.message}</span>
+            </div>
+          )}
 
           {factoryGallery.length === 0 ? (
             <div className="text-center py-10 border-2 border-dashed border-stone-200 rounded-xl text-sm text-stone-500">
@@ -759,6 +852,7 @@ NOTIFY pgrst, 'reload schema';`}
                           type="text"
                           value={item.url}
                           onChange={(e) => handleGalleryField(index, 'url', e.target.value)}
+                          disabled={galleryUploading !== null}
                           placeholder={t('admin.dashboard.settings.imageUrl', 'Image URL')}
                           className="block w-full pl-10 rounded-xl border-stone-200 py-2 text-sm focus:border-stone-900 focus:ring-1 focus:ring-stone-900 bg-white"
                         />
@@ -767,6 +861,7 @@ NOTIFY pgrst, 'reload schema';`}
                         type="text"
                         value={item.alt}
                         onChange={(e) => handleGalleryField(index, 'alt', e.target.value)}
+                        disabled={galleryUploading !== null}
                         placeholder={t(
                           'admin.dashboard.settings.altPlaceholder',
                           "Alt text (e.g. “BOLEN LED mirror assembly line in Jiaxing factory”) — required for SEO"
@@ -777,6 +872,7 @@ NOTIFY pgrst, 'reload schema';`}
                         type="text"
                         value={item.caption}
                         onChange={(e) => handleGalleryField(index, 'caption', e.target.value)}
+                        disabled={galleryUploading !== null}
                         placeholder={t('admin.dashboard.settings.captionPlaceholder', 'Caption (optional, shown under the photo)')}
                         className="block w-full rounded-xl border-stone-200 py-2 px-3 text-sm focus:border-stone-900 focus:ring-1 focus:ring-stone-900 bg-white"
                       />
@@ -793,19 +889,21 @@ NOTIFY pgrst, 'reload schema';`}
                       <button
                         type="button"
                         onClick={() => document.getElementById(`factory-upload-${index}`)?.click()}
-                        disabled={galleryUploading === index}
+                        disabled={galleryUploading !== null}
                         className="inline-flex items-center px-3 py-2 border border-stone-200 rounded-xl text-xs font-medium text-stone-700 bg-white hover:bg-stone-50 transition-colors disabled:opacity-50"
                       >
                         {galleryUploading === index
                           ? <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
                           : <Upload className="h-3.5 w-3.5 mr-1.5 text-stone-400" />}
-                        {t('admin.dashboard.settings.upload', 'Upload')}
+                        {galleryUploading === index
+                          ? t('admin.dashboard.settings.factoryPublishing', 'Uploading & publishing…')
+                          : t('admin.dashboard.settings.upload', 'Upload')}
                       </button>
                       <div className="flex gap-1">
                         <button
                           type="button"
                           onClick={() => handleGalleryMove(index, -1)}
-                          disabled={index === 0}
+                          disabled={index === 0 || galleryUploading !== null}
                           className="p-2 text-stone-400 hover:text-stone-700 hover:bg-stone-100 rounded-lg transition-colors disabled:opacity-30 disabled:hover:bg-transparent"
                           title={t('admin.dashboard.settings.moveUp', 'Move up')}
                         >
@@ -814,7 +912,7 @@ NOTIFY pgrst, 'reload schema';`}
                         <button
                           type="button"
                           onClick={() => handleGalleryMove(index, 1)}
-                          disabled={index === factoryGallery.length - 1}
+                          disabled={index === factoryGallery.length - 1 || galleryUploading !== null}
                           className="p-2 text-stone-400 hover:text-stone-700 hover:bg-stone-100 rounded-lg transition-colors disabled:opacity-30 disabled:hover:bg-transparent"
                           title={t('admin.dashboard.settings.moveDown', 'Move down')}
                         >
@@ -823,6 +921,7 @@ NOTIFY pgrst, 'reload schema';`}
                         <button
                           type="button"
                           onClick={() => handleGalleryRemove(index)}
+                          disabled={galleryUploading !== null}
                           className="p-2 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                           title={t('admin.dashboard.settings.removePhoto', 'Remove photo')}
                         >
