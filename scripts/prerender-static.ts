@@ -80,6 +80,7 @@ import {
   buildVideoIndexSchema,
   buildVideoObjectSchema,
 } from '../src/utils/videoSchema';
+import { buildStorySchema } from '../src/utils/storySchema';
 import type { BlogPost, BlogListItem, LocalizedBlogPost } from '../src/types/blog';
 import type { LocalizedVideoPost, VideoListItem, VideoPost } from '../src/types/video';
 
@@ -113,6 +114,15 @@ const LOCALE_PRODUCTS = {
   fr: frLocale.translation.products,
   de: deLocale.translation.products,
   it: itLocale.translation.products,
+} as const;
+
+const LOCALE_STORY = {
+  en: enLocale.translation.ourStoryPage,
+  zh: zhLocale.translation.ourStoryPage,
+  es: esLocale.translation.ourStoryPage,
+  fr: frLocale.translation.ourStoryPage,
+  de: deLocale.translation.ourStoryPage,
+  it: itLocale.translation.ourStoryPage,
 } as const;
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -178,14 +188,14 @@ const COPY: Record<
   en: {
     homeH1: 'BOLEN — LED Mirror Manufacturer & OEM Smart Mirror Factory',
     homeIntro:
-      'Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) operates a 50,000+ sqm facility with 200+ skilled artisans, manufacturing premium LED mirrors, smart mirrors, vanity mirrors, and bathroom mirrors for global brands. Over 20 years of OEM/ODM manufacturing experience.',
+      'Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) operates a 46,800 m² facility with 200+ skilled specialists, manufacturing LED, smart, vanity, bathroom, and decorative mirrors for OEM/ODM programs.',
     catalogH1: 'Product Catalog',
     catalogIntro:
       'Browse our extensive collection of premium mirrors, featuring smart LED technology, elegant vanity designs, and customizable options.',
     productSuffix: '| BOLEN Mirror',
     storyH1: 'Our Story',
     storyIntro:
-      'Founded in 2005 with roots tracing back to 1995, Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) combines Italian design inspiration with two decades of manufacturing expertise. A 50,000+ sqm facility, two factories, and 200+ skilled workers produce premium LED, smart, vanity, and bath mirrors for global brands.',
+      'Established in 2005, Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) develops and manufactures LED, smart, vanity, bathroom, and decorative mirrors at its 46,800 m² Jiaxing facility with a team of 200+ specialists.',
     rfqH1: 'Request a Quote',
     rfqIntro:
       'Contact Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) for OEM/ODM inquiries, custom mirror manufacturing, and bulk orders. Our sales team responds within 24 hours.',
@@ -203,13 +213,13 @@ const COPY: Record<
   zh: {
     homeH1: 'BOLEN — LED 镜制造商 & OEM 智能镜工厂',
     homeIntro:
-      '嘉兴诚泰镜业有限公司（BOLEN）拥有 50,000+ 平米厂房和 200+ 名熟练工匠，为全球品牌制造优质 LED 镜、智能镜、化妆镜和浴室镜。20 年以上 OEM/ODM 制造经验。',
+      '嘉兴诚泰镜业有限公司（BOLEN）拥有 46,800 平方米生产基地和 200+ 名专业人员，为 OEM/ODM 项目制造 LED 镜、智能镜、化妆镜、浴室镜及装饰镜。',
     catalogH1: '产品目录',
     catalogIntro: '浏览我们丰富的优质镜面系列，包括智能 LED 技术、优雅的化妆镜设计和可定制选项。',
     productSuffix: '| BOLEN 镜业',
     storyH1: '关于我们',
     storyIntro:
-      '成立于 2005 年，历史可追溯至 1995 年，嘉兴诚泰镜业有限公司（BOLEN）将意大利设计灵感与二十年的制造专业相结合。50,000+ 平米厂房、两家工厂、200+ 熟练工人为全球品牌生产优质 LED、智能、化妆和浴室镜。',
+      '嘉兴诚泰镜业有限公司（BOLEN）成立于 2005 年，在嘉兴 46,800 平方米生产基地内，由 200+ 名专业人员开发和制造 LED 镜、智能镜、化妆镜、浴室镜及装饰镜。',
     rfqH1: '请求报价',
     rfqIntro: '联系嘉兴诚泰镜业有限公司（BOLEN）获取 OEM/ODM 询价、定制镜子制造和批量订单。我们的销售团队 24 小时内回复。',
     breadcrumbHome: '首页',
@@ -226,14 +236,14 @@ const COPY: Record<
   es: {
     homeH1: 'BOLEN — Fabricante de Espejos LED y Fábrica OEM de Espejos Inteligentes',
     homeIntro:
-      'Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) opera una instalación de 50,000+ m² con más de 200 artesanos calificados, fabricando espejos LED premium, espejos inteligentes, espejos de tocador y espejos de baño para marcas globales. Más de 20 años de experiencia en fabricación OEM/ODM.',
+      'Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) opera una planta de 46.800 m² con más de 200 especialistas y fabrica espejos LED, inteligentes, de tocador, de baño y decorativos para programas OEM/ODM.',
     catalogH1: 'Catálogo de Productos',
     catalogIntro:
       'Explore nuestra extensa colección de espejos premium, con tecnología LED inteligente, elegantes diseños de tocador y opciones personalizables.',
     productSuffix: '| BOLEN Mirror',
     storyH1: 'Nuestra Historia',
     storyIntro:
-      'Fundada en 2005 con raíces que se remontan a 1995, Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) combina la inspiración del diseño italiano con dos décadas de experiencia en fabricación. Una instalación de más de 50,000 m², dos fábricas y más de 200 trabajadores calificados producen espejos LED, inteligentes, de tocador y de baño premium para marcas globales.',
+      'Fundada en 2005, Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) desarrolla y fabrica espejos LED, inteligentes, de tocador, de baño y decorativos en su planta de 46.800 m² en Jiaxing con un equipo de más de 200 especialistas.',
     rfqH1: 'Solicitar Cotización',
     rfqIntro:
       'Contacte a Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) para consultas OEM/ODM, fabricación de espejos personalizados y pedidos al por mayor. Nuestro equipo de ventas responde en 24 horas.',
@@ -251,14 +261,14 @@ const COPY: Record<
   fr: {
     homeH1: 'BOLEN — Fabricant de Miroirs LED et Usine OEM de Miroirs Intelligents',
     homeIntro:
-      "Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) exploite une installation de 50 000+ m² avec plus de 200 artisans qualifiés, fabriquant des miroirs LED haut de gamme, des miroirs intelligents, des miroirs de toilette et des miroirs de salle de bain pour les marques mondiales. Plus de 20 ans d'expérience en fabrication OEM/ODM.",
+      "Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) exploite un site de 46 800 m² avec plus de 200 spécialistes et fabrique des miroirs LED, intelligents, de toilette, de salle de bain et décoratifs pour des programmes OEM/ODM.",
     catalogH1: 'Catalogue de Produits',
     catalogIntro:
       "Parcourez notre vaste collection de miroirs haut de gamme, dotés d'une technologie LED intelligente, de designs élégants et d'options personnalisables.",
     productSuffix: '| BOLEN Mirror',
     storyH1: 'Notre Histoire',
     storyIntro:
-      "Fondée en 2005 avec des racines remontant à 1995, Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) combine l'inspiration du design italien avec deux décennies d'expertise en fabrication. Une installation de plus de 50 000 m², deux usines et plus de 200 ouvriers qualifiés produisent des miroirs LED, intelligents, de toilette et de salle de bain haut de gamme pour les marques mondiales.",
+      "Fondée en 2005, Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) développe et fabrique des miroirs LED, intelligents, de toilette, de salle de bain et décoratifs sur son site de 46 800 m² à Jiaxing avec une équipe de plus de 200 spécialistes.",
     rfqH1: 'Demande de Devis',
     rfqIntro:
       "Contactez Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) pour les demandes OEM/ODM, la fabrication de miroirs personnalisés et les commandes en gros. Notre équipe commerciale répond sous 24 heures.",
@@ -276,14 +286,14 @@ const COPY: Record<
   de: {
     homeH1: 'BOLEN — LED-Spiegelhersteller & OEM-Smart-Spiegel-Fabrik',
     homeIntro:
-      'Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) betreibt eine Anlage von über 50.000 m² mit mehr als 200 erfahrenen Handwerkern und fertigt hochwertige LED-Spiegel, Smart-Spiegel, Schminkspiegel und Badspiegel für globale Marken. Über 20 Jahre OEM/ODM-Fertigungserfahrung.',
+      'Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) betreibt eine 46.800 m² große Anlage mit mehr als 200 Fachkräften und fertigt LED-, Smart-, Schmink-, Bad- und Dekorationsspiegel für OEM/ODM-Programme.',
     catalogH1: 'Produktkatalog',
     catalogIntro:
       'Durchsuchen Sie unsere umfangreiche Kollektion hochwertiger Spiegel mit intelligenter LED-Technologie, eleganten Schminkdesigns und anpassbaren Optionen.',
     productSuffix: '| BOLEN Mirror',
     storyH1: 'Unsere Geschichte',
     storyIntro:
-      'Gegründet 2005 mit Wurzeln bis 1995, kombiniert Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) italienische Designinspiration mit zwei Jahrzehnten Fertigungsexpertise. Eine Anlage von über 50.000 m², zwei Fabriken und mehr als 200 erfahrene Arbeiter produzieren hochwertige LED-, Smart-, Schmink- und Badspiegel für globale Marken.',
+      'Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) wurde 2005 gegründet und entwickelt und fertigt LED-, Smart-, Schmink-, Bad- und Dekorationsspiegel in seiner 46.800 m² großen Anlage in Jiaxing mit mehr als 200 Fachkräften.',
     rfqH1: 'Angebotsanfrage',
     rfqIntro:
       'Kontaktieren Sie Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) für OEM/ODM-Anfragen, kundenspezifische Spiegelherstellung und Großbestellungen. Unser Vertriebsteam antwortet innerhalb von 24 Stunden.',
@@ -301,14 +311,14 @@ const COPY: Record<
   it: {
     homeH1: 'BOLEN — Produttore di Specchi LED e Fabbrica OEM di Specchi Smart',
     homeIntro:
-      "Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) gestisce un impianto di oltre 50.000 m² con più di 200 artigiani qualificati, producendo specchi LED premium, specchi smart, specchi da toeletta e specchi da bagno per marchi globali. Oltre 20 anni di esperienza nella produzione OEM/ODM.",
+      "Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) gestisce uno stabilimento di 46.800 m² con oltre 200 specialisti e produce specchi LED, smart, da toeletta, da bagno e decorativi per programmi OEM/ODM.",
     catalogH1: 'Catalogo Prodotti',
     catalogIntro:
       'Sfoglia la nostra vasta collezione di specchi premium, con tecnologia LED intelligente, eleganti design da toeletta e opzioni personalizzabili.',
     productSuffix: '| BOLEN Mirror',
     storyH1: 'La Nostra Storia',
     storyIntro:
-      "Fondata nel 2005 con radici che risalgono al 1995, Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) combina l'ispirazione del design italiano con due decenni di esperienza produttiva. Un impianto di oltre 50.000 m², due fabbriche e oltre 200 operai qualificati producono specchi LED, smart, da toeletta e da bagno premium per marchi globali.",
+      "Fondata nel 2005, Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) sviluppa e produce specchi LED, smart, da toeletta, da bagno e decorativi nel suo stabilimento di 46.800 m² a Jiaxing con un team di oltre 200 specialisti.",
     rfqH1: 'Richiedi un Preventivo',
     rfqIntro:
       "Contatta Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) per richieste OEM/ODM, produzione personalizzata di specchi e ordini all'ingrosso. Il nostro team commerciale risponde entro 24 ore.",
@@ -628,27 +638,27 @@ interface FactoryGalleryItem {
 const FACTORY_COPY: Record<Lang, { heading: string; intro: string }> = {
   en: {
     heading: 'Inside Our Factory',
-    intro: 'A look inside our 50,000 m² Jiaxing facility — vertically integrated LED, smart, vanity, and bath mirror production from raw glass to packed pallet.',
+    intro: 'A look inside our 46,800 m² Jiaxing facility — LED, smart, vanity, bath, and decorative mirror production from material preparation to packed shipment.',
   },
   zh: {
     heading: '走进我们的工厂',
-    intro: '走进我们位于嘉兴的 50,000 平方米生产基地——从原片玻璃到打包出货，垂直整合制造 LED 镜、智能镜、化妆镜与浴室镜。',
+    intro: '走进我们位于嘉兴的 46,800 平方米生产基地——从材料准备到打包出货，制造 LED 镜、智能镜、化妆镜、浴室镜及装饰镜。',
   },
   es: {
     heading: 'Dentro de Nuestra Fábrica',
-    intro: 'Un recorrido por nuestra planta de 50.000 m² en Jiaxing: producción verticalmente integrada de espejos LED, inteligentes, de tocador y de baño, desde el vidrio crudo hasta el palé listo para enviar.',
+    intro: 'Un recorrido por nuestra planta de 46.800 m² en Jiaxing: producción de espejos LED, inteligentes, de tocador, de baño y decorativos, desde la preparación de materiales hasta el envío embalado.',
   },
   fr: {
     heading: 'À l\'Intérieur de Notre Usine',
-    intro: 'Visite de notre site de 50 000 m² à Jiaxing — production verticalement intégrée de miroirs LED, intelligents, de toilette et de salle de bain, du verre brut à la palette prête à expédier.',
+    intro: 'Visite de notre site de 46 800 m² à Jiaxing — production de miroirs LED, intelligents, de toilette, de salle de bain et décoratifs, de la préparation des matériaux à l\'expédition emballée.',
   },
   de: {
     heading: 'Einblick in unsere Fabrik',
-    intro: 'Ein Blick in unsere 50.000 m² große Produktionsstätte in Jiaxing — vertikal integrierte Fertigung von LED-, Smart-, Schmink- und Badspiegeln, vom Rohglas bis zur versandfertigen Palette.',
+    intro: 'Ein Blick in unsere 46.800 m² große Produktionsstätte in Jiaxing — Fertigung von LED-, Smart-, Schmink-, Bad- und Dekorationsspiegeln, von der Materialvorbereitung bis zum verpackten Versand.',
   },
   it: {
     heading: 'Dentro la Nostra Fabbrica',
-    intro: 'Uno sguardo dentro il nostro stabilimento di 50.000 m² a Jiaxing — produzione verticalmente integrata di specchi LED, smart, da toeletta e da bagno, dal vetro grezzo al pallet pronto per la spedizione.',
+    intro: 'Uno sguardo dentro il nostro stabilimento di 46.800 m² a Jiaxing — produzione di specchi LED, smart, da toeletta, da bagno e decorativi, dalla preparazione dei materiali alla spedizione imballata.',
   },
 };
 
@@ -1045,11 +1055,37 @@ function relatedSolutionsBlock(
 }
 
 function storyContent(lang: Lang): string {
-  const c = COPY[lang];
+  const story = LOCALE_STORY[lang];
+  const stages = [
+    story.process.steps.brief,
+    story.process.steps.specification,
+    story.process.steps.manufacturing,
+    story.process.steps.inspection,
+    story.process.steps.packaging,
+    story.process.steps.logistics,
+  ];
   return `
     <div data-prerender="story">
-      <h1>${escapeHtml(c.storyH1)}</h1>
-      <p>${escapeHtml(c.storyIntro)}</p>
+      <h1>${escapeHtml(story.title)}</h1>
+      <p>${escapeHtml(story.hero.description)}</p>
+      <section>
+        <h2>${escapeHtml(story.company.titleLine1)} ${escapeHtml(story.company.titleLine2)}</h2>
+        <p>${escapeHtml(story.company.description)}</p>
+        <dl>
+          <dt>${escapeHtml(story.company.foundedLabel)}</dt><dd>2005</dd>
+          <dt>${escapeHtml(story.company.facilityLabel)}</dt><dd>46,800 m²</dd>
+          <dt>${escapeHtml(story.company.teamLabel)}</dt><dd>200+</dd>
+        </dl>
+      </section>
+      <section>
+        <h2>${escapeHtml(story.process.titleLine1)} ${escapeHtml(story.process.titleLine2)}</h2>
+        <p>${escapeHtml(story.process.description)}</p>
+        <ol>${stages.map((stage) => `<li><strong>${escapeHtml(stage.label)}</strong> — ${escapeHtml(stage.description)}</li>`).join('')}</ol>
+      </section>
+      <section>
+        <h2>${escapeHtml(story.quality.titleLine1)} ${escapeHtml(story.quality.titleLine2)}</h2>
+        <p>${escapeHtml(story.quality.scopeNote)}</p>
+      </section>
     </div>
   `.trim();
 }
@@ -1308,24 +1344,7 @@ function productDetailSchema(lang: Lang, product: Product, display: Product): an
 }
 
 function storySchema(lang: Lang): any[] {
-  return [
-    {
-      '@context': 'https://schema.org',
-      '@type': 'AboutPage',
-      name: 'Our Story — BOLEN LED Mirror Manufacturer',
-      description:
-        'Learn about the history and manufacturing excellence of BOLEN, a leading LED mirror manufacturer since 1995.',
-      url: `https://bolenmirror.com/${lang}/our-story/`,
-      mainEntity: {
-        '@type': 'Organization',
-        name: 'Jiaxing Chengtai Mirror Co., Ltd. (BOLEN)',
-        foundingDate: '1995',
-        url: 'https://bolenmirror.com',
-        numberOfEmployees: { '@type': 'QuantitativeValue', value: 200 },
-        areaServed: 'Worldwide',
-      },
-    },
-  ];
+  return [buildStorySchema(lang, LOCALE_SEO[lang].storyTitle, LOCALE_SEO[lang].storyDesc)];
 }
 
 function rfqSchema(lang: Lang): any[] {

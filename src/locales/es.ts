@@ -38,13 +38,139 @@ export const es = {
     },
     ourStoryPage: {
       title: "Nuestra Historia",
-      subtitle: "Jiaxing Chengtai Mirror Co., Ltd.",
-      paragraphs: [
-        "Con más de 20 años de experiencia dedicada a la fabricación de espejos desde 2005, Jiaxing Chengtai Mirror Co., Ltd. ha construido una reputación que va mucho más allá de cualquier canal de venta individual. Nuestro complejo de producción de 46.800 metros cuadrados, dos fábricas independientes y un equipo de más de 200 trabajadores cualificados nos brindan la capacidad y la flexibilidad para gestionar pedidos de prácticamente cualquier escala, desde proyectos boutique de diseño de interiores hasta grandes desarrollos hoteleros e inmobiliarios.",
-        "Somos propietarios de todo el proceso de producción de forma interna. Desde el procesamiento del vidrio en bruto y la integración de LED hasta la fabricación de marcos y el ensamblaje de funciones inteligentes, cada etapa de la fabricación se gestiona bajo un mismo techo y es supervisada por inspectores de QA/QC dedicados. Esta integración vertical significa que controlamos la calidad en cada paso, eliminamos los retrasos de terceros y mantenemos plazos de entrega competitivos.",
-        "Nuestros más de 200 estilos de productos en múltiples series principales no son plantillas estándar: representan años de iteración de diseño fundamentados tanto en las tendencias estéticas europeas como en los comentarios reales de los compradores. Para los clientes que necesitan algo único, nuestras capacidades OEM y ODM permiten la personalización completa de tamaño, forma, iluminación, funciones inteligentes, materiales y marca.",
-        "Respaldados por certificaciones internacionales como CE y RoHS, además de grados IP y certificaciones de mercado específicos para cada producto, nuestros productos pueden adaptarse a los requisitos de conformidad de Europa, Norteamérica, Oriente Medio y otros mercados. No solo fabricamos espejos: construimos asociaciones a largo plazo con importadores, distribuidores, diseñadores de interiores y promotores que exigen consistencia, precisión y un proveedor fiable."
-      ]
+      subtitle: "Jiaxing Chengtai Mirror Co., Ltd. (BOLEN)",
+      hero: {
+        kicker: "Fabricación de espejos LED en Jiaxing desde 2005",
+        titleLine1: "Fabricados aquí.",
+        titleLine2: "Confianza más allá de nuestras fronteras.",
+        description: "Desde la confirmación de los requisitos hasta el embalaje para el envío, BOLEN integra el desarrollo de espejos a medida, la producción, la inspección y la preparación de marca propia en nuestra planta de Jiaxing.",
+        tourCta: "Visitar la fábrica",
+        factsCta: "Ver datos de la empresa",
+        city: "Jiaxing, China",
+        facilitySuffix: "m² de instalaciones de producción",
+        productsSuffix: "productos en el catálogo actualizado"
+      },
+      chapters: {
+        company: "Empresa",
+        factory: "Fábrica",
+        making: "Fabricación",
+        quality: "Calidad",
+        partnership: "Colaboración"
+      },
+      company: {
+        eyebrow: "La empresa de un vistazo",
+        titleLine1: "Un fabricante especializado en espejos.",
+        titleLine2: "Preparado para colaboraciones de producción duraderas.",
+        description: "Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) se fundó en 2005. En la actualidad, más de 200 especialistas trabajan en una planta de producción de 46.800 m² en Jiaxing y respaldan programas de espejos a medida desde la especificación hasta el envío.",
+        foundedLabel: "Fundación",
+        foundedNote: "En actividad desde 2005.",
+        facilityLabel: "Superficie de producción",
+        facilityNote: "46.800 m² en Jiaxing.",
+        teamLabel: "Especialistas",
+        teamNote: "Más de 200 personas en las áreas de producción y apoyo.",
+        catalogLabel: "Catálogo actualizado",
+        catalogNote: "El recuento actual de productos procede de la base de datos del sitio web.",
+        snapshotLabel: "Instantánea de datos",
+        snapshotNote: "Los recuentos actuales del catálogo y del contenido multimedia se actualizan desde la base de datos del sitio web."
+      },
+      process: {
+        eyebrow: "De los requisitos al envío",
+        titleLine1: "Un proceso conectado.",
+        titleLine2: "Seis etapas con responsables definidos.",
+        description: "Cada programa sigue una secuencia definida para mantener visibles los requisitos, las aprobaciones, los controles de producción, el embalaje y los detalles de entrega.",
+        steps: {
+          brief: {
+            label: "01 · Requisitos",
+            title: "Los requisitos son el punto de partida",
+            description: "Comenzamos por aclarar qué debe hacer el espejo, dónde se venderá o instalará y cómo debe entregarse el pedido.",
+            check1: "Uso previsto, mercado de destino y volumen del pedido",
+            check2: "Tamaño, forma, funciones y acabado deseados",
+            check3: "Plazos y necesidades de embalaje y documentación"
+          },
+          specification: {
+            label: "02 · Especificación",
+            title: "Diseño a medida confirmado",
+            description: "Los requisitos acordados se convierten en una especificación lista para producción antes de iniciar la fabricación.",
+            check1: "Planos, dimensiones, tolerancias y detalles de montaje",
+            check2: "Opciones de iluminación, electricidad, materiales y controles",
+            check3: "Aprobación de muestras y confirmación documentada de cambios"
+          },
+          manufacturing: {
+            label: "03 · Fabricación",
+            title: "Fabricación de precisión",
+            description: "El vidrio, los marcos, la iluminación, los componentes eléctricos y las funciones inteligentes se integran mediante etapas de producción coordinadas.",
+            check1: "Corte del vidrio, acabado de cantos y preparación de superficies",
+            check2: "Integración de marcos, LED, componentes eléctricos y funciones",
+            check3: "Montaje controlado conforme a la especificación confirmada"
+          },
+          inspection: {
+            label: "04 · Inspección",
+            title: "Inspección en puntos de control clave",
+            description: "Antes del embalaje, se revisan la apariencia, el funcionamiento y la calidad de fabricación conforme a los requisitos aprobados.",
+            check1: "Acabado visible, superficie del espejo, dimensiones y ajuste",
+            check2: "Iluminación, controles, función antivaho y demás funciones especificadas",
+            check3: "Detalles de montaje, accesorios y uniformidad del pedido"
+          },
+          packaging: {
+            label: "05 · Embalaje",
+            title: "Embalaje de marca propia",
+            description: "Los detalles del embalaje se preparan de acuerdo con el producto, la marca y los requisitos de entrega confirmados para el pedido.",
+            check1: "Etiquetas de marca, manuales, accesorios e insertos",
+            check2: "Materiales protectores adecuados para el espejo y la caja",
+            check3: "Verificación de la información de la caja y las marcas de envío"
+          },
+          logistics: {
+            label: "06 · Logística",
+            title: "Envío y logística",
+            description: "Las cantidades finales, la información de embalaje y los detalles de expedición se coordinan antes de que el pedido salga de la planta.",
+            check1: "Confirmación final de cantidades y palés",
+            check2: "Coordinación de los documentos de envío del pedido",
+            check3: "Entrega a transporte y actualizaciones del envío"
+          }
+        }
+      },
+      gallery: {
+        eyebrow: "Dentro de la fábrica",
+        title: "Trabajo, equipos y personas, de cerca.",
+        description: "Explore imágenes actuales de la fábrica gestionadas desde la base de datos del sitio web. Cuando están disponibles, los pies de foto identifican el trabajo mostrado.",
+        previous: "Imagen anterior de la fábrica",
+        next: "Imagen siguiente de la fábrica",
+        selectImage: "Seleccionar imagen de la fábrica",
+        activeImage: "Imagen actual de la fábrica"
+      },
+      film: {
+        eyebrow: "Vídeo de la fábrica",
+        title: "Vea el proceso en movimiento.",
+        description: "Vea imágenes publicadas de la fábrica y los productos seleccionadas de la videoteca del sitio web.",
+        play: "Reproducir el vídeo de la fábrica",
+        watchFilm: "Ver el vídeo de la fábrica",
+        allVideos: "Ver todos los vídeos",
+        videoCountSuffix: "vídeos publicados"
+      },
+      quality: {
+        eyebrow: "Calidad y adecuación al mercado",
+        titleLine1: "Pruebas antes que afirmaciones.",
+        titleLine2: "Alcance confirmado para cada pedido.",
+        description: "Los registros de inspección y la documentación de producto disponible ayudan a los compradores a evaluar el modelo adecuado para el mercado previsto.",
+        documentsLabel: "Documentos y controles",
+        scopeNote: "La cobertura de certificaciones y documentos varía según el modelo y el mercado de destino, y se confirma durante la cotización."
+      },
+      partnership: {
+        eyebrow: "Inicie un proyecto",
+        titleLine1: "Comparta sus requisitos.",
+        titleLine2: "Definiremos el siguiente paso.",
+        description: "Indique el producto, el volumen, el mercado de destino y los plazos que tiene en mente. Nuestro equipo revisará los requisitos y responderá con los puntos necesarios para avanzar.",
+        primaryCta: "Solicitar cotización",
+        secondaryCta: "Explorar el catálogo",
+        emailLabel: "Correo electrónico",
+        phoneLabel: "Teléfono"
+      },
+      accessibility: {
+        chapterNavigation: "Navegación por capítulos de la historia",
+        processTabs: "Etapas del proceso de fabricación",
+        processPanel: "Detalles del proceso de fabricación",
+        factoryGallery: "Galería de imágenes de la fábrica"
+      }
     },
     home: {
       companyName: "Jiaxing Chengtai Mirror Co., Ltd.",

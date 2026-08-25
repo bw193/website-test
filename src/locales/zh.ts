@@ -40,13 +40,139 @@ export const zh = {
     },
     ourStoryPage: {
       title: "我们的故事",
-      subtitle: "嘉兴诚泰镜业有限公司",
-      paragraphs: [
-        "嘉兴诚泰镜业有限公司自2005年起专注于镜子制造，已积累20多年行业经验。我们拥有46,800平方米的生产综合体、两家独立工厂以及一支由200多名熟练工人组成的团队，这赋予了我们处理不同规模订单的能力和灵活性——从精品室内设计项目到大型酒店和房地产开发。",
-        "我们将整个生产过程掌握在自己手中。从原玻璃加工和LED集成到框架制造和智能功能组装，制造的每个阶段都在同一屋檐下进行，并由专门的QA/QC检查员监督。这种垂直整合意味着我们在每个步骤都控制质量，消除第三方延迟，并保持具有竞争力的交货时间。",
-        "我们跨越多个核心系列的200多种产品款式绝非现成的模板——它们代表了多年来结合欧洲审美趋势和真实买家反馈的设计迭代。对于需要独特产品的客户，我们的OEM和ODM能力允许对尺寸、形状、照明、智能功能、材料和品牌进行完全定制。",
-        "依托CE、RoHS等国际认证，以及按具体产品标注的IP防护等级和市场认证，我们的产品可根据欧洲、北美、中东及其他地区的要求配置合规方案。我们不仅仅是制造镜子——我们与进口商、分销商、室内设计师和开发商建立长期合作伙伴关系，满足他们对一致性、精确性以及长期可靠供应的需求。"
-      ]
+      subtitle: "嘉兴诚泰镜业有限公司（BOLEN）",
+      hero: {
+        kicker: "2005年创立于嘉兴的LED镜制造商",
+        titleLine1: "扎根制造。",
+        titleLine2: "赢得长久信赖。",
+        description: "从确认需求到装箱出货，BOLEN在嘉兴生产基地内协同完成定制镜开发、生产、检验及自有品牌包装准备。",
+        tourCta: "参观工厂",
+        factsCta: "查看企业概况",
+        city: "中国嘉兴",
+        facilitySuffix: "平方米生产基地",
+        productsSuffix: "款实时在售产品"
+      },
+      chapters: {
+        company: "企业",
+        factory: "工厂",
+        making: "制造",
+        quality: "品质",
+        partnership: "合作"
+      },
+      company: {
+        eyebrow: "企业概况",
+        titleLine1: "专注镜类产品制造。",
+        titleLine2: "为长期生产合作而建。",
+        description: "嘉兴诚泰镜业有限公司（BOLEN）成立于2005年。如今，200多名专业人员在嘉兴46,800平方米的生产基地内协同工作，为定制镜项目提供从规格确认到出货的支持。",
+        foundedLabel: "成立时间",
+        foundedNote: "自2005年起持续运营。",
+        facilityLabel: "生产规模",
+        facilityNote: "嘉兴生产基地占地46,800平方米。",
+        teamLabel: "专业人员",
+        teamNote: "生产及支持职能团队共200多人。",
+        catalogLabel: "实时产品目录",
+        catalogNote: "当前产品数量来自网站数据库。",
+        snapshotLabel: "数据快照",
+        snapshotNote: "实时产品目录和媒体数量均从网站数据库刷新。"
+      },
+      process: {
+        eyebrow: "从需求到出货",
+        titleLine1: "一套衔接顺畅的流程。",
+        titleLine2: "六个责任清晰的阶段。",
+        description: "每个项目均按明确流程推进，使需求、审批、生产检查、包装及交付信息全程清晰可追踪。",
+        steps: {
+          brief: {
+            label: "01 · 需求",
+            title: "先明确需求",
+            description: "我们首先明确镜子的功能、销售或安装市场，以及订单的交付方式。",
+            check1: "使用场景、目标市场与订单数量",
+            check2: "目标尺寸、形状、功能与表面处理",
+            check3: "时间计划、包装及文件要求"
+          },
+          specification: {
+            label: "02 · 规格",
+            title: "确认定制设计",
+            description: "生产开始前，我们将已确认的需求转化为可直接执行的生产规格。",
+            check1: "图纸、尺寸、公差与安装细节",
+            check2: "照明、电气、材料与控制选项",
+            check3: "样品确认及变更记录确认"
+          },
+          manufacturing: {
+            label: "03 · 制造",
+            title: "精密制造",
+            description: "玻璃、边框、照明、电气部件及智能功能通过协同生产环节完成整合。",
+            check1: "玻璃切割、磨边与表面处理",
+            check2: "边框、LED、电气部件与功能集成",
+            check3: "依照确认规格进行受控组装"
+          },
+          inspection: {
+            label: "04 · 检验",
+            title: "关键节点检验",
+            description: "包装前，我们依据已批准的要求检验产品的外观、功能与工艺。",
+            check1: "表面外观、镜面、尺寸与装配契合度",
+            check2: "照明、控制、除雾及约定功能",
+            check3: "组装细节、配件与订单一致性"
+          },
+          packaging: {
+            label: "05 · 包装",
+            title: "自有品牌包装",
+            description: "我们根据订单确认的产品、品牌及交付要求准备包装细节。",
+            check1: "品牌标签、说明书、配件与内装物",
+            check2: "适配镜体与纸箱的防护材料",
+            check3: "核对箱唛信息与运输标识"
+          },
+          logistics: {
+            label: "06 · 物流",
+            title: "出货与物流",
+            description: "订单离厂前，我们协调确认最终数量、包装信息及发运细节。",
+            check1: "最终数量与托盘确认",
+            check2: "协调订单所需运输文件",
+            check3: "发运交接与物流进度更新"
+          }
+        }
+      },
+      gallery: {
+        eyebrow: "走进工厂",
+        title: "近距离了解现场、设备与团队。",
+        description: "浏览由网站数据库管理的最新工厂图片；如有说明，图片文字将标注所展示的工作内容。",
+        previous: "上一张工厂图片",
+        next: "下一张工厂图片",
+        selectImage: "选择工厂图片",
+        activeImage: "当前工厂图片"
+      },
+      film: {
+        eyebrow: "工厂影像",
+        title: "在动态影像中了解生产流程。",
+        description: "观看从网站视频库中选取并已发布的工厂与产品影像。",
+        play: "播放工厂影片",
+        watchFilm: "观看工厂影片",
+        allVideos: "查看全部视频",
+        videoCountSuffix: "条已发布视频"
+      },
+      quality: {
+        eyebrow: "品质与市场适配",
+        titleLine1: "以证据支撑承诺。",
+        titleLine2: "按订单确认适用范围。",
+        description: "检验记录及可提供的产品文件，帮助买家评估具体型号是否适用于目标市场。",
+        documentsLabel: "文件与检验",
+        scopeNote: "认证及文件覆盖范围因型号和目标市场而异，并将在报价阶段确认。"
+      },
+      partnership: {
+        eyebrow: "开启合作",
+        titleLine1: "把需求交给我们。",
+        titleLine2: "共同明确下一步。",
+        description: "请告知您计划的产品、数量、目标市场和时间安排。我们的团队将审核需求，并回复推进项目所需确认的要点。",
+        primaryCta: "申请报价",
+        secondaryCta: "浏览产品目录",
+        emailLabel: "电子邮箱",
+        phoneLabel: "电话"
+      },
+      accessibility: {
+        chapterNavigation: "故事章节导航",
+        processTabs: "制造流程阶段",
+        processPanel: "制造流程详情",
+        factoryGallery: "工厂图片库"
+      }
     },
     home: {
       companyName: "嘉兴诚泰镜业有限公司",

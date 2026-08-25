@@ -40,13 +40,139 @@ export const en = {
     },
     ourStoryPage: {
       title: "Our Story",
-      subtitle: "Jiaxing Chengtai Mirror Co., Ltd.",
-      paragraphs: [
-        "With over 20 years of dedicated experience in mirror manufacturing since 2005, Jiaxing Chengtai Mirror Co., Ltd. has built a reputation that goes far beyond any single sales channel. Our 46,800 square meter production complex, two independent factories, and a team of over 200 skilled workers give us the capacity and flexibility to handle orders of virtually any scale — from boutique interior design projects to large-scale hotel and real estate developments.",
-        "We own the entire production process in-house. From raw glass processing and LED integration to frame fabrication and smart feature assembly, every stage of manufacturing is handled under one roof and overseen by dedicated QA/QC inspectors. This vertical integration means we control quality at every step, eliminate third-party delays, and keep lead times competitive.",
-        "Our 200+ product styles across multiple core series are not off-the-shelf templates — they represent years of design iteration informed by both European aesthetic trends and real-world buyer feedback. For clients who need something unique, our OEM and ODM capabilities allow full customization of size, shape, lighting, smart features, materials, and branding.",
-        "Backed by international certifications including CE and RoHS, together with product-specific IP ratings and market certifications, our products are prepared for the compliance requirements of markets across Europe, North America, the Middle East, and beyond. We don't just manufacture mirrors — we build long-term partnerships with importers, distributors, interior designers, and developers who demand consistency, precision, and a supplier they can rely on year after year."
-      ]
+      subtitle: "Jiaxing Chengtai Mirror Co., Ltd. (BOLEN)",
+      hero: {
+        kicker: "LED mirror manufacturing in Jiaxing since 2005",
+        titleLine1: "Built here.",
+        titleLine2: "Trusted beyond.",
+        description: "From a confirmed brief to packed shipment, BOLEN brings custom mirror development, production, inspection, and private-label preparation together at our Jiaxing facility.",
+        tourCta: "Tour the factory",
+        factsCta: "See company facts",
+        city: "Jiaxing, China",
+        facilitySuffix: "m² production facility",
+        productsSuffix: "products in the live catalog"
+      },
+      chapters: {
+        company: "Company",
+        factory: "Factory",
+        making: "Making",
+        quality: "Quality",
+        partnership: "Partnership"
+      },
+      company: {
+        eyebrow: "Company at a glance",
+        titleLine1: "A focused mirror manufacturer.",
+        titleLine2: "Built for long-term production work.",
+        description: "Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) was founded in 2005. Today, more than 200 specialists work across a 46,800 m² production facility in Jiaxing, supporting custom mirror programs from specification through shipment.",
+        foundedLabel: "Founded",
+        foundedNote: "Operating since 2005.",
+        facilityLabel: "Production footprint",
+        facilityNote: "46,800 m² in Jiaxing.",
+        teamLabel: "Specialists",
+        teamNote: "More than 200 people across production and support functions.",
+        catalogLabel: "Live catalog",
+        catalogNote: "The current product count comes from the website database.",
+        snapshotLabel: "Data snapshot",
+        snapshotNote: "Live catalog and media counts are refreshed from the website database."
+      },
+      process: {
+        eyebrow: "From brief to shipment",
+        titleLine1: "One connected process.",
+        titleLine2: "Six accountable stages.",
+        description: "Each program moves through a defined sequence so requirements, approvals, production checks, packaging, and delivery details stay visible.",
+        steps: {
+          brief: {
+            label: "01 · Brief",
+            title: "Requirements first",
+            description: "We begin by clarifying what the mirror must do, where it will be sold or installed, and how the order needs to be delivered.",
+            check1: "Use case, destination market, and order volume",
+            check2: "Target size, shape, functions, and finish",
+            check3: "Timing, packaging, and documentation needs"
+          },
+          specification: {
+            label: "02 · Specification",
+            title: "Custom design confirmed",
+            description: "The agreed brief becomes a production-ready specification before manufacturing begins.",
+            check1: "Drawings, dimensions, tolerances, and mounting details",
+            check2: "Lighting, electrical, material, and control options",
+            check3: "Sample approval and recorded change confirmation"
+          },
+          manufacturing: {
+            label: "03 · Manufacturing",
+            title: "Precision manufacturing",
+            description: "Glass, frames, lighting, electrical components, and smart features are brought together through coordinated production stages.",
+            check1: "Glass cutting, edge finishing, and surface preparation",
+            check2: "Frame, LED, electrical, and feature integration",
+            check3: "Controlled assembly against the confirmed specification"
+          },
+          inspection: {
+            label: "04 · Inspection",
+            title: "Inspection at key checkpoints",
+            description: "Appearance, function, and craftsmanship are reviewed against the approved requirements before packing.",
+            check1: "Visible finish, mirror surface, dimensions, and fit",
+            check2: "Lighting, controls, defogging, and specified functions",
+            check3: "Assembly details, accessories, and order consistency"
+          },
+          packaging: {
+            label: "05 · Packaging",
+            title: "Private-label packaging",
+            description: "Packing details are prepared around the product, brand, and delivery requirements confirmed for the order.",
+            check1: "Brand labels, manuals, accessories, and inserts",
+            check2: "Protective materials suited to the mirror and carton",
+            check3: "Carton information and shipping marks checked"
+          },
+          logistics: {
+            label: "06 · Logistics",
+            title: "Shipment and logistics",
+            description: "Final quantities, packing information, and dispatch details are coordinated before the order leaves the facility.",
+            check1: "Final quantity and pallet confirmation",
+            check2: "Shipping documents coordinated for the order",
+            check3: "Dispatch handoff and shipment updates"
+          }
+        }
+      },
+      gallery: {
+        eyebrow: "Inside the factory",
+        title: "Work, equipment, and people—seen up close.",
+        description: "Browse current factory images managed through the website database. Captions identify the work shown where available.",
+        previous: "Previous factory image",
+        next: "Next factory image",
+        selectImage: "Select factory image",
+        activeImage: "Current factory image"
+      },
+      film: {
+        eyebrow: "Factory film",
+        title: "See the process in motion.",
+        description: "Watch published factory and product footage selected from the website's video library.",
+        play: "Play factory film",
+        watchFilm: "Watch the factory film",
+        allVideos: "View all videos",
+        videoCountSuffix: "published videos"
+      },
+      quality: {
+        eyebrow: "Quality and market fit",
+        titleLine1: "Evidence before claims.",
+        titleLine2: "Scope confirmed per order.",
+        description: "Inspection records and available product documentation help buyers review the right model for the intended market.",
+        documentsLabel: "Documents and checks",
+        scopeNote: "Certification and document coverage varies by model and destination market and is confirmed during quotation."
+      },
+      partnership: {
+        eyebrow: "Start a project",
+        titleLine1: "Bring us the brief.",
+        titleLine2: "We'll define the next step.",
+        description: "Share the product, volume, target market, and timing you have in mind. Our team will review the requirements and respond with the points needed to move forward.",
+        primaryCta: "Request a quote",
+        secondaryCta: "Browse the catalog",
+        emailLabel: "Email",
+        phoneLabel: "Phone"
+      },
+      accessibility: {
+        chapterNavigation: "Story chapter navigation",
+        processTabs: "Manufacturing process stages",
+        processPanel: "Manufacturing process details",
+        factoryGallery: "Factory image gallery"
+      }
     },
     home: {
       companyName: "Jiaxing Chengtai Mirror Co., Ltd.",

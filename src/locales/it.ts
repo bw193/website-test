@@ -38,13 +38,139 @@ export const it = {
     },
     ourStoryPage: {
       title: "La Nostra Storia",
-      subtitle: "Jiaxing Chengtai Mirror Co., Ltd.",
-      paragraphs: [
-        "Con oltre 20 anni di esperienza dedicata alla produzione di specchi dal 2005, Jiaxing Chengtai Mirror Co., Ltd. ha costruito una reputazione che va ben oltre qualsiasi singolo canale di vendita. Il nostro complesso produttivo di 46.800 metri quadrati, due stabilimenti indipendenti e un team di oltre 200 lavoratori qualificati ci offrono la capacità e la flessibilità per gestire ordini di praticamente qualsiasi entità, dai progetti boutique di interior design ai grandi sviluppi alberghieri e immobiliari.",
-        "Gestiamo internamente l'intero processo produttivo. Dalla lavorazione del vetro grezzo e l'integrazione dei LED alla fabbricazione delle cornici e all'assemblaggio delle funzioni smart, ogni fase della produzione è gestita sotto un unico tetto e supervisionata da ispettori QA/QC dedicati. Questa integrazione verticale significa che controlliamo la qualità in ogni fase, eliminiamo i ritardi di terzi e manteniamo tempi di consegna competitivi.",
-        "I nostri oltre 200 stili di prodotto in molteplici serie principali non sono modelli standard: rappresentano anni di iterazione progettuale ispirati sia dalle tendenze estetiche europee sia dai feedback reali degli acquirenti. Per i clienti che necessitano di qualcosa di unico, le nostre capacità OEM e ODM consentono la personalizzazione completa di dimensioni, forma, illuminazione, funzioni smart, materiali e branding.",
-        "Supportati da certificazioni internazionali tra cui CE e RoHS, oltre a gradi IP e certificazioni di mercato specifici per prodotto, i nostri prodotti possono essere configurati per i requisiti di conformità di Europa, Nord America, Medio Oriente e altri mercati. Non ci limitiamo a produrre specchi: costruiamo partnership a lungo termine con importatori, distributori, interior designer e sviluppatori che esigono coerenza, precisione e un fornitore affidabile."
-      ]
+      subtitle: "Jiaxing Chengtai Mirror Co., Ltd. (BOLEN)",
+      hero: {
+        kicker: "Produzione di specchi LED a Jiaxing dal 2005",
+        titleLine1: "Realizzati qui.",
+        titleLine2: "Scelti oltre confine.",
+        description: "Dal brief confermato alla spedizione imballata, BOLEN riunisce nello stabilimento di Jiaxing lo sviluppo di specchi personalizzati, la produzione, l'ispezione e la preparazione del packaging private label.",
+        tourCta: "Visita lo stabilimento",
+        factsCta: "Scopri i dati aziendali",
+        city: "Jiaxing, Cina",
+        facilitySuffix: "m² di superficie produttiva",
+        productsSuffix: "prodotti nel catalogo aggiornato"
+      },
+      chapters: {
+        company: "Azienda",
+        factory: "Stabilimento",
+        making: "Produzione",
+        quality: "Qualità",
+        partnership: "Partnership"
+      },
+      company: {
+        eyebrow: "L'azienda in sintesi",
+        titleLine1: "Un produttore specializzato in specchi.",
+        titleLine2: "Organizzato per programmi produttivi di lungo periodo.",
+        description: "Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) è stata fondata nel 2005. Oggi oltre 200 specialisti lavorano in uno stabilimento produttivo di 46.800 m² a Jiaxing, seguendo programmi di specchi personalizzati dalla definizione delle specifiche alla spedizione.",
+        foundedLabel: "Fondazione",
+        foundedNote: "Operativa dal 2005.",
+        facilityLabel: "Superficie produttiva",
+        facilityNote: "46.800 m² a Jiaxing.",
+        teamLabel: "Specialisti",
+        teamNote: "Oltre 200 persone tra produzione e funzioni di supporto.",
+        catalogLabel: "Catalogo aggiornato",
+        catalogNote: "Il numero attuale di prodotti proviene dal database del sito.",
+        snapshotLabel: "Dati aggiornati",
+        snapshotNote: "I conteggi aggiornati di catalogo e contenuti multimediali vengono recuperati dal database del sito."
+      },
+      process: {
+        eyebrow: "Dal brief alla spedizione",
+        titleLine1: "Un processo coordinato.",
+        titleLine2: "Sei fasi con responsabilità chiare.",
+        description: "Ogni programma segue una sequenza definita, così requisiti, approvazioni, controlli di produzione, packaging e dettagli di consegna restano tracciabili.",
+        steps: {
+          brief: {
+            label: "01 · Brief",
+            title: "Prima i requisiti",
+            description: "Iniziamo chiarendo cosa deve fare lo specchio, dove sarà venduto o installato e come dovrà essere consegnato l'ordine.",
+            check1: "Utilizzo, mercato di destinazione e volume dell'ordine",
+            check2: "Dimensioni, forma, funzioni e finitura richieste",
+            check3: "Tempistiche, packaging e documentazione necessari"
+          },
+          specification: {
+            label: "02 · Specifiche",
+            title: "Design personalizzato confermato",
+            description: "Prima di avviare la produzione, il brief concordato viene trasformato in una specifica pronta per la fabbricazione.",
+            check1: "Disegni, dimensioni, tolleranze e dettagli di montaggio",
+            check2: "Opzioni di illuminazione, elettriche, materiali e comandi",
+            check3: "Approvazione del campione e conferma registrata delle modifiche"
+          },
+          manufacturing: {
+            label: "03 · Produzione",
+            title: "Produzione di precisione",
+            description: "Vetro, cornici, illuminazione, componenti elettrici e funzioni smart vengono integrati attraverso fasi produttive coordinate.",
+            check1: "Taglio del vetro, finitura dei bordi e preparazione della superficie",
+            check2: "Integrazione di cornice, LED, componenti elettrici e funzioni",
+            check3: "Assemblaggio controllato secondo le specifiche confermate"
+          },
+          inspection: {
+            label: "04 · Ispezione",
+            title: "Controlli nei passaggi chiave",
+            description: "Aspetto, funzionalità e qualità della lavorazione vengono verificati rispetto ai requisiti approvati prima dell'imballaggio.",
+            check1: "Finitura visibile, superficie dello specchio, dimensioni e accoppiamenti",
+            check2: "Illuminazione, comandi, antiappannamento e funzioni specificate",
+            check3: "Dettagli di assemblaggio, accessori e coerenza dell'ordine"
+          },
+          packaging: {
+            label: "05 · Packaging",
+            title: "Packaging private label",
+            description: "I dettagli dell'imballaggio vengono preparati in base al prodotto, al marchio e ai requisiti di consegna confermati per l'ordine.",
+            check1: "Etichette del marchio, manuali, accessori e inserti",
+            check2: "Materiali protettivi adatti allo specchio e al cartone",
+            check3: "Verifica delle informazioni sul cartone e dei marchi di spedizione"
+          },
+          logistics: {
+            label: "06 · Logistica",
+            title: "Spedizione e logistica",
+            description: "Quantità finali, informazioni di imballaggio e dettagli di partenza vengono coordinati prima che l'ordine lasci lo stabilimento.",
+            check1: "Conferma della quantità finale e dei pallet",
+            check2: "Coordinamento dei documenti di spedizione dell'ordine",
+            check3: "Passaggio al trasporto e aggiornamenti sulla spedizione"
+          }
+        }
+      },
+      gallery: {
+        eyebrow: "Dentro lo stabilimento",
+        title: "Lavoro, attrezzature e persone da vicino.",
+        description: "Esplora le immagini aggiornate dello stabilimento gestite tramite il database del sito. Dove disponibili, le didascalie descrivono il lavoro mostrato.",
+        previous: "Immagine precedente dello stabilimento",
+        next: "Immagine successiva dello stabilimento",
+        selectImage: "Seleziona un'immagine dello stabilimento",
+        activeImage: "Immagine attiva dello stabilimento"
+      },
+      film: {
+        eyebrow: "Filmato dallo stabilimento",
+        title: "Guarda il processo in movimento.",
+        description: "Guarda i filmati pubblicati sullo stabilimento e sui prodotti selezionati dalla videoteca del sito.",
+        play: "Riproduci il filmato dello stabilimento",
+        watchFilm: "Guarda il filmato dello stabilimento",
+        allVideos: "Vedi tutti i video",
+        videoCountSuffix: "video pubblicati"
+      },
+      quality: {
+        eyebrow: "Qualità e requisiti di mercato",
+        titleLine1: "Evidenze prima delle dichiarazioni.",
+        titleLine2: "Ambito confermato per ogni ordine.",
+        description: "I registri di ispezione e la documentazione di prodotto disponibile aiutano gli acquirenti a valutare il modello adatto al mercato previsto.",
+        documentsLabel: "Documenti e controlli",
+        scopeNote: "La copertura di certificazioni e documenti varia in base al modello e al mercato di destinazione e viene confermata durante la quotazione."
+      },
+      partnership: {
+        eyebrow: "Avvia un progetto",
+        titleLine1: "Portaci il tuo brief.",
+        titleLine2: "Definiremo il passo successivo.",
+        description: "Indicaci il prodotto, il volume, il mercato di destinazione e le tempistiche previste. Il nostro team esaminerà i requisiti e risponderà con i punti necessari per procedere.",
+        primaryCta: "Richiedi un preventivo",
+        secondaryCta: "Sfoglia il catalogo",
+        emailLabel: "E-mail",
+        phoneLabel: "Telefono"
+      },
+      accessibility: {
+        chapterNavigation: "Navigazione tra i capitoli della storia aziendale",
+        processTabs: "Fasi del processo produttivo",
+        processPanel: "Dettagli del processo produttivo",
+        factoryGallery: "Galleria di immagini dello stabilimento"
+      }
     },
     home: {
       companyName: "Jiaxing Chengtai Mirror Co., Ltd.",

@@ -38,13 +38,139 @@ export const fr = {
     },
     ourStoryPage: {
       title: "Notre Histoire",
-      subtitle: "Jiaxing Chengtai Mirror Co., Ltd.",
-      paragraphs: [
-        "Avec plus de 20 ans d'expérience dédiée à la fabrication de miroirs depuis 2005, Jiaxing Chengtai Mirror Co., Ltd. s'est forgé une réputation qui dépasse largement tout canal de vente unique. Notre complexe de production de 46 800 mètres carrés, deux usines indépendantes et une équipe de plus de 200 ouvriers qualifiés nous donnent la capacité et la flexibilité de gérer des commandes de pratiquement toute envergure, des projets de design d'intérieur de boutique aux grands développements hôteliers et immobiliers.",
-        "Nous maîtrisons l'intégralité du processus de production en interne. Du traitement du verre brut et de l'intégration des LED à la fabrication des cadres et à l'assemblage des fonctions intelligentes, chaque étape de la fabrication est gérée sous un même toit et supervisée par des inspecteurs QA/QC dédiés. Cette intégration verticale signifie que nous contrôlons la qualité à chaque étape, éliminons les retards liés aux tiers et maintenons des délais de livraison compétitifs.",
-        "Nos plus de 200 styles de produits répartis sur plusieurs séries principales ne sont pas des modèles standards : ils représentent des années d'itération de conception nourries à la fois par les tendances esthétiques européennes et par les retours réels des acheteurs. Pour les clients qui ont besoin de quelque chose d'unique, nos capacités OEM et ODM permettent une personnalisation complète de la taille, de la forme, de l'éclairage, des fonctions intelligentes, des matériaux et de la marque.",
-        "Soutenus par des certifications internationales telles que CE et RoHS, ainsi que par des indices IP et des certifications de marché propres à chaque produit, nos produits peuvent être adaptés aux exigences de conformité de l'Europe, de l'Amérique du Nord, du Moyen-Orient et d'autres marchés. Nous ne fabriquons pas seulement des miroirs : nous construisons des partenariats à long terme avec des importateurs, des distributeurs, des architectes d'intérieur et des promoteurs qui exigent constance, précision et fiabilité."
-      ]
+      subtitle: "Jiaxing Chengtai Mirror Co., Ltd. (BOLEN)",
+      hero: {
+        kicker: "Fabrication de miroirs LED à Jiaxing depuis 2005",
+        titleLine1: "Fabriqués ici.",
+        titleLine2: "Une confiance qui dépasse nos frontières.",
+        description: "Du cahier des charges validé à l'expédition emballée, BOLEN réunit le développement de miroirs sur mesure, la production, le contrôle et la préparation en marque propre sur son site de Jiaxing.",
+        tourCta: "Visiter l'usine",
+        factsCta: "Voir les données de l'entreprise",
+        city: "Jiaxing, Chine",
+        facilitySuffix: "m² de site de production",
+        productsSuffix: "produits dans le catalogue actualisé"
+      },
+      chapters: {
+        company: "Entreprise",
+        factory: "Usine",
+        making: "Fabrication",
+        quality: "Qualité",
+        partnership: "Partenariat"
+      },
+      company: {
+        eyebrow: "L'entreprise en bref",
+        titleLine1: "Un fabricant spécialisé dans les miroirs.",
+        titleLine2: "Conçu pour des collaborations de production durables.",
+        description: "Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) a été fondée en 2005. Aujourd'hui, plus de 200 spécialistes travaillent sur un site de production de 46 800 m² à Jiaxing et accompagnent les programmes de miroirs sur mesure, de la spécification à l'expédition.",
+        foundedLabel: "Fondation",
+        foundedNote: "En activité depuis 2005.",
+        facilityLabel: "Surface de production",
+        facilityNote: "46 800 m² à Jiaxing.",
+        teamLabel: "Spécialistes",
+        teamNote: "Plus de 200 personnes réparties entre la production et les fonctions support.",
+        catalogLabel: "Catalogue actualisé",
+        catalogNote: "Le nombre actuel de produits provient de la base de données du site web.",
+        snapshotLabel: "Instantané des données",
+        snapshotNote: "Les décomptes actuels du catalogue et des contenus multimédias sont actualisés depuis la base de données du site web."
+      },
+      process: {
+        eyebrow: "Du cahier des charges à l'expédition",
+        titleLine1: "Un processus continu.",
+        titleLine2: "Six étapes avec des responsabilités claires.",
+        description: "Chaque programme suit une séquence définie afin que les exigences, les validations, les contrôles de production, l'emballage et les modalités de livraison restent visibles.",
+        steps: {
+          brief: {
+            label: "01 · Cahier des charges",
+            title: "Les exigences avant tout",
+            description: "Nous commençons par préciser les fonctions attendues du miroir, son lieu de vente ou d'installation et les modalités de livraison de la commande.",
+            check1: "Usage, marché de destination et volume de la commande",
+            check2: "Dimensions, forme, fonctions et finition recherchées",
+            check3: "Délais et besoins en emballage et en documentation"
+          },
+          specification: {
+            label: "02 · Spécification",
+            title: "Conception sur mesure validée",
+            description: "Le cahier des charges convenu devient une spécification prête pour la production avant le début de la fabrication.",
+            check1: "Plans, dimensions, tolérances et détails de fixation",
+            check2: "Options d'éclairage, électriques, de matériaux et de commande",
+            check3: "Validation de l'échantillon et confirmation documentée des modifications"
+          },
+          manufacturing: {
+            label: "03 · Fabrication",
+            title: "Fabrication de précision",
+            description: "Le verre, les cadres, l'éclairage, les composants électriques et les fonctions intelligentes sont assemblés au fil d'étapes de production coordonnées.",
+            check1: "Découpe du verre, finition des chants et préparation des surfaces",
+            check2: "Intégration du cadre, des LED, des composants électriques et des fonctions",
+            check3: "Assemblage contrôlé selon la spécification validée"
+          },
+          inspection: {
+            label: "04 · Contrôle",
+            title: "Contrôle aux étapes clés",
+            description: "L'apparence, le fonctionnement et la qualité de fabrication sont vérifiés selon les exigences approuvées avant l'emballage.",
+            check1: "Finition visible, surface du miroir, dimensions et ajustement",
+            check2: "Éclairage, commandes, désembuage et fonctions spécifiées",
+            check3: "Détails d'assemblage, accessoires et homogénéité de la commande"
+          },
+          packaging: {
+            label: "05 · Emballage",
+            title: "Emballage en marque propre",
+            description: "Les détails de l'emballage sont préparés selon le produit, la marque et les exigences de livraison confirmées pour la commande.",
+            check1: "Étiquettes de marque, manuels, accessoires et encarts",
+            check2: "Matériaux de protection adaptés au miroir et au carton",
+            check3: "Vérification des informations du carton et des marques d'expédition"
+          },
+          logistics: {
+            label: "06 · Logistique",
+            title: "Expédition et logistique",
+            description: "Les quantités finales, les informations d'emballage et les modalités d'expédition sont coordonnées avant que la commande ne quitte le site.",
+            check1: "Confirmation finale des quantités et des palettes",
+            check2: "Coordination des documents d'expédition de la commande",
+            check3: "Remise au transporteur et mises à jour du suivi"
+          }
+        }
+      },
+      gallery: {
+        eyebrow: "Dans l'usine",
+        title: "Le travail, les équipements et les équipes au plus près.",
+        description: "Parcourez les images récentes de l'usine gérées dans la base de données du site web. Lorsqu'elles sont disponibles, les légendes précisent le travail présenté.",
+        previous: "Image précédente de l'usine",
+        next: "Image suivante de l'usine",
+        selectImage: "Sélectionner une image de l'usine",
+        activeImage: "Image actuelle de l'usine"
+      },
+      film: {
+        eyebrow: "Film de l'usine",
+        title: "Découvrez le processus en mouvement.",
+        description: "Regardez des vidéos publiées de l'usine et des produits, sélectionnées dans la vidéothèque du site web.",
+        play: "Lire le film de l'usine",
+        watchFilm: "Regarder le film de l'usine",
+        allVideos: "Voir toutes les vidéos",
+        videoCountSuffix: "vidéos publiées"
+      },
+      quality: {
+        eyebrow: "Qualité et adéquation au marché",
+        titleLine1: "Des preuves avant les affirmations.",
+        titleLine2: "Un périmètre confirmé pour chaque commande.",
+        description: "Les rapports de contrôle et la documentation produit disponible aident les acheteurs à évaluer le modèle adapté au marché visé.",
+        documentsLabel: "Documents et contrôles",
+        scopeNote: "La couverture des certifications et des documents varie selon le modèle et le marché de destination et est confirmée lors du devis."
+      },
+      partnership: {
+        eyebrow: "Démarrer un projet",
+        titleLine1: "Confiez-nous votre cahier des charges.",
+        titleLine2: "Nous définirons la prochaine étape.",
+        description: "Indiquez-nous le produit, le volume, le marché cible et le calendrier envisagés. Notre équipe examinera les exigences et vous répondra avec les éléments nécessaires pour avancer.",
+        primaryCta: "Demander un devis",
+        secondaryCta: "Parcourir le catalogue",
+        emailLabel: "E-mail",
+        phoneLabel: "Téléphone"
+      },
+      accessibility: {
+        chapterNavigation: "Navigation dans les chapitres de notre histoire",
+        processTabs: "Étapes du processus de fabrication",
+        processPanel: "Détails du processus de fabrication",
+        factoryGallery: "Galerie d'images de l'usine"
+      }
     },
     home: {
       companyName: "Jiaxing Chengtai Mirror Co., Ltd.",
