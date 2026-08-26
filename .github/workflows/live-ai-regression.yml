@@ -1,0 +1,83 @@
+name: Live AI Regression Test
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/live-ai-regression.yml
+
+permissions:
+  contents: read
+
+jobs:
+  live-ai:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for Cloudflare production deployment
+        run: sleep 100
+
+      - name: Test exact MOQ question and stale-session recovery
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          request_ai() {
+            local label="$1"
+            local session_id="$2"
+            local turn_number="$3"
+            local turn_id
+            turn_id="$(python - <<'PY'
+          import uuid
+          print(uuid.uuid4())
+          PY
+          )"
+
+            cat > payload.json <<JSON
+          {
+            "messages": [{"role": "user", "content": "what's your moq"}],
+            "language": "en",
+            "page": {"path": "/en/", "title": "BOLEN Mirror"},
+            "turnId": "${turn_id}",
+            "turnNumber": ${turn_number}
+          }
+          JSON
+
+            local status
+            status="$(curl \
+              --silent \
+              --show-error \
+              --max-time 90 \
+              --output response.json \
+              --write-out '%{http_code}' \
+              --request POST \
+              'https://bolenmirror.com/api/ai-receptionist' \
+              --header 'Content-Type: application/json' \
+              --header 'Origin: https://bolenmirror.com' \
+              --header 'Sec-Fetch-Site: same-origin' \
+              --header "X-AI-Session: ${session_id}" \
+              --data-binary @payload.json)"
+
+            echo "${label}: HTTP ${status}"
+            cat response.json
+            echo
+
+            [[ "${status}" == "200" ]]
+            jq -e '
+              .recorded == true
+              and (.reply | type == "string" and length > 0)
+              and .access.completedTurns == 1
+            ' response.json >/dev/null
+          }
+
+          request_ai \
+            'Fresh MOQ request' \
+            "regression-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-fresh" \
+            1
+
+          sleep 3
+
+          request_ai \
+            'Stale client turn repaired' \
+            "regression-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-stale" \
+            2
