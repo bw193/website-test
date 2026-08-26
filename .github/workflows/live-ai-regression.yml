@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Wait for Cloudflare production deployment
-        run: sleep 100
+        run: sleep 75
 
       - name: Test exact MOQ question and stale-session recovery
         shell: bash
