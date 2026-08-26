@@ -44,6 +44,7 @@ import { DEFAULT_SIMILARITY_THRESHOLD } from '../utils/productSimilarity';
 
 const PRODUCT_VIDEO_BUCKET = 'product-videos';
 const AdminSettings = React.lazy(() => import('./AdminSettings'));
+const AdminAiChats = React.lazy(() => import('../components/admin/AdminAiChats'));
 
 interface Product {
   id: string;
@@ -137,7 +138,7 @@ export default function AdminDashboard() {
 
   const requestedTab = (searchParams.get('tab') as AdminTab | null) || 'overview';
   const activeTab: AdminTab =
-    requestedTab === 'employees' && !canManageTeam
+    (requestedTab === 'employees' || requestedTab === 'ai-chats') && !canManageTeam
       ? 'overview'
       : ADMIN_TABS.includes(requestedTab)
         ? requestedTab
@@ -554,7 +555,7 @@ export default function AdminDashboard() {
     <div className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
       <SEO title={t('admin.seo.portal', 'Employee Portal | BOLEN Mirror')} noindex={true} />
       <PageCanvas>
-        {loading && activeTab !== 'settings' ? (
+        {loading && activeTab !== 'settings' && activeTab !== 'ai-chats' ? (
           <DashboardSkeleton />
         ) : activeTab === 'overview' ? (
           <OverviewTab
@@ -907,6 +908,10 @@ export default function AdminDashboard() {
               </div>
             )}
           </div>
+        ) : activeTab === 'ai-chats' ? (
+          <React.Suspense fallback={<DashboardSkeleton />}>
+            <AdminAiChats />
+          </React.Suspense>
         ) : activeTab === 'employees' ? (
           <div>
             <SectionHeader
@@ -1028,7 +1033,7 @@ export default function AdminDashboard() {
                 </div>
               }
             >
-              <AdminSettings />
+              <AdminSettings canManageAi={canManageTeam} />
             </React.Suspense>
           </div>
         ) : null}

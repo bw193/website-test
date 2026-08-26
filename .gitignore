@@ -6,7 +6,10 @@ coverage/
 *.log
 .env*
 !.env.example
+.dev.vars*
 .claude/
+.wrangler/
+supabase/.temp/
 lighthouse-*.json
 project_context.md
 website_map.md

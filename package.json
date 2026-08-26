@@ -11,7 +11,12 @@
     "translate": "tsx scripts/translate-products.ts",
     "generate-sitemap": "tsx scripts/generate-sitemap.ts",
     "start": "tsx server.ts",
-    "preview": "vite preview",
+    "preview": "npm run review",
+    "review": "npm run build && tsx scripts/review-server.ts",
+    "preview:cloudflare": "npm run build && wrangler dev",
+    "deploy:cloudflare": "npm run build && wrangler deploy",
+    "cf:types": "wrangler types",
+    "test:worker": "tsx --test worker/index.test.ts",
     "clean": "rm -rf dist",
     "lint": "tsc --noEmit"
   },
@@ -55,7 +60,8 @@
     "tsx": "^4.21.0",
     "typescript": "~5.8.2",
     "vite": "^6.2.0",
-    "vite-plugin-node-polyfills": "^0.25.0"
+    "vite-plugin-node-polyfills": "^0.25.0",
+    "wrangler": "^4.126.0"
   },
   "overrides": {
     "react": "$react",

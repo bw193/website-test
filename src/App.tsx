@@ -44,6 +44,7 @@ const AdminVideoForm = lazy(() => import('./pages/AdminVideoForm'));
 const SeoSolutions = lazy(() => import('./pages/SeoSolutions'));
 const SeoLandingPage = lazy(() => import('./pages/SeoLandingPage'));
 const TermsAndConditions = lazy(() => import('./pages/TermsAndConditions'));
+const AiReceptionist = lazy(() => import('./components/AiReceptionist'));
 
 // Loading fallback
 const PageLoader = () => (
@@ -124,6 +125,11 @@ function AppShell() {
         </Suspense>
       </main>
       {!isAdminRoute && <Footer />}
+      {!isAdminRoute && (
+        <Suspense fallback={null}>
+          <AiReceptionist />
+        </Suspense>
+      )}
     </div>
   );
 }

@@ -8,6 +8,7 @@ import {
   LayoutDashboard,
   LogOut,
   Menu,
+  MessageSquareText,
   Package,
   Settings,
   Users,
@@ -21,7 +22,7 @@ import AdminLanguageSwitch from './admin/AdminLanguageSwitch';
 const LOGO_URL =
   'https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/logo.png';
 
-export type AdminTab = 'overview' | 'products' | 'blog' | 'videos' | 'rfqs' | 'employees' | 'settings';
+export type AdminTab = 'overview' | 'products' | 'blog' | 'videos' | 'rfqs' | 'ai-chats' | 'employees' | 'settings';
 
 export const ADMIN_TABS: AdminTab[] = [
   'overview',
@@ -29,6 +30,7 @@ export const ADMIN_TABS: AdminTab[] = [
   'blog',
   'videos',
   'rfqs',
+  'ai-chats',
   'employees',
   'settings',
 ];
@@ -151,6 +153,16 @@ export default function AdminLayout() {
         icon: Inbox,
         badge: newRfqCount,
       },
+      ...(canManageTeam
+        ? [
+            {
+              tab: 'ai-chats' as const,
+              to: adminPath('ai-chats'),
+              label: t('admin.dashboard.tabs.aiChats', 'AI Chats'),
+              icon: MessageSquareText,
+            },
+          ]
+        : []),
     ];
     const admin: NavItem[] = [
       ...(canManageTeam

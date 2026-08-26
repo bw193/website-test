@@ -15,6 +15,7 @@ import {
 } from '../utils/video';
 import { optimizeImage } from '../utils/optimizeImage';
 import type { VideoPost } from '../types/video';
+import AdminAiSettings from '../components/admin/AdminAiSettings';
 
 type FactoryGalleryItem = { url: string; alt: string; caption: string };
 type FactoryGalleryNotice = { type: 'success' | 'error'; message: string } | null;
@@ -50,9 +51,9 @@ type FeaturedVideoOption = {
   bytes: number | null;
 };
 
-type SettingsSection = 'hero' | 'video' | 'factory' | 'categories';
+type SettingsSection = 'hero' | 'video' | 'factory' | 'categories' | 'ai';
 
-export default function AdminSettings() {
+export default function AdminSettings({ canManageAi }: { canManageAi: boolean }) {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -87,6 +88,10 @@ export default function AdminSettings() {
     fetchSettings();
     fetchVideoOptions();
   }, []);
+
+  useEffect(() => {
+    if (!canManageAi && section === 'ai') setSection('hero');
+  }, [canManageAi, section]);
 
   // The picker only offers published videos — the home section links to
   // /videos/<slug>, which 404s for drafts.
@@ -518,10 +523,15 @@ NOTIFY pgrst, 'reload schema';`}
             { id: 'video', label: t('admin.dashboard.settings.navVideo', 'Featured video') },
             { id: 'factory', label: t('admin.dashboard.settings.navFactory', 'Factory') },
             { id: 'categories', label: t('admin.dashboard.settings.navCategories', 'Categories') },
+            ...(canManageAi
+              ? [{ id: 'ai' as const, label: t('admin.dashboard.settings.navAi', 'AI receptionist') }]
+              : []),
           ]}
         />
-        {saveButton}
+        {section !== 'ai' && saveButton}
       </div>
+
+      {section === 'ai' && canManageAi && <AdminAiSettings />}
 
       {section === 'hero' && (
       <div className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
