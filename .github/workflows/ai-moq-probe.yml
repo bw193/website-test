@@ -1,0 +1,63 @@
+name: AI MOQ Probe
+
+on:
+  push:
+    branches:
+      - debug/ai-secret-smoke
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Probe live AI receptionist repeatedly
+        shell: bash
+        run: |
+          set -u
+          : > results.ndjson
+          failures=0
+
+          for i in 1 2 3 4 5; do
+            session_id="moq-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${i}"
+            turn_id="$(python - <<'PY'
+          import uuid
+          print(uuid.uuid4())
+          PY
+          )"
+
+            cat > payload.json <<JSON
+          {
+            "messages": [{"role": "user", "content": "what's your moq"}],
+            "language": "en",
+            "page": {"path": "/en/", "title": "BOLEN Mirror"},
+            "turnId": "${turn_id}",
+            "turnNumber": 1
+          }
+          JSON
+
+            status="$(curl --silent --show-error --max-time 70 \
+              --output response.json --write-out '%{http_code}' \
+              --request POST 'https://bolenmirror.com/api/ai-receptionist' \
+              --header 'Content-Type: application/json' \
+              --header 'Origin: https://bolenmirror.com' \
+              --header 'Sec-Fetch-Site: same-origin' \
+              --header "X-AI-Session: ${session_id}" \
+              --data-binary @payload.json || true)"
+
+            body="$(cat response.json 2>/dev/null || printf '{}')"
+            printf '{"attempt":%s,"session":"%s","status":"%s","body":%s}\n' \
+              "$i" "$session_id" "$status" "$(printf '%s' "$body" | jq -c . 2>/dev/null || printf '{}')" \
+              | tee -a results.ndjson
+
+            if [[ "$status" != "200" ]]; then
+              failures=$((failures + 1))
+            fi
+            sleep 2
+          done
+
+          echo "failures=${failures}"
+          cat results.ndjson
+          exit 0
