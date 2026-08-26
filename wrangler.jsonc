@@ -3,6 +3,7 @@
   "name": "website-test",
   "main": "./worker/index.ts",
   "compatibility_date": "2026-08-26",
+  "keep_vars": true,
   "routes": [
     {
       "pattern": "bolenmirror.com/*",
@@ -20,9 +21,6 @@
   },
   "vars": {
     "SUPABASE_URL": "https://mxmmffwntosvwaviippd.supabase.co"
-  },
-  "secrets": {
-    "required": ["SUPABASE_SECRET_KEY"]
   },
   "triggers": {
     "crons": ["17 * * * *"]
