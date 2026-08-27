@@ -318,7 +318,7 @@ export default function AdminAiSettings() {
       ) {
         errors.trigger_phrases = t(
           'admin.dashboard.settings.ai.faqTriggersError',
-          'Add 1–20 unique trigger phrases, each 2–160 characters and containing a letter or number.',
+          'Add 1–20 unique examples, each 2–160 characters and containing a letter or number.',
         );
       }
       if (answerEn.length < 1 || answerEn.length > MAX_ANSWER_CHARS) {
@@ -592,7 +592,7 @@ export default function AdminAiSettings() {
                   <p className="mt-1.5 max-w-3xl text-xs leading-5 text-stone-500">
                     {t(
                       'admin.dashboard.settings.ai.faqDescription',
-                      'Add approved answers for common buyer questions. English is required; Chinese is optional.',
+                      "Teach the AI approved business facts for common buyer questions. It understands the visitor's intent and answers naturally instead of requiring an exact phrase.",
                     )}
                   </p>
                   <p className="mt-1 max-w-3xl text-xs leading-5 text-stone-500">
@@ -766,7 +766,7 @@ export default function AdminAiSettings() {
                                 htmlFor={`ai-faq-triggers-${faq.id}`}
                                 className="text-xs font-semibold text-stone-700"
                               >
-                                {t('admin.dashboard.settings.ai.faqTriggers', 'Trigger phrases')}
+                                {t('admin.dashboard.settings.ai.faqTriggers', 'Customer question examples')}
                               </label>
                               <span className="text-[11px] tabular-nums text-stone-400">
                                 {triggerCount}/{MAX_TRIGGER_PHRASES}
@@ -797,7 +797,7 @@ export default function AdminAiSettings() {
                             <p id={`ai-faq-triggers-help-${faq.id}`} className="mt-1 text-[11px] text-stone-500">
                               {t(
                                 'admin.dashboard.settings.ai.faqTriggersHelp',
-                                'Enter 1–20 phrases, one per line. Each must be 2–160 characters; case and punctuation variants are removed as duplicates when saved.',
+                                'Enter 1–20 example questions or keywords, one per line. They help the AI understand the intent; visitors do not need to use the same wording.',
                               )}
                             </p>
                             {errors.trigger_phrases && (
@@ -814,7 +814,7 @@ export default function AdminAiSettings() {
                                   htmlFor={`ai-faq-answer-en-${faq.id}`}
                                   className="text-xs font-semibold text-stone-700"
                                 >
-                                  {t('admin.dashboard.settings.ai.faqAnswerEnglish', 'English answer')}
+                                  {t('admin.dashboard.settings.ai.faqAnswerEnglish', 'Approved English answer')}
                                   <span className="ml-1 text-red-600" aria-hidden="true">*</span>
                                 </label>
                                 <span className="text-[11px] tabular-nums text-stone-400">
