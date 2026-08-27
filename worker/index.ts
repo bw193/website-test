@@ -13,6 +13,13 @@ const CHAT_RETENTION_MS = 90 * 24 * 60 * 60 * 1_000;
 const AI_MAX_ATTEMPTS = 2;
 const AI_RETRY_DELAY_MS = 150;
 const MAX_ADMIN_GUIDANCE_CHARS = 1_200;
+const MAX_FAQ_RULES = 20;
+const MAX_FAQ_TRIGGERS = 20;
+const MAX_FAQ_TOPIC_CHARS = 80;
+const MAX_FAQ_TRIGGER_CHARS = 160;
+const MAX_FAQ_ANSWER_CHARS = 1_200;
+const MAX_FAQ_PRIORITY = 1_000;
+const FAQ_FETCH_TIMEOUT_MS = 2_500;
 // Qwen 3 may use part of this allowance for hidden reasoning. The prompt, not
 // a smaller hard cap, controls short answers so visible replies are not cut off.
 const SHORT_REPLY_TOKENS = 320;
@@ -66,6 +73,19 @@ interface ReceptionistSettings {
   emailGateEnabled: boolean;
   freeTurns: number;
   maxTurns: number;
+}
+
+interface FaqTrigger {
+  normalized: string;
+  tokens: string[];
+  containsHan: boolean;
+  specificity: number;
+}
+
+interface ReceptionistFaq {
+  priority: number;
+  triggers: FaqTrigger[];
+  answers: Record<SupportedLanguage, string | null>;
 }
 
 interface StoredMessage {
@@ -151,14 +171,17 @@ const INVALID_MESSAGE_CONTROL_PATTERN = /[\u0000-\u0008\u000B\u000C\u000E-\u001F
 const INVALID_METADATA_CONTROL_PATTERN = /[\u0000-\u001F\u007F]/;
 const INVALID_GUIDANCE_PATTERN = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F\u202A-\u202E\u2066-\u2069]/;
 const CONTACT_EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/u;
+const HAN_PATTERN = /\p{Script=Han}/u;
+const LATIN_WORD_PATTERN = /^(?=.*\p{Script=Latin})[\p{Script=Latin}\p{M}\p{N}]+$/u;
+const FAQ_WORD_PATTERN = /[\p{L}\p{M}\p{N}]+/gu;
 
 const PRIVACY_NOTICES: Record<SupportedLanguage, string> = {
-  en: 'For your privacy, contact details were removed before the AI processed your message. Please enter them only in the RFQ form.',
-  zh: '为保护您的隐私，联系方式已在发送给 AI 前移除；请只在询价表中填写联系方式。',
-  es: 'Para proteger su privacidad, eliminamos los datos de contacto antes de enviar el mensaje a la IA. Introdúzcalos únicamente en el formulario de cotización.',
-  fr: 'Pour protéger votre vie privée, les coordonnées ont été retirées avant le traitement par l’IA. Saisissez-les uniquement dans le formulaire de devis.',
-  de: 'Zum Schutz Ihrer Privatsphäre wurden Kontaktdaten vor der KI-Verarbeitung entfernt. Bitte geben Sie sie nur im Angebotsformular ein.',
-  it: 'Per proteggere la tua privacy, i dati di contatto sono stati rimossi prima dell’elaborazione AI. Inseriscili solo nel modulo di richiesta preventivo.',
+  en: 'For your privacy, contact details were removed before processing. Please enter them only in the RFQ form.',
+  zh: '为保护您的隐私，联系方式已在处理前移除；请只在询价表中填写联系方式。',
+  es: 'Para proteger su privacidad, eliminamos los datos de contacto antes de procesar el mensaje. Introdúzcalos únicamente en el formulario de cotización.',
+  fr: 'Pour protéger votre vie privée, les coordonnées ont été retirées avant le traitement du message. Saisissez-les uniquement dans le formulaire de devis.',
+  de: 'Zum Schutz Ihrer Privatsphäre wurden Kontaktdaten vor der Verarbeitung entfernt. Bitte geben Sie sie nur im Angebotsformular ein.',
+  it: 'Per proteggere la tua privacy, i dati di contatto sono stati rimossi prima dell’elaborazione. Inseriscili solo nel modulo di richiesta preventivo.',
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -539,6 +562,156 @@ function normalizeReply(value: string): string {
     .trim();
 }
 
+function normalizeFaqText(value: string): string {
+  return value
+    .normalize('NFKC')
+    .toLowerCase()
+    .replace(/[\p{P}\p{S}]+/gu, ' ')
+    .replace(/\s+/gu, ' ')
+    .trim();
+}
+
+function faqTokens(value: string): string[] {
+  return value.match(FAQ_WORD_PATTERN) || [];
+}
+
+function isOneEditApartLatin(triggerWord: string, candidateWord: string): boolean {
+  if (!LATIN_WORD_PATTERN.test(triggerWord) || !LATIN_WORD_PATTERN.test(candidateWord)) {
+    return false;
+  }
+
+  const trigger = Array.from(triggerWord);
+  const candidate = Array.from(candidateWord);
+  if (trigger.length < 5 || Math.abs(trigger.length - candidate.length) > 1) return false;
+
+  if (trigger.length === candidate.length) {
+    let differences = 0;
+    for (let index = 0; index < trigger.length; index += 1) {
+      if (trigger[index] !== candidate[index]) differences += 1;
+      if (differences > 1) return false;
+    }
+    return differences === 1;
+  }
+
+  const shorter = trigger.length < candidate.length ? trigger : candidate;
+  const longer = trigger.length < candidate.length ? candidate : trigger;
+  let shorterIndex = 0;
+  let longerIndex = 0;
+  let edits = 0;
+
+  while (shorterIndex < shorter.length && longerIndex < longer.length) {
+    if (shorter[shorterIndex] === longer[longerIndex]) {
+      shorterIndex += 1;
+      longerIndex += 1;
+      continue;
+    }
+    edits += 1;
+    if (edits > 1) return false;
+    longerIndex += 1;
+  }
+
+  if (longerIndex < longer.length) edits += 1;
+  return edits === 1;
+}
+
+function tokenPhraseMatchQuality(questionTokens: string[], triggerTokens: string[]): 0 | 1 | 2 {
+  if (triggerTokens.length === 0 || triggerTokens.length > questionTokens.length) return 0;
+
+  let fuzzyMatch = false;
+  for (let start = 0; start <= questionTokens.length - triggerTokens.length; start += 1) {
+    let edits = 0;
+    let matches = true;
+
+    for (let offset = 0; offset < triggerTokens.length; offset += 1) {
+      const triggerWord = triggerTokens[offset];
+      const questionWord = questionTokens[start + offset];
+      if (triggerWord === questionWord) continue;
+      if (edits === 0 && isOneEditApartLatin(triggerWord, questionWord)) {
+        edits = 1;
+        continue;
+      }
+      matches = false;
+      break;
+    }
+
+    if (!matches) continue;
+    if (edits === 0) return 2;
+
+    // Single-word fuzzy triggers are useful for short questions, but allowing
+    // them in long text creates too many accidental matches. Multi-word
+    // triggers remain high confidence because every other word must be an
+    // exact, contiguous, word-boundary match.
+    if (triggerTokens.length > 1 || questionTokens.length <= 6) fuzzyMatch = true;
+  }
+
+  return fuzzyMatch ? 1 : 0;
+}
+
+function triggerMatchQuality(
+  normalizedQuestion: string,
+  questionTokens: string[],
+  trigger: FaqTrigger,
+): 0 | 1 | 2 {
+  if (trigger.containsHan) {
+    const compactQuestion = normalizedQuestion.replace(/\s+/g, '');
+    const compactTrigger = trigger.normalized.replace(/\s+/g, '');
+    return compactTrigger.length >= 2 && compactQuestion.includes(compactTrigger) ? 2 : 0;
+  }
+
+  return tokenPhraseMatchQuality(questionTokens, trigger.tokens);
+}
+
+function findFaqReply(
+  faqs: ReceptionistFaq[],
+  question: string,
+  language: SupportedLanguage,
+): string | null {
+  const normalizedQuestion = normalizeFaqText(question);
+  if (!normalizedQuestion) return null;
+  const questionTokens = faqTokens(normalizedQuestion);
+
+  let best:
+    | { faq: ReceptionistFaq; quality: 1 | 2; specificity: number }
+    | undefined;
+
+  for (const faq of faqs) {
+    for (const trigger of faq.triggers) {
+      const quality = triggerMatchQuality(normalizedQuestion, questionTokens, trigger);
+      if (quality === 0) continue;
+
+      if (
+        !best ||
+        quality > best.quality ||
+        (quality === best.quality && faq.priority > best.faq.priority) ||
+        (quality === best.quality &&
+          faq.priority === best.faq.priority &&
+          trigger.specificity > best.specificity)
+      ) {
+        best = { faq, quality, specificity: trigger.specificity };
+      }
+    }
+  }
+
+  if (!best) return null;
+  return best.faq.answers[language] || best.faq.answers.en;
+}
+
+function prepareReply(
+  value: string,
+  language: SupportedLanguage,
+  inputPiiRedacted: boolean,
+): string | null {
+  const outputRedaction = redactPii(normalizeReply(value));
+  let reply = outputRedaction.value;
+  if (!reply) return null;
+
+  if (inputPiiRedacted || outputRedaction.redacted) {
+    reply = `${PRIVACY_NOTICES[language]}\n\n${reply}`;
+  }
+
+  return reply.slice(0, MAX_REPLY_CHARS).trim() || null;
+}
+
 async function rateLimitKey(request: Request): Promise<string> {
   const ip = request.headers.get('CF-Connecting-IP') || 'local';
   const userAgent = (request.headers.get('User-Agent') || 'unknown').slice(0, 160);
@@ -719,6 +892,135 @@ function storageHeaders(apiKey: string, prefer?: string): Headers {
   // the apikey header only and must never be placed in a browser bundle.
   if (apiKey.startsWith('eyJ')) headers.set('Authorization', `Bearer ${apiKey}`);
   return headers;
+}
+
+function normalizeFaqAnswer(value: unknown, required: boolean): string | null {
+  if (value === null || value === undefined || value === '') {
+    if (required) throw new Error('faq_read:invalid_response');
+    return null;
+  }
+  if (typeof value !== 'string') throw new Error('faq_read:invalid_response');
+
+  const answer = value.trim();
+  if (!answer) {
+    if (required) throw new Error('faq_read:invalid_response');
+    return null;
+  }
+  if (
+    answer.length > MAX_FAQ_ANSWER_CHARS ||
+    INVALID_GUIDANCE_PATTERN.test(answer) ||
+    !normalizeReply(answer)
+  ) {
+    throw new Error('faq_read:invalid_response');
+  }
+  return answer;
+}
+
+function normalizeFaqRows(value: unknown): ReceptionistFaq[] {
+  if (!Array.isArray(value) || value.length > MAX_FAQ_RULES) {
+    throw new Error('faq_read:invalid_response');
+  }
+
+  return value.map((row) => {
+    if (!isRecord(row)) throw new Error('faq_read:invalid_response');
+    const validId =
+      (typeof row.id === 'string' && row.id.length > 0 && row.id.length <= 128) ||
+      (Number.isSafeInteger(row.id) && (row.id as number) > 0);
+    const topic = typeof row.topic === 'string' ? row.topic.trim() : '';
+    const priority = row.priority;
+    if (
+      !validId ||
+      !topic ||
+      topic.length > MAX_FAQ_TOPIC_CHARS ||
+      INVALID_GUIDANCE_PATTERN.test(topic) ||
+      row.is_active !== true ||
+      !Number.isSafeInteger(priority) ||
+      (priority as number) < 1 ||
+      (priority as number) > MAX_FAQ_PRIORITY ||
+      typeof row.created_at !== 'string' ||
+      !Number.isFinite(Date.parse(row.created_at)) ||
+      typeof row.updated_at !== 'string' ||
+      !Number.isFinite(Date.parse(row.updated_at)) ||
+      !Array.isArray(row.trigger_phrases) ||
+      row.trigger_phrases.length === 0 ||
+      row.trigger_phrases.length > MAX_FAQ_TRIGGERS
+    ) {
+      throw new Error('faq_read:invalid_response');
+    }
+
+    const seenTriggers = new Set<string>();
+    const triggers: FaqTrigger[] = [];
+    for (const triggerValue of row.trigger_phrases) {
+      if (typeof triggerValue !== 'string') throw new Error('faq_read:invalid_response');
+      const trigger = triggerValue.trim();
+      if (
+        trigger.length < 2 ||
+        trigger.length > MAX_FAQ_TRIGGER_CHARS ||
+        INVALID_GUIDANCE_PATTERN.test(trigger)
+      ) {
+        throw new Error('faq_read:invalid_response');
+      }
+
+      const normalized = normalizeFaqText(trigger);
+      const tokens = faqTokens(normalized);
+      if (!normalized || tokens.length === 0) {
+        throw new Error('faq_read:invalid_response');
+      }
+      // The database validates the stored phrases, while matching additionally
+      // folds punctuation and compatibility characters. Preserve the first
+      // phrase when two valid entries become equivalent after that folding.
+      if (seenTriggers.has(normalized)) continue;
+      seenTriggers.add(normalized);
+
+      triggers.push({
+        normalized,
+        tokens,
+        containsHan: HAN_PATTERN.test(normalized),
+        specificity: Array.from(normalized.replace(/\s+/g, '')).length,
+      });
+    }
+
+    return {
+      priority: priority as number,
+      triggers,
+      answers: {
+        en: normalizeFaqAnswer(row.answer_en, true) as string,
+        zh: normalizeFaqAnswer(row.answer_zh, false),
+        es: normalizeFaqAnswer(row.answer_es, false),
+        fr: normalizeFaqAnswer(row.answer_fr, false),
+        de: normalizeFaqAnswer(row.answer_de, false),
+        it: normalizeFaqAnswer(row.answer_it, false),
+      },
+    };
+  });
+}
+
+async function loadActiveFaqs(env: Env): Promise<ReceptionistFaq[]> {
+  try {
+    const { baseUrl, apiKey, fetcher } = storageConfig(env);
+    const faqUrl = new URL('/rest/v1/ai_receptionist_faqs', baseUrl);
+    faqUrl.searchParams.set('is_active', 'eq.true');
+    faqUrl.searchParams.set(
+      'select',
+      'id,topic,trigger_phrases,answer_en,answer_zh,answer_es,answer_fr,answer_de,answer_it,is_active,priority,created_at,updated_at',
+    );
+    faqUrl.searchParams.set('order', 'priority.desc,updated_at.desc,id.asc');
+    // Fetch one extra row so an oversized active ruleset fails closed instead
+    // of silently ignoring rules beyond the configured maximum.
+    faqUrl.searchParams.set('limit', String(MAX_FAQ_RULES + 1));
+
+    const response = await fetcher(faqUrl, {
+      headers: storageHeaders(apiKey),
+      signal: AbortSignal.timeout(FAQ_FETCH_TIMEOUT_MS),
+    });
+    if (!response.ok) throw new Error(`faq_read:${response.status}`);
+    return normalizeFaqRows(await response.json());
+  } catch {
+    // FAQ availability must never take the assistant down. Invalid or
+    // unavailable approved rules simply fall back to the fixed AI policy.
+    console.error('AI receptionist FAQs unavailable');
+    return [];
+  }
 }
 
 function normalizeReceptionistSettings(value: unknown): ReceptionistSettings {
@@ -1223,37 +1525,39 @@ async function handleReceptionist(request: Request, env: Env): Promise<Response>
     return jsonError(request, 429, 'SESSION_TURN_LIMIT_REACHED');
   }
 
-  const modelMessages: Array<{ role: ModelRole; content: string }> = [
-    { role: 'system', content: buildSystemPrompt(payload.language, payload.page, settings) },
-    ...payload.messages,
-  ];
+  const latestUserMessage = payload.messages.at(-1);
+  const faqs = await loadActiveFaqs(env);
+  const approvedFaqReply = latestUserMessage
+    ? findFaqReply(faqs, latestUserMessage.content, payload.language)
+    : null;
 
-  let modelResult: unknown;
-  try {
-    modelResult = await runAiWithRetry(
-      env,
-      modelMessages,
-      settings.answerLength === 'medium' ? MEDIUM_REPLY_TOKENS : SHORT_REPLY_TOKENS,
-    );
-  } catch (error) {
-    if (isTemporaryAiError(error)) {
-      return jsonError(request, 503, 'AI_TEMPORARILY_UNAVAILABLE', { 'Retry-After': '60' });
+  let rawReply = approvedFaqReply;
+  if (!rawReply) {
+    const modelMessages: Array<{ role: ModelRole; content: string }> = [
+      { role: 'system', content: buildSystemPrompt(payload.language, payload.page, settings) },
+      ...payload.messages,
+    ];
+
+    let modelResult: unknown;
+    try {
+      modelResult = await runAiWithRetry(
+        env,
+        modelMessages,
+        settings.answerLength === 'medium' ? MEDIUM_REPLY_TOKENS : SHORT_REPLY_TOKENS,
+      );
+    } catch (error) {
+      if (isTemporaryAiError(error)) {
+        return jsonError(request, 503, 'AI_TEMPORARILY_UNAVAILABLE', { 'Retry-After': '60' });
+      }
+      return jsonError(request, 502, 'AI_REQUEST_FAILED');
     }
-    return jsonError(request, 502, 'AI_REQUEST_FAILED');
+
+    rawReply = extractReply(modelResult);
+    if (!rawReply) return jsonError(request, 502, 'AI_INVALID_RESPONSE');
   }
 
-  const extractedReply = extractReply(modelResult);
-  if (!extractedReply) return jsonError(request, 502, 'AI_INVALID_RESPONSE');
-
-  const outputRedaction = redactPii(normalizeReply(extractedReply));
-  let reply = outputRedaction.value;
+  const reply = prepareReply(rawReply, payload.language, payload.piiRedacted);
   if (!reply) return jsonError(request, 502, 'AI_INVALID_RESPONSE');
-
-  if (payload.piiRedacted || outputRedaction.redacted) {
-    reply = `${PRIVACY_NOTICES[payload.language]}\n\n${reply}`;
-  }
-
-  reply = reply.slice(0, MAX_REPLY_CHARS).trim();
 
   try {
     await persistChatTurn(

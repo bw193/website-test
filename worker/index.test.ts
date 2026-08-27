@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import worker, { type Env } from './index.ts';
+import reliableWorker from './reliable-entry.ts';
 
 type AiRun = Env['AI']['run'];
 const SESSION_ID = '9b64bf45-75db-4a68-80c2-04c57e411edf';
@@ -37,6 +38,27 @@ type TestSettingsRow = {
   max_turns: number;
 };
 
+type TestFaqRow = {
+  id: string;
+  topic: string;
+  trigger_phrases: string[];
+  answer_en: string;
+  answer_zh: string | null;
+  answer_es: string | null;
+  answer_fr: string | null;
+  answer_de: string | null;
+  answer_it: string | null;
+  is_active: boolean;
+  priority: number;
+  created_at: string;
+  updated_at: string;
+};
+
+type StorageFixtureOptions = {
+  faqs?: unknown;
+  faqStatus?: number;
+};
+
 const DEFAULT_SETTINGS_ROW: TestSettingsRow = {
   reply_guidance: '',
   tone: 'concise',
@@ -46,12 +68,36 @@ const DEFAULT_SETTINGS_ROW: TestSettingsRow = {
   max_turns: 5,
 };
 
+const FAQ_TIMESTAMP = '2026-08-27T00:00:00.000Z';
+
+function faqRow(overrides: Partial<TestFaqRow> = {}): TestFaqRow {
+  return {
+    id: 'f4f10557-33e0-4c06-a068-9667661c63cd',
+    topic: 'moq',
+    trigger_phrases: ['MOQ', 'minimum order quantity'],
+    answer_en: 'Our standard MOQ is 5 pieces.',
+    answer_zh: '我们的标准起订量为 5 件。',
+    answer_es: null,
+    answer_fr: null,
+    answer_de: null,
+    answer_it: null,
+    is_active: true,
+    priority: 100,
+    created_at: FAQ_TIMESTAMP,
+    updated_at: FAQ_TIMESTAMP,
+    ...overrides,
+  };
+}
+
 function parseStorageBody(body: BodyInit | null | undefined): unknown {
   if (typeof body !== 'string' || body.length === 0) return undefined;
   return JSON.parse(body);
 }
 
-function createStorageFixture(settings: Partial<TestSettingsRow> = {}) {
+function createStorageFixture(
+  settings: Partial<TestSettingsRow> = {},
+  options: StorageFixtureOptions = {},
+) {
   const calls: StorageCall[] = [];
   const messages: StoredTestMessage[] = [];
   const settingsRow: TestSettingsRow = { ...DEFAULT_SETTINGS_ROW, ...settings };
@@ -75,6 +121,13 @@ function createStorageFixture(settings: Partial<TestSettingsRow> = {}) {
 
     if (url.pathname === '/rest/v1/ai_receptionist_settings' && method === 'GET') {
       return Response.json([settingsRow]);
+    }
+
+    if (url.pathname === '/rest/v1/ai_receptionist_faqs' && method === 'GET') {
+      if (init.signal?.aborted) throw init.signal.reason;
+      const status = options.faqStatus || 200;
+      if (status < 200 || status >= 300) return new Response(null, { status });
+      return Response.json(options.faqs ?? []);
     }
 
     if (url.pathname === '/rest/v1/ai_conversations') {
@@ -244,6 +297,282 @@ test('returns the normalized Workers AI reply', async () => {
   assert.equal(response.headers.get('Access-Control-Allow-Origin'), 'https://bolenmirror.com');
 });
 
+test('returns an approved FAQ answer without invoking Workers AI', async () => {
+  const storage = createStorageFixture({}, { faqs: [faqRow()] });
+  let aiCalls = 0;
+  const response = await worker.fetch(
+    request(
+      payload({
+        messages: [{ role: 'user', content: 'WHAT is your MOQ?!' }],
+      }),
+    ),
+    environment(async () => {
+      aiCalls += 1;
+      return { response: 'unexpected' };
+    }, storage.fetch),
+  );
+  const result = (await response.json()) as { reply: string; recorded: boolean };
+
+  assert.equal(response.status, 200);
+  assert.equal(result.reply, 'Our standard MOQ is 5 pieces.');
+  assert.equal(result.recorded, true);
+  assert.equal(aiCalls, 0);
+  assert.equal(storage.messages.length, 2);
+  assert.equal(storage.messages[1]?.content, 'Our standard MOQ is 5 pieces.');
+});
+
+test('deduplicates equivalent normalized FAQ triggers without disabling the rule', async () => {
+  const storage = createStorageFixture({}, {
+    faqs: [faqRow({ trigger_phrases: ['MOQ', 'MOQ?', 'ｍｏｑ'] })],
+  });
+  let aiCalls = 0;
+  const response = await worker.fetch(
+    request(payload()),
+    environment(async () => {
+      aiCalls += 1;
+      return { response: 'unexpected' };
+    }, storage.fetch),
+  );
+
+  assert.equal(response.status, 200);
+  assert.equal((await response.json() as { reply: string }).reply, 'Our standard MOQ is 5 pieces.');
+  assert.equal(aiCalls, 0);
+});
+
+test('deployed reliable entry repairs a stale first turn and serves an FAQ without AI', async () => {
+  const storage = createStorageFixture({}, { faqs: [faqRow()] });
+  let aiCalls = 0;
+  const response = await reliableWorker.fetch(
+    request(payload({ turnNumber: 2 })),
+    environment(async () => {
+      aiCalls += 1;
+      return { response: 'unexpected' };
+    }, storage.fetch),
+  );
+  const result = (await response.json()) as {
+    reply: string;
+    recorded: boolean;
+    access: { completedTurns: number };
+  };
+
+  assert.equal(response.status, 200);
+  assert.equal(result.reply, 'Our standard MOQ is 5 pieces.');
+  assert.equal(result.recorded, true);
+  assert.equal(result.access.completedTurns, 1);
+  assert.equal(aiCalls, 0);
+  assert.equal(
+    storage.calls.filter(
+      (call) => new URL(call.url).pathname === '/rest/v1/ai_receptionist_faqs',
+    ).length,
+    1,
+  );
+});
+
+test('matches a multi-word FAQ trigger with one Latin spelling error', async () => {
+  const storage = createStorageFixture({}, { faqs: [faqRow()] });
+  let aiCalls = 0;
+  const response = await worker.fetch(
+    request(
+      payload({
+        messages: [{ role: 'user', content: 'What is your minimun order quantity?' }],
+      }),
+    ),
+    environment(async () => {
+      aiCalls += 1;
+      return { response: 'unexpected' };
+    }, storage.fetch),
+  );
+
+  assert.equal(response.status, 200);
+  assert.equal((await response.json() as { reply: string }).reply, 'Our standard MOQ is 5 pieces.');
+  assert.equal(aiCalls, 0);
+});
+
+test('matches a Chinese FAQ trigger and returns the approved Chinese answer', async () => {
+  const storage = createStorageFixture({}, {
+    faqs: [faqRow({ trigger_phrases: ['起订量', '最小订购量'] })],
+  });
+  let aiCalls = 0;
+  const response = await worker.fetch(
+    request(
+      payload({
+        language: 'zh-CN',
+        messages: [{ role: 'user', content: '请问，你们的起订量是多少？' }],
+      }),
+    ),
+    environment(async () => {
+      aiCalls += 1;
+      return { response: 'unexpected' };
+    }, storage.fetch),
+  );
+
+  assert.equal(response.status, 200);
+  assert.equal((await response.json() as { reply: string }).reply, '我们的标准起订量为 5 件。');
+  assert.equal(aiCalls, 0);
+});
+
+test('falls back to English when a matched FAQ has no requested localization', async () => {
+  const storage = createStorageFixture({}, { faqs: [faqRow({ answer_fr: null })] });
+  let aiCalls = 0;
+  const response = await worker.fetch(
+    request(
+      payload({
+        language: 'fr',
+        messages: [{ role: 'user', content: 'Quel est votre MOQ ?' }],
+      }),
+    ),
+    environment(async () => {
+      aiCalls += 1;
+      return { response: 'unexpected' };
+    }, storage.fetch),
+  );
+
+  assert.equal(response.status, 200);
+  assert.equal((await response.json() as { reply: string }).reply, 'Our standard MOQ is 5 pieces.');
+  assert.equal(aiCalls, 0);
+});
+
+test('uses Workers AI when no approved FAQ trigger matches', async () => {
+  const storage = createStorageFixture({}, { faqs: [faqRow()] });
+  let aiCalls = 0;
+  const response = await worker.fetch(
+    request(
+      payload({
+        messages: [{ role: 'user', content: 'Do you offer product samples?' }],
+      }),
+    ),
+    environment(async () => {
+      aiCalls += 1;
+      return { response: 'Sample availability requires sales confirmation.' };
+    }, storage.fetch),
+  );
+
+  assert.equal(response.status, 200);
+  assert.equal(
+    (await response.json() as { reply: string }).reply,
+    'Sample availability requires sales confirmation.',
+  );
+  assert.equal(aiCalls, 1);
+});
+
+test('uses Workers AI when FAQ storage is unavailable', async () => {
+  const storage = createStorageFixture({}, { faqStatus: 503 });
+  let aiCalls = 0;
+  const response = await worker.fetch(
+    request(payload()),
+    environment(async () => {
+      aiCalls += 1;
+      return { response: 'MOQ requires sales confirmation.' };
+    }, storage.fetch),
+  );
+
+  assert.equal(response.status, 200);
+  assert.equal((await response.json() as { reply: string }).reply, 'MOQ requires sales confirmation.');
+  assert.equal(aiCalls, 1);
+});
+
+test('uses Workers AI when the optional FAQ lookup times out', async (context) => {
+  let requestedTimeout = 0;
+  context.mock.method(AbortSignal, 'timeout', (delay: number) => {
+    requestedTimeout = delay;
+    return AbortSignal.abort(new DOMException('FAQ lookup timed out', 'TimeoutError'));
+  });
+
+  const storage = createStorageFixture({}, { faqs: [faqRow()] });
+  let aiCalls = 0;
+  const response = await worker.fetch(
+    request(payload()),
+    environment(async () => {
+      aiCalls += 1;
+      return { response: 'AI fallback after FAQ timeout.' };
+    }, storage.fetch),
+  );
+
+  assert.equal(requestedTimeout, 2_500);
+  assert.equal(response.status, 200);
+  assert.equal(
+    (await response.json() as { reply: string }).reply,
+    'AI fallback after FAQ timeout.',
+  );
+  assert.equal(aiCalls, 1);
+});
+
+test('rejects oversized FAQ rule and trigger sets and falls back to Workers AI', async () => {
+  const oversizedRules = Array.from({ length: 21 }, (_, index) =>
+    faqRow({ id: `faq-${index}` }),
+  );
+  const oversizedTriggers = [
+    faqRow({
+      trigger_phrases: Array.from({ length: 21 }, (_, index) => `minimum order phrase ${index}`),
+    }),
+  ];
+
+  for (const faqs of [oversizedRules, oversizedTriggers]) {
+    const storage = createStorageFixture({}, { faqs });
+    let aiCalls = 0;
+    const response = await worker.fetch(
+      request(payload()),
+      environment(async () => {
+        aiCalls += 1;
+        return { response: 'Safe AI fallback.' };
+      }, storage.fetch),
+    );
+
+    assert.equal(response.status, 200);
+    assert.equal((await response.json() as { reply: string }).reply, 'Safe AI fallback.');
+    assert.equal(aiCalls, 1);
+  }
+});
+
+test('rejects FAQ fields outside the database contract and falls back to Workers AI', async () => {
+  const invalidRules = [
+    faqRow({ topic: 'T'.repeat(81) }),
+    faqRow({ answer_en: 'A'.repeat(1_201) }),
+    faqRow({ priority: 0 }),
+    faqRow({ priority: 1_001 }),
+  ];
+
+  for (const invalidRule of invalidRules) {
+    const storage = createStorageFixture({}, { faqs: [invalidRule] });
+    let aiCalls = 0;
+    const response = await worker.fetch(
+      request(payload()),
+      environment(async () => {
+        aiCalls += 1;
+        return { response: 'Safe AI fallback.' };
+      }, storage.fetch),
+    );
+
+    assert.equal(response.status, 200);
+    assert.equal((await response.json() as { reply: string }).reply, 'Safe AI fallback.');
+    assert.equal(aiCalls, 1);
+  }
+});
+
+test('redacts contact details from an approved FAQ answer before storing it', async () => {
+  const storage = createStorageFixture({}, {
+    faqs: [faqRow({ answer_en: 'Email sales@example.com or call +86 138 0013 8000.' })],
+  });
+  let aiCalls = 0;
+  const response = await worker.fetch(
+    request(payload()),
+    environment(async () => {
+      aiCalls += 1;
+      return { response: 'unexpected' };
+    }, storage.fetch),
+  );
+  const result = (await response.json()) as { reply: string };
+
+  assert.equal(response.status, 200);
+  assert.equal(aiCalls, 0);
+  assert.doesNotMatch(result.reply, /sales@example\.com|138 0013 8000/);
+  assert.match(result.reply, /\[email removed\]/);
+  assert.match(result.reply, /\[phone or account number removed\]/);
+  assert.match(result.reply, /contact details were removed before processing/);
+  assert.doesNotMatch(result.reply, /before the AI processed/);
+  assert.equal(storage.messages[1]?.content, result.reply);
+});
+
 test('caps replies so they remain valid conversation history', async () => {
   const response = await worker.fetch(
     request(payload()),
@@ -350,7 +679,7 @@ test('stores only the latest redacted turn with an idempotency key', async () =>
   const messageBody = messageCall?.body as StoredTestMessage[];
   const messageUrl = new URL(messageCall?.url || 'https://invalid.example');
 
-  assert.equal(getCalls.length, 2);
+  assert.equal(getCalls.length, 3);
   assert.equal(postCalls.length, 2);
   assert.equal(conversationBody.session_id, SESSION_ID);
   assert.equal(conversationBody.message_count, 2);
@@ -675,7 +1004,7 @@ test('retries one transient Workers AI failure without duplicating chat storage'
 
   assert.equal(response.status, 200);
   assert.equal(attempts, 2);
-  assert.equal(storage.calls.filter((call) => call.method === 'GET').length, 2);
+  assert.equal(storage.calls.filter((call) => call.method === 'GET').length, 3);
   assert.equal(storage.calls.filter((call) => call.method === 'POST').length, 2);
   assert.equal(
     storage.calls.filter(
