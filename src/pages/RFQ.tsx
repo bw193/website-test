@@ -111,7 +111,7 @@ export default function RFQ() {
   const contactSchema = {
     "@context": "https://schema.org",
     "@type": "ContactPage",
-    "name": "Request for Quote (RFQ) | BOLEN Mirror",
+    "name": "Contact Sales | BOLEN Mirror",
     "description": "Contact Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) for OEM/ODM inquiries, custom mirror manufacturing, and bulk orders.",
     "url": `https://bolenmirror.com/${lang}/rfq/`,
     "mainEntity": {

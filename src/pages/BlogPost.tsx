@@ -267,7 +267,7 @@ export default function BlogPost() {
               to={lp('/rfq')}
               className="btn-secondary-on-dark"
             >
-              {t('blog.ctaQuote', 'Request a quote')}
+              {t('blog.ctaQuote', 'Contact Sales')}
             </Link>
           </div>
         </div>

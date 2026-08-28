@@ -767,7 +767,7 @@ export default function AiReceptionist() {
               >
                 <span className="inline-flex items-center gap-2">
                   <Headphones className="h-4 w-4" aria-hidden="true" />
-                  {copy('humanCta', 'Request a quote from our sales team')}
+                  {copy('humanCta', 'Contact Sales')}
                 </span>
                 <span aria-hidden="true">→</span>
               </Link>
@@ -988,7 +988,7 @@ export default function AiReceptionist() {
             <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full border-2 border-stone-900 bg-emerald-400" aria-hidden="true" />
           </span>
           <span className="hidden pr-1 text-sm font-semibold sm:inline">
-            {copy('buttonText', 'Ask AI')}
+            {copy('buttonText', 'Ask BOLEN')}
           </span>
         </button>
       )}

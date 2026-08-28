@@ -95,7 +95,7 @@ const UI: Record<SupportedLanguage, SeoSolutionsUi> = {
     ],
     home: 'Home',
     solutions: 'Solutions',
-    requestQuote: 'Request factory quote',
+    requestQuote: 'Contact Sales',
     viewCatalog: 'View product catalog',
     relevantProducts: 'Relevant products',
     modelsHeading: 'Example models',

@@ -334,7 +334,7 @@ export default function ProductDetail() {
   // values Helmet writes on mount match what was baked into the static HTML.
   const richDescription = buildProductDescription(
     display,
-    t('productDetail.descTemplate', 'Premium {title} by BOLEN Mirror (Jiaxing Chengtai Mirror Co., Ltd.) — OEM/ODM LED, smart, vanity, and bath mirrors. Request a quote for bulk pricing.')
+    t('productDetail.descTemplate', 'Premium {title} by BOLEN Mirror (Jiaxing Chengtai Mirror Co., Ltd.) — OEM/ODM LED, smart, vanity, and bath mirrors. Contact sales for bulk pricing.')
   );
 
   const seoTitle = buildProductSeoTitle(display.title, t('productDetail.brandSuffix', '| BOLEN Mirror'));
@@ -743,7 +743,7 @@ export default function ProductDetail() {
                 />
                 <div className="min-w-0">
                   <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-stone-400">
-                    {t('productDetail.quotingFor', 'Requesting a quote for')}
+                    {t('productDetail.quotingFor', 'Contacting sales about')}
                   </p>
                   <p className="mt-1 line-clamp-2 text-sm font-semibold leading-snug text-white">{display.title}</p>
                 </div>

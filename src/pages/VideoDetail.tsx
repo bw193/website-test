@@ -241,7 +241,7 @@ export default function VideoDetail() {
                 to={lp('/rfq')}
                 className="btn-primary"
               >
-                {t('videos.ctaQuote', 'Request a quote')}
+                {t('videos.ctaQuote', 'Contact Sales')}
                 <ArrowUpRight className="h-4 w-4" />
               </Link>
               <Link

@@ -14,7 +14,7 @@ export const en = {
       categoryDesc: "Browse BOLEN {{category}} for OEM/ODM wholesale. Factory-direct LED, vanity, and bath mirrors for global brands and hotel projects.",
       storyTitle: "Our Story | BOLEN LED Mirror Manufacturer",
       storyDesc: "Learn about the history and manufacturing excellence of BOLEN (Jiaxing Chengtai Mirror Co., Ltd.), an LED mirror manufacturer established in 2005 and specializing in OEM smart mirrors.",
-      rfqTitle: "Request for Quote | BOLEN LED Mirror Manufacturer",
+      rfqTitle: "Contact Sales | BOLEN LED Mirror Manufacturer",
       rfqDesc: "Contact BOLEN, a leading LED mirror manufacturer, for OEM/ODM inquiries, custom mirror manufacturing, and bulk orders."
     },
     navbar: {
@@ -56,7 +56,7 @@ export const en = {
       timeoutError: "The response took too long. Please try again.",
       error: "I couldn’t respond just now. Please try again.",
       retry: "Try again",
-      humanCta: "Request a quote from our sales team",
+      humanCta: "Contact Sales",
       inputLabel: "Message the AI assistant",
       placeholder: "Ask about products, MOQ, or customization…",
       sendLabel: "Send message",
@@ -84,7 +84,7 @@ export const en = {
       privacyNoteCompact: "Redacted chat is stored for up to 90 days. Do not enter sensitive information.",
       privacyContact: "Privacy request",
       openLabel: "Open BOLEN AI assistant",
-      buttonText: "Ask AI"
+      buttonText: "Ask BOLEN"
     },
     ourStoryPage: {
       title: "Our Story",
@@ -210,7 +210,7 @@ export const en = {
         titleLine1: "Bring us the brief.",
         titleLine2: "We'll define the next step.",
         description: "Share the product, volume, target market, and timing you have in mind. Our team will review the requirements and respond with the points needed to move forward.",
-        primaryCta: "Request a quote",
+        primaryCta: "Contact Sales",
         secondaryCta: "Browse the catalog",
         emailLabel: "Email",
         phoneLabel: "Phone"
@@ -369,7 +369,7 @@ export const en = {
       backToCatalog: "Back to Catalog",
       specifications: "Specifications",
       productDetails: "Product Details",
-      requestQuote: "Request a Quote (RFQ)",
+      requestQuote: "Contact Sales",
       companyName: "Company / Contact Name",
       email: "Email Address",
       inquiryDetails: "Inquiry Details (Quantity, Customization, etc.)",
@@ -400,12 +400,12 @@ export const en = {
       oemAvailable: "OEM/ODM available",
       keySpecs: "At a glance",
       viewAllSpecs: "View full specifications",
-      quotingFor: "Requesting a quote for",
+      quotingFor: "Contacting sales about",
       // SEO. brandSuffix is appended to every product <title>; descTemplate is
       // the last-resort <meta description> when a product has no `details`.
       // Keep {title} in place — it is substituted with the localized title.
       brandSuffix: "| BOLEN Mirror",
-      descTemplate: "Premium {title} by BOLEN Mirror (Jiaxing Chengtai Mirror Co., Ltd.) — OEM/ODM LED, smart, vanity, and bath mirrors. Request a quote for bulk pricing."
+      descTemplate: "Premium {title} by BOLEN Mirror (Jiaxing Chengtai Mirror Co., Ltd.) — OEM/ODM LED, smart, vanity, and bath mirrors. Contact sales for bulk pricing."
     },
     rfq: {
       intro: "Interested in wholesale pricing, custom orders, or OEM/ODM services? Send us an inquiry and our sales team will respond within 24 hours.",
@@ -451,7 +451,7 @@ export const en = {
       ctaTitle: "Looking for a mirror built to your spec?",
       ctaDesc: "BOLEN manufactures LED, smart, vanity, and bath mirrors for global brands — OEM and ODM, from one vertically integrated factory.",
       ctaCatalog: "Browse the catalog",
-      ctaQuote: "Request a quote",
+      ctaQuote: "Contact Sales",
       related: "More from the Journal",
       viewAll: "View all",
       notFound: "Article not found",
@@ -480,7 +480,7 @@ export const en = {
       backToVideos: "Back to videos",
       ctaTitle: "Need this mirror for your line?",
       ctaDesc: "Send the clip or product reference to BOLEN and our team can quote OEM/ODM options, packaging, and lead time.",
-      ctaQuote: "Request a quote",
+      ctaQuote: "Contact Sales",
       ctaCatalog: "Browse products",
       relatedProducts: "Related products",
       relatedVideos: "More videos",

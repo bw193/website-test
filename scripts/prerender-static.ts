@@ -196,7 +196,7 @@ const COPY: Record<
     storyH1: 'Our Story',
     storyIntro:
       'Established in 2005, Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) develops and manufactures LED, smart, vanity, bathroom, and decorative mirrors at its 46,800 m² Jiaxing facility with a team of 200+ specialists.',
-    rfqH1: 'Request a Quote',
+    rfqH1: 'Contact Sales',
     rfqIntro:
       'Contact Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) for OEM/ODM inquiries, custom mirror manufacturing, and bulk orders. Our sales team responds within 24 hours.',
     breadcrumbHome: 'Home',
@@ -204,11 +204,11 @@ const COPY: Record<
     navHome: 'Home',
     navCatalog: 'Catalog',
     navStory: 'Our Story',
-    navRfq: 'Request a Quote',
+    navRfq: 'Contact Sales',
     detailsHeading: 'Product Details',
     specsHeading: 'Specifications',
     productDescTemplate:
-      'Premium {title} by BOLEN Mirror (Jiaxing Chengtai Mirror Co., Ltd.) — OEM/ODM LED, smart, vanity, and bath mirrors. Request a quote for bulk pricing.',
+      'Premium {title} by BOLEN Mirror (Jiaxing Chengtai Mirror Co., Ltd.) — OEM/ODM LED, smart, vanity, and bath mirrors. Contact sales for bulk pricing.',
   },
   zh: {
     homeH1: 'BOLEN — LED 镜制造商 & OEM 智能镜工厂',
@@ -1352,7 +1352,7 @@ function rfqSchema(lang: Lang): any[] {
     {
       '@context': 'https://schema.org',
       '@type': 'ContactPage',
-      name: 'Request for Quote (RFQ) | BOLEN Mirror',
+      name: 'Contact Sales | BOLEN Mirror',
       description:
         'Contact Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) for OEM/ODM inquiries, custom mirror manufacturing, and bulk orders.',
       url: `https://bolenmirror.com/${lang}/rfq/`,
