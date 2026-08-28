@@ -13,6 +13,7 @@ import LanguageLayout from './components/LanguageLayout';
 import AnalyticsTracker from './components/AnalyticsTracker';
 import { hasSupabaseConfig } from './supabaseConfig';
 import Home from './pages/Home';
+import { INSIGHTS_PATH, LEGACY_BLOG_PATH, insightDetailPath } from './data/insights';
 
 // Home renders synchronously — it's the most common landing target and the LCP
 // route, so it must be in the initial chunk. Everything else is lazy: deep-link
@@ -58,6 +59,12 @@ function RedirectToCatalog() {
   return <Navigate to={`/${lang || 'en'}/products/`} replace />;
 }
 
+function RedirectLegacyInsights() {
+  const { lang, slug } = useParams<{ lang?: string; slug?: string }>();
+  const target = slug ? insightDetailPath(slug) : INSIGHTS_PATH;
+  return <Navigate to={`/${lang || 'en'}${target}/`} replace />;
+}
+
 function AppShell() {
   const { t } = useTranslation();
   const location = useLocation();
@@ -93,8 +100,10 @@ function AppShell() {
               <Route path="products/category/:categorySlug" element={withMotion(<Products />)} />
               <Route path="products/:id" element={withMotion(<ProductDetail />)} />
               <Route path="our-story" element={withMotion(<OurStory />)} />
-              <Route path="blog" element={withMotion(<Blog />)} />
-              <Route path="blog/:slug" element={withMotion(<BlogPost />)} />
+              <Route path={INSIGHTS_PATH.slice(1)} element={<Blog />} />
+              <Route path={`${INSIGHTS_PATH.slice(1)}/:slug`} element={<BlogPost />} />
+              <Route path={LEGACY_BLOG_PATH.slice(1)} element={<RedirectLegacyInsights />} />
+              <Route path={`${LEGACY_BLOG_PATH.slice(1)}/:slug`} element={<RedirectLegacyInsights />} />
               <Route path="videos" element={withMotion(<Videos />)} />
               <Route path="videos/:slug" element={withMotion(<VideoDetail />)} />
               <Route path="solutions" element={<SeoSolutions />} />
@@ -102,6 +111,10 @@ function AppShell() {
               <Route path="rfq" element={withMotion(<RFQ />)} />
               <Route path="terms-and-conditions" element={<TermsAndConditions />} />
             </Route>
+
+            {/* Client-side safety net; production serves permanent redirects. */}
+            <Route path={LEGACY_BLOG_PATH} element={<RedirectLegacyInsights />} />
+            <Route path={`${LEGACY_BLOG_PATH}/:slug`} element={<RedirectLegacyInsights />} />
 
             {/* Admin routes (no language prefix) — own chrome, no public nav/footer */}
             <Route

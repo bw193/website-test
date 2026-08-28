@@ -9,6 +9,9 @@ import {
   DEFAULT_PRODUCT_CATEGORIES,
   parseCategoriesSetting,
 } from './src/utils/catalogCategory';
+import { INSIGHTS_PATH, insightDetailPath } from './src/data/insights';
+import { getBlogAvailableLanguages } from './src/utils/blog';
+import type { BlogPost } from './src/types/blog';
 
 dotenv.config();
 
@@ -34,6 +37,13 @@ async function startServer() {
 
   const LANGUAGES = ['en', 'zh', 'es', 'fr', 'de', 'it'];
   const DOMAIN = 'https://bolenmirror.com';
+  type SitemapPage = {
+    loc: string;
+    changefreq: string;
+    priority: string;
+    lastmod: string;
+    availableLanguages?: readonly string[];
+  };
 
   function buildUrlEntry(
     pagePath: string,
@@ -68,12 +78,12 @@ ${xDefault}
       .select('id, title, updated_at, created_at')
       .order('created_at', { ascending: false });
 
-    const staticPages = [
+    const staticPages: SitemapPage[] = [
       { loc: '/', changefreq: 'weekly', priority: '1.0', lastmod: today },
       { loc: '/products', changefreq: 'weekly', priority: '0.9', lastmod: today },
       { loc: '/rfq', changefreq: 'monthly', priority: '0.8', lastmod: today },
       { loc: '/our-story', changefreq: 'monthly', priority: '0.7', lastmod: today },
-      { loc: '/blog', changefreq: 'weekly', priority: '0.7', lastmod: today },
+      { loc: INSIGHTS_PATH, changefreq: 'weekly', priority: '0.7', lastmod: today },
       { loc: '/videos', changefreq: 'weekly', priority: '0.7', lastmod: today },
     ];
 
@@ -103,13 +113,19 @@ ${xDefault}
 
     const { data: blogPosts } = await supabase
       .from('blog_posts')
-      .select('slug, updated_at, published_at, created_at')
+      .select('slug, title, body, updated_at, published_at, created_at')
       .eq('status', 'published')
       .order('published_at', { ascending: false });
 
-    const blogPostPages = (blogPosts || []).map((post) => {
+    const blogPostPages: SitemapPage[] = ((blogPosts || []) as BlogPost[]).map((post) => {
       const lastmod = (post.updated_at || post.published_at || post.created_at || today).split('T')[0];
-      return { loc: `/blog/${post.slug}`, changefreq: 'monthly', priority: '0.7', lastmod };
+      return {
+        loc: insightDetailPath(post.slug),
+        changefreq: 'monthly',
+        priority: '0.7',
+        lastmod,
+        availableLanguages: getBlogAvailableLanguages(post),
+      };
     });
 
     const { data: videoPosts, error: videoError } = await supabase
@@ -136,10 +152,27 @@ ${xDefault}
         lastmod: today,
       })),
     ];
-    const allPages = [...staticPages, ...solutionPages, ...productPages, ...categoryPages, ...blogPostPages, ...videoPostPages];
-    const urls = LANGUAGES.flatMap((lang) =>
-      allPages.map((p) => buildUrlEntry(p.loc, p.lastmod, p.changefreq, p.priority, lang))
-    );
+    const allPages: SitemapPage[] = [
+      ...staticPages,
+      ...solutionPages,
+      ...productPages,
+      ...categoryPages,
+      ...blogPostPages,
+      ...videoPostPages,
+    ];
+    const urls = allPages.flatMap((page) => {
+      const availableLanguages = page.availableLanguages || LANGUAGES;
+      return availableLanguages.map((lang) =>
+        buildUrlEntry(
+          page.loc,
+          page.lastmod,
+          page.changefreq,
+          page.priority,
+          lang,
+          availableLanguages
+        )
+      );
+    });
     return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
 ${urls.join('\n')}
@@ -170,6 +203,24 @@ ${urls.join('\n')}
   app.get('/videos/*', (req, res) => res.redirect(301, `/en${req.path.replace(/\/+$/, '')}/`));
   app.get('/solutions', (req, res) => res.redirect(301, '/en/solutions/'));
   app.get('/solutions/*', (req, res) => res.redirect(301, `/en${req.path.replace(/\/+$/, '')}/`));
+  app.get(INSIGHTS_PATH, (req, res) => res.redirect(301, `/en${INSIGHTS_PATH}/`));
+  app.get(`${INSIGHTS_PATH}/*`, (req, res) =>
+    res.redirect(301, `/en${req.path.replace(/\/+$/, '')}/`)
+  );
+  app.get('/blog', (req, res) => res.redirect(301, `/en${INSIGHTS_PATH}/`));
+  app.get('/blog/*', (req, res) => {
+    const suffix = req.path.replace(/^\/blog\/?/, '');
+    res.redirect(301, `/en${INSIGHTS_PATH}/${suffix.replace(/\/+$/, '')}/`);
+  });
+  app.get('/:lang/blog', (req, res, next) => {
+    if (!SUPPORTED_LANGUAGES.includes(req.params.lang)) return next();
+    res.redirect(301, `/${req.params.lang}${INSIGHTS_PATH}/`);
+  });
+  app.get('/:lang/blog/*', (req, res, next) => {
+    if (!SUPPORTED_LANGUAGES.includes(req.params.lang)) return next();
+    const suffix = req.path.split('/').slice(3).join('/').replace(/\/+$/, '');
+    res.redirect(301, `/${req.params.lang}${INSIGHTS_PATH}/${suffix}/`);
+  });
 
   // Vite middleware for development
   if (process.env.NODE_ENV !== 'production') {

@@ -129,17 +129,27 @@ export function readInitialHomeData<T>(): {
   };
 }
 
-export function readInitialBlogList(): BlogListItem[] | null {
+export function readInitialBlogList(lang?: string): BlogListItem[] | null {
   const data = getPrerenderData();
-  if (data?.route === 'blog' && Array.isArray(data.blogPosts)) {
+  if (
+    data?.route === 'blog' &&
+    (!lang || data.lang === lang) &&
+    Array.isArray(data.blogPosts)
+  ) {
     return data.blogPosts as BlogListItem[];
   }
   return null;
 }
 
-export function readInitialBlogPost(slug: string): LocalizedBlogPost | null {
+export function readInitialBlogPost(slug: string, lang?: string): LocalizedBlogPost | null {
   const data = getPrerenderData();
-  if (data?.route !== 'blogPost' || !data.blogPost) return null;
+  if (
+    data?.route !== 'blogPost' ||
+    (lang && data.lang !== lang) ||
+    !data.blogPost
+  ) {
+    return null;
+  }
   return data.blogPost.slug === slug ? data.blogPost : null;
 }
 

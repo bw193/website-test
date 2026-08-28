@@ -4,6 +4,7 @@ import { Menu, X, Globe } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useLocalizedPath } from '../hooks/useLocalizedPath';
 import { getSeoSolutionsUi } from '../data/seoLandingI18n';
+import { INSIGHTS_PATH } from '../data/insights';
 
 const LOGO_URL =
   'https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/logo.png';
@@ -90,7 +91,7 @@ export default function Navbar() {
     { path: '/', label: t('navbar.home') },
     { path: '/products', label: t('navbar.catalog') },
     { path: '/solutions', label: solutionsUi.navLabel },
-    { path: '/blog', label: t('navbar.blog') },
+    { path: INSIGHTS_PATH, label: t('navbar.blog') },
     { path: '/videos', label: t('navbar.videos', 'Videos') },
     { path: '/our-story', label: t('navbar.ourStory') },
   ];

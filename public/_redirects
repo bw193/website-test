@@ -10,6 +10,33 @@
 /rfq           /en/rfq/                301
 /solutions     /en/solutions/          301
 /solutions/*   /en/solutions/:splat/   301
+/insights      /en/insights/           301
+/insights/:slug  /en/insights/:slug/   301
+/insights/:slug/ /en/insights/:slug/   301
+
+# Public Journal URLs moved to the clearer Insights directory. Keep these
+# permanent, one-hop redirects so existing links retain their search signals.
+/blog          /en/insights/           301
+/blog/:slug    /en/insights/:slug/     301
+/blog/:slug/   /en/insights/:slug/     301
+/en/blog       /en/insights/           301
+/en/blog/:slug  /en/insights/:slug/    301
+/en/blog/:slug/ /en/insights/:slug/    301
+/zh/blog       /zh/insights/           301
+/zh/blog/:slug  /zh/insights/:slug/    301
+/zh/blog/:slug/ /zh/insights/:slug/    301
+/es/blog       /es/insights/           301
+/es/blog/:slug  /es/insights/:slug/    301
+/es/blog/:slug/ /es/insights/:slug/    301
+/fr/blog       /fr/insights/           301
+/fr/blog/:slug  /fr/insights/:slug/    301
+/fr/blog/:slug/ /fr/insights/:slug/    301
+/de/blog       /de/insights/           301
+/de/blog/:slug  /de/insights/:slug/    301
+/de/blog/:slug/ /de/insights/:slug/    301
+/it/blog       /it/insights/           301
+/it/blog/:slug  /it/insights/:slug/    301
+/it/blog/:slug/ /it/insights/:slug/    301
 
 # SPA fallback is handled by wrangler.jsonc's `not_found_handling: "single-page-application"`
 # — do NOT add `/* /index.html 200` here; Cloudflare Workers Static Assets flags it as

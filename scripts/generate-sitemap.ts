@@ -1,13 +1,18 @@
 import { createClient } from '@supabase/supabase-js';
-import { writeFileSync } from 'fs';
+import { readFileSync, writeFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
 import 'dotenv/config';
-import type { LocalizedMap } from '../src/types/blog';
+import type { BlogPost, LocalizedMap } from '../src/types/blog';
 import type { VideoSourceType } from '../src/types/video';
-import { pickLocalized } from '../src/utils/blog';
+import { getBlogAvailableLanguages, pickLocalized } from '../src/utils/blog';
 import { deriveVideoThumbnailUrl, getVideoPlayback, normalizeVideoSourceType } from '../src/utils/video';
 import { SEO_LANDING_PAGES } from '../src/data/seoLandingPages';
+import {
+  INSIGHTS_PATH,
+  LEGACY_BLOG_PATH,
+  insightDetailPath,
+} from '../src/data/insights';
 import {
   categoryPublicPages,
   DEFAULT_PRODUCT_CATEGORIES,
@@ -36,6 +41,7 @@ type SitemapPage = {
   priority: string;
   lastmod: string;
   videoByLang?: Record<string, string | null>;
+  availableLanguages?: readonly string[];
 };
 
 type SitemapVideoPost = {
@@ -185,7 +191,7 @@ async function generateSitemap() {
     { loc: '/products', changefreq: 'weekly', priority: '0.9' },
     { loc: '/rfq', changefreq: 'monthly', priority: '0.8' },
     { loc: '/our-story', changefreq: 'monthly', priority: '0.7' },
-    { loc: '/blog', changefreq: 'weekly', priority: '0.7' },
+    { loc: INSIGHTS_PATH, changefreq: 'weekly', priority: '0.7' },
     { loc: '/videos', changefreq: 'weekly', priority: '0.7' },
   ];
 
@@ -236,7 +242,7 @@ async function generateSitemap() {
   // so a failure here just omits blog URLs instead of breaking the sitemap.
   const { data: blogPosts, error: blogError } = await supabase
     .from('blog_posts')
-    .select('slug, updated_at, published_at, created_at')
+    .select('slug, title, body, updated_at, published_at, created_at')
     .eq('status', 'published')
     .order('published_at', { ascending: false });
 
@@ -244,13 +250,15 @@ async function generateSitemap() {
     console.warn('Could not fetch blog posts for sitemap:', blogError.message);
   }
 
-  const blogPostPages = (blogPosts || []).map((p) => {
+  const typedBlogPosts = (blogPosts || []) as BlogPost[];
+  const blogPostPages: SitemapPage[] = typedBlogPosts.map((p) => {
     const lastmod = (p.updated_at || p.published_at || p.created_at || today).split('T')[0];
     return {
-      loc: `/blog/${p.slug}`,
+      loc: insightDetailPath(p.slug),
       changefreq: 'monthly',
       priority: '0.7',
       lastmod,
+      availableLanguages: getBlogAvailableLanguages(p),
     };
   });
 
@@ -299,10 +307,22 @@ async function generateSitemap() {
     ...videoPostPages,
   ];
 
-  // Generate a URL entry for each page × each language
-  const urls = LANGUAGES.flatMap((lang) =>
-    allPages.map((p) => buildUrlEntry(p.loc, p.lastmod, p.changefreq, p.priority, lang, p.videoByLang?.[lang]))
-  );
+  // Most routes exist in every locale. Insight articles only emit URLs and
+  // reciprocal hreflang entries for languages that contain a real translation.
+  const urls = allPages.flatMap((page) => {
+    const availableLanguages = page.availableLanguages || LANGUAGES;
+    return availableLanguages.map((lang) =>
+      buildUrlEntry(
+        page.loc,
+        page.lastmod,
+        page.changefreq,
+        page.priority,
+        lang,
+        page.videoByLang?.[lang],
+        availableLanguages
+      )
+    );
+  });
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
 ${urls.join('\n')}
@@ -319,6 +339,56 @@ ${urls.join('\n')}
   try {
     writeFileSync(distPath, sitemap, 'utf-8');
     console.log(`Sitemap written to ${distPath}`);
+  } catch {
+    // dist/ may not exist yet during pre-build
+  }
+
+  // Direct untranslated article locales to a real localized version. This is
+  // written to dist after Vite copies public/_redirects, so production serves
+  // an HTTP 301 instead of an English fallback with a false locale canonical.
+  try {
+    const baseRedirectsPath = resolve(__dirname, '..', 'public', '_redirects');
+    const distRedirectsPath = resolve(__dirname, '..', 'dist', '_redirects');
+    // prerender-static adds legacy product UUID redirects to dist/_redirects.
+    // Preserve that generated map and only fall back to public/_redirects when
+    // this script is run before a production build has created dist/.
+    const existingRedirects = (() => {
+      try {
+        return readFileSync(distRedirectsPath, 'utf-8');
+      } catch {
+        return readFileSync(baseRedirectsPath, 'utf-8');
+      }
+    })();
+    const baseRedirects = existingRedirects
+      .replace(
+        /^# BEGIN generated untranslated Insight redirects[\s\S]*?# END generated untranslated Insight redirects\s*/u,
+        ''
+      )
+      .replace(/\n# Generated fallbacks for untranslated Insight articles\.[\s\S]*$/u, '')
+      .trimEnd();
+    const translationRedirects = typedBlogPosts.flatMap((post) => {
+      const available = getBlogAvailableLanguages(post);
+      const fallbackLanguage = available.includes('en') ? 'en' : available[0];
+      if (!fallbackLanguage) return [];
+      return LANGUAGES.filter((lang) => !available.includes(lang as (typeof available)[number])).flatMap(
+        (lang) => {
+          const insightSource = `/${lang}${insightDetailPath(post.slug)}`;
+          const legacySource = `/${lang}${LEGACY_BLOG_PATH}/${post.slug}`;
+          const target = `/${fallbackLanguage}${insightDetailPath(post.slug)}/`;
+          return [
+            `${legacySource} ${target} 301`,
+            `${legacySource}/ ${target} 301`,
+            `${insightSource} ${target} 301`,
+            `${insightSource}/ ${target} 301`,
+          ];
+        }
+      );
+    });
+    const redirectOutput = translationRedirects.length
+      ? `# BEGIN generated untranslated Insight redirects\n${translationRedirects.join('\n')}\n# END generated untranslated Insight redirects\n\n${baseRedirects}\n`
+      : `${baseRedirects}\n`;
+    writeFileSync(distRedirectsPath, redirectOutput, 'utf-8');
+    console.log(`Redirect map written to ${distRedirectsPath}`);
   } catch {
     // dist/ may not exist yet during pre-build
   }

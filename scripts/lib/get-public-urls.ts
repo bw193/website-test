@@ -1,6 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
 import 'dotenv/config';
 import { SEO_LANDING_PAGES } from '../../src/data/seoLandingPages';
+import { INSIGHTS_PATH, insightDetailPath } from '../../src/data/insights';
+import { getBlogAvailableLanguages } from '../../src/utils/blog';
+import type { BlogPost } from '../../src/types/blog';
 import {
   categoryPublicPages,
   DEFAULT_PRODUCT_CATEGORIES,
@@ -15,6 +18,7 @@ export interface PublicPage {
   changefreq: string;
   priority: string;
   lastmod: string;
+  languages?: readonly Language[];
 }
 
 export const STATIC_PAGES: Omit<PublicPage, 'lastmod'>[] = [
@@ -22,6 +26,7 @@ export const STATIC_PAGES: Omit<PublicPage, 'lastmod'>[] = [
   { path: '/products', changefreq: 'weekly', priority: '0.9' },
   { path: '/rfq', changefreq: 'monthly', priority: '0.8' },
   { path: '/our-story', changefreq: 'monthly', priority: '0.7' },
+  { path: INSIGHTS_PATH, changefreq: 'weekly', priority: '0.7' },
   { path: '/solutions', changefreq: 'monthly', priority: '0.9' },
   ...SEO_LANDING_PAGES.map((page) => ({
     path: `/solutions/${page.slug}`,
@@ -52,12 +57,9 @@ export async function getPublicPages(): Promise<PublicPage[]> {
     .select('id, title, updated_at, created_at')
     .order('created_at', { ascending: false });
 
-  if (error) {
-    console.warn(`[get-public-urls] Could not fetch products: ${error.message}`);
-    return staticPages;
-  }
+  if (error) console.warn(`[get-public-urls] Could not fetch products: ${error.message}`);
 
-  const productPages: PublicPage[] = (products || []).map((p) => ({
+  const productPages: PublicPage[] = (error ? [] : products || []).map((p) => ({
     path: `/products/${toSlug(p.title)}`,
     changefreq: 'weekly',
     priority: '0.8',
@@ -75,11 +77,27 @@ export async function getPublicPages(): Promise<PublicPage[]> {
     today
   );
 
-  return [...staticPages, ...productPages, ...categoryPages];
+  const { data: blogPosts, error: blogError } = await supabase
+    .from('blog_posts')
+    .select('slug, title, body, updated_at, published_at, created_at')
+    .eq('status', 'published')
+    .order('published_at', { ascending: false });
+  if (blogError) console.warn(`[get-public-urls] Could not fetch insights: ${blogError.message}`);
+  const insightPages: PublicPage[] = (blogError ? [] : (blogPosts || []) as BlogPost[]).map((post) => ({
+    path: insightDetailPath(post.slug),
+    changefreq: 'monthly',
+    priority: '0.7',
+    lastmod: (post.updated_at || post.published_at || post.created_at || today).split('T')[0],
+    languages: getBlogAvailableLanguages(post),
+  }));
+
+  return [...staticPages, ...productPages, ...categoryPages, ...insightPages];
 }
 
 export function expandToAllLanguageUrls(pages: PublicPage[]): string[] {
-  return LANGUAGES.flatMap((lang) =>
-    pages.map((p) => `/${lang}${p.path === '/' ? '' : p.path}`)
+  return pages.flatMap((page) =>
+    (page.languages || LANGUAGES).map(
+      (lang) => `/${lang}${page.path === '/' ? '' : page.path}`
+    )
   );
 }
