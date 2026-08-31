@@ -2,13 +2,14 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { supabase, hasSupabaseConfig } from '../supabase';
 import { useForm, Controller } from 'react-hook-form';
-import { Loader2, ArrowLeft, Upload, Image as ImageIcon, FileText, Settings, Tag, Package, Search } from 'lucide-react';
+import { Loader2, ArrowLeft, Upload, Image as ImageIcon, FileText, Settings, Tag, Package, Search, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import MDEditor from '@uiw/react-md-editor';
 import '@uiw/react-md-editor/markdown-editor.css';
 import '@uiw/react-markdown-preview/markdown.css';
 import SEO from '../components/SEO';
 import { toSlug } from '../utils/slug';
+import { normalizeBlogCover } from '../utils/blog';
 import { BLOG_LANGUAGES, type BlogLang } from '../types/blog';
 
 const DEFAULT_CATEGORIES = ['Buying Guide', 'Technology', 'Manufacturing', 'Design'];
@@ -159,6 +160,16 @@ export default function AdminBlogForm() {
     }
     const file = e.target.files?.[0];
     if (!file) return;
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+      alert(t('admin.blog.coverInvalidType', 'Choose a PNG, JPG, or WEBP image.'));
+      e.target.value = '';
+      return;
+    }
+    if (file.size > 8 * 1024 * 1024) {
+      alert(t('admin.blog.coverTooLarge', 'Cover images must be 8 MB or smaller.'));
+      e.target.value = '';
+      return;
+    }
     setUploading(true);
     try {
       const ext = file.name.split('.').pop();
@@ -184,9 +195,25 @@ export default function AdminBlogForm() {
 
   const onSubmit = async (values: BlogFormValues) => {
     const titleMap = pruneLangMap(values.title);
+    const bodyMap = pruneLangMap(values.body);
     if (!titleMap.en) {
       alert(t('admin.blog.titleRequired'));
       setActiveLang('en');
+      return;
+    }
+    if (values.status === 'published' && !bodyMap.en) {
+      alert(
+        t(
+          'admin.blog.englishBodyRequired',
+          'Add English article content before publishing.'
+        )
+      );
+      setActiveLang('en');
+      return;
+    }
+    const normalizedCover = normalizeBlogCover(values.cover_image);
+    if (values.cover_image?.trim() && !normalizedCover) {
+      alert(t('admin.blog.coverInvalidUrl', 'Enter a complete http:// or https:// image URL.'));
       return;
     }
     const slug = toSlug(values.slug.trim() || titleMap.en);
@@ -201,11 +228,11 @@ export default function AdminBlogForm() {
         status: values.status,
         category: values.category || null,
         author: values.author?.trim() || 'BOLEN Editorial',
-        cover_image: values.cover_image?.trim() || null,
+        cover_image: normalizedCover,
         reading_minutes: values.reading_minutes ? parseInt(values.reading_minutes, 10) || null : null,
         title: titleMap,
         excerpt: pruneLangMap(values.excerpt),
-        body: pruneLangMap(values.body),
+        body: bodyMap,
         seo_title: pruneLangMap(values.seo_title),
         seo_description: pruneLangMap(values.seo_description),
         product_ids: values.product_ids && values.product_ids.length ? values.product_ids : null,
@@ -528,11 +555,24 @@ export default function AdminBlogForm() {
                   <ImageIcon className="h-4 w-4 text-stone-400" />
                   {t('admin.blog.fieldCover')}
                 </h3>
+                <p className="mt-1 text-xs leading-5 text-stone-500">
+                  {t('admin.blog.coverOptionalHelp', 'Optional. Leave blank for a text-first Insight layout.')}
+                </p>
               </div>
               <div className="p-6 space-y-4">
                 {coverImage ? (
-                  <div className="relative aspect-[16/10] rounded-xl overflow-hidden bg-stone-100 border border-stone-200">
-                    <img src={coverImage} alt="" className="w-full h-full object-cover" />
+                  <div>
+                    <div className="relative aspect-[16/10] rounded-xl overflow-hidden bg-stone-100 border border-stone-200">
+                      <img src={coverImage} alt="" className="w-full h-full object-cover" />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setValue('cover_image', '', { shouldDirty: true })}
+                      className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-stone-600 hover:text-stone-900"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                      {t('admin.blog.removeCover', 'Remove cover')}
+                    </button>
                   </div>
                 ) : null}
                 <div
@@ -549,7 +589,7 @@ export default function AdminBlogForm() {
                   <p className="text-xs text-stone-500 mt-1">{t('admin.blog.coverTypes', 'PNG, JPG, WEBP')}</p>
                 </div>
                 <input
-                  type="text"
+                  type="url"
                   {...register('cover_image')}
                   placeholder="https://…"
                   className="block w-full rounded-lg border-stone-200 py-1.5 px-2 text-xs focus:border-stone-900 focus:ring-1 focus:ring-stone-900 bg-white"

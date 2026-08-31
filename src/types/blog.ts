@@ -48,6 +48,8 @@ export interface LocalizedBlogPost {
   body: string; // markdown, already resolved for the active language
   seo_title?: string;
   seo_description?: string;
+  /** Locales that contain both a real title and body (no English fallback). */
+  available_languages: BlogLang[];
 }
 
 /** Lightweight, single-language card model used by the index list. */

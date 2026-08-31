@@ -31,7 +31,7 @@ async function prerenderUrl(
   const page = await context.newPage();
   try {
     const fullUrl = `${BASE_URL}${urlPath}`;
-    const expectedCanonical = `${SITE_URL}${urlPath}`;
+    const expectedCanonical = `${SITE_URL}${urlPath}/`;
     const requireProduct = isProductDetailPath(urlPath);
 
     await page.goto(fullUrl, { waitUntil: 'networkidle', timeout: PAGE_NAV_TIMEOUT });

@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLocalizedPath } from '../hooks/useLocalizedPath';
 import { getLocalizedSeoLandingPages, getSeoSolutionsUi } from '../data/seoLandingI18n';
+import { INSIGHTS_PATH } from '../data/insights';
 import { catalogCategoryPath, DEFAULT_PRODUCT_CATEGORIES } from '../utils/catalogCategory';
 
 export default function Footer() {
@@ -78,7 +79,7 @@ export default function Footer() {
                 </li>
               ))}
               <li><Link to={lp('/our-story')} className="hover:text-white transition-colors">{t('navbar.ourStory', 'Our Story')}</Link></li>
-              <li><Link to={lp('/blog')} className="hover:text-white transition-colors">{t('navbar.blog', 'Journal')}</Link></li>
+              <li><Link to={lp(INSIGHTS_PATH)} className="hover:text-white transition-colors">{t('navbar.blog', 'Insights')}</Link></li>
               <li><Link to={lp('/videos')} className="hover:text-white transition-colors">{t('navbar.videos', 'Videos')}</Link></li>
               <li><Link to={lp('/rfq')} className="hover:text-white transition-colors">{t('blog.ctaQuote', 'Contact Sales')}</Link></li>
             </ul>

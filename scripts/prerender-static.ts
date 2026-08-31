@@ -25,7 +25,13 @@ import { fileURLToPath } from 'url';
 import { createClient } from '@supabase/supabase-js';
 import 'dotenv/config';
 import { marked } from 'marked';
-import { localizePost, toListItem } from '../src/utils/blog';
+import {
+  getBlogAvailableLanguages,
+  hasBlogTranslation,
+  localizePost,
+  normalizeBlogCover,
+  toListItem,
+} from '../src/utils/blog';
 import {
   localizeVideo,
   parseFeaturedVideoSlug,
@@ -81,6 +87,7 @@ import {
   buildVideoObjectSchema,
 } from '../src/utils/videoSchema';
 import { buildStorySchema } from '../src/utils/storySchema';
+import { INSIGHTS_PATH, insightDetailPath } from '../src/data/insights';
 import type { BlogPost, BlogListItem, LocalizedBlogPost } from '../src/types/blog';
 import type { LocalizedVideoPost, VideoListItem, VideoPost } from '../src/types/video';
 
@@ -1538,56 +1545,56 @@ const BLOG_COPY: Record<
   { metaTitle: string; metaDesc: string; h1: string; intro: string; journal: string }
 > = {
   en: {
-    metaTitle: 'The BOLEN Journal | LED & Smart Mirror Insights',
+    metaTitle: 'BOLEN Mirror Insights | LED Mirror Sourcing & Manufacturing',
     metaDesc:
-      'Buying guides, technology explainers, and manufacturing insight on LED mirrors, smart mirrors, and OEM/ODM production from BOLEN.',
-    h1: 'The BOLEN Journal',
+      'Practical sourcing guides, technology explainers, and OEM/ODM manufacturing insights for LED, smart, bathroom, and custom mirrors.',
+    h1: 'Mirror sourcing insights',
     intro:
-      'Guides, technology, and manufacturing know-how on LED and smart mirrors — written by the team that builds them.',
-    journal: 'Journal',
+      'Buying guidance, technology explanations, and manufacturing know-how for LED mirrors, smart mirrors, and OEM/ODM programs.',
+    journal: 'Insights',
   },
   zh: {
-    metaTitle: 'BOLEN 博客 | LED 与智能镜行业洞察',
-    metaDesc: '来自 BOLEN 的 LED 镜、智能镜及 OEM/ODM 生产的选购指南、技术解析与制造洞察。',
-    h1: 'BOLEN 博客',
-    intro: '关于 LED 镜与智能镜的指南、技术与制造知识——由亲手打造它们的团队撰写。',
-    journal: '博客',
+    metaTitle: 'BOLEN 镜类采购洞察 | LED 镜技术与制造指南',
+    metaDesc: '面向 LED 镜、智能镜、浴室镜与定制镜采购的实用指南、技术解析及 OEM/ODM 制造洞察。',
+    h1: '镜类采购洞察',
+    intro: '围绕 LED 镜、智能镜与 OEM/ODM 项目的选购建议、技术解析和制造知识。',
+    journal: '洞察',
   },
   es: {
-    metaTitle: 'The BOLEN Journal | Perspectivas sobre Espejos LED e Inteligentes',
+    metaTitle: 'Perspectivas BOLEN | Compra y Fabricación de Espejos LED',
     metaDesc:
-      'Guías de compra, explicaciones técnicas e información sobre fabricación de espejos LED, espejos inteligentes y producción OEM/ODM de BOLEN.',
-    h1: 'The BOLEN Journal',
+      'Guías prácticas de compra, explicaciones técnicas y perspectivas de fabricación OEM/ODM para espejos LED, inteligentes y a medida.',
+    h1: 'Perspectivas para la compra de espejos',
     intro:
-      'Guías, tecnología y conocimientos de fabricación sobre espejos LED e inteligentes, escritos por el equipo que los construye.',
-    journal: 'Blog',
+      'Consejos de compra, explicaciones técnicas y conocimientos de fabricación para espejos LED, inteligentes y programas OEM/ODM.',
+    journal: 'Perspectivas',
   },
   fr: {
-    metaTitle: 'The BOLEN Journal | Perspectives sur les Miroirs LED et Intelligents',
+    metaTitle: 'Conseils BOLEN | Achat et Fabrication de Miroirs LED',
     metaDesc:
-      "Guides d'achat, explications techniques et aperçus de fabrication sur les miroirs LED, les miroirs intelligents et la production OEM/ODM de BOLEN.",
-    h1: 'The BOLEN Journal',
+      "Guides d'achat pratiques, explications techniques et conseils de fabrication OEM/ODM pour les miroirs LED, intelligents et sur mesure.",
+    h1: "Conseils d'achat de miroirs",
     intro:
-      "Guides, technologie et savoir-faire de fabrication sur les miroirs LED et intelligents — rédigés par l'équipe qui les fabrique.",
-    journal: 'Journal',
+      "Conseils d'achat, explications techniques et savoir-faire de fabrication pour les miroirs LED, intelligents et les programmes OEM/ODM.",
+    journal: 'Conseils',
   },
   de: {
-    metaTitle: 'The BOLEN Journal | Einblicke zu LED- und Smart-Spiegeln',
+    metaTitle: 'BOLEN Einblicke | Beschaffung und Fertigung von LED-Spiegeln',
     metaDesc:
-      'Kaufratgeber, Technologie-Erklärungen und Fertigungseinblicke zu LED-Spiegeln, Smart-Spiegeln und OEM/ODM-Produktion von BOLEN.',
-    h1: 'The BOLEN Journal',
+      'Praxisnahe Einkaufsratgeber, Technik-Erklärungen und OEM/ODM-Fertigungseinblicke für LED-, Smart- und Maßspiegel.',
+    h1: 'Einblicke in die Spiegelbeschaffung',
     intro:
-      'Ratgeber, Technologie und Fertigungs-Know-how zu LED- und Smart-Spiegeln — geschrieben vom Team, das sie baut.',
-    journal: 'Journal',
+      'Einkaufsratgeber, Technik-Erklärungen und Fertigungswissen für LED-Spiegel, Smart-Spiegel und OEM/ODM-Programme.',
+    journal: 'Einblicke',
   },
   it: {
-    metaTitle: 'The BOLEN Journal | Approfondimenti su Specchi LED e Smart',
+    metaTitle: 'Approfondimenti BOLEN | Acquisto e Produzione di Specchi LED',
     metaDesc:
-      "Guide all'acquisto, spiegazioni tecniche e approfondimenti sulla produzione di specchi LED, specchi smart e produzione OEM/ODM di BOLEN.",
-    h1: 'The BOLEN Journal',
+      "Guide pratiche all'acquisto, spiegazioni tecniche e approfondimenti OEM/ODM per specchi LED, smart e su misura.",
+    h1: "Approfondimenti per l'acquisto di specchi",
     intro:
-      'Guide, tecnologia e know-how produttivo su specchi LED e smart — scritti dal team che li costruisce.',
-    journal: 'Journal',
+      "Consigli d'acquisto, spiegazioni tecniche e know-how produttivo per specchi LED, smart e programmi OEM/ODM.",
+    journal: 'Approfondimenti',
   },
 };
 
@@ -1598,6 +1605,15 @@ const BLOG_RELATED_HEADING: Record<Lang, string> = {
   fr: 'Produits associés',
   de: 'Ähnliche Produkte',
   it: 'Prodotti correlati',
+};
+
+const BLOG_MORE_HEADING: Record<Lang, string> = {
+  en: 'More insights',
+  zh: '更多洞察',
+  es: 'Más perspectivas',
+  fr: 'Plus de conseils',
+  de: 'Weitere Einblicke',
+  it: 'Altri approfondimenti',
 };
 
 async function fetchBlogPosts(): Promise<BlogPost[]> {
@@ -1633,9 +1649,10 @@ function blogIndexContent(lang: Lang, items: BlogListItem[]): string {
   const c = BLOG_COPY[lang];
   const list = items
     .map((p) => {
-      const href = `/${lang}/blog/${p.slug}/`;
-      const img = p.cover_image
-        ? `<img src="${escapeAttr(p.cover_image)}" alt="${escapeAttr(p.title)}" width="600" height="400" loading="lazy" />`
+      const href = `/${lang}${insightDetailPath(p.slug)}/`;
+      const cover = normalizeBlogCover(p.cover_image);
+      const img = cover
+        ? `<img src="${escapeAttr(cover)}" alt="" width="600" height="400" loading="lazy" />`
         : '';
       return `<li><a href="${escapeAttr(href)}">${img}<h2>${escapeHtml(p.title)}</h2></a><p>${escapeHtml(
         p.excerpt
@@ -1656,18 +1673,20 @@ function blogIndexContent(lang: Lang, items: BlogListItem[]): string {
 function blogPostContent(
   lang: Lang,
   post: LocalizedBlogPost,
-  related: { href: string; title: string; img?: string }[]
+  relatedProducts: { href: string; title: string; img?: string }[],
+  relatedArticles: { href: string; title: string; img?: string | null }[]
 ): string {
   const c = BLOG_COPY[lang];
   const hc = COPY[lang];
-  const img = post.cover_image
-    ? `<img src="${escapeAttr(post.cover_image)}" alt="${escapeAttr(post.title)}" width="1200" height="675" />`
+  const cover = normalizeBlogCover(post.cover_image);
+  const img = cover
+    ? `<img src="${escapeAttr(cover)}" alt="${escapeAttr(post.title)}" width="1200" height="675" />`
     : '';
-  const relatedBlock = related.length
+  const relatedProductsBlock = relatedProducts.length
     ? `<section aria-label="${escapeAttr(BLOG_RELATED_HEADING[lang])}">
         <h2>${escapeHtml(BLOG_RELATED_HEADING[lang])}</h2>
         <ul>
-          ${related
+          ${relatedProducts
             .map(
               (r) =>
                 `<li><a href="${escapeAttr(r.href)}">${
@@ -1680,23 +1699,41 @@ function blogPostContent(
         </ul>
       </section>`
     : '';
+  const relatedArticlesBlock = relatedArticles.length
+    ? `<section aria-label="${escapeAttr(BLOG_MORE_HEADING[lang])}">
+        <h2>${escapeHtml(BLOG_MORE_HEADING[lang])}</h2>
+        <ul>
+          ${relatedArticles
+            .map((related) => {
+              const relatedCover = normalizeBlogCover(related.img);
+              return `<li><a href="${escapeAttr(related.href)}">${
+                relatedCover
+                  ? `<img src="${escapeAttr(relatedCover)}" alt="" width="300" height="200" loading="lazy" />`
+                  : ''
+              }${escapeHtml(related.title)}</a></li>`;
+            })
+            .join('\n          ')}
+        </ul>
+      </section>`
+    : '';
   return `
     <div data-prerender="blogPost">
       <nav aria-label="Breadcrumb">
         <a href="/${lang}/">${escapeHtml(hc.breadcrumbHome)}</a>
         &raquo;
-        <a href="/${lang}/blog/">${escapeHtml(c.journal)}</a>
+        <a href="/${lang}${INSIGHTS_PATH}/">${escapeHtml(c.journal)}</a>
         &raquo;
         <span>${escapeHtml(post.title)}</span>
       </nav>
       <h1>${escapeHtml(post.title)}</h1>
       ${img}
       <div>${renderMarkdown(post.body)}</div>
-      ${relatedBlock}
+      ${relatedProductsBlock}
       ${relatedSolutionsBlock(lang, {
         title: post.title,
         category: `${post.category || ''} ${post.excerpt || ''}`,
       })}
+      ${relatedArticlesBlock}
       <p><a href="/${lang}/products/">${escapeHtml(hc.navCatalog)}</a> &middot; <a href="/${lang}/solutions/">${escapeHtml(
         getSeoSolutionsUi(lang).navLabel
       )}</a> &middot; <a href="/${lang}/rfq/">${escapeHtml(hc.navRfq)}</a></p>
@@ -2234,10 +2271,12 @@ async function main(): Promise<void> {
       routeCount++;
     }
 
-    // Journal index
+    // Insights index
     {
-      const canonical = `${SITE_URL}/${lang}/blog/`;
-      const items = blogPosts.map((p) => toListItem(p, lang));
+      const canonical = `${SITE_URL}/${lang}${INSIGHTS_PATH}/`;
+      const items = blogPosts
+        .filter((post) => hasBlogTranslation(post, lang))
+        .map((post) => toListItem(post, lang));
       const bc = BLOG_COPY[lang];
       const dataScript = prerenderDataScript({ route: 'blog', lang, blogPosts: items });
       const headExtras = `${buildHead({
@@ -2247,15 +2286,20 @@ async function main(): Promise<void> {
         canonical,
         ogImage: DEFAULT_OG_IMAGE,
         ogType: 'website',
-        routePath: '/blog',
-        schema: buildBlogIndexSchema(lang) as any[],
+        routePath: INSIGHTS_PATH,
+        schema: buildBlogIndexSchema(lang, {
+          name: bc.h1,
+          description: bc.metaDesc,
+          breadcrumbLabel: bc.journal,
+          posts: items,
+        }) as any[],
       })}\n    ${dataScript}`;
       const html = injectIntoTemplate(template, {
         lang,
         headExtras,
         bodyContent: blogIndexContent(lang, items),
       });
-      await writeRoute(`${lang}/blog`, html);
+      await writeRoute(`${lang}${INSIGHTS_PATH}`, html);
       routeCount++;
     }
 
@@ -2284,10 +2328,11 @@ async function main(): Promise<void> {
       routeCount++;
     }
 
-    // Journal articles
+    // Insight articles. Only render locales with genuine translated title/body.
     for (const rawPost of blogPosts) {
-      if (!rawPost.slug) continue;
+      if (!rawPost.slug || !hasBlogTranslation(rawPost, lang)) continue;
       const localized = localizePost(rawPost, lang);
+      const bc = BLOG_COPY[lang];
       const related = localized.product_ids
         .map((pid) => productById.get(pid))
         .filter((p): p is Product => !!p)
@@ -2295,9 +2340,29 @@ async function main(): Promise<void> {
           const disp = localizeProduct(p, translations[lang]);
           return { href: `/${lang}/products/${toSlug(p.title)}/`, title: disp.title || p.title, img: p.images?.[0] };
         });
-      const path = `/blog/${localized.slug}`;
+      const relatedArticles = blogPosts
+        .filter(
+          (candidate) =>
+            candidate.slug !== rawPost.slug &&
+            hasBlogTranslation(candidate, lang)
+        )
+        .sort(
+          (a, b) =>
+            Number(Boolean(b.category && b.category === rawPost.category)) -
+            Number(Boolean(a.category && a.category === rawPost.category))
+        )
+        .slice(0, 3)
+        .map((candidate) => {
+          const item = toListItem(candidate, lang);
+          return {
+            href: `/${lang}${insightDetailPath(item.slug)}/`,
+            title: item.title,
+            img: item.cover_image,
+          };
+        });
+      const path = insightDetailPath(localized.slug);
       const canonical = `${SITE_URL}/${lang}${path}/`;
-      const title = localized.seo_title || `${localized.title} | BOLEN Mirror`;
+      const title = localized.seo_title || `${localized.title} | BOLEN Mirror Insights`;
       const description = localized.seo_description || localized.excerpt;
       const dataScript = prerenderDataScript({ route: 'blogPost', lang, blogPost: localized });
       const headExtras = `${buildHead({
@@ -2308,12 +2373,16 @@ async function main(): Promise<void> {
         ogImage: localized.cover_image || DEFAULT_OG_IMAGE,
         ogType: 'article',
         routePath: path,
-        schema: [buildBlogPostingSchema(localized, lang), buildBlogBreadcrumbSchema(localized, lang)],
+        alternateLanguages: getBlogAvailableLanguages(rawPost),
+        schema: [
+          buildBlogPostingSchema(localized, lang),
+          buildBlogBreadcrumbSchema(localized, lang, bc.journal),
+        ],
       })}\n    ${dataScript}`;
       const html = injectIntoTemplate(template, {
         lang,
         headExtras,
-        bodyContent: blogPostContent(lang, localized, related),
+        bodyContent: blogPostContent(lang, localized, related, relatedArticles),
       });
       await writeRoute(`${lang}${path}`, html);
       routeCount++;
