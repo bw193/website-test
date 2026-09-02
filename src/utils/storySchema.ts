@@ -3,7 +3,7 @@ export const STORY_COMPANY = {
   foundedYear: 2005,
   facilitySquareMeters: 46_800,
   minimumEmployees: 200,
-  email: 'bolen2@cnjxctm.com',
+  email: 'sales@bolenmirror.com',
   phone: '+86 18058603602',
   address: {
     street: 'No. 1, Building 2, No. 1, Chuangye Road, Wangdian Town',

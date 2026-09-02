@@ -355,7 +355,7 @@ export default function Home() {
           "contactPoint": {
             "@type": "ContactPoint",
             "telephone": "+86-18058603602",
-            "email": "bolen2@cnjxctm.com",
+            "email": "sales@bolenmirror.com",
             "contactType": "customer service",
             "areaServed": "Worldwide",
             "availableLanguage": ["en", "zh", "es", "fr", "de", "it"]

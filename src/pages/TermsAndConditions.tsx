@@ -66,8 +66,8 @@ export default function TermsAndConditions() {
             <h2 className="font-serif text-2xl text-stone-900">Contact</h2>
             <p className="mt-3 leading-7 text-stone-600">
               If you have questions about these terms, contact us at{' '}
-              <a className="font-medium text-amber-700 underline decoration-amber-300 underline-offset-4 hover:text-amber-600" href="mailto:bolen2@cnjxctm.com">
-                bolen2@cnjxctm.com
+              <a className="font-medium text-amber-700 underline decoration-amber-300 underline-offset-4 hover:text-amber-600" href="mailto:sales@bolenmirror.com">
+                sales@bolenmirror.com
               </a>.
             </p>
           </section>

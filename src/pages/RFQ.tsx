@@ -40,7 +40,7 @@ export default function RFQ() {
         defaultValue: 'RFQ: {{reference}}',
       })
     : t('rfq.emailSubject', 'BOLEN mirror RFQ');
-  const backupEmailHref = `mailto:bolen2@cnjxctm.com?subject=${encodeURIComponent(emailSubject)}${
+  const backupEmailHref = `mailto:sales@bolenmirror.com?subject=${encodeURIComponent(emailSubject)}${
     initialMessage ? `&body=${encodeURIComponent(initialMessage)}` : ''
   }`;
   const [rfqStatus, setRfqStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
@@ -120,7 +120,7 @@ export default function RFQ() {
       "contactPoint": {
         "@type": "ContactPoint",
         "telephone": "+86-18058603602",
-        "email": "bolen2@cnjxctm.com",
+        "email": "sales@bolenmirror.com",
         "contactType": "customer service",
         "areaServed": "Worldwide",
         "availableLanguage": ["en", "zh"]
@@ -184,7 +184,7 @@ export default function RFQ() {
                   </div>
                   <div>
                     <p className="text-sm font-medium text-stone-900">{t('rfq.emailUs', 'Email us')}</p>
-                    <a href="mailto:bolen2@cnjxctm.com" className="text-stone-600 hover:text-amber-600 transition-colors">bolen2@cnjxctm.com</a>
+                    <a href="mailto:sales@bolenmirror.com" className="text-stone-600 hover:text-amber-600 transition-colors">sales@bolenmirror.com</a>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
