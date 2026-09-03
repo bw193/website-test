@@ -731,7 +731,7 @@ export default function OurStory() {
               <div className="relative min-h-[410px] overflow-hidden rounded-[1.25rem] bg-stone-950 sm:min-h-[360px]">
                 {videoPlaying ? (
                   <>
-                    <VideoPlayer video={featuredVideo} className="absolute inset-0 h-full w-full [&>video]:h-full" />
+                    <VideoPlayer video={featuredVideo} autoPlay className="absolute inset-0 h-full w-full [&>video]:h-full" />
                     <button
                       type="button"
                       onClick={() => setVideoPlaying(false)}

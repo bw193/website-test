@@ -50,6 +50,8 @@ type SitemapVideoPost = {
   video_url?: string | null;
   embed_url?: string | null;
   thumbnail_url?: string | null;
+  category?: string | null;
+  tags?: string[] | null;
   duration_seconds?: number | null;
   title?: LocalizedMap | null;
   excerpt?: LocalizedMap | null;
@@ -60,6 +62,9 @@ type SitemapVideoPost = {
   published_at?: string | null;
   created_at?: string | null;
 };
+
+// Google caps <video:tag> at 32 per video and <video:category> at 256 chars.
+const MAX_VIDEO_TAGS = 32;
 
 function toSlug(title: string): string {
   return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
@@ -139,6 +144,11 @@ function buildVideoBlock(video: SitemapVideoPost, lang: string): string | null {
       ? `      <video:duration>${Math.round(video.duration_seconds)}</video:duration>`
       : '';
   const publicationDate = toW3cDate(video.published_at);
+  // Google allows up to 32 <video:tag> entries; the category doubles as a tag
+  // since the dedicated <video:category> element was retired.
+  const tags = Array.from(
+    new Set([video.category || '', ...(video.tags || [])].map((tag) => normalizeText(tag)).filter(Boolean))
+  ).slice(0, 32);
 
   return [
     '    <video:video>',
@@ -148,6 +158,8 @@ function buildVideoBlock(video: SitemapVideoPost, lang: string): string | null {
     playbackTag,
     duration,
     publicationDate ? `      <video:publication_date>${escapeXml(publicationDate)}</video:publication_date>` : '',
+    '      <video:family_friendly>yes</video:family_friendly>',
+    ...tags.map((tag) => `      <video:tag>${escapeXml(tag)}</video:tag>`),
     '    </video:video>',
   ]
     .filter(Boolean)
@@ -267,7 +279,7 @@ async function generateSitemap() {
   const { data: videoPosts, error: videoError } = await supabase
     .from('videos')
     .select(
-      'slug, source_type, video_url, embed_url, thumbnail_url, duration_seconds, title, excerpt, body, seo_title, seo_description, updated_at, published_at, created_at'
+      'slug, source_type, video_url, embed_url, thumbnail_url, category, tags, duration_seconds, title, excerpt, body, seo_title, seo_description, updated_at, published_at, created_at'
     )
     .eq('status', 'published')
     .order('published_at', { ascending: false });

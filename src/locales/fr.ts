@@ -469,31 +469,95 @@ export const fr = {
       }
     },
     videos: {
-      metaTitle: "Vidéos BOLEN Mirror | Démonstrations produit et visites d'usine",
-      metaDescription: "Regardez les démonstrations de produits BOLEN, les visites d'usine, les clips d'installation et les vidéos de fonctionnalités des miroirs LED intelligents.",
-      kicker: "La preuve produit en mouvement",
-      titleLead: "Vidéos",
-      titleAccent: "BOLEN",
-      intro: "Découvrez les miroirs LED, les fonctions intelligentes, les processus d'usine et les détails d'installation avant de choisir un produit.",
+      metaTitle: "Vidéos miroirs LED : démos, visites d'usine et installation | BOLEN",
+      metaDescription: "Regardez les vidéos de miroirs LED BOLEN : démonstrations de miroirs connectés, visites de l'usine de 46 800 m², contrôle qualité et guides d'installation d'un fabricant OEM/ODM depuis 21 ans.",
+      kicker: "Vidéothèque",
+      titleLead: "Vidéos miroirs LED :",
+      titleAccent: "démos produit, visites d'usine et installation",
+      intro: "Voyez comment les miroirs LED, connectés, de toilette et de salle de bain BOLEN sont fabriqués, testés et installés : de courts clips tournés dans notre propre usine de Jiaxing qui répondent à vos questions d'achat avant de spécifier un produit.",
+      heroPrimaryCta: "Demander un devis",
+      heroSecondaryCta: "Voir les produits",
+      stats: {
+        videos: "Vidéos",
+        topics: "Thèmes",
+        runtime: "Minutes d'images",
+        updated: "Dernière mise à jour"
+      },
+      spotlightLabel: "Dernière vidéo",
+      watchNow: "Regarder",
+      libraryHeading: "Toutes les vidéos",
+      libraryIntro: "Filtrez par thème ou recherchez dans la vidéothèque.",
+      resultsCount: "{{count}} vidéos",
       search: "Rechercher des vidéos...",
+      searchLabel: "Rechercher des vidéos",
+      clearSearch: "Effacer la recherche",
+      filterLabel: "Filtrer les vidéos par thème",
       allVideos: "Toutes les vidéos",
+      clearFilters: "Réinitialiser les filtres",
+      noResults: "Aucune vidéo ne correspond à votre recherche.",
+      noResultsHint: "Essayez un autre mot-clé ou réinitialisez les filtres.",
       empty: "Aucune vidéo publiée pour le moment. Revenez bientôt.",
       cardLabel: "Vidéo",
       latest: "Récent",
+      watchLabel: "Regarder : {{title}}",
+      playLabel: "Lire la vidéo : {{title}}",
+      unavailable: "Cette vidéo est temporairement indisponible.",
+      duration: "Durée",
+      tagsLabel: "Thèmes",
+      upNext: "À suivre",
+      share: {
+        label: "Partager",
+        copy: "Copier le lien",
+        copied: "Lien copié",
+        copyPrompt: "Copiez ce lien",
+        linkedin: "Partager sur LinkedIn",
+        whatsapp: "Partager sur WhatsApp",
+        email: "Partager par e-mail",
+        more: "Autres options de partage"
+      },
       notFound: "Vidéo introuvable",
+      notFoundDescription: "La vidéo BOLEN demandée est introuvable.",
       backToVideos: "Retour aux vidéos",
+      sidebarKicker: "Spécifier ce miroir",
       ctaTitle: "Besoin de ce miroir pour votre gamme ?",
       ctaDesc: "Envoyez le clip ou la référence produit à BOLEN et notre équipe pourra chiffrer les options OEM/ODM, l'emballage et le délai.",
       ctaQuote: "Demander un devis",
       ctaCatalog: "Voir les produits",
-      relatedProducts: "Produits associés",
+      relatedProductsKicker: "Du catalogue",
+      relatedProducts: "Produits présentés dans cette vidéo",
       relatedVideos: "Plus de vidéos",
       viewAll: "Voir tout",
+      guide: {
+        kicker: "Tourné dans notre propre usine",
+        heading: "Ce que couvre la vidéothèque",
+        intro: "Chaque clip est filmé sur des unités de production BOLEN et dans l'usine de 46 800 m² de Jiaxing, sans images de banque : ce que vous voyez est ce qui est expédié.",
+        demos: {
+          title: "Démonstrations produit",
+          desc: "Modes de couleur LED, variation continue, antibuée, capteurs tactiles et fonctions connectées présentés sur de vraies unités de production, pas des rendus.",
+          cta: "Voir les démonstrations"
+        },
+        factory: {
+          title: "Usine et contrôle qualité",
+          desc: "Découpe du verre, assemblage LED, tests IP44 et emballage dans l'usine de 46 800 m² de Jiaxing qui expédie votre commande.",
+          cta: "Visiter l'usine"
+        },
+        install: {
+          title: "Installation et spécifications",
+          desc: "Détails de montage, de câblage et de manutention qui aident installateurs, détaillants et acheteurs de projets à anticiper.",
+          cta: "Vidéos d'installation"
+        }
+      },
+      closing: {
+        title: "Vous avez repéré un miroir à spécifier ?",
+        desc: "Envoyez-nous la vidéo ou la référence produit. Nous répondons avec les options OEM/ODM, le MOQ, l'emballage et le délai, et pouvons filmer une démonstration sur mesure de votre spécification."
+      },
       categories: {
         "Factory Tour": "Visite d'usine",
         "Product Demo": "Démonstration produit",
         "Installation": "Installation",
-        "Smart Features": "Fonctions intelligentes"
+        "Smart Features": "Fonctions intelligentes",
+        "Technology": "Technologie",
+        "Quality Control": "Contrôle qualité"
       }
     },
     admin: {

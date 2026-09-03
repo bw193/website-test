@@ -469,31 +469,95 @@ export const de = {
       }
     },
     videos: {
-      metaTitle: "BOLEN Mirror Videos | Produktdemos und Werksrundgänge",
-      metaDescription: "Sehen Sie BOLEN Produktdemos, Werksrundgänge, Installationsclips und Funktionsvideos zu LED- und Smart-Spiegeln.",
-      kicker: "Produktnachweis in Bewegung",
-      titleLead: "BOLEN",
-      titleAccent: "Videos",
-      intro: "Sehen Sie LED-Spiegel, Smart-Funktionen, Fertigungsprozesse und Installationsdetails, bevor Sie ein Produkt spezifizieren.",
+      metaTitle: "LED-Spiegel Videos: Produktdemos, Werksrundgänge & Installation | BOLEN",
+      metaDescription: "Sehen Sie BOLEN LED-Spiegel-Videos: Smart-Mirror-Produktdemos, Rundgänge durch das 46.800 m² Werk, Qualitätskontrolle und Installationsanleitungen eines OEM/ODM-Spiegelherstellers mit 21 Jahren Erfahrung.",
+      kicker: "Videobibliothek",
+      titleLead: "LED-Spiegel Videos:",
+      titleAccent: "Produktdemos, Werksrundgänge & Installation",
+      intro: "Sehen Sie, wie BOLEN LED-, Smart-, Schmink- und Badspiegel gefertigt, geprüft und montiert werden – kurze Clips aus unserem eigenen Werk in Jiaxing, die Ihre Beschaffungsfragen beantworten, bevor Sie ein Produkt spezifizieren.",
+      heroPrimaryCta: "Angebot anfordern",
+      heroSecondaryCta: "Produkte ansehen",
+      stats: {
+        videos: "Videos",
+        topics: "Themen",
+        runtime: "Minuten Material",
+        updated: "Zuletzt aktualisiert"
+      },
+      spotlightLabel: "Neuestes Video",
+      watchNow: "Jetzt ansehen",
+      libraryHeading: "Alle Videos",
+      libraryIntro: "Nach Thema filtern oder die Bibliothek durchsuchen.",
+      resultsCount: "{{count}} Videos",
       search: "Videos suchen...",
+      searchLabel: "Videos suchen",
+      clearSearch: "Suche löschen",
+      filterLabel: "Videos nach Thema filtern",
       allVideos: "Alle Videos",
+      clearFilters: "Filter zurücksetzen",
+      noResults: "Keine Videos passen zu Ihrer Suche.",
+      noResultsHint: "Versuchen Sie ein anderes Stichwort oder setzen Sie die Filter zurück.",
       empty: "Noch keine Videos veröffentlicht. Schauen Sie bald wieder vorbei.",
       cardLabel: "Video",
       latest: "Neu",
+      watchLabel: "Ansehen: {{title}}",
+      playLabel: "Video abspielen: {{title}}",
+      unavailable: "Dieses Video ist vorübergehend nicht verfügbar.",
+      duration: "Dauer",
+      tagsLabel: "Themen",
+      upNext: "Als Nächstes",
+      share: {
+        label: "Teilen",
+        copy: "Link kopieren",
+        copied: "Link kopiert",
+        copyPrompt: "Diesen Link kopieren",
+        linkedin: "Auf LinkedIn teilen",
+        whatsapp: "Über WhatsApp teilen",
+        email: "Per E-Mail teilen",
+        more: "Weitere Optionen zum Teilen"
+      },
       notFound: "Video nicht gefunden",
+      notFoundDescription: "Das angeforderte BOLEN-Video wurde nicht gefunden.",
       backToVideos: "Zurück zu Videos",
+      sidebarKicker: "Diesen Spiegel spezifizieren",
       ctaTitle: "Benötigen Sie diesen Spiegel für Ihre Produktlinie?",
       ctaDesc: "Senden Sie den Clip oder die Produktreferenz an BOLEN. Unser Team kann OEM/ODM-Optionen, Verpackung und Lieferzeit kalkulieren.",
       ctaQuote: "Angebot anfordern",
       ctaCatalog: "Produkte ansehen",
-      relatedProducts: "Ähnliche Produkte",
+      relatedProductsKicker: "Aus dem Katalog",
+      relatedProducts: "Produkte in diesem Video",
       relatedVideos: "Weitere Videos",
       viewAll: "Alle ansehen",
+      guide: {
+        kicker: "Gedreht in unserem eigenen Werk",
+        heading: "Was die Bibliothek abdeckt",
+        intro: "Jeder Clip wird an BOLEN-Serienprodukten und im 46.800 m² großen Werk in Jiaxing gefilmt – ohne Stockmaterial. Was Sie sehen, ist das, was geliefert wird.",
+        demos: {
+          title: "Produktdemos",
+          desc: "LED-Farbmodi, stufenloses Dimmen, Antibeschlag, Touchsensoren und Smart-Funktionen an echten Serienprodukten – keine Renderings.",
+          cta: "Produktdemos ansehen"
+        },
+        factory: {
+          title: "Werk & Qualitätskontrolle",
+          desc: "Glaszuschnitt, LED-Montage, IP44-Prüfung und Verpackung im 46.800 m² Werk in Jiaxing, das Ihre Bestellung versendet.",
+          cta: "Das Werk sehen"
+        },
+        install: {
+          title: "Installation & Spezifikationen",
+          desc: "Montage-, Verkabelungs- und Handling-Details, mit denen Installateure, Händler und Projekteinkäufer vorausplanen.",
+          cta: "Installationsvideos"
+        }
+      },
+      closing: {
+        title: "Einen Spiegel gesehen, den Sie spezifizieren möchten?",
+        desc: "Senden Sie uns das Video oder die Produktreferenz. Wir antworten mit OEM/ODM-Optionen, MOQ, Verpackung und Lieferzeit – und drehen auf Wunsch eine Demo nach Ihrer Spezifikation."
+      },
       categories: {
         "Factory Tour": "Werksrundgang",
         "Product Demo": "Produktdemo",
         "Installation": "Installation",
-        "Smart Features": "Smart-Funktionen"
+        "Smart Features": "Smart-Funktionen",
+        "Technology": "Technologie",
+        "Quality Control": "Qualitätskontrolle"
       }
     },
     admin: {

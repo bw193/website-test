@@ -26,6 +26,7 @@ import { createClient } from '@supabase/supabase-js';
 import 'dotenv/config';
 import { marked } from 'marked';
 import {
+  formatBlogDate,
   getBlogAvailableLanguages,
   hasBlogTranslation,
   localizePost,
@@ -33,10 +34,14 @@ import {
   toListItem,
 } from '../src/utils/blog';
 import {
+  formatVideoDuration,
+  getVideoPlayback,
   localizeVideo,
   parseFeaturedVideoSlug,
   recommendProductsForVideo,
+  toIsoDuration,
   toVideoListItem,
+  videoMimeType,
 } from '../src/utils/video';
 import { optimizeImage } from '../src/utils/optimizeImage';
 import {
@@ -501,12 +506,21 @@ function ogTwitterBlock(
   title: string,
   description: string,
   ogImage: string,
-  ogType: string
+  ogType: string,
+  ogVideo?: { url: string; type: string }
 ): string {
   const t = escapeAttr(title);
   const d = escapeAttr(description);
   const u = escapeAttr(canonical);
   const img = escapeAttr(ogImage);
+  // Tag order mirrors src/components/SEO.tsx so Helmet adopts these nodes.
+  const videoTags = ogVideo
+    ? [
+        `<meta ${RH} property="og:video" content="${escapeAttr(ogVideo.url)}" />`,
+        `<meta ${RH} property="og:video:secure_url" content="${escapeAttr(ogVideo.url)}" />`,
+        `<meta ${RH} property="og:video:type" content="${escapeAttr(ogVideo.type)}" />`,
+      ]
+    : [];
   return [
     `<meta ${RH} property="og:type" content="${ogType}" />`,
     `<meta ${RH} property="og:url" content="${u}" />`,
@@ -514,6 +528,7 @@ function ogTwitterBlock(
     `<meta ${RH} property="og:description" content="${d}" />`,
     `<meta ${RH} property="og:image" content="${img}" />`,
     `<meta ${RH} property="og:site_name" content="BOLEN Mirror" />`,
+    ...videoTags,
     `<meta ${RH} name="twitter:card" content="summary_large_image" />`,
     `<meta ${RH} name="twitter:url" content="${u}" />`,
     `<meta ${RH} name="twitter:title" content="${t}" />`,
@@ -538,6 +553,7 @@ function buildHead(opts: {
   canonical: string;
   ogImage: string;
   ogType?: string;
+  ogVideo?: { url: string; type: string };
   routePath: string;
   schema?: any[];
   alternateLanguages?: readonly string[];
@@ -549,6 +565,7 @@ function buildHead(opts: {
     canonical,
     ogImage,
     ogType = 'website',
+    ogVideo,
     routePath,
     schema = [],
     alternateLanguages = LANGUAGES,
@@ -560,7 +577,7 @@ function buildHead(opts: {
     `<meta ${RH} name="description" content="${escapeAttr(description)}" />`,
     `<link ${RH} rel="canonical" href="${escapeAttr(canonical)}" />`,
     hreflangBlock(routePath, alternateLanguages),
-    ogTwitterBlock(canonical, title, description, ogImage, ogType),
+    ogTwitterBlock(canonical, title, description, ogImage, ogType, ogVideo),
     schemaBlock(schema),
   ]
     .filter(Boolean)
@@ -1743,69 +1760,138 @@ function blogPostContent(
 
 // ---- Videos -----------------------------------------------------------------
 
+// Mirrors `videos.*` in src/locales/*.ts — the React page renders the same
+// strings, so the prerendered fallback and the hydrated DOM read identically.
 const VIDEO_COPY: Record<
   Lang,
-  { metaTitle: string; metaDesc: string; h1: string; intro: string; videos: string; relatedProducts: string }
+  {
+    metaTitle: string;
+    metaDesc: string;
+    h1: string;
+    intro: string;
+    videos: string;
+    allVideos: string;
+    duration: string;
+    upNext: string;
+    relatedProducts: string;
+    ctaTitle: string;
+    ctaDesc: string;
+  }
 > = {
   en: {
-    metaTitle: 'BOLEN Mirror Videos | Product Demos & Factory Walkthroughs',
+    metaTitle: 'LED Mirror Videos: Product Demos, Factory Tours & Installation | BOLEN',
     metaDesc:
-      'Watch BOLEN mirror product demos, factory walkthroughs, installation clips, and LED smart mirror feature videos.',
-    h1: 'BOLEN Videos',
+      'Watch BOLEN LED mirror videos: smart mirror product demos, 46,800 m² factory tours, quality-control footage and installation guides from a 21-year OEM/ODM mirror manufacturer.',
+    h1: 'LED mirror videos: product demos, factory tours & installation',
     intro:
-      'See LED mirrors, smart features, factory processes, and installation details before you specify a product.',
+      'See how BOLEN LED, smart, vanity and bathroom mirrors are built, tested and installed — short clips shot in our own Jiaxing factory that answer sourcing questions before you specify a product.',
     videos: 'Videos',
-    relatedProducts: 'Related products',
+    allVideos: 'All videos',
+    duration: 'Duration',
+    upNext: 'Up next',
+    relatedProducts: 'Products in this video',
+    ctaTitle: 'Seen a mirror you want to specify?',
+    ctaDesc:
+      'Send us the video or product reference. We reply with OEM/ODM options, MOQ, packaging and lead time — and can film a custom demo of your specification.',
   },
   zh: {
-    metaTitle: 'BOLEN 镜业视频 | 产品演示与工厂实拍',
-    metaDesc: '观看 BOLEN 镜子的产品演示、工厂实拍、安装片段以及 LED 智能镜功能视频。',
-    h1: 'BOLEN 视频',
-    intro: '在选型前，了解 LED 镜、智能功能、工厂流程和安装细节。',
+    metaTitle: 'LED 镜视频：产品演示、工厂实拍与安装指南 | BOLEN',
+    metaDesc:
+      '观看 BOLEN LED 镜视频：智能镜产品演示、46,800 平方米工厂实拍、质检画面与安装指南，来自拥有 21 年经验的 OEM/ODM 镜子制造商。',
+    h1: 'LED 镜视频：产品演示、工厂实拍与安装指南',
+    intro:
+      '了解 BOLEN LED 镜、智能镜、化妆镜与浴室镜如何生产、测试和安装——所有短片均在我们嘉兴自有工厂实拍，在选型前解答您的采购疑问。',
     videos: '视频',
-    relatedProducts: '相关产品',
+    allVideos: '全部视频',
+    duration: '时长',
+    upNext: '接下来观看',
+    relatedProducts: '视频中的产品',
+    ctaTitle: '看到想要选用的镜子了吗？',
+    ctaDesc: '把视频或产品参考发给我们，我们将回复 OEM/ODM 选项、MOQ、包装和交期——还可以按您的规格拍摄定制演示。',
   },
   es: {
-    metaTitle: 'Videos de BOLEN Mirror | Demostraciones de producto y recorridos de fábrica',
+    metaTitle: 'Videos de espejos LED: demos, recorridos de fábrica e instalación | BOLEN',
     metaDesc:
-      'Vea demostraciones de productos BOLEN, recorridos de fábrica, clips de instalación y videos de funciones de espejos LED inteligentes.',
-    h1: 'Videos de BOLEN',
+      'Vea los videos de espejos LED de BOLEN: demostraciones de espejos inteligentes, recorridos por la fábrica de 46.800 m², control de calidad y guías de instalación de un fabricante OEM/ODM con 21 años de experiencia.',
+    h1: 'Videos de espejos LED: demos de producto, recorridos de fábrica e instalación',
     intro:
-      'Vea espejos LED, funciones inteligentes, procesos de fábrica y detalles de instalación antes de especificar un producto.',
+      'Descubra cómo se fabrican, prueban e instalan los espejos LED, inteligentes, de tocador y de baño BOLEN: clips breves grabados en nuestra propia fábrica de Jiaxing que responden a sus dudas de compra antes de especificar un producto.',
     videos: 'Videos',
-    relatedProducts: 'Productos relacionados',
+    allVideos: 'Todos los videos',
+    duration: 'Duración',
+    upNext: 'A continuación',
+    relatedProducts: 'Productos en este video',
+    ctaTitle: '¿Ha visto un espejo que quiere especificar?',
+    ctaDesc:
+      'Envíenos el video o la referencia del producto. Respondemos con opciones OEM/ODM, MOQ, embalaje y plazo de entrega, y podemos grabar una demostración a medida de su especificación.',
   },
   fr: {
-    metaTitle: "Vidéos BOLEN Mirror | Démonstrations produit et visites d'usine",
+    metaTitle: "Vidéos miroirs LED : démos, visites d'usine et installation | BOLEN",
     metaDesc:
-      "Regardez les démonstrations de produits BOLEN, les visites d'usine, les clips d'installation et les vidéos de fonctionnalités des miroirs LED intelligents.",
-    h1: 'Vidéos BOLEN',
+      "Regardez les vidéos de miroirs LED BOLEN : démonstrations de miroirs connectés, visites de l'usine de 46 800 m², contrôle qualité et guides d'installation d'un fabricant OEM/ODM depuis 21 ans.",
+    h1: "Vidéos miroirs LED : démos produit, visites d'usine et installation",
     intro:
-      "Découvrez les miroirs LED, les fonctions intelligentes, les processus d'usine et les détails d'installation avant de choisir un produit.",
+      "Voyez comment les miroirs LED, connectés, de toilette et de salle de bain BOLEN sont fabriqués, testés et installés : de courts clips tournés dans notre propre usine de Jiaxing qui répondent à vos questions d'achat avant de spécifier un produit.",
     videos: 'Vidéos',
-    relatedProducts: 'Produits associés',
+    allVideos: 'Toutes les vidéos',
+    duration: 'Durée',
+    upNext: 'À suivre',
+    relatedProducts: 'Produits présentés dans cette vidéo',
+    ctaTitle: 'Vous avez repéré un miroir à spécifier ?',
+    ctaDesc:
+      'Envoyez-nous la vidéo ou la référence produit. Nous répondons avec les options OEM/ODM, le MOQ, l\'emballage et le délai, et pouvons filmer une démonstration sur mesure de votre spécification.',
   },
   de: {
-    metaTitle: 'BOLEN Mirror Videos | Produktdemos und Werksrundgänge',
+    metaTitle: 'LED-Spiegel Videos: Produktdemos, Werksrundgänge & Installation | BOLEN',
     metaDesc:
-      'Sehen Sie BOLEN Produktdemos, Werksrundgänge, Installationsclips und Funktionsvideos zu LED- und Smart-Spiegeln.',
-    h1: 'BOLEN Videos',
+      'Sehen Sie BOLEN LED-Spiegel-Videos: Smart-Mirror-Produktdemos, Rundgänge durch das 46.800 m² Werk, Qualitätskontrolle und Installationsanleitungen eines OEM/ODM-Spiegelherstellers mit 21 Jahren Erfahrung.',
+    h1: 'LED-Spiegel Videos: Produktdemos, Werksrundgänge & Installation',
     intro:
-      'Sehen Sie LED-Spiegel, Smart-Funktionen, Fertigungsprozesse und Installationsdetails, bevor Sie ein Produkt spezifizieren.',
+      'Sehen Sie, wie BOLEN LED-, Smart-, Schmink- und Badspiegel gefertigt, geprüft und montiert werden – kurze Clips aus unserem eigenen Werk in Jiaxing, die Ihre Beschaffungsfragen beantworten, bevor Sie ein Produkt spezifizieren.',
     videos: 'Videos',
-    relatedProducts: 'Ähnliche Produkte',
+    allVideos: 'Alle Videos',
+    duration: 'Dauer',
+    upNext: 'Als Nächstes',
+    relatedProducts: 'Produkte in diesem Video',
+    ctaTitle: 'Einen Spiegel gesehen, den Sie spezifizieren möchten?',
+    ctaDesc:
+      'Senden Sie uns das Video oder die Produktreferenz. Wir antworten mit OEM/ODM-Optionen, MOQ, Verpackung und Lieferzeit – und drehen auf Wunsch eine Demo nach Ihrer Spezifikation.',
   },
   it: {
-    metaTitle: 'Video BOLEN Mirror | Demo prodotto e tour della fabbrica',
+    metaTitle: 'Video specchi LED: demo prodotto, tour della fabbrica e installazione | BOLEN',
     metaDesc:
-      'Guarda demo dei prodotti BOLEN, tour della fabbrica, clip di installazione e video sulle funzioni degli specchi LED smart.',
-    h1: 'Video BOLEN',
+      'Guarda i video degli specchi LED BOLEN: demo di specchi smart, tour della fabbrica di 46.800 m², controllo qualità e guide di installazione da un produttore OEM/ODM con 21 anni di esperienza.',
+    h1: 'Video specchi LED: demo prodotto, tour della fabbrica e installazione',
     intro:
-      'Scopri specchi LED, funzioni smart, processi di fabbrica e dettagli di installazione prima di specificare un prodotto.',
+      'Scopri come gli specchi LED, smart, da toeletta e da bagno BOLEN vengono costruiti, testati e installati: brevi clip girate nella nostra fabbrica di Jiaxing che rispondono alle domande di acquisto prima di specificare un prodotto.',
     videos: 'Video',
-    relatedProducts: 'Prodotti correlati',
+    allVideos: 'Tutti i video',
+    duration: 'Durata',
+    upNext: 'Prossimi video',
+    relatedProducts: 'Prodotti in questo video',
+    ctaTitle: 'Hai visto uno specchio che vuoi specificare?',
+    ctaDesc:
+      'Inviaci il video o il riferimento prodotto. Rispondiamo con opzioni OEM/ODM, MOQ, imballaggio e tempi di consegna, e possiamo girare una demo su misura della tua specifica.',
   },
 };
+
+function videoMetaLine(video: VideoListItem | LocalizedVideoPost, lang: Lang): string {
+  const parts: string[] = [];
+  if (video.category) parts.push(`<span>${escapeHtml(video.category)}</span>`);
+  if (video.published_at) {
+    parts.push(
+      `<time datetime="${escapeAttr(video.published_at)}">${escapeHtml(formatBlogDate(video.published_at, lang))}</time>`
+    );
+  }
+  if (video.duration_seconds) {
+    parts.push(
+      `<time datetime="${escapeAttr(toIsoDuration(video.duration_seconds))}">${escapeHtml(
+        formatVideoDuration(video.duration_seconds)
+      )}</time>`
+    );
+  }
+  return parts.length ? `<p>${parts.join(' &middot; ')}</p>` : '';
+}
 
 async function fetchVideos(): Promise<VideoPost[]> {
   const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || '';
@@ -1829,24 +1915,39 @@ async function fetchVideos(): Promise<VideoPost[]> {
 
 function videoIndexContent(lang: Lang, items: VideoListItem[]): string {
   const c = VIDEO_COPY[lang];
+  const hc = COPY[lang];
   const list = items
-    .map((video) => {
+    .map((video, index) => {
       const href = `/${lang}/videos/${video.slug}/`;
       const img = video.thumbnail_url
-        ? `<img src="${escapeAttr(video.thumbnail_url)}" alt="${escapeAttr(video.title)}" width="640" height="360" loading="lazy" />`
+        ? `<img src="${escapeAttr(video.thumbnail_url)}" alt="${escapeAttr(video.title)}" width="640" height="360" loading="${
+            index < 3 ? 'eager' : 'lazy'
+          }" />`
         : '';
-      return `<li><a href="${escapeAttr(href)}">${img}<h2>${escapeHtml(video.title)}</h2></a><p>${escapeHtml(
-        video.excerpt
-      )}</p></li>`;
+      return `<li><a href="${escapeAttr(href)}">${img}<h3>${escapeHtml(video.title)}</h3></a>${videoMetaLine(
+        video,
+        lang
+      )}<p>${escapeHtml(video.excerpt)}</p></li>`;
     })
     .join('\n        ');
   return `
     <div data-prerender="videos">
+      <nav aria-label="Breadcrumb">
+        <a href="/${lang}/">${escapeHtml(hc.breadcrumbHome)}</a>
+        &raquo;
+        <span>${escapeHtml(c.videos)}</span>
+      </nav>
       <h1>${escapeHtml(c.h1)}</h1>
       <p>${escapeHtml(c.intro)}</p>
-      <ul aria-label="Videos">
+      <h2>${escapeHtml(c.allVideos)}</h2>
+      <ul aria-label="${escapeAttr(c.allVideos)}">
         ${list}
       </ul>
+      <h2>${escapeHtml(c.ctaTitle)}</h2>
+      <p>${escapeHtml(c.ctaDesc)}</p>
+      <p><a href="/${lang}/rfq/">${escapeHtml(hc.navRfq)}</a> &middot; <a href="/${lang}/products/">${escapeHtml(
+        hc.navCatalog
+      )}</a></p>
     </div>
   `.trim();
 }
@@ -1854,7 +1955,8 @@ function videoIndexContent(lang: Lang, items: VideoListItem[]): string {
 function videoPostContent(
   lang: Lang,
   video: LocalizedVideoPost,
-  related: { href: string; title: string; img?: string }[]
+  related: { href: string; title: string; img?: string }[],
+  upNext: VideoListItem[]
 ): string {
   const c = VIDEO_COPY[lang];
   const hc = COPY[lang];
@@ -1878,6 +1980,25 @@ function videoPostContent(
         </ul>
       </section>`
     : '';
+  const upNextBlock = upNext.length
+    ? `<section aria-label="${escapeAttr(c.upNext)}">
+        <h2>${escapeHtml(c.upNext)}</h2>
+        <ul>
+          ${upNext
+            .map(
+              (item) =>
+                `<li><a href="/${lang}/videos/${escapeAttr(item.slug)}/">${
+                  item.thumbnail_url
+                    ? `<img src="${escapeAttr(item.thumbnail_url)}" alt="${escapeAttr(item.title)}" width="320" height="180" loading="lazy" />`
+                    : ''
+                }${escapeHtml(item.title)}</a>${videoMetaLine(item, lang)}</li>`
+            )
+            .join('\n          ')}
+        </ul>
+        <p><a href="/${lang}/videos/">${escapeHtml(c.allVideos)}</a></p>
+      </section>`
+    : '';
+  const tags = video.tags.length ? `<p>${video.tags.map((tag) => escapeHtml(tag)).join(' &middot; ')}</p>` : '';
   return `
     <div data-prerender="videoPost">
       <nav aria-label="Breadcrumb">
@@ -1887,16 +2008,29 @@ function videoPostContent(
         &raquo;
         <span>${escapeHtml(video.title)}</span>
       </nav>
-      <h1>${escapeHtml(video.title)}</h1>
       ${media}
+      ${videoMetaLine(video, lang)}
+      <h1>${escapeHtml(video.title)}</h1>
       <p>${escapeHtml(video.excerpt)}</p>
       <div>${renderMarkdown(video.body)}</div>
+      ${tags}
       ${relatedBlock}
-      <p><a href="/${lang}/products/">${escapeHtml(hc.navCatalog)}</a> &middot; <a href="/${lang}/rfq/">${escapeHtml(
-        hc.navRfq
+      ${upNextBlock}
+      <h2>${escapeHtml(c.ctaTitle)}</h2>
+      <p>${escapeHtml(c.ctaDesc)}</p>
+      <p><a href="/${lang}/rfq/">${escapeHtml(hc.navRfq)}</a> &middot; <a href="/${lang}/products/">${escapeHtml(
+        hc.navCatalog
       )}</a></p>
     </div>
   `.trim();
+}
+
+/** og:video for a watch page — the MP4 for self-hosted clips, the player URL for embeds. */
+function videoOgVideo(video: LocalizedVideoPost): { url: string; type: string } | undefined {
+  const playback = getVideoPlayback(video);
+  if (playback.kind === 'video') return { url: playback.src, type: videoMimeType(playback.src) || 'video/mp4' };
+  if (playback.kind === 'embed') return { url: playback.src, type: 'text/html' };
+  return undefined;
 }
 
 async function writeUuidRedirects(products: Product[]): Promise<void> {
@@ -2314,10 +2448,10 @@ async function main(): Promise<void> {
         title: vc.metaTitle,
         description: vc.metaDesc,
         canonical,
-        ogImage: DEFAULT_OG_IMAGE,
+        ogImage: items[0]?.thumbnail_url || DEFAULT_OG_IMAGE,
         ogType: 'website',
         routePath: '/videos',
-        schema: buildVideoIndexSchema(lang) as any[],
+        schema: buildVideoIndexSchema(lang, items) as any[],
       })}\n    ${dataScript}`;
       const html = injectIntoTemplate(template, {
         lang,
@@ -2398,6 +2532,16 @@ async function main(): Promise<void> {
         const disp = localizeProduct(p, translations[lang]);
         return { href: `/${lang}/products/${toSlug(p.title)}/`, title: disp.title || p.title, img: p.images?.[0] };
       });
+      // Same ordering as VideoDetail.tsx's "Up next": same-topic clips first, then newest.
+      const upNext = videos
+        .filter((item) => item.slug && item.slug !== rawVideo.slug)
+        .map((item) => toVideoListItem(item, lang))
+        .sort(
+          (a, b) =>
+            Number(Boolean(b.category && b.category === localized.category)) -
+            Number(Boolean(a.category && a.category === localized.category))
+        )
+        .slice(0, 4);
       const path = `/videos/${localized.slug}`;
       const canonical = `${SITE_URL}/${lang}${path}/`;
       const title = localized.seo_title || `${localized.title} | BOLEN Mirror Videos`;
@@ -2410,13 +2554,14 @@ async function main(): Promise<void> {
         canonical,
         ogImage: localized.thumbnail_url || DEFAULT_OG_IMAGE,
         ogType: 'video.other',
+        ogVideo: videoOgVideo(localized),
         routePath: path,
         schema: [buildVideoObjectSchema(localized, lang), buildVideoBreadcrumbSchema(localized, lang)],
       })}\n    ${dataScript}`;
       const html = injectIntoTemplate(template, {
         lang,
         headExtras,
-        bodyContent: videoPostContent(lang, localized, related),
+        bodyContent: videoPostContent(lang, localized, related, upNext),
       });
       await writeRoute(`${lang}${path}`, html);
       routeCount++;

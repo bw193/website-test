@@ -469,31 +469,95 @@ export const it = {
       }
     },
     videos: {
-      metaTitle: "Video BOLEN Mirror | Demo prodotto e tour della fabbrica",
-      metaDescription: "Guarda demo dei prodotti BOLEN, tour della fabbrica, clip di installazione e video sulle funzioni degli specchi LED smart.",
-      kicker: "La prova del prodotto in movimento",
-      titleLead: "Video",
-      titleAccent: "BOLEN",
-      intro: "Scopri specchi LED, funzioni smart, processi di fabbrica e dettagli di installazione prima di specificare un prodotto.",
+      metaTitle: "Video specchi LED: demo prodotto, tour della fabbrica e installazione | BOLEN",
+      metaDescription: "Guarda i video degli specchi LED BOLEN: demo di specchi smart, tour della fabbrica di 46.800 m², controllo qualità e guide di installazione da un produttore OEM/ODM con 21 anni di esperienza.",
+      kicker: "Libreria video",
+      titleLead: "Video specchi LED:",
+      titleAccent: "demo prodotto, tour della fabbrica e installazione",
+      intro: "Scopri come gli specchi LED, smart, da toeletta e da bagno BOLEN vengono costruiti, testati e installati: brevi clip girate nella nostra fabbrica di Jiaxing che rispondono alle domande di acquisto prima di specificare un prodotto.",
+      heroPrimaryCta: "Richiedi un preventivo",
+      heroSecondaryCta: "Vedi prodotti",
+      stats: {
+        videos: "Video",
+        topics: "Argomenti",
+        runtime: "Minuti di riprese",
+        updated: "Ultimo aggiornamento"
+      },
+      spotlightLabel: "Ultimo video",
+      watchNow: "Guarda ora",
+      libraryHeading: "Tutti i video",
+      libraryIntro: "Filtra per argomento o cerca nella libreria.",
+      resultsCount: "{{count}} video",
       search: "Cerca video...",
+      searchLabel: "Cerca video",
+      clearSearch: "Cancella ricerca",
+      filterLabel: "Filtra i video per argomento",
       allVideos: "Tutti i video",
+      clearFilters: "Azzera filtri",
+      noResults: "Nessun video corrisponde alla tua ricerca.",
+      noResultsHint: "Prova un'altra parola chiave o azzera i filtri.",
       empty: "Nessun video pubblicato ancora. Torna presto.",
       cardLabel: "Video",
       latest: "Recente",
+      watchLabel: "Guarda: {{title}}",
+      playLabel: "Riproduci video: {{title}}",
+      unavailable: "Questo video non è al momento disponibile.",
+      duration: "Durata",
+      tagsLabel: "Argomenti",
+      upNext: "Prossimi video",
+      share: {
+        label: "Condividi",
+        copy: "Copia link",
+        copied: "Link copiato",
+        copyPrompt: "Copia questo link",
+        linkedin: "Condividi su LinkedIn",
+        whatsapp: "Condividi su WhatsApp",
+        email: "Condividi via e-mail",
+        more: "Altre opzioni di condivisione"
+      },
       notFound: "Video non trovato",
+      notFoundDescription: "Il video BOLEN richiesto non è stato trovato.",
       backToVideos: "Torna ai video",
+      sidebarKicker: "Specifica questo specchio",
       ctaTitle: "Ti serve questo specchio per la tua linea?",
       ctaDesc: "Invia il clip o il riferimento prodotto a BOLEN e il nostro team potrà quotare opzioni OEM/ODM, imballaggio e tempi di consegna.",
       ctaQuote: "Richiedi un preventivo",
       ctaCatalog: "Vedi prodotti",
-      relatedProducts: "Prodotti correlati",
+      relatedProductsKicker: "Dal catalogo",
+      relatedProducts: "Prodotti in questo video",
       relatedVideos: "Altri video",
       viewAll: "Vedi tutto",
+      guide: {
+        kicker: "Girato nella nostra fabbrica",
+        heading: "Cosa copre la libreria",
+        intro: "Ogni clip è girata su unità di produzione BOLEN e all'interno dello stabilimento di 46.800 m² di Jiaxing, senza filmati di repertorio: ciò che vedi è ciò che spediamo.",
+        demos: {
+          title: "Demo prodotto",
+          desc: "Modalità colore LED, dimmerazione continua, antiappannamento, sensori touch e funzioni smart mostrati su vere unità di produzione, non su render.",
+          cta: "Guarda le demo prodotto"
+        },
+        factory: {
+          title: "Fabbrica e controllo qualità",
+          desc: "Taglio del vetro, assemblaggio LED, test IP44 e imballaggio nello stabilimento di 46.800 m² di Jiaxing che spedisce il tuo ordine.",
+          cta: "Visita la fabbrica"
+        },
+        install: {
+          title: "Installazione e specifiche",
+          desc: "Dettagli di montaggio, cablaggio e movimentazione che aiutano installatori, rivenditori e buyer di progetto a pianificare.",
+          cta: "Video di installazione"
+        }
+      },
+      closing: {
+        title: "Hai visto uno specchio che vuoi specificare?",
+        desc: "Inviaci il video o il riferimento prodotto. Rispondiamo con opzioni OEM/ODM, MOQ, imballaggio e tempi di consegna, e possiamo girare una demo su misura della tua specifica."
+      },
       categories: {
         "Factory Tour": "Tour della fabbrica",
         "Product Demo": "Demo prodotto",
         "Installation": "Installazione",
-        "Smart Features": "Funzioni smart"
+        "Smart Features": "Funzioni smart",
+        "Technology": "Tecnologia",
+        "Quality Control": "Controllo qualità"
       }
     },
     admin: {

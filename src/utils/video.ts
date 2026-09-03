@@ -132,6 +132,54 @@ export function formatVideoDuration(seconds: number | null | undefined): string 
   return `${mins}:${String(secs).padStart(2, '0')}`;
 }
 
+/** ISO 8601 duration (PT1M30S) for schema.org `duration` and `<time dateTime>`. */
+export function toIsoDuration(seconds: number): string {
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = Math.round(seconds % 60);
+  return `PT${h ? `${h}H` : ''}${m ? `${m}M` : ''}${s || (!h && !m) ? `${s}S` : ''}`;
+}
+
+/** MIME type for a direct media URL — used for `og:video:type` and `<source type>`. */
+export function videoMimeType(url: string | null | undefined): string {
+  const match = (url || '').match(DIRECT_VIDEO_RE);
+  switch ((match?.[1] || '').toLowerCase()) {
+    case 'mp4':
+      return 'video/mp4';
+    case 'webm':
+      return 'video/webm';
+    case 'ogg':
+      return 'video/ogg';
+    case 'mov':
+      return 'video/quicktime';
+    default:
+      return '';
+  }
+}
+
+/**
+ * Turns a stored embed URL into the one the player iframe should load once the
+ * visitor has pressed play. YouTube is moved to the privacy-enhanced
+ * youtube-nocookie host, and both providers get `autoplay=1` so the click on
+ * the facade starts playback without a second click inside the iframe.
+ */
+export function buildPlaybackEmbedSrc(src: string, options: { autoplay?: boolean } = {}): string {
+  const parsed = parseAbsoluteUrl(src);
+  if (!parsed) return src;
+  const host = parsed.hostname.replace(/^www\./, '').toLowerCase();
+  const isYouTube = host === 'youtube.com' || host === 'youtube-nocookie.com' || host.endsWith('.youtube.com');
+  const isVimeo = host === 'player.vimeo.com' || host.endsWith('.vimeo.com');
+  if (isYouTube) {
+    parsed.hostname = 'www.youtube-nocookie.com';
+    parsed.searchParams.set('rel', '0');
+    parsed.searchParams.set('playsinline', '1');
+  }
+  if ((isYouTube || isVimeo) && options.autoplay) {
+    parsed.searchParams.set('autoplay', '1');
+  }
+  return parsed.toString();
+}
+
 export function normalizeVideoSourceType(value: unknown): VideoSourceType {
   return value === 'upload' || value === 'direct' || value === 'embed' ? value : 'embed';
 }

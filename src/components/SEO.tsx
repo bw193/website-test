@@ -10,6 +10,12 @@ interface SEOProps {
   path?: string;
   ogImage?: string;
   ogType?: string;
+  /**
+   * Open Graph video for watch pages — an MP4 URL (type video/mp4) or a
+   * YouTube/Vimeo embed URL (type text/html) so LinkedIn / Facebook / WhatsApp
+   * previews can offer inline playback.
+   */
+  ogVideo?: { url: string; type: string };
   schema?: any | any[];
   noindex?: boolean;
   /** Languages with a real equivalent route. Defaults to all supported locales. */
@@ -24,6 +30,7 @@ export default function SEO({
   path = '/',
   ogImage = 'https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-images/site-assets/1773994889396-9i4t1ap.jpg',
   ogType = 'website',
+  ogVideo,
   schema,
   noindex = false,
   alternateLanguages = ['en', 'zh', 'es', 'fr', 'de', 'it']
@@ -66,6 +73,9 @@ export default function SEO({
       <meta property="og:description" content={description} />
       <meta property="og:image" content={ogImage} />
       <meta property="og:site_name" content="BOLEN Mirror" />
+      {ogVideo && <meta property="og:video" content={ogVideo.url} />}
+      {ogVideo && <meta property="og:video:secure_url" content={ogVideo.url} />}
+      {ogVideo && <meta property="og:video:type" content={ogVideo.type} />}
 
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:url" content={canonicalUrl} />
