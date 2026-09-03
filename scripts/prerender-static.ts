@@ -44,11 +44,13 @@ import {
   videoMimeType,
 } from '../src/utils/video';
 import { optimizeImage } from '../src/utils/optimizeImage';
+import { polishEnglishProductTitle } from '../src/utils/productCopy';
 import {
-  buildProductDescription,
   buildProductBuyerSummary,
-  buildProductSeoTitle,
   normalizeSpecs,
+  resolveProductSeo,
+  type ProductSeoMetadata,
+  type ResolvedProductSeo,
 } from '../src/utils/productSeo';
 import { en as enLocale } from '../src/locales/en';
 import { zh as zhLocale } from '../src/locales/zh';
@@ -75,6 +77,8 @@ import {
   buildCatalogCategorySchema,
   CATALOG_CATEGORY_PREFIX,
   DEFAULT_PRODUCT_CATEGORIES,
+  getCatalogCategoryPageCopy,
+  getCatalogCategorySeoTitle,
   interpolateTemplate,
   parseCategoriesSetting,
   productMatchesCategory,
@@ -160,6 +164,7 @@ interface Product {
   price_range?: string;
   msrp?: string;
   details?: string;
+  seo?: ProductSeoMetadata;
   specifications?: unknown;
   buyer_summary?: string;
   display_title?: string;
@@ -942,7 +947,7 @@ function catalogContent(
   lang: Lang,
   products: Product[],
   tr: LangTranslations,
-  opts?: { categoryName?: string; categories?: string[] }
+  opts?: { categoryName?: string; categories?: string[]; heading?: string; description?: string }
 ): string {
   const c = COPY[lang];
   const categoryName = opts?.categoryName;
@@ -978,9 +983,9 @@ function catalogContent(
           })
           .join('\n        ')}
       </nav>`;
-  const intro = categoryName
+  const intro = opts?.description ?? (categoryName
     ? interpolateTemplate(LOCALE_PRODUCTS[lang].categoryIntro, { category: categoryLabel })
-    : c.catalogIntro;
+    : c.catalogIntro);
   return `
     <div data-prerender="catalog">
       <nav aria-label="Breadcrumb">
@@ -990,8 +995,8 @@ function catalogContent(
           ? `<a href="/${lang}/products/">${escapeHtml(c.breadcrumbCatalog)}</a> &raquo; <span>${escapeHtml(categoryLabel)}</span>`
           : `<span>${escapeHtml(c.breadcrumbCatalog)}</span>`}
       </nav>
-      <h1>${escapeHtml(categoryName ? categoryLabel : c.catalogH1)}</h1>
-      <p>${escapeHtml(intro)}</p>
+      <h1>${escapeHtml(opts?.heading ?? (categoryName ? categoryLabel : c.catalogH1))}</h1>
+      <p data-seo-description="">${escapeHtml(intro)}</p>
       ${categoryNav}
       <ul aria-label="Products">
         ${items}
@@ -1000,7 +1005,7 @@ function catalogContent(
   `.trim();
 }
 
-function productDetailContent(lang: Lang, product: Product, tr: LangTranslations): string {
+function productDetailContent(lang: Lang, product: Product, tr: LangTranslations, seo: ResolvedProductSeo): string {
   const c = COPY[lang];
   const localized = localizeProduct(product, tr);
   const img = product.images?.[0];
@@ -1011,7 +1016,9 @@ function productDetailContent(lang: Lang, product: Product, tr: LangTranslations
   // as a model number when it is short, and as an actual description only when
   // it is long enough to be one.
   const descText = localized.description?.trim() || '';
-  const desc = descText.length >= 30 ? `<p>${escapeHtml(descText.slice(0, 600))}</p>` : '';
+  const desc = descText.length >= 30 && descText !== seo.description
+    ? `<p>${escapeHtml(descText.slice(0, 600))}</p>`
+    : '';
   const modelNo = descText.length > 0 && descText.length < 30 ? `<p>${escapeHtml(descText)}</p>` : '';
   const price = product.price_range
     ? `<p><strong>${escapeHtml(product.price_range.startsWith('$') ? product.price_range : `$${product.price_range}`)}</strong></p>`
@@ -1050,7 +1057,8 @@ function productDetailContent(lang: Lang, product: Product, tr: LangTranslations
         &raquo;
         <span>${escapeHtml(localized.title)}</span>
       </nav>
-      <h1>${escapeHtml(localized.title)}</h1>
+      <h1>${escapeHtml(seo.h1)}</h1>
+      <p data-seo-description="">${escapeHtml(seo.description)}</p>
       ${imgTag}
       ${modelNo}
       ${desc}
@@ -1204,9 +1212,8 @@ function catalogSchema(lang: Lang): any[] {
     {
       '@context': 'https://schema.org',
       '@type': 'CollectionPage',
-      name: 'BOLEN LED Mirror Products Catalog',
-      description:
-        'Explore our wide range of OEM LED mirrors, smart mirrors, vanity mirrors, and bath mirrors from a leading LED mirror manufacturer.',
+      name: COPY[lang].catalogH1,
+      description: LOCALE_SEO[lang].catalogDesc,
       url: `https://bolenmirror.com/${lang}/products/`,
       isPartOf: {
         '@type': 'WebSite',
@@ -1311,15 +1318,15 @@ function parsePriceRange(range?: string): { low: number; high: number } {
 // Thin localized wrappers over the shared helpers in src/utils/productSeo.ts,
 // which src/pages/ProductDetail.tsx also uses — so the prerendered <title>/
 // <meta description> and the values Helmet writes on mount cannot drift.
-function richProductDescription(product: Product, lang: Lang): string {
-  return buildProductDescription(product, COPY[lang].productDescTemplate);
+function productPageSeo(product: Product, lang: Lang): ResolvedProductSeo {
+  const display = { ...product, title: lang === 'en' ? polishEnglishProductTitle(product.title) : product.title };
+  return resolveProductSeo(display, lang, {
+    titleSuffix: COPY[lang].productSuffix,
+    descriptionTemplate: COPY[lang].productDescTemplate,
+  });
 }
 
-function productSeoTitle(product: Product, lang: Lang): string {
-  return buildProductSeoTitle(product.title, COPY[lang].productSuffix);
-}
-
-function productDetailSchema(lang: Lang, product: Product, display: Product): any[] {
+function productDetailSchema(lang: Lang, product: Product, display: Product, seo: ResolvedProductSeo): any[] {
   const slug = toSlug(product.title); // slug/URL from English title
   const productFullUrl = `https://bolenmirror.com/${lang}/products/${slug}/`;
   const { low: lowPrice, high: highPrice } = parsePriceRange(product.price_range);
@@ -1327,9 +1334,9 @@ function productDetailSchema(lang: Lang, product: Product, display: Product): an
     {
       '@context': 'https://schema.org/',
       '@type': 'Product',
-      name: display.title,
+      name: seo.h1,
       image: product.images || [],
-      description: richProductDescription(display, lang),
+      description: seo.description,
       sku: product.id,
       brand: {
         '@type': 'Brand',
@@ -1428,7 +1435,7 @@ async function fetchAllProducts(): Promise<Product[]> {
   for (let from = 0; ; from += PAGE) {
     const { data, error } = await supabase
       .from('products')
-      .select('id, title, description, images, category, price_range, msrp, details, specifications')
+      .select('id, title, description, images, category, price_range, msrp, details, specifications, seo')
       .eq('is_active', true)
       .order('created_at', { ascending: false })
       .range(from, from + PAGE - 1);
@@ -2237,7 +2244,10 @@ async function main(): Promise<void> {
       const html = injectIntoTemplate(template, {
         lang,
         headExtras,
-        bodyContent: catalogContent(lang, products, translations[lang], { categories }),
+        bodyContent: catalogContent(lang, products, translations[lang], {
+          categories,
+          description: LOCALE_SEO[lang].catalogDesc,
+        }),
       });
       await writeRoute(`${lang}/products`, html);
       routeCount++;
@@ -2247,11 +2257,18 @@ async function main(): Promise<void> {
       const categoryLabel = categoryDisplayName(lang, categoryName);
       const routePath = `${CATALOG_CATEGORY_PREFIX}/${categorySlug}`;
       const canonical = `${SITE_URL}/${lang}${routePath}/`;
-      const title = interpolateTemplate(LOCALE_SEO[lang].categoryTitle, { category: categoryLabel });
-      const description = interpolateTemplate(LOCALE_SEO[lang].categoryDesc, { category: categoryLabel });
-      const ogImage =
-        products.find((product) => productMatchesCategory(product.category, categoryName))?.images?.[0] ||
-        DEFAULT_OG_IMAGE;
+      const title = getCatalogCategorySeoTitle(
+        lang,
+        categorySlug,
+        interpolateTemplate(LOCALE_SEO[lang].categoryTitle, { category: categoryLabel })
+      );
+      const categoryCopy = getCatalogCategoryPageCopy(lang, categorySlug, {
+        h1: categoryLabel,
+        description: interpolateTemplate(LOCALE_SEO[lang].categoryDesc, { category: categoryLabel }),
+      });
+      const description = categoryCopy.description;
+      const categoryProducts = products.filter((product) => productMatchesCategory(product.category, categoryName));
+      const ogImage = categoryProducts[0]?.images?.[0] || DEFAULT_OG_IMAGE;
       const dataScript = prerenderDataScript({
         route: 'catalog',
         lang,
@@ -2272,17 +2289,25 @@ async function main(): Promise<void> {
           lang,
           slug: categorySlug,
           name: categoryLabel,
+          pageName: categoryCopy.h1,
           description,
           homeLabel: LOCALE_NAV[lang].home,
           catalogLabel: LOCALE_NAV[lang].catalog,
+          products: categoryProducts.map((product) => ({
+            title: product.title,
+            name: translations[lang][product.id]?.title || product.title,
+            image: product.images?.[0],
+          })),
         }),
       })}\n    ${dataScript}`;
       const html = injectIntoTemplate(template, {
         lang,
         headExtras,
-        bodyContent: catalogContent(lang, products, translations[lang], {
+        bodyContent: catalogContent(lang, categoryProducts, translations[lang], {
           categoryName,
           categories,
+          heading: categoryCopy.h1,
+          description,
         }),
       });
       await writeRoute(`${lang}${routePath}`, html);
@@ -2583,8 +2608,8 @@ async function main(): Promise<void> {
       const path = `/products/${slug}`; // slug from English title
       const canonical = `${SITE_URL}/${lang}${path}/`;
       const display = localizeProduct(product, translations[lang]);
-      const title = productSeoTitle(display, lang);
-      const description = richProductDescription(display, lang);
+      const seo = productPageSeo(display, lang);
+      const { title, description } = seo;
       const productFields = translations[lang][product.id];
       const dataScript = prerenderDataScript({
         route: 'productDetail',
@@ -2600,12 +2625,12 @@ async function main(): Promise<void> {
         ogImage: product.images?.[0] || DEFAULT_OG_IMAGE,
         ogType: 'product',
         routePath: path,
-        schema: productDetailSchema(lang, product, display),
+        schema: productDetailSchema(lang, product, display, seo),
       })}\n    ${dataScript}`;
       const html = injectIntoTemplate(template, {
         lang,
         headExtras,
-        bodyContent: productDetailContent(lang, product, translations[lang]),
+        bodyContent: productDetailContent(lang, product, translations[lang], seo),
       });
       await writeRoute(`${lang}${path}`, html);
       routeCount++;

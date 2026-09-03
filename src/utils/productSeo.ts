@@ -15,6 +15,69 @@ export interface ProductSeoFields {
   description?: string;
   details?: string;
   specifications?: unknown;
+  seo?: ProductSeoMetadata | null;
+}
+
+export const PRODUCT_SEO_LANGUAGES = ['en', 'zh', 'es', 'fr', 'de', 'it'] as const;
+export type ProductSeoLanguage = (typeof PRODUCT_SEO_LANGUAGES)[number];
+export type ProductSeoField = 'title' | 'description' | 'h1';
+export type ProductSeoOverrides = Partial<Record<ProductSeoField, string>>;
+export type ProductSeoMetadata = Partial<Record<ProductSeoLanguage, ProductSeoOverrides>>;
+export type ResolvedProductSeo = Record<ProductSeoField, string>;
+
+// Editorial reference ranges only, not Google limits or validation constraints.
+// Chinese glyphs usually need more display width than Latin characters.
+const PRODUCT_SEO_LENGTH_RECOMMENDATIONS = {
+  latin: {
+    title: { min: 50, max: 60 },
+    description: { min: 140, max: 160 },
+    h1: { min: 20, max: 70 },
+  },
+  zh: {
+    title: { min: 25, max: 30 },
+    description: { min: 70, max: 90 },
+    h1: { min: 10, max: 30 },
+  },
+} as const;
+
+/** Use the content language, not the admin interface language. */
+export function getProductSeoLengthRecommendation(field: ProductSeoField, language: ProductSeoLanguage) {
+  return PRODUCT_SEO_LENGTH_RECOMMENDATIONS[language === 'zh' ? 'zh' : 'latin'][field];
+}
+
+/** Only persist supported, nonblank plain-text overrides; blanks restore defaults. */
+export function normalizeProductSeo(value: unknown): ProductSeoMetadata {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
+  const result: ProductSeoMetadata = {};
+  for (const lang of PRODUCT_SEO_LANGUAGES) {
+    const entry = (value as Record<string, unknown>)[lang];
+    if (!entry || typeof entry !== 'object' || Array.isArray(entry)) continue;
+    const fields: ProductSeoOverrides = {};
+    for (const field of ['title', 'description', 'h1'] as const) {
+      const raw = (entry as Record<string, unknown>)[field];
+      if (typeof raw !== 'string') continue;
+      const text = collapseWhitespace(raw);
+      if (text) fields[field] = text;
+    }
+    if (Object.keys(fields).length > 0) result[lang] = fields;
+  }
+  return result;
+}
+
+/** Shared by the admin preview, public page and static HTML. Never changes URLs. */
+export function resolveProductSeo(
+  product: ProductSeoFields,
+  lang: string,
+  defaults: { titleSuffix: string; descriptionTemplate: string }
+): ResolvedProductSeo {
+  const language = lang.toLowerCase().split('-')[0] as ProductSeoLanguage;
+  const overrides = normalizeProductSeo(product.seo)[language];
+  return {
+    // Manual titles are not truncated and do not get another brand suffix.
+    title: overrides?.title || buildProductSeoTitle(product.title, defaults.titleSuffix),
+    description: overrides?.description || buildProductDescription(product, defaults.descriptionTemplate),
+    h1: overrides?.h1 || product.title,
+  };
 }
 
 /**

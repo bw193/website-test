@@ -51,12 +51,20 @@ i18n
     }
   });
 
-// Lazy-load non-English language bundles
-const loadLanguage = async (lng: string) => {
+/** Load a locale without changing the employee portal's interface language. */
+export async function loadLanguageResources(lng: string): Promise<void> {
   const code = lng.split('-')[0];
   if (code !== 'en' && localeLoaders[code] && !i18n.hasResourceBundle(code, 'translation')) {
     const resources = await localeLoaders[code]();
     i18n.addResourceBundle(code, 'translation', resources.translation, true, true);
+  }
+}
+
+// Lazy-load non-English language bundles
+const loadLanguage = async (lng: string) => {
+  const code = lng.split('-')[0];
+  if (code !== 'en' && localeLoaders[code] && !i18n.hasResourceBundle(code, 'translation')) {
+    await loadLanguageResources(code);
     if (i18n.language.split('-')[0] === code) {
       await i18n.changeLanguage(code);
     }
@@ -69,10 +77,7 @@ const loadLanguage = async (lng: string) => {
  */
 export async function ensureLanguage(lng: string) {
   const code = lng.split('-')[0];
-  if (code !== 'en' && localeLoaders[code] && !i18n.hasResourceBundle(code, 'translation')) {
-    const resources = await localeLoaders[code]();
-    i18n.addResourceBundle(code, 'translation', resources.translation, true, true);
-  }
+  await loadLanguageResources(code);
   if (i18n.language.split('-')[0] !== code) {
     await i18n.changeLanguage(code);
   }

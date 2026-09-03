@@ -9,6 +9,8 @@ import '@uiw/react-md-editor/markdown-editor.css';
 import '@uiw/react-markdown-preview/markdown.css';
 import SEO from '../components/SEO';
 import { ProductSimilarityHints } from '../components/admin/ProductSimilarityPanel';
+import ProductSeoEditor from '../components/admin/ProductSeoEditor';
+import { normalizeProductSeo, type ProductSeoMetadata } from '../utils/productSeo';
 import {
   findSimilarTo,
   SAVE_WARN_SCORE,
@@ -20,6 +22,7 @@ interface ProductForm {
   title: string;
   description: string;
   details: string;
+  seo: ProductSeoMetadata;
   is_active: boolean;
   category: string;
   price_range: string;
@@ -48,6 +51,7 @@ export default function AdminProductForm() {
 
   const { register, control, handleSubmit, reset, getValues, setValue, formState: { errors } } = useForm<ProductForm>({
     defaultValues: {
+      seo: {},
       is_active: true,
       images: [{ url: '' }],
       specifications: [{ key: '', value: '' }]
@@ -55,6 +59,8 @@ export default function AdminProductForm() {
   });
 
   const watchedTitle = useWatch({ control, name: 'title' });
+  const watchedDescription = useWatch({ control, name: 'description' });
+  const watchedDetails = useWatch({ control, name: 'details' });
   const watchedCategory = useWatch({ control, name: 'category' });
   const watchedSpecs = useWatch({ control, name: 'specifications' });
   const watchedIsActive = useWatch({ control, name: 'is_active' }) ?? true;
@@ -125,6 +131,7 @@ export default function AdminProductForm() {
               title: data.title || '',
               description: data.description || '',
               details: data.details || '',
+              seo: normalizeProductSeo(data.seo),
               is_active: data.is_active !== false,
               category: matchedCategory,
               price_range: data.price_range || '',
@@ -280,6 +287,7 @@ export default function AdminProductForm() {
         title: data.title,
         description: data.description,
         details: data.details,
+        seo: normalizeProductSeo(data.seo),
         is_active: data.is_active,
         category: data.category,
         price_range: data.price_range,
@@ -296,7 +304,9 @@ export default function AdminProductForm() {
         const { error } = await supabase
           .from('products')
           .update(productData)
-          .eq('id', id);
+          .eq('id', id)
+          .select('id')
+          .single();
         if (error) throw error;
       } else {
         const { data: created, error } = await supabase
@@ -385,7 +395,24 @@ export default function AdminProductForm() {
         
         <form id="product-form" onSubmit={handleSubmit(onSubmit)} className="flex flex-col lg:flex-row gap-8">
           {/* Main Column */}
-          <div className="flex-1 space-y-8">
+          <div className="min-w-0 flex-1 space-y-8">
+            <Controller
+              name="seo"
+              control={control}
+              render={({ field }) => (
+                <ProductSeoEditor
+                  product={{
+                    id,
+                    title: watchedTitle || '',
+                    description: watchedDescription || '',
+                    details: watchedDetails || '',
+                  }}
+                  value={field.value}
+                  onChange={field.onChange}
+                  disabled={saving}
+                />
+              )}
+            />
             {/* Basic Info */}
             <div className="bg-white shadow-sm border border-stone-200 rounded-2xl overflow-hidden">
               <div className="px-6 py-5 border-b border-stone-100 bg-stone-50/50">

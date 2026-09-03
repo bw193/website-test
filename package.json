@@ -17,6 +17,8 @@
     "deploy:cloudflare": "npm run build && wrangler deploy",
     "cf:types": "wrangler types",
     "test:worker": "tsx --test worker/index.test.ts",
+    "test:seo": "tsx --test src/utils/catalogCategory.test.ts src/utils/productSeo.test.ts",
+    "verify:seo:rendered": "tsx scripts/verify-product-seo.ts",
     "clean": "rm -rf dist",
     "lint": "tsc --noEmit"
   },

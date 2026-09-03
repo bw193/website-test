@@ -6,7 +6,7 @@ import { Loader2, CheckCircle2, ChevronLeft, ChevronRight, Send, ShieldCheck, Tr
 import { useTranslation } from 'react-i18next';
 import Markdown from '../components/Markdown';
 import SEO from '../components/SEO';
-import { buildProductDescription, buildProductSeoTitle, normalizeSpecs } from '../utils/productSeo';
+import { resolveProductSeo, normalizeSpecs, type ProductSeoMetadata } from '../utils/productSeo';
 import VideoCard from '../components/VideoCard';
 import { optimizeImage, imageSrcSet } from '../utils/optimizeImage';
 import { PRODUCT_IMAGE_PLACEHOLDER, handleImageError } from '../utils/imagePlaceholder';
@@ -27,6 +27,7 @@ interface Product {
   title: string;
   description: string;
   details?: string;
+  seo?: ProductSeoMetadata;
   images: string[];
   is_active?: boolean;
   category?: string;
@@ -277,12 +278,6 @@ export default function ProductDetail() {
   };
   const originalDescription = normalizeDescription(display.description);
   const useBuyerSummary = needsBuyerSummary(originalDescription);
-  const visibleDescription = useBuyerSummary
-    ? t(
-        'productDetail.buyerSummary',
-        'Factory-direct mirrors for wholesale and OEM/ODM projects. Pricing is prepared to your specifications—ask about MOQ, sample options, custom sizes and functions, certification needs, and production lead time.'
-      )
-    : originalDescription;
   const productReference = useBuyerSummary && looksLikeModelReference(originalDescription)
     ? originalDescription
     : null;
@@ -345,18 +340,16 @@ export default function ProductDetail() {
 
   // Shared with scripts/prerender-static.ts via src/utils/productSeo.ts so the
   // values Helmet writes on mount match what was baked into the static HTML.
-  const richDescription = buildProductDescription(
-    display,
-    t('productDetail.descTemplate', 'Premium {title} by BOLEN Mirror (Jiaxing Chengtai Mirror Co., Ltd.) — OEM/ODM LED, smart, vanity, and bath mirrors. Contact sales for bulk pricing.')
-  );
-
-  const seoTitle = buildProductSeoTitle(display.title, t('productDetail.brandSuffix', '| BOLEN Mirror'));
+  const { title: seoTitle, description: richDescription, h1: pageHeading } = resolveProductSeo(display, lang, {
+    descriptionTemplate: t('productDetail.descTemplate', 'Premium {title} by BOLEN Mirror (Jiaxing Chengtai Mirror Co., Ltd.) — OEM/ODM LED, smart, vanity, and bath mirrors. Contact sales for bulk pricing.'),
+    titleSuffix: t('productDetail.brandSuffix', '| BOLEN Mirror'),
+  });
 
   const productSchema = product ? [
     {
       "@context": "https://schema.org/",
       "@type": "Product",
-      "name": display.title,
+      "name": pageHeading,
       "image": product.images,
       "description": richDescription,
       "sku": product.id,
@@ -562,12 +555,17 @@ export default function ProductDetail() {
             </m.div>
 
             <m.h1 variants={fadeInUp} className="mt-4 font-serif text-3xl tracking-tight text-stone-900 sm:text-4xl lg:text-[2.75rem] leading-[1.15]">
-              {display.title}
+              {pageHeading}
             </m.h1>
 
-            <m.p variants={fadeInUp} className="mt-5 text-base leading-relaxed text-stone-600 sm:text-lg">
-              {visibleDescription}
+            <m.p data-seo-description="" variants={fadeInUp} className="mt-5 text-base leading-relaxed text-stone-600 sm:text-lg">
+              {richDescription}
             </m.p>
+            {!useBuyerSummary && originalDescription !== richDescription ? (
+              <m.p variants={fadeInUp} className="mt-3 text-base leading-relaxed text-stone-600 sm:text-lg">
+                {originalDescription}
+              </m.p>
+            ) : null}
 
             {(product.price_range || product.msrp) && (
               <m.div variants={fadeInUp} className="mt-7 rounded-2xl border border-stone-200 bg-stone-50/70 p-5">

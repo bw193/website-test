@@ -8,12 +8,16 @@ import { useTranslation } from 'react-i18next';
 import SEO from '../components/SEO';
 import { useCurrentLang, useLocalizedPath } from '../hooks/useLocalizedPath';
 import { readInitialCatalogData } from '../utils/prerenderData';
+import { useProductTranslator } from '../utils/productI18n';
+import { polishEnglishProductTitle } from '../utils/productCopy';
 import {
   buildCatalogCategorySchema,
   CATALOG_CATEGORY_PREFIX,
   catalogCategoryPath,
   DEFAULT_PRODUCT_CATEGORIES,
   findCategoryBySlug,
+  getCatalogCategoryPageCopy,
+  getCatalogCategorySeoTitle,
   productMatchesCategory,
   toCategorySlug,
 } from '../utils/catalogCategory';
@@ -52,6 +56,7 @@ export default function Products() {
   const searchQuery = searchParams.get('q') || '';
   const { t } = useTranslation();
   const lang = useCurrentLang();
+  const translateProduct = useProductTranslator(lang);
   const { lp } = useLocalizedPath();
 
   const updateSearchQuery = (value: string) => {
@@ -136,15 +141,24 @@ export default function Products() {
       ? `${CATALOG_CATEGORY_PREFIX}/${categorySlug}`
       : '/products';
   const seoTitle = selectedCategory
-    ? t('seo.categoryTitle', '{{category}} | BOLEN Mirror Manufacturer', { category: categoryLabel })
-    : t('seo.catalogTitle');
-  const seoDescription = selectedCategory
-    ? t(
-        'seo.categoryDesc',
-        'Browse BOLEN {{category}} for OEM/ODM wholesale. Factory-direct LED, vanity, and bath mirrors for global brands and hotel projects.',
-        { category: categoryLabel }
+    ? getCatalogCategorySeoTitle(
+        lang,
+        toCategorySlug(selectedCategory),
+        t('seo.categoryTitle', '{{category}} | BOLEN Mirror Manufacturer', { category: categoryLabel })
       )
-    : t('seo.catalogDesc');
+    : t('seo.catalogTitle');
+  const categoryCopy = selectedCategory
+    ? getCatalogCategoryPageCopy(lang, toCategorySlug(selectedCategory), {
+        h1: categoryLabel,
+        description: t(
+          'seo.categoryDesc',
+          'Browse BOLEN {{category}} for OEM/ODM wholesale. Factory-direct LED, vanity, and bath mirrors for global brands and hotel projects.',
+          { category: categoryLabel }
+        ),
+      })
+    : null;
+  const pageHeading = categoryCopy?.h1 ?? t('products.catalog');
+  const seoDescription = categoryCopy?.description ?? t('seo.catalogDesc');
 
   const filteredProducts = products.filter(p => {
     const matchesCategory = categoryUnresolved
@@ -182,15 +196,25 @@ export default function Products() {
                 lang,
                 slug: categorySlug,
                 name: categoryLabel,
+                pageName: pageHeading,
                 description: seoDescription,
                 homeLabel: t('navbar.home'),
                 catalogLabel: t('navbar.catalog'),
+                products: loading ? undefined : visibleProducts.map((product) => {
+                  const name = translateProduct(product).title || product.title;
+                  return {
+                    title: product.title,
+                    name: lang === 'en' ? polishEnglishProductTitle(name) : name,
+                    image: product.images?.[0],
+                  };
+                }),
+                totalProducts: filteredProducts.length,
               })
             : {
                 "@context": "https://schema.org",
                 "@type": "CollectionPage",
-                "name": "BOLEN LED Mirror Products Catalog",
-                "description": "Explore our wide range of OEM LED mirrors, smart mirrors, vanity mirrors, and bath mirrors from a leading LED mirror manufacturer.",
+                "name": pageHeading,
+                "description": seoDescription,
                 "url": `https://bolenmirror.com/${lang}/products/`,
                 "isPartOf": {
                   "@type": "WebSite",
@@ -225,22 +249,17 @@ export default function Products() {
             transition={{ duration: 0.7, delay: 0.08 }}
             className="font-serif text-5xl leading-[0.95] tracking-tight sm:text-6xl md:text-7xl"
           >
-            {selectedCategory ? categoryLabel : t('products.catalog')}
+            {pageHeading}
           </m.h1>
           <div className="mx-auto mt-8 h-px w-24 bg-gradient-to-r from-transparent via-amber-500 to-transparent" />
           <m.p 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.18 }}
+            data-seo-description=""
             className="mx-auto mt-8 max-w-2xl text-lg font-light leading-relaxed text-stone-300"
           >
-            {selectedCategory
-              ? t(
-                  'products.categoryIntro',
-                  'Factory-direct {{category}} for OEM/ODM and wholesale projects — custom sizes, lighting, and finishes from our Jiaxing factory.',
-                  { category: categoryLabel }
-                )
-              : t('products.desc')}
+            {seoDescription}
           </m.p>
         </div>
       </div>
