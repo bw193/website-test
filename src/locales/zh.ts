@@ -752,6 +752,8 @@ export const zh = {
         },
         products: {
           uncategorized: "未分类",
+          active: "已启用",
+          inactive: "已停用",
           noProducts: "未找到产品。",
           deleteConfirm: "您确定要删除此产品吗？",
           deleteError: "删除产品失败。"
@@ -989,6 +991,11 @@ export const zh = {
         supabaseSetupDesc: "要启用图片上传，请将 VITE_SUPABASE_URL 和 VITE_SUPABASE_ANON_KEY 添加到您的环境变量（或 AI Studio Secrets）中，并重新构建应用。",
         editProduct: "编辑产品",
         addProduct: "添加新产品",
+        visibility: "公开状态",
+        active: "已启用",
+        inactive: "已停用",
+        activeHelp: "会显示在产品目录中，并发布对应的产品网址。",
+        inactiveHelp: "不会在公开网站中显示，也不会发布对应的产品网址。",
         productTitle: "产品标题",
         category: "类别",
         priceRange: "价格区间",

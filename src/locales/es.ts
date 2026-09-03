@@ -572,6 +572,8 @@ export const es = {
         },
         products: {
           uncategorized: "Sin categoría",
+          active: "Activo",
+          inactive: "Inactivo",
           noProducts: "No se encontraron productos.",
           deleteConfirm: "¿Está seguro de que desea eliminar este producto?",
           deleteError: "Error al eliminar el producto."
@@ -637,6 +639,11 @@ export const es = {
         supabaseSetupDesc: "Para habilitar la carga de imágenes, añada VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY a sus Variables de Entorno (o Secretos de AI Studio) y reconstruya la aplicación.",
         editProduct: "Editar Producto",
         addProduct: "Añadir Nuevo Producto",
+        visibility: "Visibilidad",
+        active: "Activo",
+        inactive: "Inactivo",
+        activeHelp: "Visible en el catálogo y en su URL de producto.",
+        inactiveHelp: "Oculto del sitio público y sin publicar en su URL de producto.",
         productTitle: "Título del Producto",
         category: "Categoría",
         priceRange: "Rango de Precios",

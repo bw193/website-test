@@ -23,6 +23,7 @@ interface Product {
   title: string;
   description: string;
   images: string[];
+  is_active?: boolean;
   category?: string;
   price_range?: string;
   msrp?: string;
@@ -87,6 +88,7 @@ export default function Products() {
         const { data: productsData, error: productsError } = await supabase
           .from('products')
           .select('*')
+          .eq('is_active', true)
           .order('created_at', { ascending: false });
 
         if (productsError) throw productsError;

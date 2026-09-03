@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { supabase, hasSupabaseConfig } from '../supabase';
 import { useForm, useFieldArray, Controller, useWatch } from 'react-hook-form';
-import { Loader2, ArrowLeft, Plus, Trash2, Upload, Image as ImageIcon, Tag, DollarSign, FileText, GripVertical, Settings } from 'lucide-react';
+import { Loader2, ArrowLeft, Plus, Trash2, Upload, Image as ImageIcon, Tag, DollarSign, FileText, GripVertical, Settings, Eye, EyeOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import MDEditor from '@uiw/react-md-editor';
 import '@uiw/react-md-editor/markdown-editor.css';
@@ -20,6 +20,7 @@ interface ProductForm {
   title: string;
   description: string;
   details: string;
+  is_active: boolean;
   category: string;
   price_range: string;
   msrp: string;
@@ -47,6 +48,7 @@ export default function AdminProductForm() {
 
   const { register, control, handleSubmit, reset, getValues, setValue, formState: { errors } } = useForm<ProductForm>({
     defaultValues: {
+      is_active: true,
       images: [{ url: '' }],
       specifications: [{ key: '', value: '' }]
     }
@@ -55,6 +57,7 @@ export default function AdminProductForm() {
   const watchedTitle = useWatch({ control, name: 'title' });
   const watchedCategory = useWatch({ control, name: 'category' });
   const watchedSpecs = useWatch({ control, name: 'specifications' });
+  const watchedIsActive = useWatch({ control, name: 'is_active' }) ?? true;
   const [similarMatches, setSimilarMatches] = useState<ReturnType<typeof findSimilarTo>>([]);
 
   const { fields: imageFields, append: appendImage, remove: removeImage, move: moveImage } = useFieldArray({
@@ -122,6 +125,7 @@ export default function AdminProductForm() {
               title: data.title || '',
               description: data.description || '',
               details: data.details || '',
+              is_active: data.is_active !== false,
               category: matchedCategory,
               price_range: data.price_range || '',
               msrp: data.msrp || '',
@@ -276,6 +280,7 @@ export default function AdminProductForm() {
         title: data.title,
         description: data.description,
         details: data.details,
+        is_active: data.is_active,
         category: data.category,
         price_range: data.price_range,
         msrp: data.msrp,
@@ -503,6 +508,43 @@ export default function AdminProductForm() {
 
           {/* Sidebar Column */}
           <div className="w-full lg:w-80 flex flex-col gap-8">
+            {/* Public visibility */}
+            <div className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
+              <div className="border-b border-stone-100 bg-stone-50/50 px-6 py-5">
+                <h3 className="flex items-center gap-2 text-base font-semibold text-stone-900">
+                  {watchedIsActive ? <Eye className="h-4 w-4 text-emerald-600" /> : <EyeOff className="h-4 w-4 text-stone-400" />}
+                  {t('admin.productForm.visibility', 'Visibility')}
+                </h3>
+              </div>
+              <div className="p-6">
+                <label className="flex cursor-pointer items-center justify-between gap-4">
+                  <span>
+                    <span className="block text-sm font-semibold text-stone-900">
+                      {watchedIsActive
+                        ? t('admin.productForm.active', 'Active')
+                        : t('admin.productForm.inactive', 'Inactive')}
+                    </span>
+                    <span className="mt-1 block text-xs leading-relaxed text-stone-500">
+                      {watchedIsActive
+                        ? t('admin.productForm.activeHelp', 'Visible in the catalog and at its product URL.')
+                        : t('admin.productForm.inactiveHelp', 'Hidden from the public site and not published at its product URL.')}
+                    </span>
+                  </span>
+                  <input
+                    type="checkbox"
+                    role="switch"
+                    aria-label={t('admin.productForm.visibility', 'Visibility')}
+                    {...register('is_active')}
+                    className="peer sr-only"
+                  />
+                  <span
+                    aria-hidden="true"
+                    className="relative h-6 w-11 shrink-0 rounded-full bg-stone-300 transition-colors after:absolute after:left-1 after:top-1 after:h-4 after:w-4 after:rounded-full after:bg-white after:shadow-sm after:transition-transform peer-checked:bg-emerald-600 peer-checked:after:translate-x-5 peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-600 peer-focus-visible:ring-offset-2"
+                  />
+                </label>
+              </div>
+            </div>
+
             <ProductSimilarityHints matches={similarMatches} />
 
             {/* Organization */}

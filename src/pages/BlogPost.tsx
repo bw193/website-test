@@ -94,6 +94,7 @@ export default function BlogPost() {
           const { data: products } = await supabase
             .from('products')
             .select('id, title, description, images, category, price_range, msrp')
+            .eq('is_active', true)
             .in('id', productIds);
           if (active && products) {
             const byId = new Map((products as ProductLite[]).map((product) => [product.id, product]));

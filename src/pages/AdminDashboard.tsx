@@ -49,6 +49,7 @@ const AdminAiChats = React.lazy(() => import('../components/admin/AdminAiChats')
 interface Product {
   id: string;
   title: string;
+  is_active: boolean;
   category?: string;
   images?: unknown;
   description?: string | null;
@@ -93,6 +94,7 @@ interface VideoPostRow {
 }
 
 type RfqStatusFilter = 'active' | 'new' | 'read' | 'archived' | 'all';
+type ProductStatusFilter = 'all' | 'active' | 'inactive';
 type PublishFilter = 'all' | 'published' | 'draft';
 type RoleFilter = 'all' | 'pending' | 'employee' | 'admin' | 'rejected';
 
@@ -160,6 +162,7 @@ export default function AdminDashboard() {
   const [rfqEndDate, setRfqEndDate] = useState<string>('');
   const [selectedRfqId, setSelectedRfqId] = useState<string | null>(null);
   const [productCategoryFilter, setProductCategoryFilter] = useState<string>('all');
+  const [productStatusFilter, setProductStatusFilter] = useState<ProductStatusFilter>('all');
   const [productSearch, setProductSearch] = useState('');
   const [similarityOpen, setSimilarityOpen] = useState(false);
   const [similarityThreshold, setSimilarityThreshold] = useState(DEFAULT_SIMILARITY_THRESHOLD);
@@ -236,7 +239,7 @@ export default function AdminDashboard() {
 
       if (activeTab === 'overview') {
         const [prodData, rfqData, blogData, videoData] = await Promise.all([
-          supabase.from('products').select('id, title, category, images').order('created_at', { ascending: false }).limit(8),
+          supabase.from('products').select('id, title, is_active, category, images').order('created_at', { ascending: false }).limit(8),
           supabase.from('rfqs').select('*').order('created_at', { ascending: false }).limit(6),
           supabase.from('blog_posts').select('id, slug, status, category, title').order('created_at', { ascending: false }).limit(5),
           supabase
@@ -256,7 +259,7 @@ export default function AdminDashboard() {
       } else if (activeTab === 'products') {
         const { data, error } = await supabase
           .from('products')
-          .select('id, title, category, images, description, specifications')
+          .select('id, title, is_active, category, images, description, specifications')
           .order('created_at', { ascending: false });
         if (error) throw error;
         setProducts(data || []);
@@ -433,6 +436,9 @@ export default function AdminDashboard() {
   const filteredProducts = useMemo(() => {
     const q = productSearch.trim().toLowerCase();
     return products.filter((p) => {
+      const isActive = p.is_active !== false;
+      if (productStatusFilter === 'active' && !isActive) return false;
+      if (productStatusFilter === 'inactive' && isActive) return false;
       if (productCategoryFilter !== 'all') {
         if (productCategoryFilter === 'uncategorized') {
           if (p.category) return false;
@@ -443,7 +449,12 @@ export default function AdminDashboard() {
       if (q && !p.title.toLowerCase().includes(q)) return false;
       return true;
     });
-  }, [products, productCategoryFilter, productSearch]);
+  }, [products, productCategoryFilter, productStatusFilter, productSearch]);
+
+  const productCounts = useMemo(() => {
+    const active = products.filter((product) => product.is_active !== false).length;
+    return { all: products.length, active, inactive: products.length - active };
+  }, [products]);
 
   const filteredRfqs = useMemo(() => {
     return rfqs.filter((rfq) => {
@@ -623,6 +634,15 @@ export default function AdminDashboard() {
                     label: uncategorized,
                     count: products.filter((p) => !p.category).length,
                   },
+                ]}
+              />
+              <FilterPills<ProductStatusFilter>
+                value={productStatusFilter}
+                onChange={setProductStatusFilter}
+                options={[
+                  { id: 'all', label: t('admin.dashboard.filterAll', 'All'), count: productCounts.all },
+                  { id: 'active', label: t('admin.dashboard.products.active', 'Active'), count: productCounts.active },
+                  { id: 'inactive', label: t('admin.dashboard.products.inactive', 'Inactive'), count: productCounts.inactive },
                 ]}
               />
               <ResultMeta shown={filteredProducts.length} total={products.length} label={t('admin.dashboard.stats.products', 'Products')} />
@@ -1406,6 +1426,7 @@ function QuickAction({ to, icon: Icon, label }: { to: string; icon: React.Compon
 function ProductCard({ product, uncategorized, compact }: { product: Product; uncategorized: string; compact?: boolean }) {
   const { t } = useTranslation();
   const src = firstImage(product.images) || PRODUCT_IMAGE_PLACEHOLDER;
+  const isActive = product.is_active !== false;
   const categoryLabel = product.category
     ? t(`products.categories.${product.category}`, product.category)
     : uncategorized;
@@ -1414,8 +1435,15 @@ function ProductCard({ product, uncategorized, compact }: { product: Product; un
       to={`/admin/products/${product.id}`}
       className="group overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
     >
-      <div className={`bg-stone-100 ${compact ? 'aspect-square' : 'aspect-[4/3]'}`}>
+      <div className={`relative bg-stone-100 ${compact ? 'aspect-square' : 'aspect-[4/3]'}`}>
         <img src={src} alt="" className="h-full w-full object-cover" onError={handleImageError} />
+        <div className="absolute left-2 top-2">
+          <StatusPill tone={isActive ? 'emerald' : 'stone'}>
+            {isActive
+              ? t('admin.dashboard.products.active', 'Active')
+              : t('admin.dashboard.products.inactive', 'Inactive')}
+          </StatusPill>
+        </div>
       </div>
       <div className={compact ? 'p-3' : 'flex items-start justify-between gap-2 p-4'}>
         <div className="min-w-0">

@@ -572,6 +572,8 @@ export const de = {
         },
         products: {
           uncategorized: "Nicht kategorisiert",
+          active: "Aktiv",
+          inactive: "Inaktiv",
           noProducts: "Keine Produkte gefunden.",
           deleteConfirm: "Sind Sie sicher, dass Sie dieses Produkt löschen möchten?",
           deleteError: "Fehler beim Löschen des Produkts."
@@ -637,6 +639,11 @@ export const de = {
         supabaseSetupDesc: "Um Bild-Uploads zu aktivieren, fügen Sie bitte VITE_SUPABASE_URL und VITE_SUPABASE_ANON_KEY zu Ihren Umgebungsvariablen (oder AI Studio-Secrets) hinzu und erstellen Sie die App neu.",
         editProduct: "Produkt bearbeiten",
         addProduct: "Neues Produkt hinzufügen",
+        visibility: "Sichtbarkeit",
+        active: "Aktiv",
+        inactive: "Inaktiv",
+        activeHelp: "Im Katalog und unter der Produkt-URL sichtbar.",
+        inactiveHelp: "Auf der öffentlichen Website verborgen und nicht unter der Produkt-URL veröffentlicht.",
         productTitle: "Produkttitel",
         category: "Kategorie",
         priceRange: "Preisspanne",

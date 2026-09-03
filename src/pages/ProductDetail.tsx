@@ -28,6 +28,7 @@ interface Product {
   description: string;
   details?: string;
   images: string[];
+  is_active?: boolean;
   category?: string;
   price_range?: string;
   msrp?: string;
@@ -130,11 +131,15 @@ export default function ProductDetail() {
             .from('products')
             .select('*')
             .eq('id', knownId)
-            .single();
+            .eq('is_active', true)
+            .maybeSingle();
           if (error) throw error;
           resolved = (data as Product) ?? null;
         } else {
-          const { data, error } = await supabase.from('products').select('*');
+          const { data, error } = await supabase
+            .from('products')
+            .select('*')
+            .eq('is_active', true);
           if (error) throw error;
           resolved = (data as Product[] | null)?.find((p) => toSlug(p.title) === routeSlug) ?? null;
         }
@@ -247,9 +252,17 @@ export default function ProductDetail() {
 
   if (!product) {
     return (
-      <div className="text-center py-24 text-stone-500 text-xl">
-        {t('productDetail.notFound', 'Product not found.')}
-      </div>
+      <>
+        <SEO
+          title={t('productDetail.notFound', 'Product not found.')}
+          path={`/products/${routeSlug || routeParam || ''}`}
+          noindex
+          alternateLanguages={[]}
+        />
+        <div className="text-center py-24 text-stone-500 text-xl">
+          {t('productDetail.notFound', 'Product not found.')}
+        </div>
+      </>
     );
   }
 

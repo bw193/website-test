@@ -155,6 +155,7 @@ interface Product {
   title: string;
   description?: string;
   images?: string[];
+  is_active?: boolean;
   category?: string;
   price_range?: string;
   msrp?: string;
@@ -1428,6 +1429,7 @@ async function fetchAllProducts(): Promise<Product[]> {
     const { data, error } = await supabase
       .from('products')
       .select('id, title, description, images, category, price_range, msrp, details, specifications')
+      .eq('is_active', true)
       .order('created_at', { ascending: false })
       .range(from, from + PAGE - 1);
     if (error) {

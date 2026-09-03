@@ -76,6 +76,7 @@ ${xDefault}
     const { data: products } = await supabase
       .from('products')
       .select('id, title, updated_at, created_at')
+      .eq('is_active', true)
       .order('created_at', { ascending: false });
 
     const staticPages: SitemapPage[] = [

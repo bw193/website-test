@@ -76,6 +76,7 @@ export default function VideoDetail() {
           supabase
             .from('products')
             .select('id, title, description, images, category, price_range, msrp')
+            .eq('is_active', true)
             .order('created_at', { ascending: false }),
           supabase
             .from('videos')

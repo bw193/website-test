@@ -228,7 +228,7 @@ export default function OurStory() {
         const { supabase } = await import('../supabase');
         const [settingsResult, productsResult, videosResult] = await Promise.all([
           supabase.from('site_settings').select('key, value').in('key', ['factory_gallery', 'home_featured_video']),
-          supabase.from('products').select('id', { count: 'exact', head: true }),
+          supabase.from('products').select('id', { count: 'exact', head: true }).eq('is_active', true),
           supabase.from('videos').select('id', { count: 'exact', head: true }).eq('status', 'published'),
         ]);
 

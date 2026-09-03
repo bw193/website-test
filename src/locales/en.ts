@@ -755,6 +755,8 @@ export const en = {
         },
         products: {
           uncategorized: "Uncategorized",
+          active: "Active",
+          inactive: "Inactive",
           noProducts: "No products found.",
           deleteConfirm: "Are you sure you want to delete this product?",
           deleteError: "Failed to delete product."
@@ -992,6 +994,11 @@ export const en = {
         supabaseSetupDesc: "To enable image uploads, please add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to your Environment Variables (or AI Studio Secrets) and rebuild the app.",
         editProduct: "Edit Product",
         addProduct: "Add New Product",
+        visibility: "Visibility",
+        active: "Active",
+        inactive: "Inactive",
+        activeHelp: "Visible in the catalog and at its product URL.",
+        inactiveHelp: "Hidden from the public site and not published at its product URL.",
         productTitle: "Product Title",
         category: "Category",
         priceRange: "Price Range",

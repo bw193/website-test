@@ -55,6 +55,7 @@ export async function getPublicPages(): Promise<PublicPage[]> {
   const { data: products, error } = await supabase
     .from('products')
     .select('id, title, updated_at, created_at')
+    .eq('is_active', true)
     .order('created_at', { ascending: false });
 
   if (error) console.warn(`[get-public-urls] Could not fetch products: ${error.message}`);

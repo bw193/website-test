@@ -60,6 +60,7 @@ export default function SeoLandingPage() {
         const { data, error } = await supabase
           .from('products')
           .select('id, title, description, details, images, category, price_range, msrp')
+          .eq('is_active', true)
           .order('created_at', { ascending: false });
         if (error) throw error;
         if (!cancelled) setProducts((data as Product[]) || []);
