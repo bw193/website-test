@@ -92,8 +92,13 @@ async function main(): Promise<void> {
       assert.equal(normalized(String(pageSchemas[0].description)), description, `${route}: schema description differs from Meta Description`);
 
       if (categorySlug) {
-        assert.equal(title, getCatalogCategorySeoTitle(lang, categorySlug, title), `${route}: category Title override missing`);
-        assert.deepEqual({ h1, description }, getCatalogCategoryPageCopy(lang, categorySlug, { h1, description }), `${route}: category copy override missing`);
+        const expectedTitle = getCatalogCategorySeoTitle(lang, categorySlug, '');
+        if (expectedTitle) {
+          const expectedCopy = getCatalogCategoryPageCopy(lang, categorySlug, { h1: '', description: '' });
+          assert.ok(expectedCopy.h1 && expectedCopy.description, `${route}: custom title has no dedicated page copy`);
+          assert.equal(title, expectedTitle, `${route}: category Title override missing`);
+          assert.deepEqual({ h1, description }, expectedCopy, `${route}: category copy override missing`);
+        }
         const itemLists = schemas.filter((schema) => schema['@type'] === 'ItemList');
         assert.equal(itemLists.length, 1, `${route}: expected one ItemList`);
         assert.equal(itemLists[0].name, h1, `${route}: ItemList name differs from H1`);

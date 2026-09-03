@@ -42,6 +42,14 @@ const translatedSeo = {
       "full-length-dressing-mirror": {
         "h1": "全身穿衣镜制造商",
         "description": "从制造商和批发供应商处采购全身穿衣镜。支持定制尺寸、镜框和表面处理，适用于酒店、零售商及家居品牌。"
+      },
+      "irregular-mirror": {
+        "h1": "定制异形镜制造商",
+        "description": "向专业镜子制造商采购定制异形镜。支持定制形状、尺寸和表面处理，为品牌商及酒店项目提供 OEM/ODM 供应服务。"
+      },
+      "mirror-cabinet": {
+        "h1": "LED 镜柜制造商",
+        "description": "采购兼具实用储物空间的 LED 镜柜，支持定制尺寸与表面处理。为品牌商和酒店提供 OEM/ODM 镜柜制造及批发供应。"
       }
     }
   },
@@ -70,6 +78,14 @@ const translatedSeo = {
       "full-length-dressing-mirror": {
         "h1": "Fabricante de espejos de vestidor de cuerpo entero",
         "description": "Adquiera espejos de vestidor de cuerpo entero de un fabricante y proveedor mayorista. Tamaños, marcos y acabados personalizados para hoteles, minoristas y marcas de artículos para el hogar."
+      },
+      "irregular-mirror": {
+        "h1": "Fabricante de espejos irregulares a medida",
+        "description": "Adquiera espejos irregulares a medida de un fabricante profesional. Formas, tamaños y acabados personalizados, con suministro OEM/ODM para marcas y proyectos hoteleros."
+      },
+      "mirror-cabinet": {
+        "h1": "Fabricante de armarios con espejo LED",
+        "description": "Adquiera armarios con espejo LED y espacio de almacenamiento práctico, con tamaños y acabados personalizados. Fabricación OEM/ODM y suministro al por mayor para marcas y hoteles."
       }
     }
   },
@@ -98,6 +114,14 @@ const translatedSeo = {
       "full-length-dressing-mirror": {
         "h1": "Fabricant de miroirs de dressing en pied",
         "description": "Commandez des miroirs de dressing en pied auprès d'un fabricant et fournisseur en gros. Dimensions, cadres et finitions sur mesure pour les hôtels, les détaillants et les marques d'articles pour la maison."
+      },
+      "irregular-mirror": {
+        "h1": "Fabricant de miroirs irréguliers sur mesure",
+        "description": "Commandez des miroirs irréguliers sur mesure auprès d'un fabricant professionnel. Formes, dimensions et finitions personnalisées, avec fourniture OEM/ODM pour les marques et les projets hôteliers."
+      },
+      "mirror-cabinet": {
+        "h1": "Fabricant d'armoires à miroir LED",
+        "description": "Commandez des armoires à miroir LED avec des rangements pratiques, des dimensions et des finitions sur mesure. Fabrication OEM/ODM et fourniture en gros pour les marques et les hôtels."
       }
     }
   },
@@ -126,6 +150,14 @@ const translatedSeo = {
       "full-length-dressing-mirror": {
         "h1": "Hersteller von Ganzkörper-Ankleidespiegeln",
         "description": "Beziehen Sie Ganzkörper-Ankleidespiegel von einem Hersteller und Großhändler. Individuelle Größen, Rahmen und Oberflächen für Hotels, Einzelhändler und Einrichtungsmarken."
+      },
+      "irregular-mirror": {
+        "h1": "Hersteller unregelmäßiger Spiegel nach Maß",
+        "description": "Beziehen Sie unregelmäßige Spiegel nach Maß von einem professionellen Hersteller. Individuelle Formen, Größen und Oberflächen mit OEM/ODM-Lieferungen für Marken und Hotelprojekte."
+      },
+      "mirror-cabinet": {
+        "h1": "Hersteller von LED-Spiegelschränken",
+        "description": "Beziehen Sie LED-Spiegelschränke mit praktischem Stauraum sowie individuellen Größen und Oberflächen. OEM/ODM-Fertigung und Großhandelslieferungen für Marken und Hotels."
       }
     }
   },
@@ -154,6 +186,14 @@ const translatedSeo = {
       "full-length-dressing-mirror": {
         "h1": "Produttore di specchi da guardaroba a figura intera",
         "description": "Acquista specchi da guardaroba a figura intera da un produttore e fornitore all'ingrosso. Dimensioni, cornici e finiture personalizzate per hotel, rivenditori e marchi per la casa."
+      },
+      "irregular-mirror": {
+        "h1": "Produttore di specchi irregolari su misura",
+        "description": "Acquista specchi irregolari su misura da un produttore professionale. Forme, dimensioni e finiture personalizzate, con fornitura OEM/ODM per marchi e progetti alberghieri."
+      },
+      "mirror-cabinet": {
+        "h1": "Produttore di armadietti con specchio LED",
+        "description": "Acquista armadietti con specchio LED e pratici vani portaoggetti, con dimensioni e finiture personalizzate. Produzione OEM/ODM e fornitura all'ingrosso per marchi e hotel."
       }
     }
   }
@@ -215,7 +255,33 @@ const approvedPageCopy = [
     h1: 'Full-Length Dressing Mirror Manufacturer',
     description: 'Source full-length dressing mirrors from a manufacturer and wholesale supplier. Custom sizes, frames and finishes for hotels, retailers and home brands.',
   },
+  {
+    slug: 'irregular-mirror',
+    h1: 'Custom Irregular Mirror Manufacturer',
+    description: 'Source custom irregular mirrors from a professional mirror manufacturer. Custom shapes, sizes and finishes with OEM/ODM supply for brands and hotel projects.',
+  },
+  {
+    slug: 'mirror-cabinet',
+    h1: 'LED Mirror Cabinet Manufacturer',
+    description: 'Source LED mirror cabinets with practical storage, custom sizes and finishes. OEM/ODM mirror cabinet manufacturing and wholesale supply for brands and hotels.',
+  },
 ] as const;
+
+test('every category with a custom title has dedicated H1 and description copy in all languages', () => {
+  const fallback = { h1: 'Fallback heading', description: 'Fallback description' };
+  for (const lang of supportedLanguages) {
+    const descriptions = new Set<string>();
+    for (const [slug] of approvedTitles) {
+      const copy = getCatalogCategoryPageCopy(lang, slug, fallback);
+      assert.ok(copy.h1.trim(), `${lang}/${slug}: missing H1`);
+      assert.ok(copy.description.trim(), `${lang}/${slug}: missing description`);
+      assert.notEqual(copy.h1, fallback.h1, `${lang}/${slug}: still using the default H1`);
+      assert.notEqual(copy.description, fallback.description, `${lang}/${slug}: still using the generic description`);
+      descriptions.add(copy.description);
+    }
+    assert.equal(descriptions.size, approvedTitles.length, `${lang}: category descriptions must be distinct`);
+  }
+});
 
 for (const { slug, h1, description } of approvedPageCopy) {
   test(`uses the exact approved English H1 and description for ${slug}`, () => {
@@ -246,10 +312,10 @@ test('preserves fallback copy for unsupported languages', () => {
   }
 });
 
-test('does not change the H1 or description for unapproved categories', () => {
+test('preserves fallback H1 and description for additional or unknown categories', () => {
   const fallback = { h1: 'Original heading', description: 'Original description' };
   for (const lang of supportedLanguages) {
-    for (const slug of ['irregular-mirror', 'mirror-cabinet', 'new-arrival', 'unknown', 'constructor', '__proto__']) {
+    for (const slug of ['new-arrival', 'unknown', 'constructor', '__proto__']) {
       assert.deepEqual(getCatalogCategoryPageCopy(lang, slug, fallback), fallback);
     }
   }
