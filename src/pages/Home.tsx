@@ -506,208 +506,207 @@ export default function Home() {
         )}
       </div>
 
-      {/* The quick-inquiry card crosses the banner edge like the reference,
-          while the value band begins directly underneath it as one composition. */}
+      {/* Hero footer — a compact quick-inquiry card crosses the banner edge,
+          while the value copy and stats stay on the open band, so the parts
+          share one axis without boxing everything into a single slab. */}
       <div className="relative z-10 isolate bg-gradient-to-b from-stone-100 to-[#FAF9F6] text-stone-900">
         {/* Clip only the animated wash; the inquiry card itself must remain free
             to rise above the section and overlap the hero artwork. */}
         <div className="band-aurora pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true" />
-        {/* pb is larger than pt because the stats card below overlaps this band
-            by -mt-8/-mt-10 and would otherwise crowd the buttons. */}
-        <div className="relative z-10 mx-auto flex max-w-7xl flex-col px-4 pb-16 sm:px-6 sm:pb-20 lg:px-8">
-          <Reveal variant="blur" delay={320} className="relative -top-8 mx-auto w-full max-w-[780px] sm:-top-10 lg:-top-12">
+        {/* flow-root keeps the card's negative top margin from collapsing
+            through to the band, so only the card overlaps the hero. */}
+        <div className="relative z-10 mx-auto flow-root max-w-6xl px-4 pb-16 sm:px-6 sm:pb-20 lg:px-8">
+          <Reveal variant="blur" delay={320} className="relative -mt-8 sm:-mt-10 lg:-mt-12">
             <form
               onSubmit={handleHomeInquirySubmit(onSubmitHomeInquiry)}
-              className="rounded-2xl border border-stone-200/90 bg-white/95 p-4 shadow-xl shadow-stone-900/10 backdrop-blur sm:p-5 lg:px-6"
+              className="mx-auto max-w-5xl rounded-2xl border border-stone-200/90 bg-white p-4 shadow-xl shadow-stone-900/10 sm:p-5 lg:px-8 lg:py-5"
               aria-labelledby="home-quick-inquiry-title"
               noValidate
             >
-              <h2 id="home-quick-inquiry-title" className="text-center font-serif text-lg text-stone-900 sm:text-xl">
-                {t('home.quickInquiry.title')}
-              </h2>
-              <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.5fr)_auto] lg:items-start">
-                <div>
-                  <label htmlFor="home-inquiry-name" className="sr-only">
-                    {t('home.quickInquiry.name')}
-                  </label>
-                  <input
-                    id="home-inquiry-name"
-                    type="text"
-                    autoComplete="name"
-                    maxLength={200}
-                    placeholder={`${t('home.quickInquiry.name')} *`}
-                    aria-invalid={homeInquiryErrors.customerName ? true : undefined}
-                    aria-describedby={homeInquiryErrors.customerName ? 'home-inquiry-name-error' : undefined}
-                    {...registerHomeInquiry('customerName', {
-                      required: t('rfq.errors.nameRequired'),
-                      maxLength: 200,
-                    })}
-                    className="h-12 w-full rounded-xl border border-stone-200 bg-stone-50 px-4 text-sm text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-amber-500 focus:bg-white focus:ring-2 focus:ring-amber-500/20"
-                  />
-                  {homeInquiryErrors.customerName && (
-                    <p id="home-inquiry-name-error" className="mt-1 text-xs text-red-600" role="alert">
-                      {homeInquiryErrors.customerName.message}
-                    </p>
-                  )}
+                {/* Desktop: title rides in the same row as the fields so the
+                    header stays one line tall; mobile/tablet keep it centered
+                    above the stacked controls. */}
+                <div className="grid items-center gap-3 sm:grid-cols-2 lg:grid-cols-[auto_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.4fr)_auto]">
+                  <h2 id="home-quick-inquiry-title" className="text-center font-serif text-lg text-stone-900 sm:col-span-2 sm:text-xl lg:col-span-1 lg:max-w-[10rem] lg:text-left lg:text-lg lg:leading-snug xl:max-w-none xl:whitespace-nowrap">
+                    {t('home.quickInquiry.title')}
+                  </h2>
+                  <div>
+                    <label htmlFor="home-inquiry-name" className="sr-only">
+                      {t('home.quickInquiry.name')}
+                    </label>
+                    <input
+                      id="home-inquiry-name"
+                      type="text"
+                      autoComplete="name"
+                      maxLength={200}
+                      placeholder={`${t('home.quickInquiry.name')} *`}
+                      aria-invalid={homeInquiryErrors.customerName ? true : undefined}
+                      aria-describedby={homeInquiryErrors.customerName ? 'home-inquiry-name-error' : undefined}
+                      {...registerHomeInquiry('customerName', {
+                        required: t('rfq.errors.nameRequired'),
+                        maxLength: 200,
+                      })}
+                      className="h-12 w-full rounded-xl border border-stone-200 bg-stone-50 px-4 text-sm text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-amber-500 focus:bg-white focus:ring-2 focus:ring-amber-500/20"
+                    />
+                    {homeInquiryErrors.customerName && (
+                      <p id="home-inquiry-name-error" className="mt-1 text-xs text-red-600" role="alert">
+                        {homeInquiryErrors.customerName.message}
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label htmlFor="home-inquiry-email" className="sr-only">
+                      {t('home.quickInquiry.email')}
+                    </label>
+                    <input
+                      id="home-inquiry-email"
+                      type="email"
+                      autoComplete="email"
+                      maxLength={320}
+                      placeholder={`${t('home.quickInquiry.email')} *`}
+                      aria-invalid={homeInquiryErrors.customerEmail ? true : undefined}
+                      aria-describedby={homeInquiryErrors.customerEmail ? 'home-inquiry-email-error' : undefined}
+                      {...registerHomeInquiry('customerEmail', {
+                        required: t('rfq.errors.emailRequired'),
+                        pattern: {
+                          value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/i,
+                          message: t('rfq.errors.invalidEmail'),
+                        },
+                        maxLength: 320,
+                      })}
+                      className="h-12 w-full rounded-xl border border-stone-200 bg-stone-50 px-4 text-sm text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-amber-500 focus:bg-white focus:ring-2 focus:ring-amber-500/20"
+                    />
+                    {homeInquiryErrors.customerEmail && (
+                      <p id="home-inquiry-email-error" className="mt-1 text-xs text-red-600" role="alert">
+                        {homeInquiryErrors.customerEmail.message}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="sm:col-span-2 lg:col-span-1">
+                    <label htmlFor="home-inquiry-message" className="sr-only">
+                      {t('home.quickInquiry.message')}
+                    </label>
+                    <input
+                      id="home-inquiry-message"
+                      type="text"
+                      maxLength={10000}
+                      placeholder={`${t('home.quickInquiry.message')} *`}
+                      aria-invalid={homeInquiryErrors.message ? true : undefined}
+                      aria-describedby={homeInquiryErrors.message ? 'home-inquiry-message-error' : undefined}
+                      {...registerHomeInquiry('message', {
+                        required: t('rfq.errors.messageRequired'),
+                        maxLength: 10000,
+                      })}
+                      className="h-12 w-full rounded-xl border border-stone-200 bg-stone-50 px-4 text-sm text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-amber-500 focus:bg-white focus:ring-2 focus:ring-amber-500/20"
+                    />
+                    {homeInquiryErrors.message && (
+                      <p id="home-inquiry-message-error" className="mt-1 text-xs text-red-600" role="alert">
+                        {homeInquiryErrors.message.message}
+                      </p>
+                    )}
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={homeInquiryStatus === 'submitting'}
+                    className="btn-primary h-12 justify-center px-7 uppercase tracking-wide sm:col-span-2 lg:col-span-1 disabled:cursor-not-allowed disabled:opacity-70"
+                  >
+                    {homeInquiryStatus === 'submitting' ? (
+                      <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                    ) : homeInquiryStatus === 'success' ? (
+                      <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
+                    ) : (
+                      <Send className="h-4 w-4" aria-hidden="true" />
+                    )}
+                    <span>
+                      {homeInquiryStatus === 'submitting'
+                        ? t('home.quickInquiry.sending')
+                        : t('home.quickInquiry.send')}
+                    </span>
+                  </button>
                 </div>
 
-                <div>
-                  <label htmlFor="home-inquiry-email" className="sr-only">
-                    {t('home.quickInquiry.email')}
-                  </label>
-                  <input
-                    id="home-inquiry-email"
-                    type="email"
-                    autoComplete="email"
-                    maxLength={320}
-                    placeholder={`${t('home.quickInquiry.email')} *`}
-                    aria-invalid={homeInquiryErrors.customerEmail ? true : undefined}
-                    aria-describedby={homeInquiryErrors.customerEmail ? 'home-inquiry-email-error' : undefined}
-                    {...registerHomeInquiry('customerEmail', {
-                      required: t('rfq.errors.emailRequired'),
-                      pattern: {
-                        value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/i,
-                        message: t('rfq.errors.invalidEmail'),
-                      },
-                      maxLength: 320,
-                    })}
-                    className="h-12 w-full rounded-xl border border-stone-200 bg-stone-50 px-4 text-sm text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-amber-500 focus:bg-white focus:ring-2 focus:ring-amber-500/20"
-                  />
-                  {homeInquiryErrors.customerEmail && (
-                    <p id="home-inquiry-email-error" className="mt-1 text-xs text-red-600" role="alert">
-                      {homeInquiryErrors.customerEmail.message}
-                    </p>
-                  )}
-                </div>
+                {(homeInquiryStatus === 'success' || homeInquiryStatus === 'error') && (
+                  <p
+                    ref={homeInquiryStatusRef}
+                    tabIndex={-1}
+                    role={homeInquiryStatus === 'error' ? 'alert' : 'status'}
+                    className={`mt-3 text-center text-sm font-medium focus:outline-none ${
+                      homeInquiryStatus === 'success' ? 'text-emerald-700' : 'text-red-600'
+                    }`}
+                  >
+                    {homeInquiryStatus === 'success'
+                      ? t('home.quickInquiry.success')
+                      : t('home.quickInquiry.error')}
+                  </p>
+                )}
+              </form>
+            </Reveal>
 
-                <div className="sm:col-span-2 lg:col-span-1">
-                  <label htmlFor="home-inquiry-message" className="sr-only">
-                    {t('home.quickInquiry.message')}
-                  </label>
-                  <input
-                    id="home-inquiry-message"
-                    type="text"
-                    maxLength={10000}
-                    placeholder={`${t('home.quickInquiry.message')} *`}
-                    aria-invalid={homeInquiryErrors.message ? true : undefined}
-                    aria-describedby={homeInquiryErrors.message ? 'home-inquiry-message-error' : undefined}
-                    {...registerHomeInquiry('message', {
-                      required: t('rfq.errors.messageRequired'),
-                      maxLength: 10000,
-                    })}
-                    className="h-12 w-full rounded-xl border border-stone-200 bg-stone-50 px-4 text-sm text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-amber-500 focus:bg-white focus:ring-2 focus:ring-amber-500/20"
-                  />
-                  {homeInquiryErrors.message && (
-                    <p id="home-inquiry-message-error" className="mt-1 text-xs text-red-600" role="alert">
-                      {homeInquiryErrors.message.message}
-                    </p>
-                  )}
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={homeInquiryStatus === 'submitting'}
-                  className="btn-primary h-12 justify-center px-7 uppercase tracking-wide sm:col-span-2 lg:col-span-1 disabled:cursor-not-allowed disabled:opacity-70"
-                >
-                  {homeInquiryStatus === 'submitting' ? (
-                    <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-                  ) : homeInquiryStatus === 'success' ? (
-                    <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
-                  ) : (
-                    <Send className="h-4 w-4" aria-hidden="true" />
-                  )}
-                  <span>
-                    {homeInquiryStatus === 'submitting'
-                      ? t('home.quickInquiry.sending')
-                      : t('home.quickInquiry.send')}
-                  </span>
-                </button>
+            <div className="mt-8 grid gap-5 sm:mt-10 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-center lg:gap-10">
+              {/* Kicker and h1 are one unit — keeping the kicker outside the grid
+                  left it pinned to the top while the h1 dropped to meet the right
+                  column, opening a dead gap between them. */}
+              <div>
+                <Reveal as="p" variant="left" className="text-[10px] sm:text-xs font-semibold uppercase tracking-[0.2em] text-amber-600">
+                  {t('home.heroKicker')}
+                </Reveal>
+                <Reveal as="h1" variant="left" delay={90} className="mt-2 font-serif text-3xl sm:text-4xl lg:text-[2.6rem] leading-[1.08]">
+                  {t('home.heroTitle1')}
+                  <span className="block italic text-sheen">{t('home.heroTitle2')}</span>
+                </Reveal>
               </div>
+              <div className="lg:border-l lg:border-stone-300/70 lg:pl-10">
+                <Reveal as="p" variant="right" delay={180} className="text-sm text-stone-600 font-light">
+                  {/* heroDesc contains <1>BOLEN</1>, so it must go through Trans
+                      rather than t() or the markup renders as literal text. */}
+                  <Trans i18nKey="home.heroDesc" components={[<span key="0" />, <strong key="1" className="font-medium text-stone-900" />]} />
+                </Reveal>
+                <Reveal variant="right" delay={270} className="mt-4 flex flex-wrap gap-3">
+                  <Link to={lp('/rfq')} className="btn-primary transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-amber-500/25">
+                    {t('home.heroPrimaryCta')}
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                  <Link to={lp('/products')} className="btn-secondary transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md">
+                    {t('home.heroSecondaryCta')}
+                  </Link>
+                </Reveal>
+              </div>
+            </div>
 
-              {(homeInquiryStatus === 'success' || homeInquiryStatus === 'error') && (
-                <p
-                  ref={homeInquiryStatusRef}
-                  tabIndex={-1}
-                  role={homeInquiryStatus === 'error' ? 'alert' : 'status'}
-                  className={`mt-3 text-center text-sm font-medium focus:outline-none ${
-                    homeInquiryStatus === 'success' ? 'text-emerald-700' : 'text-red-600'
+            {/* Stats — a hairline spec strip on the open band, not a card. */}
+            <div id="home-stats" className="mt-10 grid scroll-mt-24 grid-cols-2 border-t border-stone-200/80 pt-8 sm:mt-12 sm:pt-10 lg:grid-cols-4">
+              {[
+                { icon: Factory, value: "46,800 m²", label: t('home.stats.sqMeters') },
+                { icon: Users, value: "200+", label: t('home.stats.artisans') },
+                { icon: Lightbulb, value: "200+", label: t('home.stats.styles') },
+                { icon: Globe, value: "Global", label: t('home.stats.global') }
+              ].map((stat, idx) => (
+                <Reveal
+                  key={idx}
+                  variant="scale"
+                  delay={idx * 100}
+                  className={`min-w-0 flex flex-col items-center text-center group px-3 py-4 sm:px-6 sm:py-5 lg:px-5 ${
+                    idx % 2 === 0 ? 'border-r border-stone-100 lg:border-r-0' : ''
+                  } ${idx < 2 ? 'border-b border-stone-100 lg:border-b-0' : ''} ${
+                    idx > 0 ? 'lg:border-l lg:border-stone-100' : ''
                   }`}
                 >
-                  {homeInquiryStatus === 'success'
-                    ? t('home.quickInquiry.success')
-                    : t('home.quickInquiry.error')}
-                </p>
-              )}
-            </form>
-          </Reveal>
-
-          <div className="-mt-1 grid gap-5 sm:-mt-2 lg:-mt-3 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-center lg:gap-10">
-            {/* Kicker and h1 are one unit — keeping the kicker outside the grid
-                left it pinned to the top while the h1 dropped to meet the right
-                column, opening a dead gap between them. */}
-            <div>
-              <Reveal as="p" variant="left" className="text-[10px] sm:text-xs font-semibold uppercase tracking-[0.2em] text-amber-600">
-                {t('home.heroKicker')}
-              </Reveal>
-              <Reveal as="h1" variant="left" delay={90} className="mt-2 font-serif text-3xl sm:text-4xl lg:text-[2.6rem] leading-[1.08]">
-                {t('home.heroTitle1')}
-                <span className="block italic text-sheen">{t('home.heroTitle2')}</span>
-              </Reveal>
+                  <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-full border border-stone-200/80 bg-white transition-all duration-300 group-hover:scale-110 group-hover:border-amber-300 group-hover:bg-amber-50 sm:h-10 sm:w-10">
+                    <stat.icon className="h-4.5 w-4.5 sm:h-5 sm:w-5 text-amber-600" />
+                  </div>
+                  <StatValue
+                    value={stat.value}
+                    className="text-xl sm:text-2xl font-bold text-stone-900 mb-1 font-serif whitespace-nowrap tabular-nums"
+                  />
+                  <p className="max-w-[15rem] text-xs lg:text-[13px] text-stone-500 font-medium leading-relaxed">
+                    {stat.label}
+                  </p>
+                </Reveal>
+              ))}
             </div>
-            <div className="lg:border-l lg:border-stone-300/70 lg:pl-10">
-              <Reveal as="p" variant="right" delay={180} className="text-sm text-stone-600 font-light">
-                {/* heroDesc contains <1>BOLEN</1>, so it must go through Trans
-                    rather than t() or the markup renders as literal text. */}
-                <Trans i18nKey="home.heroDesc" components={[<span key="0" />, <strong key="1" className="font-medium text-stone-900" />]} />
-              </Reveal>
-              <Reveal variant="right" delay={270} className="mt-4 flex flex-wrap gap-3">
-                <Link to={lp('/rfq')} className="btn-primary transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-amber-500/25">
-                  {t('home.heroPrimaryCta')}
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-                <Link to={lp('/products')} className="btn-secondary transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md">
-                  {t('home.heroSecondaryCta')}
-                </Link>
-              </Reveal>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-      {/* Stats Section */}
-      <div id="home-stats" className="relative -mt-8 sm:-mt-10 z-10 max-w-5xl mx-auto px-3 sm:px-6 lg:px-8 scroll-mt-24">
-        <div
-          className="bg-white rounded-xl sm:rounded-2xl shadow-xl shadow-stone-900/5 border border-stone-100 grid grid-cols-2 lg:grid-cols-4 overflow-hidden"
-        >
-          {[
-            { icon: Factory, value: "46,800 m²", label: t('home.stats.sqMeters') },
-            { icon: Users, value: "200+", label: t('home.stats.artisans') },
-            { icon: Lightbulb, value: "200+", label: t('home.stats.styles') },
-            { icon: Globe, value: "Global", label: t('home.stats.global') }
-          ].map((stat, idx) => (
-            <Reveal
-              key={idx}
-              variant="scale"
-              delay={idx * 100}
-              className={`min-w-0 flex flex-col items-center text-center group px-3 py-5 sm:px-6 sm:py-6 lg:px-5 ${
-                idx % 2 === 0 ? 'border-r border-stone-100 lg:border-r-0' : ''
-              } ${idx < 2 ? 'border-b border-stone-100 lg:border-b-0' : ''} ${
-                idx > 0 ? 'lg:border-l lg:border-stone-100' : ''
-              }`}
-            >
-              <div className="flex h-9 w-9 sm:h-10 sm:w-10 rounded-full bg-stone-50 group-hover:bg-amber-50 group-hover:scale-110 items-center justify-center mb-2.5 transition-all duration-300">
-                <stat.icon className="h-4.5 w-4.5 sm:h-5 sm:w-5 text-amber-600" />
-              </div>
-              <StatValue
-                value={stat.value}
-                className="text-xl sm:text-2xl font-bold text-stone-900 mb-1.5 font-serif whitespace-nowrap tabular-nums"
-              />
-              <p className="max-w-[15rem] text-xs lg:text-[13px] text-stone-500 font-medium leading-relaxed">
-                {stat.label}
-              </p>
-            </Reveal>
-          ))}
         </div>
       </div>
 
