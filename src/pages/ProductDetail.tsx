@@ -59,9 +59,6 @@ interface RFQForm {
 const VIDEO_LIST_COLUMNS =
   'id, slug, source_type, video_url, embed_url, thumbnail_url, category, tags, duration_seconds, published_at, title, excerpt';
 
-/** Number of specs surfaced next to the gallery before the full table below. */
-const HERO_SPEC_COUNT = 4;
-
 function SectionHeading({ children }: { children: React.ReactNode }) {
   return (
     <h2 className="flex items-start gap-3 font-serif text-2xl leading-tight text-stone-900 sm:text-3xl">
@@ -286,7 +283,6 @@ export default function ProductDetail() {
     localizeSeoLandingPage(page, lang)
   );
   const specs = normalizeSpecs(display.specifications);
-  const heroSpecs = specs.slice(0, HERO_SPEC_COUNT);
   const hasDetails = Boolean(display.details);
   // Specs and long-form details share one band below the hero. When both exist
   // they sit side by side; a lone block spans the full width instead.
@@ -427,12 +423,7 @@ export default function ProductDetail() {
           <span className="text-stone-900 truncate max-w-[140px] sm:max-w-none">{display.title}</span>
         </m.nav>
 
-        {/* Product titles here run past 100 characters, so the right column is
-            always the taller of the two. Explicit placement lets the spec
-            summary sit under the gallery on desktop (filling that gap) while
-            staying last in DOM order, so phones still get image → title →
-            price → CTA before any spec table. */}
-        <div className="mt-6 lg:mt-10 lg:grid lg:grid-cols-2 lg:gap-x-14 lg:gap-y-8 xl:gap-x-20">
+        <div className="mt-6 lg:mt-10 lg:grid lg:grid-cols-2 lg:gap-x-14 xl:gap-x-20">
           {/* Left Column: Image Gallery */}
           <div className="flex flex-col lg:col-start-1 lg:row-start-1">
             <m.div 
@@ -535,7 +526,7 @@ export default function ProductDetail() {
             variants={staggerContainer}
             initial="hidden"
             animate="visible"
-            className="mt-8 lg:col-start-2 lg:row-start-1 lg:row-span-2 lg:mt-0"
+            className="mt-8 lg:col-start-2 lg:mt-0"
           >
             <m.div variants={fadeInUp} className="flex flex-wrap items-center gap-x-3 gap-y-2">
               {product.category && (
@@ -623,36 +614,6 @@ export default function ProductDetail() {
             </m.ul>
           </m.div>
 
-          {/* The headline specs a buyer scans before scrolling. Desktop only:
-              on a phone the full table below is already the next thing on
-              screen, so a preview here would just repeat it. */}
-          {heroSpecs.length > 0 && (
-            <m.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="hidden lg:col-start-1 lg:row-start-2 lg:block"
-            >
-              <div className="mb-2 flex items-baseline justify-between gap-4">
-                <h2 className="text-[11px] font-bold uppercase tracking-[0.16em] text-stone-500">
-                  {t('productDetail.keySpecs', 'At a glance')}
-                </h2>
-                {specs.length > heroSpecs.length && (
-                  <a href="#product-specs" className="text-xs font-semibold text-amber-700 hover:text-amber-800">
-                    {t('productDetail.viewAllSpecs', 'View full specifications')}
-                  </a>
-                )}
-              </div>
-              <dl>
-                {heroSpecs.map((spec) => (
-                  <div key={spec.key} className="flex items-baseline justify-between gap-6 border-b border-stone-200/80 py-2.5">
-                    <dt className="text-xs text-stone-500">{spec.key}</dt>
-                    <dd className="text-right text-xs font-semibold text-stone-900">{spec.value}</dd>
-                  </div>
-                ))}
-              </dl>
-            </m.div>
-          )}
         </div>
         </div>
       </section>

@@ -228,11 +228,21 @@ export const de = {
       heroDesc: "<1>BOLEN</1> unterstützt Marken weltweit dabei, unverwechselbare Spiegelkollektionen auf den Markt zu bringen. Von Design und Individualisierung über qualitätsgesicherte Fertigung bis hin zur weltweiten Lieferung machen wir Premiumfertigung einfach, zuverlässig und skalierbar.",
       heroPrimaryCta: "Preise & MOQ anfragen",
       heroSecondaryCta: "Produkte entdecken",
+      quickInquiry: {
+        title: "Nachricht für eine schnelle Antwort",
+        name: "Name oder Unternehmen",
+        email: "E-Mail",
+        message: "Nachricht",
+        send: "Senden",
+        sending: "Wird gesendet...",
+        success: "Vielen Dank — Ihre Anfrage wurde gesendet.",
+        error: "Ihre Anfrage konnte nicht gesendet werden. Bitte versuchen Sie es erneut."
+      },
       stats: {
-        sqMeters: "Produktionsfläche",
-        artisans: "Qualifizierte Fachkräfte",
-        styles: "Spiegeldesigns",
-        global: "Weltweite Lieferung"
+        sqMeters: "Großserienfertigung im Werk mit zuverlässiger, termingerechter Abwicklung.",
+        artisans: "Qualifizierte Fachkräfte mit strenger Qualitätskontrolle und 3 Jahren erweiterter Garantie.",
+        styles: "Vollständig anpassbare Spiegeldesigns mit internationalen Zertifizierungen.",
+        global: "Weltweite Lieferung zu Sonderkonditionen mit international anerkannten Logistikpartnern."
       },
       about: {
         heritage: "Unser Erbe",
@@ -323,7 +333,7 @@ export const de = {
         paragraphs: [
           "Wir haben enge Partnerschaften in Europa (NL, RO, UK, ES, NO, DK), im Nahen Osten, in Nordamerika, Australien und Südamerika aufgebaut. Unsere Produkte entsprechen vollständig den internationalen Standards und verfügen über CE-, CB-, RoHS-, IP44-, SAA- und weitere Zertifizierungen.",
           "Als Direkthersteller bieten wir hochkompetitive Preise. Wir verpflichten uns zu Premium-Qualität, die perfekt zu Ihren Budget-Anforderungen passt.",
-          "Unser Qualitätssicherungssystem entspricht unserem After-Sales-Versprechen. Jedes Produkt wird vor dem Versand zu 100% geprüft, mit einer umfassenden 2-Jahres-Garantie auf elektronische Komponenten.",
+          "Unser Qualitätssicherungssystem entspricht unserem After-Sales-Versprechen. Jedes Produkt wird vor dem Versand zu 100% geprüft und durch eine umfassende erweiterte Garantie von 3 Jahren auf elektronische Komponenten abgesichert.",
           "Vom Spiegelglas bis zur Verpackung bieten wir End-to-End-OEM/ODM-Anpassungsservices, die Ihnen helfen, Ihre Marktreichweite zu erweitern und Ihre Marke aufzubauen."
         ]
       },

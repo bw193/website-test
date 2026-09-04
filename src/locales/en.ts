@@ -230,11 +230,21 @@ export const en = {
       heroDesc: "<1>BOLEN</1> helps global brands bring distinctive mirror collections to market. From design and customization to quality-controlled production and worldwide delivery, we make premium manufacturing simple, reliable, and scalable.",
       heroPrimaryCta: "Get Pricing & MOQ",
       heroSecondaryCta: "Explore Products",
+      quickInquiry: {
+        title: "Message for a Quick Reply",
+        name: "Name or company",
+        email: "Email",
+        message: "Message",
+        send: "Send",
+        sending: "Sending...",
+        success: "Thanks — your inquiry has been sent.",
+        error: "We couldn't send your inquiry. Please try again."
+      },
       stats: {
-        sqMeters: "Production Base",
-        artisans: "Skilled Specialists",
-        styles: "Mirror Designs",
-        global: "Worldwide Delivery"
+        sqMeters: "Large-scale factory production with reliable, on-time fulfillment.",
+        artisans: "Skilled specialists with strict quality control, backed by a 3-year extended warranty.",
+        styles: "Fully customizable mirror designs with international certifications.",
+        global: "Worldwide delivery with exclusive shipping rates from globally recognized logistics partners."
       },
       about: {
         heritage: "Our Heritage",
@@ -325,7 +335,7 @@ export const en = {
         paragraphs: [
           "We have established deep partnerships across Europe (NL, RO, UK, ES, NO, DK), the Middle East, North America, Australia, and South America. Our products are fully compliant with international standards, holding CE, CB, RoHS, IP44, and SAA certifications and so on.",
           "As a direct manufacturer, we offer highly competitive pricing. We are committed to delivering premium quality that perfectly aligns with your budget requirements.",
-          "Our quality assurance system matches our after-sales commitment. Every product undergoes 100% pre-shipment inspection, backed by a comprehensive 2-year warranty on electronic components.",
+          "Our quality assurance system matches our after-sales commitment. Every product undergoes 100% pre-shipment inspection, backed by a comprehensive 3-year extended warranty on electronic components.",
           "From mirror glass to packaging, we provide end-to-end OEM/ODM customization services tailored to help you expand your market reach and build your brand."
         ]
       },

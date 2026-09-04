@@ -228,11 +228,21 @@ export const es = {
       heroDesc: "<1>BOLEN</1> ayuda a marcas de todo el mundo a llevar al mercado colecciones de espejos con identidad propia. Desde el diseño y la personalización hasta la producción con rigurosos controles de calidad y la entrega en todo el mundo, hacemos que la fabricación de alta gama sea sencilla, fiable y escalable.",
       heroPrimaryCta: "Solicitar precio y MOQ",
       heroSecondaryCta: "Explore nuestros productos",
+      quickInquiry: {
+        title: "Mensaje para una respuesta rápida",
+        name: "Nombre o empresa",
+        email: "Correo electrónico",
+        message: "Mensaje",
+        send: "Enviar",
+        sending: "Enviando...",
+        success: "Gracias — su consulta se ha enviado.",
+        error: "No se pudo enviar su consulta. Inténtelo de nuevo."
+      },
       stats: {
-        sqMeters: "Planta de producción",
-        artisans: "Profesionales especializados",
-        styles: "Diseños de espejos",
-        global: "Entrega mundial"
+        sqMeters: "Producción industrial a gran escala con plazos fiables y puntuales.",
+        artisans: "Especialistas cualificados, control de calidad estricto y garantía ampliada de 3 años.",
+        styles: "Diseños de espejos totalmente personalizables con certificaciones internacionales.",
+        global: "Entrega mundial con tarifas exclusivas de socios logísticos reconocidos internacionalmente."
       },
       about: {
         heritage: "Nuestra Herencia",
@@ -323,7 +333,7 @@ export const es = {
         paragraphs: [
           "Hemos establecido alianzas profundas en Europa (NL, RO, UK, ES, NO, DK), Oriente Medio, Norteamérica, Australia y Sudamérica. Nuestros productos cumplen plenamente con los estándares internacionales, contando con certificaciones CE, CB, RoHS, IP44, SAA, entre otras.",
           "Como fabricante directo, ofrecemos precios altamente competitivos. Nos comprometemos a entregar una calidad premium que se ajuste perfectamente a sus requisitos de presupuesto.",
-          "Nuestro sistema de aseguramiento de la calidad está a la altura de nuestro compromiso postventa. Cada producto pasa por una inspección al 100% antes del envío, respaldada por una garantía integral de 2 años en componentes electrónicos.",
+          "Nuestro sistema de aseguramiento de la calidad está a la altura de nuestro compromiso postventa. Cada producto pasa por una inspección al 100% antes del envío, respaldada por una garantía ampliada integral de 3 años para los componentes electrónicos.",
           "Desde el cristal del espejo hasta el embalaje, ofrecemos servicios integrales de personalización OEM/ODM diseñados para ayudarle a ampliar su alcance de mercado y construir su marca."
         ]
       },

@@ -228,11 +228,21 @@ export const fr = {
       heroDesc: "<1>BOLEN</1> accompagne des marques du monde entier dans la commercialisation de collections de miroirs distinctives. De la conception et de la personnalisation à la production soumise à un contrôle qualité rigoureux et à la livraison mondiale, nous rendons la fabrication haut de gamme simple, fiable et adaptée à tous les volumes.",
       heroPrimaryCta: "Demander prix et MOQ",
       heroSecondaryCta: "Découvrir nos produits",
+      quickInquiry: {
+        title: "Un message pour une réponse rapide",
+        name: "Nom ou entreprise",
+        email: "E-mail",
+        message: "Message",
+        send: "Envoyer",
+        sending: "Envoi...",
+        success: "Merci — votre demande a bien été envoyée.",
+        error: "Votre demande n'a pas pu être envoyée. Veuillez réessayer."
+      },
       stats: {
-        sqMeters: "Site de production",
-        artisans: "Spécialistes qualifiés",
-        styles: "Modèles de miroirs",
-        global: "Livraison mondiale"
+        sqMeters: "Production industrielle à grande échelle avec des délais fiables et respectés.",
+        artisans: "Des spécialistes qualifiés, un contrôle qualité strict et une garantie prolongée de 3 ans.",
+        styles: "Des modèles de miroirs entièrement personnalisables avec certifications internationales.",
+        global: "Livraison mondiale à tarifs privilégiés avec des partenaires logistiques de renommée internationale."
       },
       about: {
         heritage: "Notre Héritage",
@@ -323,7 +333,7 @@ export const fr = {
         paragraphs: [
           "Nous avons établi des partenariats solides en Europe (NL, RO, UK, ES, NO, DK), au Moyen-Orient, en Amérique du Nord, en Australie et en Amérique du Sud. Nos produits sont entièrement conformes aux normes internationales et possèdent les certifications CE, CB, RoHS, IP44, SAA, entre autres.",
           "En tant que fabricant direct, nous offrons des prix très compétitifs. Nous nous engageons à livrer une qualité premium parfaitement adaptée à vos exigences budgétaires.",
-          "Notre système d'assurance qualité est à la hauteur de notre engagement après-vente. Chaque produit subit une inspection à 100% avant expédition, soutenue par une garantie complète de 2 ans sur les composants électroniques.",
+          "Notre système d'assurance qualité est à la hauteur de notre engagement après-vente. Chaque produit subit une inspection à 100% avant expédition et bénéficie d'une garantie prolongée complète de 3 ans sur les composants électroniques.",
           "Du verre des miroirs à l'emballage, nous offrons des services de personnalisation OEM/ODM de bout en bout, conçus pour vous aider à étendre votre portée et à construire votre marque."
         ]
       },

@@ -228,11 +228,21 @@ export const it = {
       heroDesc: "<1>BOLEN</1> aiuta brand di tutto il mondo a portare sul mercato collezioni di specchi dal carattere distintivo. Dalla progettazione e personalizzazione alla produzione con rigorosi controlli di qualità e alla consegna in tutto il mondo, rendiamo la produzione di alta gamma semplice, affidabile e scalabile.",
       heroPrimaryCta: "Richiedi prezzi e MOQ",
       heroSecondaryCta: "Scopri i prodotti",
+      quickInquiry: {
+        title: "Messaggio per una risposta rapida",
+        name: "Nome o azienda",
+        email: "E-mail",
+        message: "Messaggio",
+        send: "Invia",
+        sending: "Invio...",
+        success: "Grazie — la tua richiesta è stata inviata.",
+        error: "Non è stato possibile inviare la richiesta. Riprova."
+      },
       stats: {
-        sqMeters: "Stabilimento produttivo",
-        artisans: "Specialisti qualificati",
-        styles: "Design di specchi",
-        global: "Consegna globale"
+        sqMeters: "Produzione industriale su larga scala con tempi affidabili e puntuali.",
+        artisans: "Specialisti qualificati, rigoroso controllo qualità e garanzia estesa di 3 anni.",
+        styles: "Design di specchi completamente personalizzabili con certificazioni internazionali.",
+        global: "Consegna mondiale a tariffe esclusive con partner logistici riconosciuti a livello internazionale."
       },
       about: {
         heritage: "Il Nostro Patrimonio",
@@ -323,7 +333,7 @@ export const it = {
         paragraphs: [
           "Abbiamo stabilito partnership solide in Europa (NL, RO, UK, ES, NO, DK), Medio Oriente, Nord America, Australia e Sud America. I nostri prodotti sono pienamente conformi agli standard internazionali, con certificazioni CE, CB, RoHS, IP44, SAA e altre.",
           "Come produttore diretto, offriamo prezzi altamente competitivi. Ci impegniamo a fornire una qualità premium perfettamente in linea con le tue esigenze di budget.",
-          "Il nostro sistema di garanzia della qualità rispecchia il nostro impegno post-vendita. Ogni prodotto viene sottoposto a ispezione al 100% prima della spedizione, supportato da una garanzia completa di 2 anni sui componenti elettronici.",
+          "Il nostro sistema di garanzia della qualità rispecchia il nostro impegno post-vendita. Ogni prodotto viene sottoposto a ispezione al 100% prima della spedizione ed è coperto da una garanzia estesa completa di 3 anni sui componenti elettronici.",
           "Dal vetro dello specchio all'imballaggio, offriamo servizi di personalizzazione OEM/ODM end-to-end pensati per aiutarti ad ampliare la tua portata di mercato e costruire il tuo marchio."
         ]
       },

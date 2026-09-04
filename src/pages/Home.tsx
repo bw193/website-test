@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState, lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Globe, ShieldCheck, Truck, Factory, Lightbulb, Users, ChevronRight, ChevronLeft, Palette, DollarSign } from 'lucide-react';
+import { ArrowRight, Globe, ShieldCheck, Truck, Factory, Lightbulb, Users, ChevronRight, ChevronLeft, Palette, DollarSign, Loader2, Send, CheckCircle2 } from 'lucide-react';
 import { useTranslation, Trans } from 'react-i18next';
+import { useForm } from 'react-hook-form';
 import ProductCard from '../components/ProductCard';
 import ProductCardSkeleton from '../components/ProductCardSkeleton';
 import SEO from '../components/SEO';
@@ -17,6 +18,7 @@ import type { VideoListItem, VideoPost } from '../types/video';
 import { getLocalizedSeoLandingPages, getSeoSolutionsUi } from '../data/seoLandingI18n';
 import { HOME_SOLUTION_SLUGS } from '../data/seoLandingPages';
 import { catalogCategoryPath, DEFAULT_PRODUCT_CATEGORIES } from '../utils/catalogCategory';
+import { trackEvent } from '../utils/analytics';
 
 const GlobalMap = lazy(() => import('../components/GlobalMap'));
 // Lazy so `motion` (used by GlobalMap's animated markers) stays off the home
@@ -43,6 +45,12 @@ const heroSrcSet = (url: string) =>
 // supplies real dimensions; reserving the box prevents layout shift.
 const DEFAULT_HERO_W = 1920;
 const DEFAULT_HERO_H = 750;
+
+interface HomeInquiryForm {
+  customerName: string;
+  customerEmail: string;
+  message: string;
+}
 
 const CERTS = [
   { url: "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/au.png", alt: "SAA Australia certification" },
@@ -153,6 +161,20 @@ export default function Home() {
     initialData?.factoryGallery ?? []
   );
   const [featuredVideo, setFeaturedVideo] = useState<VideoListItem | null>(initialData?.featuredVideo ?? null);
+  const [homeInquiryStatus, setHomeInquiryStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+  const homeInquiryStatusRef = useRef<HTMLParagraphElement>(null);
+  const {
+    register: registerHomeInquiry,
+    handleSubmit: handleHomeInquirySubmit,
+    reset: resetHomeInquiry,
+    formState: { errors: homeInquiryErrors },
+  } = useForm<HomeInquiryForm>();
+
+  useEffect(() => {
+    if (homeInquiryStatus === 'success' || homeInquiryStatus === 'error') {
+      homeInquiryStatusRef.current?.focus();
+    }
+  }, [homeInquiryStatus]);
 
   useEffect(() => {
     let cancelled = false;
@@ -343,6 +365,37 @@ export default function Home() {
     setCurrentBgIndex((prev) => (prev - 1 + heroBgs.length) % heroBgs.length);
   };
 
+  const onSubmitHomeInquiry = async (data: HomeInquiryForm) => {
+    setHomeInquiryStatus('submitting');
+    try {
+      const { supabase } = await import('../supabase');
+      const { error } = await supabase.from('rfqs').insert([
+        {
+          product_id: null,
+          product_name: 'Homepage Quick Inquiry',
+          customer_name: data.customerName.trim(),
+          customer_email: data.customerEmail.trim(),
+          message: data.message.trim(),
+        },
+      ]);
+
+      if (error) throw error;
+
+      trackEvent('generate_lead', {
+        form_location: 'home_quick_inquiry',
+        lead_source: 'homepage',
+      });
+      resetHomeInquiry();
+      setHomeInquiryStatus('success');
+    } catch (error) {
+      console.error('Error submitting homepage inquiry', error);
+      trackEvent('rfq_submit_error', {
+        form_location: 'home_quick_inquiry',
+      });
+      setHomeInquiryStatus('error');
+    }
+  };
+
   return (
     <div className="bg-[#FAF9F6] text-stone-800 font-sans overflow-hidden">
       <SEO title={t('seo.homeTitle')} description={t('seo.homeDesc')} schema={[
@@ -415,7 +468,7 @@ export default function Home() {
               height={heroH}
               alt="BOLEN LED bathroom mirror manufacturing showcase"
               referrerPolicy="no-referrer"
-              fetchPriority="high"
+              {...({ fetchpriority: 'high' } as Record<string, string>)}
               decoding="async"
             />
           )}
@@ -437,11 +490,9 @@ export default function Home() {
             >
               <ChevronRight className="w-8 h-8" />
             </button>
-            {/* Sit low in the frame: at sm:bottom-20 the dots landed on top of
-                the certification badges baked into the banner artwork, which
-                was hidden while the hero carried a heavy scrim and obvious once
-                it didn't. */}
-            <div className="absolute bottom-3 sm:bottom-5 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1 rounded-full bg-black/25 px-2 py-0.5 backdrop-blur-sm">
+            {/* Keep pagination above the floating inquiry card while leaving the
+                baked-in certification row unobstructed. */}
+            <div className="absolute bottom-14 sm:bottom-16 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1 rounded-full bg-black/25 px-2 py-0.5 backdrop-blur-sm">
               {heroBgs.map((_, idx) => (
                 <button
                   key={idx}
@@ -455,24 +506,142 @@ export default function Home() {
         )}
       </div>
 
-      {/* Value proposition band.
-          Sits BELOW the banner rather than on top of it: the hero images are
-          finished marketing artwork with their own headline and certification
-          badges, so an overlay both fights that composition and needs a scrim
-          heavy enough to smother the photo. Keeping it separate means the
-          banner renders at full fidelity while the page still gets a visible,
-          keyword-bearing h1 and the RFQ call to action — the hero previously
-          had only an sr-only h1 and no CTA, and this translated copy
-          (home.heroTitle1/2, home.heroDesc) sat unused in all six locales.
-          The <img> markup, and therefore the LCP element and its preload, is
-          untouched. */}
-      {/* band-aurora paints a slow drifting amber wash via ::before, so the
-          section needs a stacking context and clipped overflow. */}
-      <div className="band-aurora relative isolate overflow-hidden bg-gradient-to-b from-stone-100 to-[#FAF9F6] text-stone-900">
+      {/* The quick-inquiry card crosses the banner edge like the reference,
+          while the value band begins directly underneath it as one composition. */}
+      <div className="relative z-10 isolate bg-gradient-to-b from-stone-100 to-[#FAF9F6] text-stone-900">
+        {/* Clip only the animated wash; the inquiry card itself must remain free
+            to rise above the section and overlap the hero artwork. */}
+        <div className="band-aurora pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true" />
         {/* pb is larger than pt because the stats card below overlaps this band
             by -mt-8/-mt-10 and would otherwise crowd the buttons. */}
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-14 sm:pt-8 sm:pb-16 lg:pt-6 lg:pb-14">
-          <div className="grid gap-5 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:gap-10 lg:items-center">
+        <div className="relative z-10 mx-auto flex max-w-7xl flex-col px-4 pb-16 sm:px-6 sm:pb-20 lg:px-8">
+          <Reveal variant="blur" delay={320} className="relative -top-8 mx-auto w-full max-w-[780px] sm:-top-10 lg:-top-12">
+            <form
+              onSubmit={handleHomeInquirySubmit(onSubmitHomeInquiry)}
+              className="rounded-2xl border border-stone-200/90 bg-white/95 p-4 shadow-xl shadow-stone-900/10 backdrop-blur sm:p-5 lg:px-6"
+              aria-labelledby="home-quick-inquiry-title"
+              noValidate
+            >
+              <h2 id="home-quick-inquiry-title" className="text-center font-serif text-lg text-stone-900 sm:text-xl">
+                {t('home.quickInquiry.title')}
+              </h2>
+              <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.5fr)_auto] lg:items-start">
+                <div>
+                  <label htmlFor="home-inquiry-name" className="sr-only">
+                    {t('home.quickInquiry.name')}
+                  </label>
+                  <input
+                    id="home-inquiry-name"
+                    type="text"
+                    autoComplete="name"
+                    maxLength={200}
+                    placeholder={`${t('home.quickInquiry.name')} *`}
+                    aria-invalid={homeInquiryErrors.customerName ? true : undefined}
+                    aria-describedby={homeInquiryErrors.customerName ? 'home-inquiry-name-error' : undefined}
+                    {...registerHomeInquiry('customerName', {
+                      required: t('rfq.errors.nameRequired'),
+                      maxLength: 200,
+                    })}
+                    className="h-12 w-full rounded-xl border border-stone-200 bg-stone-50 px-4 text-sm text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-amber-500 focus:bg-white focus:ring-2 focus:ring-amber-500/20"
+                  />
+                  {homeInquiryErrors.customerName && (
+                    <p id="home-inquiry-name-error" className="mt-1 text-xs text-red-600" role="alert">
+                      {homeInquiryErrors.customerName.message}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label htmlFor="home-inquiry-email" className="sr-only">
+                    {t('home.quickInquiry.email')}
+                  </label>
+                  <input
+                    id="home-inquiry-email"
+                    type="email"
+                    autoComplete="email"
+                    maxLength={320}
+                    placeholder={`${t('home.quickInquiry.email')} *`}
+                    aria-invalid={homeInquiryErrors.customerEmail ? true : undefined}
+                    aria-describedby={homeInquiryErrors.customerEmail ? 'home-inquiry-email-error' : undefined}
+                    {...registerHomeInquiry('customerEmail', {
+                      required: t('rfq.errors.emailRequired'),
+                      pattern: {
+                        value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/i,
+                        message: t('rfq.errors.invalidEmail'),
+                      },
+                      maxLength: 320,
+                    })}
+                    className="h-12 w-full rounded-xl border border-stone-200 bg-stone-50 px-4 text-sm text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-amber-500 focus:bg-white focus:ring-2 focus:ring-amber-500/20"
+                  />
+                  {homeInquiryErrors.customerEmail && (
+                    <p id="home-inquiry-email-error" className="mt-1 text-xs text-red-600" role="alert">
+                      {homeInquiryErrors.customerEmail.message}
+                    </p>
+                  )}
+                </div>
+
+                <div className="sm:col-span-2 lg:col-span-1">
+                  <label htmlFor="home-inquiry-message" className="sr-only">
+                    {t('home.quickInquiry.message')}
+                  </label>
+                  <input
+                    id="home-inquiry-message"
+                    type="text"
+                    maxLength={10000}
+                    placeholder={`${t('home.quickInquiry.message')} *`}
+                    aria-invalid={homeInquiryErrors.message ? true : undefined}
+                    aria-describedby={homeInquiryErrors.message ? 'home-inquiry-message-error' : undefined}
+                    {...registerHomeInquiry('message', {
+                      required: t('rfq.errors.messageRequired'),
+                      maxLength: 10000,
+                    })}
+                    className="h-12 w-full rounded-xl border border-stone-200 bg-stone-50 px-4 text-sm text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-amber-500 focus:bg-white focus:ring-2 focus:ring-amber-500/20"
+                  />
+                  {homeInquiryErrors.message && (
+                    <p id="home-inquiry-message-error" className="mt-1 text-xs text-red-600" role="alert">
+                      {homeInquiryErrors.message.message}
+                    </p>
+                  )}
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={homeInquiryStatus === 'submitting'}
+                  className="btn-primary h-12 justify-center px-7 uppercase tracking-wide sm:col-span-2 lg:col-span-1 disabled:cursor-not-allowed disabled:opacity-70"
+                >
+                  {homeInquiryStatus === 'submitting' ? (
+                    <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                  ) : homeInquiryStatus === 'success' ? (
+                    <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
+                  ) : (
+                    <Send className="h-4 w-4" aria-hidden="true" />
+                  )}
+                  <span>
+                    {homeInquiryStatus === 'submitting'
+                      ? t('home.quickInquiry.sending')
+                      : t('home.quickInquiry.send')}
+                  </span>
+                </button>
+              </div>
+
+              {(homeInquiryStatus === 'success' || homeInquiryStatus === 'error') && (
+                <p
+                  ref={homeInquiryStatusRef}
+                  tabIndex={-1}
+                  role={homeInquiryStatus === 'error' ? 'alert' : 'status'}
+                  className={`mt-3 text-center text-sm font-medium focus:outline-none ${
+                    homeInquiryStatus === 'success' ? 'text-emerald-700' : 'text-red-600'
+                  }`}
+                >
+                  {homeInquiryStatus === 'success'
+                    ? t('home.quickInquiry.success')
+                    : t('home.quickInquiry.error')}
+                </p>
+              )}
+            </form>
+          </Reveal>
+
+          <div className="-mt-1 grid gap-5 sm:-mt-2 lg:-mt-3 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-center lg:gap-10">
             {/* Kicker and h1 are one unit — keeping the kicker outside the grid
                 left it pinned to the top while the h1 dropped to meet the right
                 column, opening a dead gap between them. */}
@@ -502,13 +671,14 @@ export default function Home() {
               </Reveal>
             </div>
           </div>
+
         </div>
       </div>
 
       {/* Stats Section */}
-      <div className="relative -mt-8 sm:-mt-10 z-10 max-w-5xl mx-auto px-3 sm:px-6 lg:px-8">
+      <div id="home-stats" className="relative -mt-8 sm:-mt-10 z-10 max-w-5xl mx-auto px-3 sm:px-6 lg:px-8 scroll-mt-24">
         <div
-          className="bg-white rounded-xl sm:rounded-2xl shadow-xl shadow-stone-900/5 border border-stone-100 py-3 px-2 sm:py-5 sm:px-6 lg:py-6 lg:px-8 flex overflow-x-auto sm:grid sm:grid-cols-4 sm:overflow-visible gap-0 sm:gap-4 lg:gap-6 sm:divide-x sm:divide-stone-100"
+          className="bg-white rounded-xl sm:rounded-2xl shadow-xl shadow-stone-900/5 border border-stone-100 grid grid-cols-2 lg:grid-cols-4 overflow-hidden"
         >
           {[
             { icon: Factory, value: "46,800 m²", label: t('home.stats.sqMeters') },
@@ -516,19 +686,86 @@ export default function Home() {
             { icon: Lightbulb, value: "200+", label: t('home.stats.styles') },
             { icon: Globe, value: "Global", label: t('home.stats.global') }
           ].map((stat, idx) => (
-            <Reveal key={idx} variant="scale" delay={idx * 100} className="flex-1 min-w-0 flex flex-col items-center text-center group">
-              <div className="hidden sm:flex h-10 w-10 rounded-full bg-stone-50 group-hover:bg-amber-50 group-hover:scale-110 items-center justify-center mb-2 transition-all duration-300">
-                <stat.icon className="h-5 w-5 text-amber-600" />
+            <Reveal
+              key={idx}
+              variant="scale"
+              delay={idx * 100}
+              className={`min-w-0 flex flex-col items-center text-center group px-3 py-5 sm:px-6 sm:py-6 lg:px-5 ${
+                idx % 2 === 0 ? 'border-r border-stone-100 lg:border-r-0' : ''
+              } ${idx < 2 ? 'border-b border-stone-100 lg:border-b-0' : ''} ${
+                idx > 0 ? 'lg:border-l lg:border-stone-100' : ''
+              }`}
+            >
+              <div className="flex h-9 w-9 sm:h-10 sm:w-10 rounded-full bg-stone-50 group-hover:bg-amber-50 group-hover:scale-110 items-center justify-center mb-2.5 transition-all duration-300">
+                <stat.icon className="h-4.5 w-4.5 sm:h-5 sm:w-5 text-amber-600" />
               </div>
               <StatValue
                 value={stat.value}
-                className="text-base sm:text-2xl font-bold text-stone-900 mb-0.5 font-serif whitespace-nowrap tabular-nums"
+                className="text-xl sm:text-2xl font-bold text-stone-900 mb-1.5 font-serif whitespace-nowrap tabular-nums"
               />
-              <p className="text-[10px] sm:text-[11px] text-stone-500 uppercase tracking-wide sm:tracking-wider font-semibold leading-tight">{stat.label}</p>
+              <p className="max-w-[15rem] text-xs lg:text-[13px] text-stone-500 font-medium leading-relaxed">
+                {stat.label}
+              </p>
             </Reveal>
           ))}
         </div>
       </div>
+
+      {/* Factory Showcase — editor-managed gallery (site_settings.factory_gallery).
+          Lazy/responsive imgs, explicit dims => no LCP/CLS hit. */}
+      {factoryGallery.length > 0 && (
+        <section
+          id="factory-showcase"
+          aria-labelledby="factory-showcase-title"
+          className="py-24 bg-stone-50 border-t border-stone-100 scroll-mt-20"
+        >
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <Reveal className="text-center max-w-3xl mx-auto mb-12">
+              <SectionKicker centered>
+                {t('home.factoryShowcase.subtitle')}
+              </SectionKicker>
+              <h2 id="factory-showcase-title" className="text-4xl font-serif text-stone-900 sm:text-5xl mb-4">
+                {t('home.factoryShowcase.title')}
+              </h2>
+              <p className="text-lg text-stone-600 font-light leading-relaxed">
+                {t('home.factoryShowcase.desc')}
+              </p>
+            </Reveal>
+
+            <ul
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+              aria-label={t('home.factoryShowcase.title') as string}
+            >
+              {factoryGallery.map((item, idx) => (
+                <Reveal as="li" variant="blur" key={`${item.url}-${idx}`} delay={(idx % 3) * 80}>
+                  <figure className="group relative bg-white rounded-2xl overflow-hidden shadow-sm border border-stone-200 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-stone-900/10 hover:border-amber-200">
+                    <div className="relative w-full aspect-[4/3] overflow-hidden bg-stone-200">
+                      <img
+                        src={optimizeImage(item.url, { width: 800 })}
+                        srcSet={[400, 800, 1200].map((w) => `${optimizeImage(item.url, { width: w })} ${w}w`).join(', ')}
+                        sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                        width={800}
+                        height={600}
+                        alt={item.alt}
+                        loading="lazy"
+                        decoding="async"
+                        referrerPolicy="no-referrer"
+                        className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+                      />
+                      <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-gradient-to-t from-stone-950/30 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                    </div>
+                    {item.caption && (
+                      <figcaption className="px-5 py-4 text-sm text-stone-700 font-medium leading-snug border-t border-stone-100 transition-colors duration-300 group-hover:text-stone-900">
+                        {item.caption}
+                      </figcaption>
+                    )}
+                  </figure>
+                </Reveal>
+              ))}
+            </ul>
+          </div>
+        </section>
+      )}
 
       {/* Featured Collections (Versatile & Custom — products) */}
       <section aria-labelledby="home-collections-title" className="py-24 bg-stone-50 text-stone-900 border-t border-stone-200">
@@ -668,62 +905,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      {/* Factory Showcase — editor-managed gallery (site_settings.factory_gallery).
-          Lazy/responsive imgs, explicit dims => no LCP/CLS hit. */}
-      {factoryGallery.length > 0 && (
-        <section
-          id="factory-showcase"
-          aria-labelledby="factory-showcase-title"
-          className="py-24 bg-stone-50 border-t border-stone-100 scroll-mt-20"
-        >
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <Reveal className="text-center max-w-3xl mx-auto mb-12">
-              <SectionKicker centered>
-                {t('home.factoryShowcase.subtitle')}
-              </SectionKicker>
-              <h2 id="factory-showcase-title" className="text-4xl font-serif text-stone-900 sm:text-5xl mb-4">
-                {t('home.factoryShowcase.title')}
-              </h2>
-              <p className="text-lg text-stone-600 font-light leading-relaxed">
-                {t('home.factoryShowcase.desc')}
-              </p>
-            </Reveal>
-
-            <ul
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-              aria-label={t('home.factoryShowcase.title') as string}
-            >
-              {factoryGallery.map((item, idx) => (
-                <Reveal as="li" variant="blur" key={`${item.url}-${idx}`} delay={(idx % 3) * 80}>
-                  <figure className="group relative bg-white rounded-2xl overflow-hidden shadow-sm border border-stone-200 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-stone-900/10 hover:border-amber-200">
-                    <div className="relative w-full aspect-[4/3] overflow-hidden bg-stone-200">
-                      <img
-                        src={optimizeImage(item.url, { width: 800 })}
-                        srcSet={[400, 800, 1200].map((w) => `${optimizeImage(item.url, { width: w })} ${w}w`).join(', ')}
-                        sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                        width={800}
-                        height={600}
-                        alt={item.alt}
-                        loading="lazy"
-                        decoding="async"
-                        referrerPolicy="no-referrer"
-                        className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
-                      />
-                      <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-gradient-to-t from-stone-950/30 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-                    </div>
-                    {item.caption && (
-                      <figcaption className="px-5 py-4 text-sm text-stone-700 font-medium leading-snug border-t border-stone-100 transition-colors duration-300 group-hover:text-stone-900">
-                        {item.caption}
-                      </figcaption>
-                    )}
-                  </figure>
-                </Reveal>
-              ))}
-            </ul>
-          </div>
-        </section>
-      )}
 
       {/* Manufacturing Process — new 6-step block */}
       <section aria-labelledby="home-process-title" className="py-24 bg-stone-100">
