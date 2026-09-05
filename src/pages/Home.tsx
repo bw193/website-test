@@ -106,7 +106,10 @@ function StatValue({ value, className }: { value: string; className?: string }) 
         const start = performance.now();
         const duration = 1600;
         const tick = (now: number) => {
-          const p = Math.min((now - start) / duration, 1);
+          // rAF timestamps use the frame's vsync time, which can precede the
+          // `start` captured when the observer fired — clamp or the first
+          // frame renders a negative count (e.g. "-97 m²").
+          const p = Math.min(Math.max((now - start) / duration, 0), 1);
           const eased = 1 - Math.pow(1 - p, 3);
           setDisplay(`${Math.round(target * eased).toLocaleString('en-US')}${suffix}`);
           if (p < 1) raf = requestAnimationFrame(tick);
@@ -396,6 +399,34 @@ export default function Home() {
     }
   };
 
+  // Factory filmstrip rail: arrow scrolling plus edge fades and disabled
+  // states that track the scroll position. Touch swipe/native scroll and
+  // keyboard arrows (the rail is a focusable region) work regardless.
+  const factoryRailRef = useRef<HTMLUListElement>(null);
+  const [factoryRailEdges, setFactoryRailEdges] = useState({ start: true, end: false });
+  const updateFactoryRailEdges = () => {
+    const rail = factoryRailRef.current;
+    if (!rail) return;
+    setFactoryRailEdges({
+      start: rail.scrollLeft <= 4,
+      end: rail.scrollLeft + rail.clientWidth >= rail.scrollWidth - 4,
+    });
+  };
+  const scrollFactoryRail = (dir: 1 | -1) => {
+    const rail = factoryRailRef.current;
+    if (!rail) return;
+    const card = rail.querySelector('li');
+    const step = card ? card.clientWidth + 24 : rail.clientWidth * 0.8;
+    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    rail.scrollBy({ left: dir * step, behavior: reduce ? 'auto' : 'smooth' });
+  };
+  useEffect(() => {
+    updateFactoryRailEdges();
+    const onResize = () => updateFactoryRailEdges();
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, [factoryGallery.length]);
+
   return (
     <div className="bg-[#FAF9F6] text-stone-800 font-sans overflow-hidden">
       <SEO title={t('seo.homeTitle')} description={t('seo.homeDesc')} schema={[
@@ -515,7 +546,7 @@ export default function Home() {
         <div className="band-aurora pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true" />
         {/* flow-root keeps the card's negative top margin from collapsing
             through to the band, so only the card overlaps the hero. */}
-        <div className="relative z-10 mx-auto flow-root max-w-6xl px-4 pb-16 sm:px-6 sm:pb-20 lg:px-8">
+        <div className="relative z-10 mx-auto flow-root max-w-6xl px-4 pb-8 sm:px-6 sm:pb-12 lg:px-8">
           <Reveal variant="blur" delay={320} className="relative -mt-8 sm:-mt-10 lg:-mt-12">
             <form
               onSubmit={handleHomeInquirySubmit(onSubmitHomeInquiry)}
@@ -645,7 +676,7 @@ export default function Home() {
               </form>
             </Reveal>
 
-            <div className="mt-8 grid gap-5 sm:mt-10 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-center lg:gap-10">
+            <div className="mt-4 grid gap-5 sm:mt-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-center lg:gap-10">
               {/* Kicker and h1 are one unit — keeping the kicker outside the grid
                   left it pinned to the top while the h1 dropped to meet the right
                   column, opening a dead gap between them. */}
@@ -653,7 +684,7 @@ export default function Home() {
                 <Reveal as="p" variant="left" className="text-[10px] sm:text-xs font-semibold uppercase tracking-[0.2em] text-amber-600">
                   {t('home.heroKicker')}
                 </Reveal>
-                <Reveal as="h1" variant="left" delay={90} className="mt-2 font-serif text-3xl sm:text-4xl lg:text-[2.6rem] leading-[1.08]">
+                <Reveal as="h1" variant="left" delay={90} className="mt-2 font-serif text-3xl sm:text-4xl lg:text-4xl lg:leading-[1.12]">
                   {t('home.heroTitle1')}
                   <span className="block italic text-sheen">{t('home.heroTitle2')}</span>
                 </Reveal>
@@ -677,7 +708,7 @@ export default function Home() {
             </div>
 
             {/* Stats — a hairline spec strip on the open band, not a card. */}
-            <div id="home-stats" className="mt-10 grid scroll-mt-24 grid-cols-2 border-t border-stone-200/80 pt-8 sm:mt-12 sm:pt-10 lg:grid-cols-4">
+            <div id="home-stats" className="mt-5 grid scroll-mt-24 grid-cols-2 sm:mt-6 lg:grid-cols-4">
               {[
                 { icon: Factory, value: "46,800 m²", label: t('home.stats.sqMeters') },
                 { icon: Users, value: "200+", label: t('home.stats.artisans') },
@@ -688,20 +719,20 @@ export default function Home() {
                   key={idx}
                   variant="scale"
                   delay={idx * 100}
-                  className={`min-w-0 flex flex-col items-center text-center group px-3 py-4 sm:px-6 sm:py-5 lg:px-5 ${
+                  className={`min-w-0 flex flex-col items-center text-center group px-3 py-3.5 sm:px-6 sm:py-4 lg:px-5 ${
                     idx % 2 === 0 ? 'border-r border-stone-100 lg:border-r-0' : ''
                   } ${idx < 2 ? 'border-b border-stone-100 lg:border-b-0' : ''} ${
                     idx > 0 ? 'lg:border-l lg:border-stone-100' : ''
                   }`}
                 >
-                  <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-full border border-stone-200/80 bg-white transition-all duration-300 group-hover:scale-110 group-hover:border-amber-300 group-hover:bg-amber-50 sm:h-10 sm:w-10">
-                    <stat.icon className="h-4.5 w-4.5 sm:h-5 sm:w-5 text-amber-600" />
+                  <div className="mb-1.5 flex h-8 w-8 items-center justify-center rounded-full border border-stone-200/80 bg-white transition-all duration-300 group-hover:scale-110 group-hover:border-amber-300 group-hover:bg-amber-50 sm:h-9 sm:w-9">
+                    <stat.icon className="h-4 w-4 sm:h-4.5 sm:w-4.5 text-amber-600" />
                   </div>
                   <StatValue
                     value={stat.value}
                     className="text-xl sm:text-2xl font-bold text-stone-900 mb-1 font-serif whitespace-nowrap tabular-nums"
                   />
-                  <p className="max-w-[15rem] text-xs lg:text-[13px] text-stone-500 font-medium leading-relaxed">
+                  <p className="max-w-[15rem] text-xs sm:text-[13px] text-stone-600 font-medium leading-relaxed">
                     {stat.label}
                   </p>
                 </Reveal>
@@ -711,57 +742,93 @@ export default function Home() {
       </div>
 
       {/* Factory Showcase — editor-managed gallery (site_settings.factory_gallery).
-          Lazy/responsive imgs, explicit dims => no LCP/CLS hit. */}
+          A snap-scrolling filmstrip rail that bleeds to the right viewport edge. */}
       {factoryGallery.length > 0 && (
         <section
           id="factory-showcase"
           aria-labelledby="factory-showcase-title"
-          className="py-24 bg-stone-50 border-t border-stone-100 scroll-mt-20"
+          className="relative overflow-hidden border-t border-stone-100 bg-stone-50 py-24 text-stone-900 scroll-mt-20"
         >
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <Reveal className="text-center max-w-3xl mx-auto mb-12">
-              <SectionKicker centered>
-                {t('home.factoryShowcase.subtitle')}
-              </SectionKicker>
-              <h2 id="factory-showcase-title" className="text-4xl font-serif text-stone-900 sm:text-5xl mb-4">
-                {t('home.factoryShowcase.title')}
-              </h2>
-              <p className="text-lg text-stone-600 font-light leading-relaxed">
-                {t('home.factoryShowcase.desc')}
-              </p>
+          <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <Reveal className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+              <div className="max-w-2xl">
+                <p className="flex items-center gap-3 text-sm font-semibold uppercase tracking-wider text-amber-600">
+                  <span aria-hidden="true" className="h-px w-8 bg-amber-500/70" />
+                  {t('home.factoryShowcase.subtitle')}
+                </p>
+                <h2 id="factory-showcase-title" className="mt-4 text-4xl font-serif text-stone-900 sm:text-5xl">
+                  {t('home.factoryShowcase.title')}
+                </h2>
+                <p className="mt-4 max-w-xl text-lg font-light leading-relaxed text-stone-600">
+                  {t('home.factoryShowcase.desc')}
+                </p>
+              </div>
+              <div className="flex gap-3 lg:pb-1">
+                <button
+                  type="button"
+                  onClick={() => scrollFactoryRail(-1)}
+                  disabled={factoryRailEdges.start}
+                  aria-label={t('home.factoryShowcase.prev', 'Previous factory photos') as string}
+                  className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-stone-300 bg-white text-stone-500 transition hover:border-amber-500/60 hover:text-stone-900 disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:border-stone-300"
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => scrollFactoryRail(1)}
+                  disabled={factoryRailEdges.end}
+                  aria-label={t('home.factoryShowcase.next', 'More factory photos') as string}
+                  className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-stone-300 bg-white text-stone-500 transition hover:border-amber-500/60 hover:text-stone-900 disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:border-stone-300"
+                >
+                  <ChevronRight className="h-5 w-5" />
+                </button>
+              </div>
             </Reveal>
 
-            <ul
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-              aria-label={t('home.factoryShowcase.title') as string}
-            >
-              {factoryGallery.map((item, idx) => (
-                <Reveal as="li" variant="blur" key={`${item.url}-${idx}`} delay={(idx % 3) * 80}>
-                  <figure className="group relative bg-white rounded-2xl overflow-hidden shadow-sm border border-stone-200 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-stone-900/10 hover:border-amber-200">
-                    <div className="relative w-full aspect-[4/3] overflow-hidden bg-stone-200">
-                      <img
-                        src={optimizeImage(item.url, { width: 800 })}
-                        srcSet={[400, 800, 1200].map((w) => `${optimizeImage(item.url, { width: w })} ${w}w`).join(', ')}
-                        sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                        width={800}
-                        height={600}
-                        alt={item.alt}
-                        loading="lazy"
-                        decoding="async"
-                        referrerPolicy="no-referrer"
-                        className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
-                      />
-                      <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-gradient-to-t from-stone-950/30 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-                    </div>
-                    {item.caption && (
-                      <figcaption className="px-5 py-4 text-sm text-stone-700 font-medium leading-snug border-t border-stone-100 transition-colors duration-300 group-hover:text-stone-900">
-                        {item.caption}
-                      </figcaption>
-                    )}
-                  </figure>
-                </Reveal>
-              ))}
-            </ul>
+            {/* Filmstrip rail. The negative right margin at lg+ bleeds the rail
+                to the viewport edge so the peeking next card signals scrolling;
+                the section's overflow-hidden absorbs the 100vw scrollbar excess. */}
+            <Reveal variant="blur" delay={150} className="relative mt-12 lg:mr-[calc((100%_-_100vw)/2)]">
+              <div aria-hidden="true" className={`pointer-events-none absolute inset-y-0 left-0 z-10 w-14 bg-gradient-to-r from-stone-50 to-transparent transition-opacity duration-300 ${factoryRailEdges.start ? 'opacity-0' : 'opacity-100'}`} />
+              <div aria-hidden="true" className={`pointer-events-none absolute inset-y-0 right-0 z-10 w-14 bg-gradient-to-l from-stone-50 to-transparent transition-opacity duration-300 ${factoryRailEdges.end ? 'opacity-0' : 'opacity-100'}`} />
+              <ul
+                ref={factoryRailRef}
+                onScroll={updateFactoryRailEdges}
+                tabIndex={0}
+                role="region"
+                aria-label={t('home.factoryShowcase.title') as string}
+                className="flex snap-x snap-mandatory gap-6 overflow-x-auto pb-2 pr-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/60 sm:pr-6 lg:pr-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              >
+                {factoryGallery.map((item, idx) => (
+                  <li key={`${item.url}-${idx}`} className="w-[82%] shrink-0 snap-start sm:w-[24rem] lg:w-[28rem]">
+                    <figure className="group relative overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-stone-200 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-stone-900/10 hover:ring-amber-300">
+                      <div className="relative aspect-[4/3] w-full overflow-hidden bg-stone-200">
+                        <img
+                          src={optimizeImage(item.url, { width: 800 })}
+                          srcSet={[400, 800, 1200].map((w) => `${optimizeImage(item.url, { width: w })} ${w}w`).join(', ')}
+                          sizes="(min-width: 1024px) 28rem, (min-width: 640px) 24rem, 82vw"
+                          width={800}
+                          height={600}
+                          alt={item.alt}
+                          loading="lazy"
+                          decoding="async"
+                          referrerPolicy="no-referrer"
+                          className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                        />
+                      </div>
+                      <span aria-hidden="true" className="absolute left-4 top-4 rounded-full bg-stone-950/55 px-2.5 py-1 text-[11px] font-semibold tracking-[0.18em] text-white/85 backdrop-blur-sm">
+                        {String(idx + 1).padStart(2, '0')} / {String(factoryGallery.length).padStart(2, '0')}
+                      </span>
+                      {item.caption && (
+                        <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-stone-950/90 via-stone-950/35 to-transparent px-5 pb-4 pt-14 text-sm font-medium leading-snug text-white">
+                          {item.caption}
+                        </figcaption>
+                      )}
+                    </figure>
+                  </li>
+                ))}
+              </ul>
+            </Reveal>
           </div>
         </section>
       )}

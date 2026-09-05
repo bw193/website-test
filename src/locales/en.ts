@@ -285,7 +285,7 @@ export const en = {
       factoryShowcase: {
         subtitle: "Inside the Factory",
         title: "Where Every Mirror Is Made",
-        desc: "A look inside our 46,800 m² Jiaxing facility — vertically integrated LED, smart, vanity, and bath mirror production from raw glass to packed pallet.",
+        desc: "A look inside our 46,800 m² factory — vertically integrated LED, smart, vanity, and bath mirror production from raw glass to packed pallet.",
         empty: "Factory photos coming soon."
       },
       featuredVideo: {
