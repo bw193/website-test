@@ -284,6 +284,11 @@ export const de = {
         subtitle: "Einblick in die Fabrik",
         title: "Wo jeder Spiegel entsteht",
         desc: "Ein Blick in unsere 46.800 m² große Produktionsstätte in Jiaxing — vertikal integrierte Fertigung von LED-, Smart-, Schmink- und Badspiegeln, vom Rohglas bis zur versandfertigen Palette.",
+        visit: "Unsere Fabrik entdecken",
+        prev: "Vorheriges Fabrikfoto",
+        next: "Nächstes Fabrikfoto",
+        selectImage: "Fabrikfoto ansehen",
+        imageUnavailable: "Dieses Foto ist nicht verfügbar. Bitte wählen Sie ein anderes.",
         empty: "Fabrikfotos folgen in Kürze."
       },
       featuredVideo: {

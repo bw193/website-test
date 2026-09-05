@@ -284,6 +284,11 @@ export const fr = {
         subtitle: "À l'Intérieur de l'Usine",
         title: "Là Où Naît Chaque Miroir",
         desc: "Visite de notre site de 46 800 m² à Jiaxing — production verticalement intégrée de miroirs LED, intelligents, de toilette et de salle de bain, du verre brut à la palette prête à expédier.",
+        visit: "Découvrez notre usine",
+        prev: "Photo précédente de l'usine",
+        next: "Photo suivante de l'usine",
+        selectImage: "Voir la photo de l'usine",
+        imageUnavailable: "Cette photo est indisponible. Veuillez en sélectionner une autre.",
         empty: "Photos de l'usine bientôt disponibles."
       },
       featuredVideo: {

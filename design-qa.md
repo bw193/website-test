@@ -297,3 +297,34 @@ The source and implementation were captured at the same state and viewport and e
 - Residual test gap: capture one 390 px production-preview screenshot when a browser surface that permits a true mobile viewport is available.
 
 final result: passed
+
+---
+
+# Homepage Factory Gallery - 2026-09-05
+
+- Reference: user screenshot `Screenshots/屏幕截图(110).png`.
+- Preview: `http://localhost:3000/en/#factory-showcase`.
+- Final captures: `shots/home-factory-redesign-desktop.png`, `shots/home-factory-redesign-wide.png`, and `shots/home-factory-redesign-mobile.png`.
+- Replaced the viewport-wide filmstrip with a contained two-column composition: introduction, featured photograph, caption/navigation row, and thumbnail strip. Mobile stacks the introduction above the gallery.
+- Keeps editor-managed photography, descriptive image alt text, structured image data, and localized routes. Added gallery control and factory link copy in all six supported languages.
+- Verified all nine photographs, synchronized captions, thumbnail selection, previous/next wrapping, Arrow Left/Right, Home/End, and keyboard focus from the selected thumbnail to the image panel.
+- Checked 320, 390, 768, 1024, 1440, and 2048 px widths; no horizontal document overflow. Thumbnail and arrow targets remain at least 44 px.
+- Verified each locale and the factory-story link. Browser console/page errors: zero.
+- Browser-only response fixtures verified reordered images, a removed selection, one image, missing captions, an empty gallery, restored images, and reduced-motion thumbnail navigation. No backend data was changed.
+- TypeScript check (`npm.cmd run lint`) and Vite production build (`npm.cmd exec vite build`) passed. The build emitted its bundle-size advisory.
+
+final result: passed
+
+## Factory Gallery Animation Follow-up - 2026-09-05
+
+- Current preview: `http://127.0.0.1:5178/en/#factory-showcase`. Port 3000 is now serving a separate Chengtai site, so this workspace has a dedicated Vite preview.
+- Added staggered copy and thumbnail entrances, a directional photo crossfade with a short zoom, animated captions and position line, thumbnail lift, button feedback, and a link underline. All animations are finite; no automatic slide changes or animation dependencies were added.
+- The last completed photo stays visible until its replacement decodes. Stale loads are ignored and failed images show localized recovery guidance.
+- Captures: `shots/home-factory-animation-entry.png`, `shots/home-factory-animation-transition.png`, `shots/home-factory-animation-desktop.png`, and `shots/home-factory-animation-mobile.png`.
+- Browser checks confirmed entrance timing, both slide directions including wrapping, outgoing image cleanup, rapid selection, and thumbnail hover feedback.
+- Responsive checks passed at 320, 390, 768, 1024, and 1440 px. A separate touch-device context verified tap navigation and disabled hover zoom.
+- Reduced-motion checks found no running gallery animations or hover transforms. Normal browsing produced no console or page errors.
+- Browser-only delayed and failed image responses verified continuity, stale-response protection, clear failure feedback, and recovery. Backend data was not changed.
+- TypeScript and the Vite production build passed; the existing bundle-size advisory remains.
+
+final result: passed

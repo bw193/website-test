@@ -8,6 +8,7 @@ import ProductCardSkeleton from '../components/ProductCardSkeleton';
 import SEO from '../components/SEO';
 import Reveal from '../components/Reveal';
 import FeaturedVideo from '../components/FeaturedVideo';
+import FactoryShowcase from '../components/FactoryShowcase';
 import { optimizeImage } from '../utils/optimizeImage';
 import { useLocalizedPath } from '../hooks/useLocalizedPath';
 import { readInitialHomeData, type FactoryGalleryItem } from '../utils/prerenderData';
@@ -399,34 +400,6 @@ export default function Home() {
     }
   };
 
-  // Factory filmstrip rail: arrow scrolling plus edge fades and disabled
-  // states that track the scroll position. Touch swipe/native scroll and
-  // keyboard arrows (the rail is a focusable region) work regardless.
-  const factoryRailRef = useRef<HTMLUListElement>(null);
-  const [factoryRailEdges, setFactoryRailEdges] = useState({ start: true, end: false });
-  const updateFactoryRailEdges = () => {
-    const rail = factoryRailRef.current;
-    if (!rail) return;
-    setFactoryRailEdges({
-      start: rail.scrollLeft <= 4,
-      end: rail.scrollLeft + rail.clientWidth >= rail.scrollWidth - 4,
-    });
-  };
-  const scrollFactoryRail = (dir: 1 | -1) => {
-    const rail = factoryRailRef.current;
-    if (!rail) return;
-    const card = rail.querySelector('li');
-    const step = card ? card.clientWidth + 24 : rail.clientWidth * 0.8;
-    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-    rail.scrollBy({ left: dir * step, behavior: reduce ? 'auto' : 'smooth' });
-  };
-  useEffect(() => {
-    updateFactoryRailEdges();
-    const onResize = () => updateFactoryRailEdges();
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
-  }, [factoryGallery.length]);
-
   return (
     <div className="bg-[#FAF9F6] text-stone-800 font-sans overflow-hidden">
       <SEO title={t('seo.homeTitle')} description={t('seo.homeDesc')} schema={[
@@ -741,97 +714,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Factory Showcase — editor-managed gallery (site_settings.factory_gallery).
-          A snap-scrolling filmstrip rail that bleeds to the right viewport edge. */}
-      {factoryGallery.length > 0 && (
-        <section
-          id="factory-showcase"
-          aria-labelledby="factory-showcase-title"
-          className="relative overflow-hidden border-t border-stone-100 bg-stone-50 py-24 text-stone-900 scroll-mt-20"
-        >
-          <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <Reveal className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
-              <div className="max-w-2xl">
-                <p className="flex items-center gap-3 text-sm font-semibold uppercase tracking-wider text-amber-600">
-                  <span aria-hidden="true" className="h-px w-8 bg-amber-500/70" />
-                  {t('home.factoryShowcase.subtitle')}
-                </p>
-                <h2 id="factory-showcase-title" className="mt-4 text-4xl font-serif text-stone-900 sm:text-5xl">
-                  {t('home.factoryShowcase.title')}
-                </h2>
-                <p className="mt-4 max-w-xl text-lg font-light leading-relaxed text-stone-600">
-                  {t('home.factoryShowcase.desc')}
-                </p>
-              </div>
-              <div className="flex gap-3 lg:pb-1">
-                <button
-                  type="button"
-                  onClick={() => scrollFactoryRail(-1)}
-                  disabled={factoryRailEdges.start}
-                  aria-label={t('home.factoryShowcase.prev', 'Previous factory photos') as string}
-                  className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-stone-300 bg-white text-stone-500 transition hover:border-amber-500/60 hover:text-stone-900 disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:border-stone-300"
-                >
-                  <ChevronLeft className="h-5 w-5" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => scrollFactoryRail(1)}
-                  disabled={factoryRailEdges.end}
-                  aria-label={t('home.factoryShowcase.next', 'More factory photos') as string}
-                  className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-stone-300 bg-white text-stone-500 transition hover:border-amber-500/60 hover:text-stone-900 disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:border-stone-300"
-                >
-                  <ChevronRight className="h-5 w-5" />
-                </button>
-              </div>
-            </Reveal>
-
-            {/* Filmstrip rail. The negative right margin at lg+ bleeds the rail
-                to the viewport edge so the peeking next card signals scrolling;
-                the section's overflow-hidden absorbs the 100vw scrollbar excess. */}
-            <Reveal variant="blur" delay={150} className="relative mt-12 lg:mr-[calc((100%_-_100vw)/2)]">
-              <div aria-hidden="true" className={`pointer-events-none absolute inset-y-0 left-0 z-10 w-14 bg-gradient-to-r from-stone-50 to-transparent transition-opacity duration-300 ${factoryRailEdges.start ? 'opacity-0' : 'opacity-100'}`} />
-              <div aria-hidden="true" className={`pointer-events-none absolute inset-y-0 right-0 z-10 w-14 bg-gradient-to-l from-stone-50 to-transparent transition-opacity duration-300 ${factoryRailEdges.end ? 'opacity-0' : 'opacity-100'}`} />
-              <ul
-                ref={factoryRailRef}
-                onScroll={updateFactoryRailEdges}
-                tabIndex={0}
-                role="region"
-                aria-label={t('home.factoryShowcase.title') as string}
-                className="flex snap-x snap-mandatory gap-6 overflow-x-auto pb-2 pr-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/60 sm:pr-6 lg:pr-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-              >
-                {factoryGallery.map((item, idx) => (
-                  <li key={`${item.url}-${idx}`} className="w-[82%] shrink-0 snap-start sm:w-[24rem] lg:w-[28rem]">
-                    <figure className="group relative overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-stone-200 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-stone-900/10 hover:ring-amber-300">
-                      <div className="relative aspect-[4/3] w-full overflow-hidden bg-stone-200">
-                        <img
-                          src={optimizeImage(item.url, { width: 800 })}
-                          srcSet={[400, 800, 1200].map((w) => `${optimizeImage(item.url, { width: w })} ${w}w`).join(', ')}
-                          sizes="(min-width: 1024px) 28rem, (min-width: 640px) 24rem, 82vw"
-                          width={800}
-                          height={600}
-                          alt={item.alt}
-                          loading="lazy"
-                          decoding="async"
-                          referrerPolicy="no-referrer"
-                          className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                        />
-                      </div>
-                      <span aria-hidden="true" className="absolute left-4 top-4 rounded-full bg-stone-950/55 px-2.5 py-1 text-[11px] font-semibold tracking-[0.18em] text-white/85 backdrop-blur-sm">
-                        {String(idx + 1).padStart(2, '0')} / {String(factoryGallery.length).padStart(2, '0')}
-                      </span>
-                      {item.caption && (
-                        <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-stone-950/90 via-stone-950/35 to-transparent px-5 pb-4 pt-14 text-sm font-medium leading-snug text-white">
-                          {item.caption}
-                        </figcaption>
-                      )}
-                    </figure>
-                  </li>
-                ))}
-              </ul>
-            </Reveal>
-          </div>
-        </section>
-      )}
+      <FactoryShowcase items={factoryGallery} />
 
       {/* Featured Collections (Versatile & Custom — products) */}
       <section aria-labelledby="home-collections-title" className="py-24 bg-stone-50 text-stone-900 border-t border-stone-200">

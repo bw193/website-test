@@ -286,6 +286,11 @@ export const en = {
         subtitle: "Inside the Factory",
         title: "Where Every Mirror Is Made",
         desc: "A look inside our 46,800 m² factory — vertically integrated LED, smart, vanity, and bath mirror production from raw glass to packed pallet.",
+        visit: "Explore our factory",
+        prev: "Previous factory photo",
+        next: "Next factory photo",
+        selectImage: "View factory photo",
+        imageUnavailable: "This photo is unavailable. Please select another.",
         empty: "Factory photos coming soon."
       },
       featuredVideo: {

@@ -284,6 +284,11 @@ export const es = {
         subtitle: "Dentro de la Fábrica",
         title: "Donde Nace Cada Espejo",
         desc: "Un recorrido por nuestra planta de 46.800 m² en Jiaxing: producción verticalmente integrada de espejos LED, inteligentes, de tocador y de baño, desde el vidrio crudo hasta el palé listo para enviar.",
+        visit: "Conozca nuestra fábrica",
+        prev: "Foto anterior de la fábrica",
+        next: "Foto siguiente de la fábrica",
+        selectImage: "Ver foto de la fábrica",
+        imageUnavailable: "Esta foto no está disponible. Seleccione otra.",
         empty: "Fotos de la fábrica próximamente."
       },
       featuredVideo: {

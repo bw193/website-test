@@ -284,6 +284,11 @@ export const it = {
         subtitle: "Dentro la Fabbrica",
         title: "Dove Nasce Ogni Specchio",
         desc: "Uno sguardo dentro il nostro stabilimento di 46.800 m² a Jiaxing — produzione verticalmente integrata di specchi LED, smart, da toeletta e da bagno, dal vetro grezzo al pallet pronto per la spedizione.",
+        visit: "Scopri la nostra fabbrica",
+        prev: "Foto precedente della fabbrica",
+        next: "Foto successiva della fabbrica",
+        selectImage: "Visualizza la foto della fabbrica",
+        imageUnavailable: "Questa foto non è disponibile. Selezionane un'altra.",
         empty: "Foto della fabbrica in arrivo."
       },
       featuredVideo: {

@@ -286,6 +286,11 @@ export const zh = {
         subtitle: "走进工厂",
         title: "每一面镜子的诞生之地",
         desc: "走进我们位于嘉兴的 46,800 平方米生产基地——从原片玻璃到打包出货，垂直整合制造 LED 镜、智能镜、化妆镜与浴室镜。",
+        visit: "了解我们的工厂",
+        prev: "上一张工厂照片",
+        next: "下一张工厂照片",
+        selectImage: "查看工厂照片",
+        imageUnavailable: "这张照片暂时无法加载，请选择其他照片。",
         empty: "工厂照片即将上线。"
       },
       featuredVideo: {
