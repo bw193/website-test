@@ -368,14 +368,14 @@ test('adds a product ItemList while retaining CollectionPage and breadcrumbs', (
         '@type': 'ListItem',
         position: 1,
         name: 'Round LED Bathroom Mirror',
-        url: 'https://bolenmirror.com/en/products/round-led-bathroom-mirror/',
+        url: 'https://bolenmirror.com/en/products/led-lighted-mirror/round-led-bathroom-mirror/',
         image: 'https://example.com/round-mirror.jpg',
       },
       {
         '@type': 'ListItem',
         position: 2,
         name: 'Oval Anti-Fog Mirror, 3000-6500K',
-        url: 'https://bolenmirror.com/en/products/oval-anti-fog-mirror-3000-6500k/',
+        url: 'https://bolenmirror.com/en/products/led-lighted-mirror/oval-anti-fog-mirror-3000-6500k/',
         image: 'https://example.com/oval-mirror.jpg',
       },
     ],
@@ -433,12 +433,12 @@ for (const [lang, { copy }] of Object.entries(translatedSeo)) {
       assert.equal(crumbs[2].name, categoryLabel);
       assert.equal(crumbs[2].item, categoryUrl);
       const entries = itemList.itemListElement as Array<Record<string, unknown>>;
-      assert.equal(entries[0].url, `https://bolenmirror.com/${lang}/products/round-led-bathroom-mirror/`);
+      assert.equal(entries[0].url, `https://bolenmirror.com/${lang}/products/${slug}/round-led-bathroom-mirror/`);
     }
   });
 }
 
-test('uses localized names but keeps the English slug and localized URL prefix', () => {
+test('uses localized names and includes the category for products awaiting a route-map build', () => {
   const [, , itemList] = buildCatalogCategorySchema({
     ...options,
     lang: 'fr',
@@ -448,7 +448,7 @@ test('uses localized names but keeps the English slug and localized URL prefix',
     '@type': 'ListItem',
     position: 1,
     name: 'Miroir rond à LED',
-    url: 'https://bolenmirror.com/fr/products/round-led-bathroom-mirror/',
+    url: 'https://bolenmirror.com/fr/products/led-lighted-mirror/round-led-bathroom-mirror/',
   }]);
 });
 

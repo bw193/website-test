@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useLocalizedPath } from '../hooks/useLocalizedPath';
 import { getSeoSolutionsUi } from '../data/seoLandingI18n';
 import { INSIGHTS_PATH } from '../data/insights';
+import { localizedProductPathname } from '../utils/productRoutes';
 
 const LOGO_URL =
   'https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/logo.png';
@@ -33,7 +34,10 @@ export default function Navbar() {
   const changeLanguage = (code: string) => {
     // Replace current language prefix in URL with new language
     const pathWithoutLang = location.pathname.replace(/^\/[a-z]{2}(?=\/|$)/, '');
-    navigate(`/${code}${pathWithoutLang || '/'}`);
+    const productPath = localizedProductPathname(location.pathname, code);
+    navigate(productPath
+      ? `${productPath}${location.search}${location.hash}`
+      : `/${code}${pathWithoutLang || '/'}`);
     setLangMenuOpen(false);
   };
 

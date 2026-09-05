@@ -239,7 +239,7 @@ export default function AiReceptionist() {
   const copy = (key: string, defaultValue: string) =>
     t(`aiReceptionist.${key}`, { defaultValue });
 
-  const isProductDetail = /^\/(?:en|zh|es|fr|de|it)\/products\/(?!category(?:\/|$))[^/]+\/?$/.test(
+  const isProductDetail = /^\/(?:en|zh|es|fr|de|it)\/products\/(?!category(?:\/|$))[^/]+(?:\/[^/]+)?\/?$/.test(
     location.pathname,
   );
 

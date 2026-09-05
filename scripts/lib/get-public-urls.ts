@@ -3,6 +3,7 @@ import 'dotenv/config';
 import { SEO_LANDING_PAGES } from '../../src/data/seoLandingPages';
 import { INSIGHTS_PATH, insightDetailPath } from '../../src/data/insights';
 import { getBlogAvailableLanguages } from '../../src/utils/blog';
+import { productDetailPath, productAlternatePaths } from '../../src/utils/productRoutes';
 import type { BlogPost } from '../../src/types/blog';
 import {
   categoryPublicPages,
@@ -19,6 +20,7 @@ export interface PublicPage {
   priority: string;
   lastmod: string;
   languages?: readonly Language[];
+  pathsByLang?: Record<string, string>;
 }
 
 export const STATIC_PAGES: Omit<PublicPage, 'lastmod'>[] = [
@@ -35,10 +37,6 @@ export const STATIC_PAGES: Omit<PublicPage, 'lastmod'>[] = [
   })),
 ];
 
-function toSlug(title: string): string {
-  return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-}
-
 export async function getPublicPages(): Promise<PublicPage[]> {
   const today = new Date().toISOString().split('T')[0];
   const staticPages: PublicPage[] = STATIC_PAGES.map((p) => ({ ...p, lastmod: today }));
@@ -54,14 +52,15 @@ export async function getPublicPages(): Promise<PublicPage[]> {
   const supabase = createClient(supabaseUrl, supabaseKey);
   const { data: products, error } = await supabase
     .from('products')
-    .select('id, title, updated_at, created_at')
+    .select('id, title, category, updated_at, created_at')
     .eq('is_active', true)
     .order('created_at', { ascending: false });
 
   if (error) console.warn(`[get-public-urls] Could not fetch products: ${error.message}`);
 
   const productPages: PublicPage[] = (error ? [] : products || []).map((p) => ({
-    path: `/products/${toSlug(p.title)}`,
+    path: productDetailPath(p, 'en'),
+    pathsByLang: productAlternatePaths(p),
     changefreq: 'weekly',
     priority: '0.8',
     lastmod: (p.updated_at || p.created_at || today).split('T')[0],
@@ -98,7 +97,7 @@ export async function getPublicPages(): Promise<PublicPage[]> {
 export function expandToAllLanguageUrls(pages: PublicPage[]): string[] {
   return pages.flatMap((page) =>
     (page.languages || LANGUAGES).map(
-      (lang) => `/${lang}${page.path === '/' ? '' : page.path}`
+      (lang) => `/${lang}${page.pathsByLang?.[lang] ?? (page.path === '/' ? '' : page.path)}`
     )
   );
 }

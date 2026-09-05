@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import worker, { type Env } from './index.ts';
 import reliableWorker from './reliable-entry.ts';
+import { PRODUCT_ROUTES, productDetailPath } from '../src/utils/productRoutes';
 
 type AiRun = Env['AI']['run'];
 const SESSION_ID = '9b64bf45-75db-4a68-80c2-04c57e411edf';
@@ -1145,6 +1146,24 @@ test('retries one transient Workers AI failure without duplicating chat storage'
       limitReached: false,
     },
   });
+});
+
+test('deployed Worker redirects old product URLs with HTTP 301 and keeps canonical/category pages intact', async () => {
+  const id = 'edcee852-cbc8-4d0d-a0e8-eb54f443e94d';
+  const route = PRODUCT_ROUTES[id];
+  const canonical = `/de${productDetailPath({ id, title: '' }, 'de')}/`;
+  for (const method of ['GET', 'HEAD']) {
+    for (const param of [route.slugs.en, `${route.slugs.en}-${id}`, id]) {
+      const response = await reliableWorker.fetch(new Request(`https://bolenmirror.com/de/products/${param}/?utm_source=test`, { method }), environment());
+      assert.equal(response.status, 301);
+      assert.equal(response.headers.get('Location'), `${canonical}?utm_source=test`);
+    }
+  }
+  for (const pathname of [canonical, '/de/products/', '/de/products/category/led-lighted-mirror/']) {
+    const response = await reliableWorker.fetch(new Request(`https://bolenmirror.com${pathname}`), environment());
+    assert.equal(response.status, 200);
+    assert.equal(await response.text(), 'asset');
+  }
 });
 
 test('forwards non-API requests to the static asset binding', async () => {

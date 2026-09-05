@@ -2,10 +2,9 @@
 // Generated at build time by scripts/translate-products.ts into
 // public/i18n/products.<lang>.json and served as static assets.
 //
-// English is the source of truth and is also what every URL slug / product
-// lookup is derived from — so these overlays only ever replace *display*
-// fields, never the data used for routing. Chinese is intentionally left
-// untranslated (zh shows the original English product copy).
+// These overlays replace display fields only. Localized URL slugs are compiled
+// separately into productRoutes.json so links do not wait for a translation
+// fetch. Chinese display copy retains its existing English fallback.
 
 import { useEffect, useState } from 'react';
 

@@ -13,7 +13,7 @@ import {
   type ProductSeoLanguage,
   type ProductSeoMetadata,
 } from '../../utils/productSeo';
-import { toSlug } from '../../utils/slug';
+import { productDetailPath } from '../../utils/productRoutes';
 
 const LANGUAGE_NAMES: Record<ProductSeoLanguage, string> = {
   en: 'English', zh: '中文', es: 'Español', fr: 'Français', de: 'Deutsch', it: 'Italiano',
@@ -21,7 +21,7 @@ const LANGUAGE_NAMES: Record<ProductSeoLanguage, string> = {
 const SEO_FIELDS: ProductSeoField[] = ['title', 'description', 'h1'];
 
 interface Props {
-  product: Pick<ProductSeoFields, 'title' | 'description' | 'details'> & { id?: string };
+  product: Pick<ProductSeoFields, 'title' | 'description' | 'details'> & { id?: string; category?: string };
   value: ProductSeoMetadata;
   onChange: (value: ProductSeoMetadata) => void;
   disabled?: boolean;
@@ -57,7 +57,7 @@ export default function ProductSeoEditor({ product, value, onChange, disabled = 
   const effective = resolveProductSeo({ ...display, seo: value }, language, fallback);
   const overrides = value?.[language] || {};
   const ready = readyLanguage === language && !loadError;
-  const productUrl = `https://bolenmirror.com/${language}/products/${toSlug(product.title)}/`;
+  const productUrl = `https://bolenmirror.com/${language}${productDetailPath(product, language)}/`;
 
   const updateField = (field: ProductSeoField, text: string) => {
     onChange({ ...value, [language]: { ...overrides, [field]: text } });

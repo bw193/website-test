@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "tsx server.ts",
     "build": "tsx scripts/build-site.ts",
-    "build:prerender": "playwright install chromium && vite build && tsx scripts/prerender.ts && tsx scripts/generate-sitemap.ts",
+    "build:prerender": "tsx scripts/generate-product-routes.ts && playwright install chromium && vite build && tsx scripts/prerender.ts && tsx scripts/generate-sitemap.ts",
+    "generate-product-routes": "tsx scripts/generate-product-routes.ts",
     "prerender": "tsx scripts/prerender.ts",
     "translate": "tsx scripts/translate-products.ts",
     "generate-sitemap": "tsx scripts/generate-sitemap.ts",
@@ -17,7 +18,7 @@
     "deploy:cloudflare": "npm run build && wrangler deploy",
     "cf:types": "wrangler types",
     "test:worker": "tsx --test worker/index.test.ts",
-    "test:seo": "tsx --test src/utils/catalogCategory.test.ts src/utils/productSeo.test.ts",
+    "test:seo": "tsx --test src/utils/catalogCategory.test.ts src/utils/productSeo.test.ts src/utils/productRoutes.test.ts",
     "verify:seo:rendered": "tsx scripts/verify-product-seo.ts",
     "clean": "rm -rf dist",
     "lint": "tsc --noEmit"

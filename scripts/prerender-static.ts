@@ -97,6 +97,7 @@ import {
 } from '../src/utils/videoSchema';
 import { buildStorySchema } from '../src/utils/storySchema';
 import { INSIGHTS_PATH, insightDetailPath } from '../src/data/insights';
+import { productDetailPath, productAlternatePaths } from '../src/utils/productRoutes';
 import type { BlogPost, BlogListItem, LocalizedBlogPost } from '../src/types/blog';
 import type { LocalizedVideoPost, VideoListItem, VideoPost } from '../src/types/video';
 
@@ -485,16 +486,16 @@ function localizeProduct(product: Product, tr: LangTranslations | undefined): Pr
 // causing duplicates (two canonicals, 14 hreflangs, etc).
 const RH = 'data-rh="true"';
 
-function hreflangBlock(routePath: string, languages: readonly string[] = LANGUAGES): string {
+function hreflangBlock(routePath: string, languages: readonly string[] = LANGUAGES, alternatePaths?: Record<string, string>): string {
   // Trailing slash matches Cloudflare Pages directory-style URLs (it serves
   // dist/en/products/index.html as /en/products/). Keeping canonical and
   // hreflang URLs aligned with the served URL avoids Google picking a
   // different canonical and dropping URLs from the index.
   const suffix = routePath === '/' ? '' : routePath;
   return [
-    ...languages.map((l) => `<link ${RH} rel="alternate" hreflang="${l}" href="${SITE_URL}/${l}${suffix}/" />`),
+    ...languages.map((l) => `<link ${RH} rel="alternate" hreflang="${l}" href="${SITE_URL}/${l}${alternatePaths?.[l] ?? suffix}/" />`),
     ...(languages.includes('en')
-      ? [`<link ${RH} rel="alternate" hreflang="x-default" href="${SITE_URL}/en${suffix}/" />`]
+      ? [`<link ${RH} rel="alternate" hreflang="x-default" href="${SITE_URL}/en${alternatePaths?.en ?? suffix}/" />`]
       : []),
   ].join('\n    ');
 }
@@ -563,6 +564,7 @@ function buildHead(opts: {
   routePath: string;
   schema?: any[];
   alternateLanguages?: readonly string[];
+  alternatePaths?: Record<string, string>;
 }): string {
   const {
     lang,
@@ -575,6 +577,7 @@ function buildHead(opts: {
     routePath,
     schema = [],
     alternateLanguages = LANGUAGES,
+    alternatePaths,
   } = opts;
   return [
     // <title> is updated by Helmet via document.title (not appended), so it
@@ -582,7 +585,7 @@ function buildHead(opts: {
     `<title>${escapeHtml(title)}</title>`,
     `<meta ${RH} name="description" content="${escapeAttr(description)}" />`,
     `<link ${RH} rel="canonical" href="${escapeAttr(canonical)}" />`,
-    hreflangBlock(routePath, alternateLanguages),
+    hreflangBlock(routePath, alternateLanguages, alternatePaths),
     ogTwitterBlock(canonical, title, description, ogImage, ogType, ogVideo),
     schemaBlock(schema),
   ]
@@ -905,7 +908,7 @@ function seoLandingContent(
       const fallbackCopy = getSeoLandingProductCardCopy(product, lang);
       const hasTranslation = Boolean(tr[product.id]?.title);
       const displayTitle = lang === 'en' ? display.title : hasTranslation ? display.title : fallbackCopy.title;
-      const href = `/${lang}/products/${toSlug(product.title)}/`;
+      const href = `/${lang}${productDetailPath(product, lang)}/`;
       const image = product.images?.[0]
         ? `<img src="${escapeAttr(product.images[0])}" alt="${escapeAttr(displayTitle)}" width="400" height="400" loading="lazy" />`
         : '';
@@ -957,8 +960,7 @@ function catalogContent(
     : products;
   const items = listed
     .map((p) => {
-      const slug = toSlug(p.title || ''); // slug from English title
-      const href = `/${lang}/products/${slug}/`;
+      const href = `/${lang}${productDetailPath(p, lang)}/`;
       const title = tr[p.id]?.title || p.title;
       const img = p.images?.[0];
       const imgTag = img
@@ -1327,8 +1329,7 @@ function productPageSeo(product: Product, lang: Lang): ResolvedProductSeo {
 }
 
 function productDetailSchema(lang: Lang, product: Product, display: Product, seo: ResolvedProductSeo): any[] {
-  const slug = toSlug(product.title); // slug/URL from English title
-  const productFullUrl = `https://bolenmirror.com/${lang}/products/${slug}/`;
+  const productFullUrl = `https://bolenmirror.com/${lang}${productDetailPath(product, lang)}/`;
   const { low: lowPrice, high: highPrice } = parsePriceRange(product.price_range);
   return [
     {
@@ -2068,10 +2069,10 @@ async function writeUuidRedirects(products: Product[]): Promise<void> {
     if (!slug) continue;
 
     const pairs: Array<[string, string]> = [];
-    pairs.push([`/products/${slug}-${product.id}`, `/en/products/${slug}/`]);
-    pairs.push([`/products/${slug}-${product.id}/`, `/en/products/${slug}/`]);
+    pairs.push([`/products/${slug}-${product.id}`, `/en${productDetailPath(product, 'en')}/`]);
+    pairs.push([`/products/${slug}-${product.id}/`, `/en${productDetailPath(product, 'en')}/`]);
     for (const lang of LANGUAGES) {
-      const dest = `/${lang}/products/${slug}/`;
+      const dest = `/${lang}${productDetailPath(product, lang)}/`;
       pairs.push([`/${lang}/products/${slug}-${product.id}`, dest]);
       pairs.push([`/${lang}/products/${slug}-${product.id}/`, dest]);
     }
@@ -2294,6 +2295,8 @@ async function main(): Promise<void> {
           homeLabel: LOCALE_NAV[lang].home,
           catalogLabel: LOCALE_NAV[lang].catalog,
           products: categoryProducts.map((product) => ({
+            id: product.id,
+            category: product.category,
             title: product.title,
             name: translations[lang][product.id]?.title || product.title,
             image: product.images?.[0],
@@ -2499,7 +2502,7 @@ async function main(): Promise<void> {
         .filter((p): p is Product => !!p)
         .map((p) => {
           const disp = localizeProduct(p, translations[lang]);
-          return { href: `/${lang}/products/${toSlug(p.title)}/`, title: disp.title || p.title, img: p.images?.[0] };
+          return { href: `/${lang}${productDetailPath(p, lang)}/`, title: disp.title || p.title, img: p.images?.[0] };
         });
       const relatedArticles = blogPosts
         .filter(
@@ -2557,7 +2560,7 @@ async function main(): Promise<void> {
       const localized = localizeVideo(rawVideo, lang);
       const related = recommendProductsForVideo(localized, products, 4).map((p) => {
         const disp = localizeProduct(p, translations[lang]);
-        return { href: `/${lang}/products/${toSlug(p.title)}/`, title: disp.title || p.title, img: p.images?.[0] };
+        return { href: `/${lang}${productDetailPath(p, lang)}/`, title: disp.title || p.title, img: p.images?.[0] };
       });
       // Same ordering as VideoDetail.tsx's "Up next": same-topic clips first, then newest.
       const upNext = videos
@@ -2596,16 +2599,15 @@ async function main(): Promise<void> {
 
     for (const product of products) {
       if (!product.id || !product.title) continue;
-      const slug = toSlug(product.title);
-      const slugKey = `${lang}/${slug}`;
+      const path = productDetailPath(product, lang);
+      const slugKey = `${lang}${path}`;
       if (seenProductSlugs.has(slugKey)) {
         console.warn(
-          `[prerender-static] Duplicate product slug "${slug}" (${product.id}); skipping to avoid overwriting the earlier product.`
+          `[prerender-static] Duplicate product URL "${slugKey}" (${product.id}); skipping to avoid overwriting the earlier product.`
         );
         continue;
       }
       seenProductSlugs.add(slugKey);
-      const path = `/products/${slug}`; // slug from English title
       const canonical = `${SITE_URL}/${lang}${path}/`;
       const display = localizeProduct(product, translations[lang]);
       const seo = productPageSeo(display, lang);
@@ -2626,13 +2628,14 @@ async function main(): Promise<void> {
         ogType: 'product',
         routePath: path,
         schema: productDetailSchema(lang, product, display, seo),
+        alternatePaths: productAlternatePaths(product),
       })}\n    ${dataScript}`;
       const html = injectIntoTemplate(template, {
         lang,
         headExtras,
         bodyContent: productDetailContent(lang, product, translations[lang], seo),
       });
-      await writeRoute(`${lang}${path}`, html);
+      await writeRoute(decodeURI(`${lang}${path}`), html);
       routeCount++;
     }
   }

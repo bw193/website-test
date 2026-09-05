@@ -5,7 +5,7 @@ import { ArrowUpRight } from 'lucide-react';
 import { optimizeImage, imageSrcSet } from '../utils/optimizeImage';
 import { PRODUCT_IMAGE_PLACEHOLDER, handleImageError } from '../utils/imagePlaceholder';
 import { useLocalizedPath } from '../hooks/useLocalizedPath';
-import { toSlug } from '../utils/slug';
+import { productDetailPath } from '../utils/productRoutes';
 import { catalogCategoryPath } from '../utils/catalogCategory';
 import { useProductTranslator } from '../utils/productI18n';
 import { polishEnglishProductTitle } from '../utils/productCopy';
@@ -40,8 +40,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
     return val.startsWith('$') ? val : `$${val}`;
   };
 
-  // Slug stays derived from the English title (prop); only display is localized.
-  const productUrl = lp(`/products/${toSlug(title)}`);
+  const productUrl = lp(productDetailPath({ id, title, category }, lang));
   const d = translate({ id, title, description });
   const translatedTitle = d.title ?? title;
   const displayTitle = displayTitleOverride || (lang === 'en' ? polishEnglishProductTitle(translatedTitle) : translatedTitle);

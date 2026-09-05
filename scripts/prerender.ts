@@ -20,7 +20,7 @@ const PAGE_NAV_TIMEOUT = 30_000;
 const HYDRATE_TIMEOUT = 20_000;
 
 function isProductDetailPath(urlPath: string): boolean {
-  return /^\/[a-z]{2}\/products\/[^/]+$/.test(urlPath);
+  return /^\/[a-z]{2}\/products\/(?!category\/)[^/]+\/[^/]+$/.test(urlPath);
 }
 
 async function prerenderUrl(
@@ -77,7 +77,7 @@ async function prerenderUrl(
     );
 
     // dist/en/products/foo-uuid/index.html
-    const outDir = resolve(DIST, urlPath.replace(/^\//, ''));
+    const outDir = resolve(DIST, decodeURI(urlPath).replace(/^\//, ''));
     await mkdir(outDir, { recursive: true });
     await writeFile(resolve(outDir, 'index.html'), newHtml, 'utf-8');
 

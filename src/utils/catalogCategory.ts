@@ -1,5 +1,6 @@
 import type { SupportedLanguage } from '../hooks/useLocalizedPath';
 import { toSlug } from './slug';
+import { productDetailPath } from './productRoutes';
 
 export const DEFAULT_PRODUCT_CATEGORIES = [
   'New Arrival',
@@ -337,7 +338,9 @@ export function categoryPublicPages(
 }
 
 export interface CatalogCategorySchemaProduct {
-  /** Original English title used by product links; never a translated slug. */
+  id?: string;
+  category?: string;
+  /** Original product title; display names and URL translations are separate. */
   title: string;
   /** Localized display name, when available. */
   name?: string;
@@ -371,7 +374,7 @@ export function buildCatalogCategorySchema(opts: {
       '@type': 'ListItem',
       position: index + 1,
       name: product.name || product.title,
-      url: `${SITE_URL}/${opts.lang}/products/${toSlug(product.title)}/`,
+      url: `${SITE_URL}/${opts.lang}${productDetailPath({ ...product, category: product.category || opts.slug }, opts.lang)}/`,
       ...(product.image ? { image: product.image } : {}),
     })),
   };

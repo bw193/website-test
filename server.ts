@@ -12,6 +12,7 @@ import {
 import { INSIGHTS_PATH, insightDetailPath } from './src/data/insights';
 import { getBlogAvailableLanguages } from './src/utils/blog';
 import type { BlogPost } from './src/types/blog';
+import { productDetailPath, productAlternatePaths, productRedirectLocation } from './src/utils/productRoutes';
 
 dotenv.config();
 
@@ -43,6 +44,7 @@ async function startServer() {
     priority: string;
     lastmod: string;
     availableLanguages?: readonly string[];
+    pathsByLang?: Record<string, string>;
   };
 
   function buildUrlEntry(
@@ -51,17 +53,18 @@ async function startServer() {
     changefreq: string,
     priority: string,
     lang: string,
-    alternateLanguages: readonly string[] = LANGUAGES
+    alternateLanguages: readonly string[] = LANGUAGES,
+    pathsByLang?: Record<string, string>,
   ): string {
     const slug = pagePath === '/' ? '' : pagePath.replace(/\/+$/, '');
     const hreflangs = alternateLanguages.map(
-      (l) => `    <xhtml:link rel="alternate" hreflang="${l}" href="${DOMAIN}/${l}${slug}/" />`
+      (l) => `    <xhtml:link rel="alternate" hreflang="${l}" href="${DOMAIN}/${l}${pathsByLang?.[l] ?? slug}/" />`
     ).join('\n');
     const xDefault = alternateLanguages.includes('en')
-      ? `    <xhtml:link rel="alternate" hreflang="x-default" href="${DOMAIN}/en${slug}/" />`
+      ? `    <xhtml:link rel="alternate" hreflang="x-default" href="${DOMAIN}/en${pathsByLang?.en ?? slug}/" />`
       : '';
     return `  <url>
-    <loc>${DOMAIN}/${lang}${slug}/</loc>
+    <loc>${DOMAIN}/${lang}${pathsByLang?.[lang] ?? slug}/</loc>
     <lastmod>${lastmod}</lastmod>
     <changefreq>${changefreq}</changefreq>
     <priority>${priority}</priority>
@@ -75,7 +78,7 @@ ${xDefault}
     const today = new Date().toISOString().split('T')[0];
     const { data: products } = await supabase
       .from('products')
-      .select('id, title, updated_at, created_at')
+      .select('id, title, category, updated_at, created_at')
       .eq('is_active', true)
       .order('created_at', { ascending: false });
 
@@ -88,12 +91,9 @@ ${xDefault}
       { loc: '/videos', changefreq: 'weekly', priority: '0.7', lastmod: today },
     ];
 
-    const toSlug = (title: string) => title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-
     const productPages = (products || []).map(product => {
-      const slug = toSlug(product.title);
       const lastmod = (product.updated_at || product.created_at || today).split('T')[0];
-      return { loc: `/products/${slug}`, changefreq: 'weekly', priority: '0.8', lastmod };
+      return { loc: productDetailPath(product, 'en'), pathsByLang: productAlternatePaths(product), changefreq: 'weekly', priority: '0.8', lastmod };
     });
 
     const { data: categorySetting } = await supabase
@@ -170,7 +170,8 @@ ${xDefault}
           page.changefreq,
           page.priority,
           lang,
-          availableLanguages
+          availableLanguages,
+          page.pathsByLang,
         )
       );
     });
@@ -194,6 +195,15 @@ ${urls.join('\n')}
   });
 
   const SUPPORTED_LANGUAGES = ['en', 'zh', 'es', 'fr', 'de', 'it'];
+
+  app.use((req, res, next) => {
+    const target = productRedirectLocation(new URL(req.originalUrl, DOMAIN));
+    if ((req.method === 'GET' || req.method === 'HEAD') && target) {
+      res.redirect(301, target);
+      return;
+    }
+    next();
+  });
 
   // 301 redirects for old non-language-prefixed URLs → /en/...
   app.get('/products', (req, res) => res.redirect(301, '/en/products/'));

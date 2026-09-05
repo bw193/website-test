@@ -8,6 +8,7 @@ import type { VideoSourceType } from '../src/types/video';
 import { getBlogAvailableLanguages, pickLocalized } from '../src/utils/blog';
 import { deriveVideoThumbnailUrl, getVideoPlayback, normalizeVideoSourceType } from '../src/utils/video';
 import { SEO_LANDING_PAGES } from '../src/data/seoLandingPages';
+import { productDetailPath, productAlternatePaths } from '../src/utils/productRoutes';
 import {
   INSIGHTS_PATH,
   LEGACY_BLOG_PATH,
@@ -42,6 +43,7 @@ type SitemapPage = {
   lastmod: string;
   videoByLang?: Record<string, string | null>;
   availableLanguages?: readonly string[];
+  pathsByLang?: Record<string, string>;
 };
 
 type SitemapVideoPost = {
@@ -65,10 +67,6 @@ type SitemapVideoPost = {
 
 // Google caps <video:tag> at 32 per video and <video:category> at 256 chars.
 const MAX_VIDEO_TAGS = 32;
-
-function toSlug(title: string): string {
-  return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-}
 
 function escapeXml(value: string): string {
   return value
@@ -173,21 +171,22 @@ function buildUrlEntry(
   priority: string,
   lang: string,
   videoBlock?: string | null,
-  alternateLanguages: readonly string[] = LANGUAGES
+  alternateLanguages: readonly string[] = LANGUAGES,
+  pathsByLang?: Record<string, string>,
 ): string {
   // Trailing slash matches Cloudflare Pages directory-style serving and the
   // canonical/hreflang URLs the prerender emits, so sitemap URLs resolve
   // 200 directly without a slash-redirect hop.
   const slug = pagePath === '/' ? '' : pagePath;
   const hreflangs = alternateLanguages.map(
-    (l) => `    <xhtml:link rel="alternate" hreflang="${l}" href="${DOMAIN}/${l}${slug}/" />`
+    (l) => `    <xhtml:link rel="alternate" hreflang="${l}" href="${DOMAIN}/${l}${pathsByLang?.[l] ?? slug}/" />`
   ).join('\n');
   const xDefault = alternateLanguages.includes('en')
-    ? `    <xhtml:link rel="alternate" hreflang="x-default" href="${DOMAIN}/en${slug}/" />`
+    ? `    <xhtml:link rel="alternate" hreflang="x-default" href="${DOMAIN}/en${pathsByLang?.en ?? slug}/" />`
     : '';
 
   return `  <url>
-    <loc>${DOMAIN}/${lang}${slug}/</loc>
+    <loc>${DOMAIN}/${lang}${pathsByLang?.[lang] ?? slug}/</loc>
     <lastmod>${lastmod}</lastmod>
     <changefreq>${changefreq}</changefreq>
     <priority>${priority}</priority>
@@ -210,7 +209,7 @@ async function generateSitemap() {
   // Fetch products for dynamic pages
   const { data: products, error } = await supabase
     .from('products')
-    .select('id, title, updated_at, created_at')
+    .select('id, title, category, updated_at, created_at')
     .eq('is_active', true)
     .order('created_at', { ascending: false });
 
@@ -220,10 +219,10 @@ async function generateSitemap() {
   }
 
   const productPages = (products || []).map((p) => {
-    const slug = toSlug(p.title);
     const lastmod = (p.updated_at || p.created_at || today).split('T')[0];
     return {
-      loc: `/products/${slug}`,
+      loc: productDetailPath(p, 'en'),
+      pathsByLang: productAlternatePaths(p),
       changefreq: 'weekly',
       priority: '0.8',
       lastmod,
@@ -332,7 +331,8 @@ async function generateSitemap() {
         page.priority,
         lang,
         page.videoByLang?.[lang],
-        availableLanguages
+        availableLanguages,
+        page.pathsByLang,
       )
     );
   });

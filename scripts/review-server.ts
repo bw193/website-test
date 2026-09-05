@@ -1,5 +1,6 @@
 import express from 'express';
 import path from 'node:path';
+import { productRedirectLocation } from '../src/utils/productRoutes';
 
 const app = express();
 const reviewPort = Number.parseInt(process.env.REVIEW_PORT || '4173', 10);
@@ -80,6 +81,15 @@ app.use(
     }
   },
 );
+
+app.use((request, response, next) => {
+  const target = productRedirectLocation(new URL(request.originalUrl, productionOrigin));
+  if ((request.method === 'GET' || request.method === 'HEAD') && target) {
+    response.redirect(301, target);
+    return;
+  }
+  next();
+});
 
 app.use(
   express.static(distPath, {

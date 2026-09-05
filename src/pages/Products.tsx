@@ -203,6 +203,8 @@ export default function Products() {
                 products: loading ? undefined : visibleProducts.map((product) => {
                   const name = translateProduct(product).title || product.title;
                   return {
+                    id: product.id,
+                    category: product.category,
                     title: product.title,
                     name: lang === 'en' ? polishEnglishProductTitle(name) : name,
                     image: product.images?.[0],

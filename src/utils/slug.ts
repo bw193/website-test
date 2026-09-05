@@ -1,13 +1,24 @@
-// Product URLs are keyed by a slug derived from the title — the products table
-// has no slug column. New URLs are clean ("/products/<slug>"). Older URLs also
-// carried the row UUID ("/products/<slug>-<uuid>"); parseProductParam still
-// pulls that id out so previously indexed / bookmarked links keep resolving.
+// Keep the original slug algorithm for category paths and legacy product URLs.
+// Localized product detail routes use toProductSlug and the product route map.
 
 export function toSlug(title: string): string {
   return title
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/(^-|-$)+/g, '');
+}
+
+/** Readable localized slugs; preserve CJK and transliterate Latin accents. */
+export function toProductSlug(title: string, lang: string): string {
+  let value = title.toLowerCase();
+  if (lang === 'de') {
+    value = value.replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss');
+  }
+  return value.normalize('NFKD')
+    .replace(/\p{M}+/gu, '')
+    .replace(/œ/g, 'oe').replace(/æ/g, 'ae')
+    .replace(/[^\p{L}\p{N}]+/gu, '-')
+    .replace(/^-+|-+$/g, '');
 }
 
 const TRAILING_UUID =

@@ -98,6 +98,7 @@ function AppShell() {
               <Route path="products" element={withMotion(<Products />)} />
               <Route path="products/category" element={<RedirectToCatalog />} />
               <Route path="products/category/:categorySlug" element={withMotion(<Products />)} />
+              <Route path="products/:productCategory/:id" element={withMotion(<ProductDetail />)} />
               <Route path="products/:id" element={withMotion(<ProductDetail />)} />
               <Route path="our-story" element={withMotion(<OurStory />)} />
               <Route path={INSIGHTS_PATH.slice(1)} element={<Blog />} />

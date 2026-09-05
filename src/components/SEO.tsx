@@ -20,6 +20,8 @@ interface SEOProps {
   noindex?: boolean;
   /** Languages with a real equivalent route. Defaults to all supported locales. */
   alternateLanguages?: string[];
+  /** Product details have a different translated slug in each locale. */
+  alternatePaths?: Record<string, string>;
 }
 
 const SITE_URL = 'https://bolenmirror.com';
@@ -33,7 +35,8 @@ export default function SEO({
   ogVideo,
   schema,
   noindex = false,
-  alternateLanguages = ['en', 'zh', 'es', 'fr', 'de', 'it']
+  alternateLanguages = ['en', 'zh', 'es', 'fr', 'de', 'it'],
+  alternatePaths,
 }: SEOProps) {
   const currentLang = useCurrentLang();
   const { i18n } = useTranslation();
@@ -44,6 +47,7 @@ export default function SEO({
   // the final URL and Google doesn't pick a different canonical.
   const suffix = path === '/' ? '' : path;
   const canonicalUrl = `${SITE_URL}/${currentLang}${suffix}/`;
+  const alternateUrl = (lang: string) => `${SITE_URL}/${lang}${alternatePaths?.[lang] ?? suffix}/`;
 
   // react-helmet-async iterates <Helmet> children with React.Children but does NOT
   // recurse into nested arrays/expressions, so every alternate link and JSON-LD
@@ -59,13 +63,13 @@ export default function SEO({
       {noindex && <meta name="robots" content="noindex, nofollow" />}
       <link rel="canonical" href={canonicalUrl} />
 
-      {hasAlternate('en') && <link rel="alternate" hrefLang="en" href={`${SITE_URL}/en${suffix}/`} />}
-      {hasAlternate('zh') && <link rel="alternate" hrefLang="zh" href={`${SITE_URL}/zh${suffix}/`} />}
-      {hasAlternate('es') && <link rel="alternate" hrefLang="es" href={`${SITE_URL}/es${suffix}/`} />}
-      {hasAlternate('fr') && <link rel="alternate" hrefLang="fr" href={`${SITE_URL}/fr${suffix}/`} />}
-      {hasAlternate('de') && <link rel="alternate" hrefLang="de" href={`${SITE_URL}/de${suffix}/`} />}
-      {hasAlternate('it') && <link rel="alternate" hrefLang="it" href={`${SITE_URL}/it${suffix}/`} />}
-      {hasAlternate('en') && <link rel="alternate" hrefLang="x-default" href={`${SITE_URL}/en${suffix}/`} />}
+      {hasAlternate('en') && <link rel="alternate" hrefLang="en" href={alternateUrl('en')} />}
+      {hasAlternate('zh') && <link rel="alternate" hrefLang="zh" href={alternateUrl('zh')} />}
+      {hasAlternate('es') && <link rel="alternate" hrefLang="es" href={alternateUrl('es')} />}
+      {hasAlternate('fr') && <link rel="alternate" hrefLang="fr" href={alternateUrl('fr')} />}
+      {hasAlternate('de') && <link rel="alternate" hrefLang="de" href={alternateUrl('de')} />}
+      {hasAlternate('it') && <link rel="alternate" hrefLang="it" href={alternateUrl('it')} />}
+      {hasAlternate('en') && <link rel="alternate" hrefLang="x-default" href={alternateUrl('en')} />}
 
       <meta property="og:type" content={ogType} />
       <meta property="og:url" content={canonicalUrl} />

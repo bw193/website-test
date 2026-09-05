@@ -18,6 +18,7 @@ const env = {
 };
 
 const commands = [
+  'tsx scripts/generate-product-routes.ts',
   'vite build',
   'tsx scripts/prerender-static.ts',
   'tsx scripts/generate-sitemap.ts',

@@ -404,6 +404,7 @@ export default function AdminProductForm() {
                   product={{
                     id,
                     title: watchedTitle || '',
+                    category: watchedCategory || '',
                     description: watchedDescription || '',
                     details: watchedDetails || '',
                   }}

@@ -1,4 +1,5 @@
 import baseWorker, { type Env } from './index.ts';
+import { parseProductDetailPath, productRedirectLocation } from '../src/utils/productRoutes';
 
 const AI_API_PATH = '/api/ai-receptionist';
 const FALLBACK_AI_MODEL = '@cf/meta/llama-3.1-8b-instruct-fast';
@@ -171,6 +172,11 @@ async function repairStaleSequence(
 const worker = {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
+    if ((request.method === 'GET' || request.method === 'HEAD') && parseProductDetailPath(url.pathname)) {
+      const target = productRedirectLocation(url);
+      if (target) return new Response(null, { status: 301, headers: { Location: target } });
+      return env.ASSETS.fetch(request);
+    }
     const repairableRequest =
       url.pathname === AI_API_PATH && request.method === 'POST' ? request.clone() : null;
     const reliableEnv = withReliableAi(env);

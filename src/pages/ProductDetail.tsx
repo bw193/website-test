@@ -1,6 +1,6 @@
 import { m, AnimatePresence } from 'motion/react';
 import React, { useEffect, useRef, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, useLocation, Navigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { Loader2, CheckCircle2, ChevronLeft, ChevronRight, Send, ShieldCheck, Truck, Clock, Check } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -12,7 +12,8 @@ import { optimizeImage, imageSrcSet } from '../utils/optimizeImage';
 import { PRODUCT_IMAGE_PLACEHOLDER, handleImageError } from '../utils/imagePlaceholder';
 import { useLocalizedPath } from '../hooks/useLocalizedPath';
 import { readInitialProduct } from '../utils/prerenderData';
-import { toSlug, parseProductParam } from '../utils/slug';
+import { parseProductParam } from '../utils/slug';
+import { findProductRoute, productDetailPath, productAlternatePaths, productMatchesDetailPath } from '../utils/productRoutes';
 import { catalogCategoryPath } from '../utils/catalogCategory';
 import { useProductTranslator } from '../utils/productI18n';
 import { recommendVideosForProduct, toVideoListItem } from '../utils/video';
@@ -71,12 +72,15 @@ function SectionHeading({ children }: { children: React.ReactNode }) {
 }
 
 export default function ProductDetail() {
-  const { id: routeParam } = useParams<{ id: string }>();
+  const { id: routeParam, productCategory } = useParams<{ id: string; productCategory: string }>();
+  const location = useLocation();
   const { lang, lp } = useLocalizedPath();
-  // URLs are now "/products/<slug>"; "<slug>-<uuid>" (and bare uuid) still resolve.
   const { slug: routeSlug, legacyId } = parseProductParam(routeParam);
-  const initialProduct = readInitialProduct<Product>({ slug: routeSlug, id: legacyId });
+  const routeKey = `${lang}/${productCategory || ''}/${routeParam || ''}`;
+  const initialProduct = readInitialProduct<Product>(location.pathname);
+  const knownId = findProductRoute(location.pathname)?.id || legacyId || initialProduct?.id;
   const [product, setProduct] = useState<Product | null>(initialProduct);
+  const [resolvedRouteKey, setResolvedRouteKey] = useState(routeKey);
   const [loading, setLoading] = useState(initialProduct === null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [rfqStatus, setRfqStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
@@ -115,14 +119,16 @@ export default function ProductDetail() {
 
   useEffect(() => {
     let cancelled = false;
+    setProduct(initialProduct);
+    setLoading(initialProduct === null);
+    setResolvedRouteKey(routeKey);
+    setCurrentImageIndex(0);
     const fetchProduct = async () => {
       if (!routeSlug && !legacyId) return;
       try {
         const { supabase } = await import('../supabase');
-        // Fast path: a legacy URL gives the id outright, and a prerendered
-        // direct visit already knows it from the data island. Otherwise the
-        // slug must be matched against title-derived slugs (no slug column).
-        const knownId = legacyId || initialProduct?.id;
+        // Resolve translated routes to IDs before querying; new products also
+        // support title lookup until a build refreshes the route index.
         let resolved: Product | null = null;
         if (knownId) {
           const { data, error } = await supabase
@@ -139,7 +145,7 @@ export default function ProductDetail() {
             .select('*')
             .eq('is_active', true);
           if (error) throw error;
-          resolved = (data as Product[] | null)?.find((p) => toSlug(p.title) === routeSlug) ?? null;
+          resolved = (data as Product[] | null)?.find((p) => productMatchesDetailPath(p, location.pathname)) ?? null;
         }
         if (!cancelled) setProduct(resolved);
       } catch (error) {
@@ -152,7 +158,7 @@ export default function ProductDetail() {
     return () => {
       cancelled = true;
     };
-  }, [routeSlug, legacyId]);
+  }, [routeKey, knownId]);
 
   useEffect(() => {
     if (!product) return;
@@ -220,7 +226,7 @@ export default function ProductDetail() {
     return val.startsWith('$') ? val : `$${val}`;
   };
 
-  if (loading) {
+  if (loading || resolvedRouteKey !== routeKey) {
     return (
       <div className="bg-stone-50 min-h-screen py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -253,7 +259,7 @@ export default function ProductDetail() {
       <>
         <SEO
           title={t('productDetail.notFound', 'Product not found.')}
-          path={`/products/${routeSlug || routeParam || ''}`}
+          path={location.pathname.replace(/^\/[a-z]{2}/, '').replace(/\/+$/, '')}
           noindex
           alternateLanguages={[]}
         />
@@ -264,8 +270,13 @@ export default function ProductDetail() {
     );
   }
 
-  // Localized copy for display + SEO. `product` (English) still drives the
-  // slug/canonical/lookup so URLs stay identical across languages.
+  const productPath = productDetailPath(product, lang);
+  const canonicalPathname = lp(productPath);
+  if (location.pathname !== canonicalPathname) {
+    return <Navigate to={`${canonicalPathname}${location.search}${location.hash}`} replace />;
+  }
+
+  // Display copy stays independent of the localized URL index.
   const translatedProduct = translate(product);
   const display = {
     ...translatedProduct,
@@ -320,7 +331,6 @@ export default function ProductDetail() {
     }
   };
 
-  const productPath = product ? `/products/${toSlug(product.title)}` : '/products';
   // Trailing slash to match Cloudflare Pages directory-style URLs and the
   // canonical/sitemap; prerender-static.ts uses the same shape so Helmet
   // adopts the existing JSON-LD tag instead of appending a duplicate.
@@ -388,6 +398,7 @@ export default function ProductDetail() {
         title={seoTitle}
         description={richDescription}
         path={productPath}
+        alternatePaths={productAlternatePaths(product)}
         ogImage={product.images?.[0]}
         ogType="product"
         schema={productSchema}

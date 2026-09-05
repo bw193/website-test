@@ -4,6 +4,7 @@ import path from 'node:path';
 import { getCatalogCategoryPageCopy, getCatalogCategorySeoTitle } from '../src/utils/catalogCategory';
 import { resolveProductSeo, type ProductSeoFields } from '../src/utils/productSeo';
 import { polishEnglishProductTitle } from '../src/utils/productCopy';
+import { productDetailPath, productAlternatePaths } from '../src/utils/productRoutes';
 import { en } from '../src/locales/en';
 import { zh } from '../src/locales/zh';
 import { es } from '../src/locales/es';
@@ -53,7 +54,6 @@ async function main(): Promise<void> {
       const absolutePath = path.join(productRoot, file);
       const relativePath = path.relative(DIST, absolutePath).split(path.sep).join('/');
       const route = `/${relativePath.replace(/index\.html$/, '')}`;
-      routeSet.add(route.slice(lang.length + 1));
       const html = (await readFile(absolutePath, 'utf8')).replace(/<!--[\s\S]*?-->/g, '');
       const title = readOne(html, /<title\b[^>]*>([^<]*)<\/title>/g, route, 'Title');
       const h1 = readOne(html, /<h1\b[^>]*>([^<]*)<\/h1>/g, route, 'H1');
@@ -63,7 +63,7 @@ async function main(): Promise<void> {
       const htmlLang = readOne(html, /<html\b[^>]*lang="([^"]*)"[^>]*>/g, route, 'HTML language');
 
       assert.equal(visibleDescription, description, `${route}: visible description differs from Meta Description`);
-      assert.equal(canonical, `${ORIGIN}${route}`, `${route}: canonical URL changed`);
+      assert.equal(canonical, new URL(route, ORIGIN).href, `${route}: canonical URL does not match the served route`);
       assert.equal(htmlLang, lang, `${route}: HTML language does not match the route`);
 
       for (const [attribute, prefix] of [['property', 'og'], ['name', 'twitter']] as const) {
@@ -92,6 +92,7 @@ async function main(): Promise<void> {
       assert.equal(normalized(String(pageSchemas[0].description)), description, `${route}: schema description differs from Meta Description`);
 
       if (categorySlug) {
+        routeSet.add(route.slice(lang.length + 1));
         const expectedTitle = getCatalogCategorySeoTitle(lang, categorySlug, '');
         if (expectedTitle) {
           const expectedCopy = getCatalogCategoryPageCopy(lang, categorySlug, { h1: '', description: '' });
@@ -104,14 +105,23 @@ async function main(): Promise<void> {
         assert.equal(itemLists[0].name, h1, `${route}: ItemList name differs from H1`);
         counts.categories += 1;
       } else if (isCatalog) {
+        routeSet.add('/products/');
         counts.catalogs += 1;
       } else {
         const islandMatch = html.match(/<script\b[^>]*id="__BOLEN_PRERENDER_DATA__"[^>]*>([\s\S]*?)<\/script>/);
         assert.ok(islandMatch, `${route}: product data island missing`);
         const payload = JSON.parse(islandMatch[1]) as {
-          product: ProductSeoFields & { id: string };
+          product: ProductSeoFields & { id: string; category?: string };
           productTranslations?: Record<string, Partial<ProductSeoFields>>;
         };
+        routeSet.add(`product:${payload.product.id}`);
+        assert.equal(canonical, `${ORIGIN}/${lang}${productDetailPath(payload.product, lang)}/`);
+        for (const [alternateLang, alternatePath] of Object.entries(productAlternatePaths(payload.product))) {
+          const href = readOne(html, new RegExp(`<link\\b[^>]*hreflang="${alternateLang}"[^>]*href="([^"]*)"[^>]*>`, 'g'), route, `${alternateLang} alternate`);
+          assert.equal(href, `${ORIGIN}/${alternateLang}${alternatePath}/`, `${route}: incorrect translated alternate URL`);
+        }
+        const offer = pageSchemas[0].offers as { url: string };
+        assert.equal(offer.url, canonical, `${route}: Product offer uses an old URL`);
         const translated = payload.productTranslations?.[payload.product.id];
         const product: ProductSeoFields = {
           ...payload.product,
@@ -136,7 +146,7 @@ async function main(): Promise<void> {
   }
 
   for (let index = 1; index < routeSets.length; index += 1) {
-    assert.deepEqual(routeSets[index], routeSets[0], `${LANGUAGES[index]}: product routes differ from the English routes`);
+    assert.deepEqual(routeSets[index], routeSets[0], `${LANGUAGES[index]}: translated routes do not contain the same products/categories as English`);
   }
   console.log(`[verify-product-seo] Passed: ${counts.catalogs} catalogs, ${counts.categories} category pages, ${counts.products} product pages across ${LANGUAGES.length} languages.`);
   console.log('[verify-product-seo] Title, Meta Description, visible H1/description, canonical, social tags and page schema are consistent.');
