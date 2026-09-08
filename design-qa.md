@@ -328,3 +328,64 @@ final result: passed
 - TypeScript and the Vite production build passed; the existing bundle-size advisory remains.
 
 final result: passed
+
+---
+
+# Solution Detail Redesign - 2026-09-08
+
+- Preview: `http://127.0.0.1:5178/en/solutions/led-bathroom-mirror-manufacturer/`.
+- Scope: the shared solution detail template, covering all 12 solution types. Reuses the site's 1280 px container, ivory/stone/amber palette, serif headings, rounded imagery and canonical buttons.
+- Added an image-led split hero with real matching catalog models, a manufacturing proof row, sticky section navigation and reading progress, an overview, product highlights, a numbered specification guide, expandable FAQs, related-solution cards and a dark closing inquiry section.
+- Motion includes staggered hero/copy entrances, decoded-image fade/zoom transitions, scroll reveals, specification rule entrances, thumbnail/card/link feedback and animated FAQ expansion. No animation dependency was added; reduced motion disables animations and transitions.
+- New interface copy is provided in English, Chinese, Spanish, French, German and Italian. Existing solution copy, product selection, canonical URLs and structured data are retained.
+- Browser verification used installed Playwright with headless Chrome because the agent-browser CLI was unavailable. The initial detail and homepage references loaded without errors before implementation.
+- Responsive matrix passed 69 checks: every English solution at 320 and 1440 px, plus the three longest translated titles in each of the other five languages at 320, 768 and 1440 px. Additional English checks passed at 701, 900, 1024 and 2048 px. No document overflow, clipped headings/body text or broken loaded images were detected.
+- Corrected the rotating FAQ icon's bounds at 320 px by giving it a dedicated 32 px container. Final desktop and mobile screenshots were recaptured after the fix.
+- Keyboard checks passed for model selection, section anchors with focus transfer, and FAQ Enter/Space behavior. Sticky navigation sits below the 64 px main navbar; selected sections and FAQ ARIA states stay synchronized.
+- Browser-only delayed-image checks confirmed that the previous image remains visible, rapid selection works, and a late response cannot replace the newer selection. Failed-image feedback and retry recovery passed. An empty product response displays the real factory photograph and factory link without an empty product section.
+- Product links, related-solution navigation, locale-specific canonical URLs, Service/FAQ data and the loaded RFQ form were verified. Navigating to another solution resets gallery and FAQ state. No RFQ was submitted or backend data modified.
+- Touch model selection and FAQ controls passed at 390 px. Reduced-motion checks found zero running solution animations. Normal browsing produced zero console or page errors.
+- Final TypeScript check (`npm.cmd run lint`) passed. The final direct production build (`node node_modules/vite/bin/vite.js build --logLevel warn`) exited successfully; the existing bundle-size advisory remains. The npm-wrapped build had completed bundling before a Windows process-exit assertion, so the direct build was used to confirm a clean exit.
+- Final evidence: `shots/solution-detail-after-hero-1440.png`, `shots/solution-detail-after-full-1440.png`, `shots/solution-detail-after-full-390.png`, `shots/solution-detail-after-solution-details-1440.png`, `shots/solution-detail-after-solution-faq-1440.png`, and the six locale captures under `shots/solution-detail-{lang}-*.png`.
+
+final result: passed
+
+## Solution Detail Visual Refinement and SEO Comparison - 2026-09-08
+
+- Revised the shared detail template after feedback on its appearance. The hero now uses a larger room photograph blended into the ivory background, an amber italic emphasis within the unchanged English H1, compact manufacturing proof points, and a small scroll-driven image offset.
+- Product cards use staggered sizes and positions. The three original specification chapters now alternate product photography and copy. FAQ expansion uses a dark active panel; related solutions use open ruled links; the closing inquiry area uses the real factory exterior photograph.
+- All original introductions, paragraphs, specification bullets and FAQ questions/answers were checked against the source content. New styling does not rewrite the original H1 or metadata.
+- Created an isolated, ignored snapshot of Git commit `12e6f1e` under `build/solution-detail-baseline/` and rendered its original irregular mirror detail page at port 5180. The workspace preview remains at port 5178.
+- Exact rendered comparison for `/en/solutions/irregular-shaped-mirror-manufacturer/` confirmed equality of Title, Description, canonical, robots meta, HTML language, H1, all hreflang links, every Open Graph/Twitter field and all three JSON-LD objects.
+- H2 count changed from 6 to 8, H3 count from 6 to 9, and image elements from 3 to 11. Every original H2 and paragraph remains. The new overview H2 now uses the solution-specific eyebrow instead of the generic heading from the first redesign.
+- Full comparison and raw data: `reports/irregular-mirror-seo-before-after-2026-09-08.md` and `.json`. These compare locally rendered implementations; they do not claim changes to search rankings, indexing or traffic.
+- Responsive checks passed 56 combinations: all 12 English solutions at 320/768/1440 px, plus the irregular mirror page and the longest translated heading in each of the other five languages at 320/1440 px. A long German proof label was given wrapping to fit 320 px.
+- Final interaction checks passed keyboard gallery selection, the visible hero scroll offset, FAQ anchor/focus and keyboard expansion, chapter product navigation, and reduced motion. The reduced-motion state has no running solution animations or gallery offset. Normal browsing had zero console/page errors.
+- TypeScript passed. Vite production build passed with the existing bundle-size advisory. Earlier overridden declarations and unused sidebar selectors were removed from the page stylesheet.
+- Current visual evidence: `shots/irregular-solution-refined-hero-1440.png`, `shots/irregular-solution-refined-full-1440.png`, `shots/irregular-solution-refined-full-390.png`. Original and first-redesign captures are retained with the `irregular-solution-original-*` and `irregular-solution-first-redesign-*` prefixes.
+
+final result: passed
+
+## Custom Mirror Solution Motion - 2026-09-08
+
+- Enhanced `/en/solutions/custom-mirror-manufacturer/` and its five translated versions through the scoped `solution-motion` class. The shared solution template, other solution types, and the homepage retain their existing presentation.
+- Added a staggered title accent, eyebrow line drawing, a finite scroll hint, proof-point dot entrances, a longer decoded-gallery image entrance, alternating chapter photo reveals, staggered chapter copy, drawn specification checkmarks, product-card lift, button sheen, link feedback, smoother FAQ expansion and a factory-photo entrance.
+- Chapter and factory images have small scroll offsets on desktop devices with a fine pointer. The existing passive scroll listener and animation-frame scheduler handle these transforms without per-frame React state for the images. The image frames and text do not move. Mobile retains the entrance and touch feedback without the additional parallax.
+- Reduced motion immediately removes animations, translations, scales and the hero offset. All decorative entrance/interaction animations are finite; the gallery continues to change only after a user selection and successful decoding.
+- Exact rendered comparison against a snapshot taken immediately before this change confirmed unchanged Title, Description, robots, Open Graph/Twitter tags, canonical/hreflang links, JSON-LD and all heading/paragraph copy. The hero, proof row and every main section retained their bounds at 320, 390, 768 and 1440 px with reduced motion.
+- Fourteen language/viewport checks passed. Normal-motion verification confirmed gallery transitions, chapter reveal timing, visible scroll response with covered image edges, hover lift and sheen, keyboard FAQ expansion, live reduced-motion changes and mobile touch interaction. No page or console errors were detected.
+- TypeScript and the direct Vite production build passed. The existing bundle-size advisory remains. No form was submitted, no backend data changed, and no commit or push was made.
+- Evidence: `shots/custom-solution-motion-hero-1440.png`, `shots/custom-solution-motion-hero-390.png`, `shots/custom-solution-motion-chapter-entry-1440.png`, and `shots/custom-solution-motion-chapter-1440.png`. The ignored `build/custom-solution-motion-before/` snapshot preserves the preceding design for comparison.
+
+final result: passed
+
+## Solution Detail Readability - 2026-09-08
+
+- Responded to the highlighted body copy, proof descriptions and section navigation in screenshots 122 and 123 of the LED mirror wholesale solution. Updated the shared solution detail stylesheet without changing the heading font, content, SEO fields or page structure.
+- Desktop chapter/overview copy increased to 18 px, proof descriptions and section navigation to 15 px, proof values to 17 px/600 weight, and specification/FAQ answer text to 16 px. Darkened supporting text from stone-600 to stone-700. Supporting labels, photo links and product actions were adjusted to match.
+- Mobile keeps chapter copy at 17 px, proof labels/navigation at 14 px and FAQ questions at 16 px. Line height and wrapping accommodate the larger text while preserving the existing image/text arrangement.
+- Browser comparison confirmed the actual computed font sizes before/after. Twenty-two viewport checks covered the wholesale, custom and irregular solutions at 320/390/768/1440 px and the wholesale solution in the other five languages at 320/1440 px. No overflow, clipped text, console errors or page errors were found.
+- The custom solution's animations, keyboard FAQ expansion and gallery selection still work. The Vite production build passed with its existing bundle-size advisory.
+- Before/after evidence: shots/solution-readability-{before,after}-copy-1440.png and shots/solution-readability-{before,after}-proof-1440.png. Mobile captures: shots/solution-readability-after-copy-390.png and shots/solution-readability-after-proof-390.png. The previous stylesheet is preserved under ignored build/solution-readability-before/.
+
+final result: passed

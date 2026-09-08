@@ -1,0 +1,758 @@
+{
+  "baselineCommit": "12e6f1ec010da8b0c64772f0685e2f36cd61a5aa",
+  "date": "2026-09-08",
+  "scope": "Local rendered page before the solution redesign versus the current local refinement; not search ranking or indexing data.",
+  "unchangedFields": [
+    "title",
+    "description",
+    "canonical",
+    "robots",
+    "language",
+    "h1",
+    "alternates",
+    "social",
+    "schemas"
+  ],
+  "before": {
+    "title": "Irregular Shaped Mirror Manufacturer | BOLEN",
+    "description": "Create organic, asymmetric, oval and custom-shaped mirrors with engineering review, LED options, sampling and protective export packaging from BOLEN.",
+    "canonical": "https://bolenmirror.com/en/solutions/irregular-shaped-mirror-manufacturer/",
+    "robots": [
+      "index, follow"
+    ],
+    "language": "en",
+    "h1": [
+      "Irregular Shaped Mirror Manufacturer for Custom Collections"
+    ],
+    "h2": [
+      "Example models",
+      "Choose a distinctive shape that remains manufacturable",
+      "Light distribution around curves and asymmetry",
+      "Sampling, tolerances and packaging for repeat orders",
+      "Frequently asked questions",
+      "Related manufacturing solutions"
+    ],
+    "h3": [
+      "Organic shape designer black frame back lit LED bathroom mirrors with 3 color dimming and antifog",
+      "Custom Irregular Oval Backlit Bathroom Mirror for Distributors and Private Label Brands",
+      "Irregular matt black frame led light mirror for bathroom with antifog and 3000-6500K dimming",
+      "Can BOLEN manufacture an irregular mirror from our drawing?",
+      "Can irregular shaped mirrors include LED lighting?",
+      "Do custom shapes have a different MOQ?"
+    ],
+    "alternates": [
+      {
+        "lang": "en",
+        "href": "https://bolenmirror.com/en/solutions/irregular-shaped-mirror-manufacturer/"
+      },
+      {
+        "lang": "zh",
+        "href": "https://bolenmirror.com/zh/solutions/irregular-shaped-mirror-manufacturer/"
+      },
+      {
+        "lang": "es",
+        "href": "https://bolenmirror.com/es/solutions/irregular-shaped-mirror-manufacturer/"
+      },
+      {
+        "lang": "fr",
+        "href": "https://bolenmirror.com/fr/solutions/irregular-shaped-mirror-manufacturer/"
+      },
+      {
+        "lang": "de",
+        "href": "https://bolenmirror.com/de/solutions/irregular-shaped-mirror-manufacturer/"
+      },
+      {
+        "lang": "it",
+        "href": "https://bolenmirror.com/it/solutions/irregular-shaped-mirror-manufacturer/"
+      },
+      {
+        "lang": "x-default",
+        "href": "https://bolenmirror.com/en/solutions/irregular-shaped-mirror-manufacturer/"
+      }
+    ],
+    "social": [
+      {
+        "name": "og:type",
+        "content": "website"
+      },
+      {
+        "name": "og:url",
+        "content": "https://bolenmirror.com/en/solutions/irregular-shaped-mirror-manufacturer/"
+      },
+      {
+        "name": "og:title",
+        "content": "Irregular Shaped Mirror Manufacturer | BOLEN"
+      },
+      {
+        "name": "og:description",
+        "content": "Create organic, asymmetric, oval and custom-shaped mirrors with engineering review, LED options, sampling and protective export packaging from BOLEN."
+      },
+      {
+        "name": "og:site_name",
+        "content": "BOLEN Mirror"
+      },
+      {
+        "name": "twitter:card",
+        "content": "summary_large_image"
+      },
+      {
+        "name": "twitter:url",
+        "content": "https://bolenmirror.com/en/solutions/irregular-shaped-mirror-manufacturer/"
+      },
+      {
+        "name": "twitter:title",
+        "content": "Irregular Shaped Mirror Manufacturer | BOLEN"
+      },
+      {
+        "name": "twitter:description",
+        "content": "Create organic, asymmetric, oval and custom-shaped mirrors with engineering review, LED options, sampling and protective export packaging from BOLEN."
+      },
+      {
+        "name": "og:image",
+        "content": "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-images/products/1783924026806-szqnpzy.jpg"
+      },
+      {
+        "name": "twitter:image",
+        "content": "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-images/products/1783924026806-szqnpzy.jpg"
+      }
+    ],
+    "schemas": [
+      {
+        "@context": "https://schema.org",
+        "@type": "Service",
+        "name": "Irregular Shaped Mirror Manufacturer for Custom Collections",
+        "alternateName": "Irregular shaped mirror manufacturer",
+        "serviceType": "Irregular shaped mirror manufacturer",
+        "description": "Create organic, asymmetric, oval and custom-shaped mirrors with engineering review, LED options, sampling and protective export packaging from BOLEN.",
+        "url": "https://bolenmirror.com/en/solutions/irregular-shaped-mirror-manufacturer/",
+        "areaServed": {
+          "@type": "Place",
+          "name": "Worldwide"
+        },
+        "audience": {
+          "@type": "BusinessAudience",
+          "audienceType": "Importers, distributors, brands, hotel and project buyers"
+        },
+        "brand": {
+          "@type": "Brand",
+          "name": "BOLEN"
+        },
+        "provider": {
+          "@type": "Organization",
+          "name": "Jiaxing Chengtai Mirror Co., Ltd. (BOLEN)",
+          "url": "https://bolenmirror.com"
+        },
+        "hasOfferCatalog": {
+          "@type": "OfferCatalog",
+          "name": "BOLEN mirror catalog",
+          "url": "https://bolenmirror.com/en/products/"
+        }
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Can BOLEN manufacture an irregular mirror from our drawing?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. Vector or CAD artwork is preferred for a precise original outline, but a dimensioned reference image can start the review. The final production drawing is confirmed before sampling."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can irregular shaped mirrors include LED lighting?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes, many shapes can use front, back or ambient lighting. Feasibility depends on the curve, backing or frame construction, LED route, driver and mounting space."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Do custom shapes have a different MOQ?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "They can. MOQ depends on whether the design uses standard glass processing and components or requires dedicated tooling, frame development or packaging. It is confirmed after drawing review."
+            }
+          }
+        ]
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://bolenmirror.com/en/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Manufacturing Solutions",
+            "item": "https://bolenmirror.com/en/solutions/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": "Irregular Shaped Mirror Manufacturer for Custom Collections",
+            "item": "https://bolenmirror.com/en/solutions/irregular-shaped-mirror-manufacturer/"
+          }
+        ]
+      }
+    ],
+    "images": [
+      {
+        "src": "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/render/image/public/product-images/products/1783924026806-szqnpzy.jpg?width=400&resize=contain",
+        "alt": "Organic shape designer black frame back lit LED bathroom mirrors with 3 color dimming and antifog",
+        "width": 360
+      },
+      {
+        "src": "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/render/image/public/product-images/products/1787366958532-vc1yxeq.jpg?width=400&resize=contain",
+        "alt": "Custom Irregular Oval Backlit Bathroom Mirror for Distributors and Private Label Brands",
+        "width": 360
+      },
+      {
+        "src": "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/render/image/public/product-images/products/1783925938336-dchklcp.jpg?width=400&resize=contain",
+        "alt": "Irregular matt black frame led light mirror for bathroom with antifog and 3000-6500K dimming",
+        "width": 360
+      }
+    ],
+    "links": [
+      {
+        "text": "Home",
+        "href": "/en/"
+      },
+      {
+        "text": "Solutions",
+        "href": "/en/solutions/"
+      },
+      {
+        "text": "Contact Sales",
+        "href": "/en/rfq/"
+      },
+      {
+        "text": "View product catalog",
+        "href": "/en/products/"
+      },
+      {
+        "text": "View all products",
+        "href": "/en/products/"
+      },
+      {
+        "text": "",
+        "href": "/en/products/irregular-mirror/organic-shape-designer-black-frame-back-lit-led-bathroom-mirrors-with-3-color-dimming-and-antifog/"
+      },
+      {
+        "text": "Irregular Mirror",
+        "href": "/en/products/category/irregular-mirror/"
+      },
+      {
+        "text": "Organic shape designer black frame back lit LED bathroom mirrors with 3 color dimming and antifog",
+        "href": "/en/products/irregular-mirror/organic-shape-designer-black-frame-back-lit-led-bathroom-mirrors-with-3-color-dimming-and-antifog/"
+      },
+      {
+        "text": "Contact Sales",
+        "href": "/en/rfq/?product=Organic+shape+designer+black+frame+back+lit+LED+bathroom+mirrors+with+3+color+dimming+and+antifog&model=CTL1022B"
+      },
+      {
+        "text": "",
+        "href": "/en/products/led-lighted-mirror/custom-irregular-oval-backlit-bathroom-mirror-for-distributors-and-private-label-brands/"
+      },
+      {
+        "text": "Led Lighted Mirror",
+        "href": "/en/products/category/led-lighted-mirror/"
+      },
+      {
+        "text": "Custom Irregular Oval Backlit Bathroom Mirror for Distributors and Private Label Brands",
+        "href": "/en/products/led-lighted-mirror/custom-irregular-oval-backlit-bathroom-mirror-for-distributors-and-private-label-brands/"
+      },
+      {
+        "text": "Contact Sales",
+        "href": "/en/rfq/?product=Custom+Irregular+Oval+Backlit+Bathroom+Mirror+for+Distributors+and+Private+Label+Brands&model=CTL1020"
+      },
+      {
+        "text": "",
+        "href": "/en/products/led-lighted-mirror/irregular-matt-black-frame-led-light-mirror-for-bathroom-with-antifog-and-3000-6500k-dimming/"
+      },
+      {
+        "text": "Led Lighted Mirror",
+        "href": "/en/products/category/led-lighted-mirror/"
+      },
+      {
+        "text": "Irregular matt black frame led light mirror for bathroom with antifog and 3000-6500K dimming",
+        "href": "/en/products/led-lighted-mirror/irregular-matt-black-frame-led-light-mirror-for-bathroom-with-antifog-and-3000-6500k-dimming/"
+      },
+      {
+        "text": "Contact Sales",
+        "href": "/en/rfq/?product=Irregular+matt+black+frame+led+light+mirror+for+bathroom+with+antifog+and+3000-6500K+dimming&model=6504B+S"
+      },
+      {
+        "text": "Custom-size LED mirrors",
+        "href": "/en/solutions/custom-size-led-mirrors/"
+      },
+      {
+        "text": "Custom mirror manufacturer",
+        "href": "/en/solutions/custom-mirror-manufacturer/"
+      },
+      {
+        "text": "Full-length mirror manufacturer",
+        "href": "/en/solutions/full-length-mirror-manufacturer/"
+      },
+      {
+        "text": "Start an RFQ",
+        "href": "/en/rfq/"
+      }
+    ],
+    "paragraphs": [
+      "Organic, asymmetric and geometric outlines with optional LED.",
+      "Indicative factory range",
+      "$35-70",
+      "Suggested Retail Price: $499",
+      "Indicative factory range",
+      "$25-55",
+      "Suggested Retail Price: $359",
+      "Indicative factory range",
+      "$35-70",
+      "Suggested Retail Price: $499",
+      "BOLEN develops irregular and custom-shaped mirrors for bathroom brands, furniture programs, hotels and design-led distributors. Organic curves, asymmetric outlines and geometric forms require coordination between the glass edge, frame or backing, lighting path, mounting orientation and packaging. We review those details before sampling so the design can be produced consistently.",
+      "Irregular mirrors can include pebble, cloud, capsule, arch, oval, asymmetric and other buyer-defined forms. The final outline affects cutting and polishing, frame bending or backing design, LED diffusion and wall balance. Sharp internal corners and very tight curves may need adjustment to maintain edge quality and structural reliability.",
+      "A vector drawing is ideal for an original shape, but a reference image with the required width, height and orientation can begin the feasibility review. We clarify whether proportions may be adjusted across different sizes or whether every model must preserve one exact outline.",
+      "On an illuminated irregular mirror, LED position and distance from the edge influence brightness and visual continuity. BOLEN reviews the lighting route, diffuser or backing, driver, cable exit and control position for the chosen shape. Anti-fog, dimming and color-temperature functions can be added where the construction and usable surface permit.",
+      "The sample confirms the physical outline, edge finish, mounting balance and lighting effect. Approved drawings and orientation references are then used for production inspection. Packaging is developed to support projecting curves and vulnerable points rather than forcing an irregular mirror into a standard rectangular protection plan.",
+      "Yes. Vector or CAD artwork is preferred for a precise original outline, but a dimensioned reference image can start the review. The final production drawing is confirmed before sampling.",
+      "Yes, many shapes can use front, back or ambient lighting. Feasibility depends on the curve, backing or frame construction, LED route, driver and mounting space.",
+      "They can. MOQ depends on whether the design uses standard glass processing and components or requires dedicated tooling, frame development or packaging. It is confirmed after drawing review.",
+      "Send the dimensions, quantity and functions you need."
+    ]
+  },
+  "after": {
+    "title": "Irregular Shaped Mirror Manufacturer | BOLEN",
+    "description": "Create organic, asymmetric, oval and custom-shaped mirrors with engineering review, LED options, sampling and protective export packaging from BOLEN.",
+    "canonical": "https://bolenmirror.com/en/solutions/irregular-shaped-mirror-manufacturer/",
+    "robots": [
+      "index, follow"
+    ],
+    "language": "en",
+    "h1": [
+      "Irregular Shaped Mirror Manufacturer for Custom Collections"
+    ],
+    "h2": [
+      "Organic and geometric mirror programs",
+      "Example models",
+      "Choose a distinctive shape that remains manufacturable",
+      "Light distribution around curves and asymmetry",
+      "Sampling, tolerances and packaging for repeat orders",
+      "Frequently asked questions",
+      "Related manufacturing solutions",
+      "From your brief to the finished mirror."
+    ],
+    "h3": [
+      "Organic shape designer black frame back lit LED bathroom mirrors with 3 color dimming and antifog",
+      "Custom Irregular Oval Backlit Bathroom Mirror for Distributors and Private Label Brands",
+      "Irregular matt black frame led light mirror for bathroom with antifog and 3000-6500K dimming",
+      "01Can BOLEN manufacture an irregular mirror from our drawing?",
+      "02Can irregular shaped mirrors include LED lighting?",
+      "03Do custom shapes have a different MOQ?",
+      "Custom-size LED mirrors",
+      "Custom mirror manufacturer",
+      "Full-length mirror manufacturer"
+    ],
+    "alternates": [
+      {
+        "lang": "en",
+        "href": "https://bolenmirror.com/en/solutions/irregular-shaped-mirror-manufacturer/"
+      },
+      {
+        "lang": "zh",
+        "href": "https://bolenmirror.com/zh/solutions/irregular-shaped-mirror-manufacturer/"
+      },
+      {
+        "lang": "es",
+        "href": "https://bolenmirror.com/es/solutions/irregular-shaped-mirror-manufacturer/"
+      },
+      {
+        "lang": "fr",
+        "href": "https://bolenmirror.com/fr/solutions/irregular-shaped-mirror-manufacturer/"
+      },
+      {
+        "lang": "de",
+        "href": "https://bolenmirror.com/de/solutions/irregular-shaped-mirror-manufacturer/"
+      },
+      {
+        "lang": "it",
+        "href": "https://bolenmirror.com/it/solutions/irregular-shaped-mirror-manufacturer/"
+      },
+      {
+        "lang": "x-default",
+        "href": "https://bolenmirror.com/en/solutions/irregular-shaped-mirror-manufacturer/"
+      }
+    ],
+    "social": [
+      {
+        "name": "og:type",
+        "content": "website"
+      },
+      {
+        "name": "og:url",
+        "content": "https://bolenmirror.com/en/solutions/irregular-shaped-mirror-manufacturer/"
+      },
+      {
+        "name": "og:title",
+        "content": "Irregular Shaped Mirror Manufacturer | BOLEN"
+      },
+      {
+        "name": "og:description",
+        "content": "Create organic, asymmetric, oval and custom-shaped mirrors with engineering review, LED options, sampling and protective export packaging from BOLEN."
+      },
+      {
+        "name": "og:site_name",
+        "content": "BOLEN Mirror"
+      },
+      {
+        "name": "twitter:card",
+        "content": "summary_large_image"
+      },
+      {
+        "name": "twitter:url",
+        "content": "https://bolenmirror.com/en/solutions/irregular-shaped-mirror-manufacturer/"
+      },
+      {
+        "name": "twitter:title",
+        "content": "Irregular Shaped Mirror Manufacturer | BOLEN"
+      },
+      {
+        "name": "twitter:description",
+        "content": "Create organic, asymmetric, oval and custom-shaped mirrors with engineering review, LED options, sampling and protective export packaging from BOLEN."
+      },
+      {
+        "name": "og:image",
+        "content": "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-images/products/1783924026806-szqnpzy.jpg"
+      },
+      {
+        "name": "twitter:image",
+        "content": "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-images/products/1783924026806-szqnpzy.jpg"
+      }
+    ],
+    "schemas": [
+      {
+        "@context": "https://schema.org",
+        "@type": "Service",
+        "name": "Irregular Shaped Mirror Manufacturer for Custom Collections",
+        "alternateName": "Irregular shaped mirror manufacturer",
+        "serviceType": "Irregular shaped mirror manufacturer",
+        "description": "Create organic, asymmetric, oval and custom-shaped mirrors with engineering review, LED options, sampling and protective export packaging from BOLEN.",
+        "url": "https://bolenmirror.com/en/solutions/irregular-shaped-mirror-manufacturer/",
+        "areaServed": {
+          "@type": "Place",
+          "name": "Worldwide"
+        },
+        "audience": {
+          "@type": "BusinessAudience",
+          "audienceType": "Importers, distributors, brands, hotel and project buyers"
+        },
+        "brand": {
+          "@type": "Brand",
+          "name": "BOLEN"
+        },
+        "provider": {
+          "@type": "Organization",
+          "name": "Jiaxing Chengtai Mirror Co., Ltd. (BOLEN)",
+          "url": "https://bolenmirror.com"
+        },
+        "hasOfferCatalog": {
+          "@type": "OfferCatalog",
+          "name": "BOLEN mirror catalog",
+          "url": "https://bolenmirror.com/en/products/"
+        }
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Can BOLEN manufacture an irregular mirror from our drawing?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. Vector or CAD artwork is preferred for a precise original outline, but a dimensioned reference image can start the review. The final production drawing is confirmed before sampling."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can irregular shaped mirrors include LED lighting?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes, many shapes can use front, back or ambient lighting. Feasibility depends on the curve, backing or frame construction, LED route, driver and mounting space."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Do custom shapes have a different MOQ?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "They can. MOQ depends on whether the design uses standard glass processing and components or requires dedicated tooling, frame development or packaging. It is confirmed after drawing review."
+            }
+          }
+        ]
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://bolenmirror.com/en/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Manufacturing Solutions",
+            "item": "https://bolenmirror.com/en/solutions/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": "Irregular Shaped Mirror Manufacturer for Custom Collections",
+            "item": "https://bolenmirror.com/en/solutions/irregular-shaped-mirror-manufacturer/"
+          }
+        ]
+      }
+    ],
+    "images": [
+      {
+        "src": "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/render/image/public/product-images/products/1783924026806-szqnpzy.jpg?width=960&resize=contain",
+        "alt": "Organic shape designer black frame back lit LED bathroom mirrors with 3 color dimming and antifog",
+        "width": 960
+      },
+      {
+        "src": "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/render/image/public/product-images/products/1783924026806-szqnpzy.jpg?width=100&resize=contain",
+        "alt": "",
+        "width": 100
+      },
+      {
+        "src": "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/render/image/public/product-images/products/1787366958532-vc1yxeq.jpg?width=100&resize=contain",
+        "alt": "",
+        "width": 100
+      },
+      {
+        "src": "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/render/image/public/product-images/products/1783925938336-dchklcp.jpg?width=100&resize=contain",
+        "alt": "",
+        "width": 100
+      },
+      {
+        "src": "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/render/image/public/product-images/products/1783924026806-szqnpzy.jpg?width=400&resize=contain",
+        "alt": "Organic shape designer black frame back lit LED bathroom mirrors with 3 color dimming and antifog",
+        "width": 360
+      },
+      {
+        "src": "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/render/image/public/product-images/products/1787366958532-vc1yxeq.jpg?width=400&resize=contain",
+        "alt": "Custom Irregular Oval Backlit Bathroom Mirror for Distributors and Private Label Brands",
+        "width": 360
+      },
+      {
+        "src": "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/render/image/public/product-images/products/1783925938336-dchklcp.jpg?width=400&resize=contain",
+        "alt": "Irregular matt black frame led light mirror for bathroom with antifog and 3000-6500K dimming",
+        "width": 360
+      },
+      {
+        "src": "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/render/image/public/product-images/products/1783924026806-szqnpzy.jpg?width=800&resize=contain",
+        "alt": "Organic shape designer black frame back lit LED bathroom mirrors with 3 color dimming and antifog",
+        "width": 800
+      },
+      {
+        "src": "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/render/image/public/product-images/products/1787366958532-vc1yxeq.jpg?width=800&resize=contain",
+        "alt": "Custom Irregular Oval Backlit Bathroom Mirror for Distributors and Private Label Brands",
+        "width": 800
+      },
+      {
+        "src": "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/render/image/public/product-images/products/1783925938336-dchklcp.jpg?width=800&resize=contain",
+        "alt": "Irregular matt black frame led light mirror for bathroom with antifog and 3000-6500K dimming",
+        "width": 800
+      },
+      {
+        "src": "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/render/image/public/product-images/site-assets/factory/1783993292006-xx5h5wp.jpg?width=1200&resize=contain",
+        "alt": "",
+        "width": 1200
+      }
+    ],
+    "links": [
+      {
+        "text": "Home",
+        "href": "/en/"
+      },
+      {
+        "text": "Solutions",
+        "href": "/en/solutions/"
+      },
+      {
+        "text": "Contact Sales",
+        "href": "/en/rfq/"
+      },
+      {
+        "text": "View product catalog",
+        "href": "/en/products/"
+      },
+      {
+        "text": "Explore this solution",
+        "href": "#solution-overview"
+      },
+      {
+        "text": "Example modelsExplore this model",
+        "href": "/en/products/irregular-mirror/organic-shape-designer-black-frame-back-lit-led-bathroom-mirrors-with-3-color-dimming-and-antifog/"
+      },
+      {
+        "text": "Overview",
+        "href": "#solution-overview"
+      },
+      {
+        "text": "Example models",
+        "href": "#solution-models"
+      },
+      {
+        "text": "Specification guide",
+        "href": "#solution-details"
+      },
+      {
+        "text": "Buyer questions",
+        "href": "#solution-faq"
+      },
+      {
+        "text": "Contact Sales",
+        "href": "/en/rfq/"
+      },
+      {
+        "text": "View all products",
+        "href": "/en/products/"
+      },
+      {
+        "text": "",
+        "href": "/en/products/irregular-mirror/organic-shape-designer-black-frame-back-lit-led-bathroom-mirrors-with-3-color-dimming-and-antifog/"
+      },
+      {
+        "text": "Irregular Mirror",
+        "href": "/en/products/category/irregular-mirror/"
+      },
+      {
+        "text": "Organic shape designer black frame back lit LED bathroom mirrors with 3 color dimming and antifog",
+        "href": "/en/products/irregular-mirror/organic-shape-designer-black-frame-back-lit-led-bathroom-mirrors-with-3-color-dimming-and-antifog/"
+      },
+      {
+        "text": "Contact Sales",
+        "href": "/en/rfq/?product=Organic+shape+designer+black+frame+back+lit+LED+bathroom+mirrors+with+3+color+dimming+and+antifog&model=CTL1022B"
+      },
+      {
+        "text": "",
+        "href": "/en/products/led-lighted-mirror/custom-irregular-oval-backlit-bathroom-mirror-for-distributors-and-private-label-brands/"
+      },
+      {
+        "text": "Led Lighted Mirror",
+        "href": "/en/products/category/led-lighted-mirror/"
+      },
+      {
+        "text": "Custom Irregular Oval Backlit Bathroom Mirror for Distributors and Private Label Brands",
+        "href": "/en/products/led-lighted-mirror/custom-irregular-oval-backlit-bathroom-mirror-for-distributors-and-private-label-brands/"
+      },
+      {
+        "text": "Contact Sales",
+        "href": "/en/rfq/?product=Custom+Irregular+Oval+Backlit+Bathroom+Mirror+for+Distributors+and+Private+Label+Brands&model=CTL1020"
+      },
+      {
+        "text": "",
+        "href": "/en/products/led-lighted-mirror/irregular-matt-black-frame-led-light-mirror-for-bathroom-with-antifog-and-3000-6500k-dimming/"
+      },
+      {
+        "text": "Led Lighted Mirror",
+        "href": "/en/products/category/led-lighted-mirror/"
+      },
+      {
+        "text": "Irregular matt black frame led light mirror for bathroom with antifog and 3000-6500K dimming",
+        "href": "/en/products/led-lighted-mirror/irregular-matt-black-frame-led-light-mirror-for-bathroom-with-antifog-and-3000-6500k-dimming/"
+      },
+      {
+        "text": "Contact Sales",
+        "href": "/en/rfq/?product=Irregular+matt+black+frame+led+light+mirror+for+bathroom+with+antifog+and+3000-6500K+dimming&model=6504B+S"
+      },
+      {
+        "text": "Explore this model",
+        "href": "/en/products/irregular-mirror/organic-shape-designer-black-frame-back-lit-led-bathroom-mirrors-with-3-color-dimming-and-antifog/"
+      },
+      {
+        "text": "Explore this model",
+        "href": "/en/products/led-lighted-mirror/custom-irregular-oval-backlit-bathroom-mirror-for-distributors-and-private-label-brands/"
+      },
+      {
+        "text": "Explore this model",
+        "href": "/en/products/led-lighted-mirror/irregular-matt-black-frame-led-light-mirror-for-bathroom-with-antifog-and-3000-6500k-dimming/"
+      },
+      {
+        "text": "Discuss your project",
+        "href": "/en/rfq/"
+      },
+      {
+        "text": "Solutions",
+        "href": "/en/solutions/"
+      },
+      {
+        "text": "01Custom-size LED mirrorsMade-to-measure lighting and dimensions for vanities and project walls.Explore solution",
+        "href": "/en/solutions/custom-size-led-mirrors/"
+      },
+      {
+        "text": "02Custom mirror manufacturerTurn a drawing, sample or brief into a manufacturable OEM/ODM program.Explore solution",
+        "href": "/en/solutions/custom-mirror-manufacturer/"
+      },
+      {
+        "text": "03Full-length mirror manufacturerWall, leaning and dressing mirrors for retail, hotels and apartments.Explore solution",
+        "href": "/en/solutions/full-length-mirror-manufacturer/"
+      },
+      {
+        "text": "Start an RFQ",
+        "href": "/en/rfq/"
+      },
+      {
+        "text": "Browse product catalog",
+        "href": "/en/products/"
+      }
+    ],
+    "paragraphs": [
+      "Organic and geometric mirror programs",
+      "Organic, asymmetric and geometric outlines with optional LED.",
+      "Overview",
+      "BOLEN develops irregular and custom-shaped mirrors for bathroom brands, furniture programs, hotels and design-led distributors. Organic curves, asymmetric outlines and geometric forms require coordination between the glass edge, frame or backing, lighting path, mounting orientation and packaging. We review those details before sampling so the design can be produced consistently.",
+      "Relevant products",
+      "Indicative factory range",
+      "$35-70",
+      "Suggested Retail Price: $499",
+      "Indicative factory range",
+      "$25-55",
+      "Suggested Retail Price: $359",
+      "Indicative factory range",
+      "$35-70",
+      "Suggested Retail Price: $499",
+      "01Specification guide",
+      "Irregular mirrors can include pebble, cloud, capsule, arch, oval, asymmetric and other buyer-defined forms. The final outline affects cutting and polishing, frame bending or backing design, LED diffusion and wall balance. Sharp internal corners and very tight curves may need adjustment to maintain edge quality and structural reliability.",
+      "A vector drawing is ideal for an original shape, but a reference image with the required width, height and orientation can begin the feasibility review. We clarify whether proportions may be adjusted across different sizes or whether every model must preserve one exact outline.",
+      "02Specification guide",
+      "On an illuminated irregular mirror, LED position and distance from the edge influence brightness and visual continuity. BOLEN reviews the lighting route, diffuser or backing, driver, cable exit and control position for the chosen shape. Anti-fog, dimming and color-temperature functions can be added where the construction and usable surface permit.",
+      "03Specification guide",
+      "The sample confirms the physical outline, edge finish, mounting balance and lighting effect. Approved drawings and orientation references are then used for production inspection. Packaging is developed to support projecting curves and vulnerable points rather than forcing an irregular mirror into a standard rectangular protection plan.",
+      "Buyer questions",
+      "Yes. Vector or CAD artwork is preferred for a precise original outline, but a dimensioned reference image can start the review. The final production drawing is confirmed before sampling.",
+      "Yes, many shapes can use front, back or ambient lighting. Feasibility depends on the curve, backing or frame construction, LED route, driver and mounting space.",
+      "They can. MOQ depends on whether the design uses standard glass processing and components or requires dedicated tooling, frame development or packaging. It is confirmed after drawing review.",
+      "Made-to-measure lighting and dimensions for vanities and project walls.",
+      "Turn a drawing, sample or brief into a manufacturable OEM/ODM program.",
+      "Wall, leaning and dressing mirrors for retail, hotels and apartments.",
+      "Your manufacturing partner",
+      "Send the dimensions, quantity and functions you need."
+    ]
+  },
+  "validation": {
+    "layouts": 56,
+    "pageErrors": []
+  }
+}
