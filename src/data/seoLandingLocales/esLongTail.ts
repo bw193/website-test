@@ -48,7 +48,7 @@ export const esLongTailSeoLandingTranslations = {
     ],
   },
   'irregular-shaped-mirror-manufacturer': {
-    title: 'Fabricante de espejos de formas irregulares | BOLEN',
+    title: 'Fabricante de espejos irregulares con 3 años de garantía',
     description: 'Cree espejos orgánicos, asimétricos, ovales y personalizados con revisión técnica, LED, muestras y embalaje protector de BOLEN.',
     eyebrow: 'Programas de formas orgánicas y geométricas',
     h1: 'Fabricante de espejos irregulares para colecciones a medida',

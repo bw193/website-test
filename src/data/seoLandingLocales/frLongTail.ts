@@ -48,7 +48,7 @@ export const frLongTailSeoLandingTranslations = {
     ],
   },
   'irregular-shaped-mirror-manufacturer': {
-    title: 'Fabricant de miroirs de forme irrégulière | BOLEN',
+    title: 'Fabricant de miroirs de forme irrégulière avec garantie de 3 ans',
     description: 'Créez des miroirs organiques, asymétriques, ovales ou personnalisés avec étude technique, LED, échantillon et emballage protecteur BOLEN.',
     eyebrow: 'Programmes de formes organiques et géométriques',
     h1: 'Fabricant de miroirs irréguliers pour collections sur mesure',

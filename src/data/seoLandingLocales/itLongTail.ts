@@ -48,7 +48,7 @@ export const itLongTailSeoLandingTranslations = {
     ],
   },
   'irregular-shaped-mirror-manufacturer': {
-    title: 'Produttore di specchi di forma irregolare | BOLEN',
+    title: 'Produttore di specchi di forma irregolare con garanzia di 3 anni',
     description: 'Crea specchi organici, asimmetrici, ovali o personalizzati con revisione tecnica, LED, campione e imballaggio protettivo BOLEN.',
     eyebrow: 'Programmi di forme organiche e geometriche',
     h1: 'Produttore di specchi irregolari per collezioni su misura',

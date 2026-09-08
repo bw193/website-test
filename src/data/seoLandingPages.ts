@@ -536,7 +536,7 @@ export const SEO_LANDING_PAGES: SeoLandingPage[] = [
   },
   {
     slug: 'irregular-shaped-mirror-manufacturer',
-    title: 'Irregular Shaped Mirror Manufacturer | BOLEN',
+    title: 'Irregular shaped mirror manufacturer with 3-year warranty',
     description:
       'Create organic, asymmetric, oval and custom-shaped mirrors with engineering review, LED options, sampling and protective export packaging from BOLEN.',
     eyebrow: 'Organic and geometric mirror programs',

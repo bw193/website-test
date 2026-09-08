@@ -48,7 +48,7 @@ export const deLongTailSeoLandingTranslations = {
     ],
   },
   'irregular-shaped-mirror-manufacturer': {
-    title: 'Hersteller für unregelmäßig geformte Spiegel | BOLEN',
+    title: 'Formspiegel-Hersteller mit 3 Jahren Garantie',
     description: 'Organische, asymmetrische, ovale und individuelle Spiegel mit technischer Prüfung, LED, Muster und Schutzverpackung von BOLEN.',
     eyebrow: 'Organische und geometrische Formprogramme',
     h1: 'Hersteller unregelmäßiger Spiegel für individuelle Kollektionen',

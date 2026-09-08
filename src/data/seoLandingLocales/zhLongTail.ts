@@ -56,7 +56,7 @@ export const zhLongTailSeoLandingTranslations = {
     ],
   },
   'irregular-shaped-mirror-manufacturer': {
-    title: '异形镜制造商 | BOLEN',
+    title: '异形镜制造商，提供3年质保',
     description: 'BOLEN 提供有机形、不对称、椭圆及定制形状镜子开发，支持工程审核、LED 方案、打样和出口防护包装。',
     eyebrow: '有机与几何造型镜项目',
     h1: '面向定制系列的异形镜制造商',
