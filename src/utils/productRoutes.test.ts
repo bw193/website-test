@@ -73,6 +73,49 @@ test('old English, UUID and unprefixed detail links redirect directly, preservin
   }
 });
 
+const historicalMisspellings = [
+  {
+    id: '0a97a69f-9285-42be-b8ef-04b3e1ebfd00',
+    category: 'bathroom-mirror-without-led',
+    slug: 'modern-minimalist-bulk-frameless-rectanglar-beveled-edge-bathroom-vanity-mirror-wall-mounted',
+  },
+  {
+    id: 'ed981223-b816-44ca-be5a-feee3512fe9b',
+    category: 'led-lighted-mirror',
+    slug: 'low-moq-rectanglar-ip44-waterproof-led-lighted-bathroom-mirror-with-aluminum-alloy-frame',
+  },
+  {
+    id: 'fdbac784-0592-4680-bb92-cf2e10f6026b',
+    category: 'mirror-cabinet',
+    slug: 'manufacturer-rectanglar-smart-light-color-temperature-adjustable-vanity-mirror-cabinet-with-storage',
+  },
+];
+
+for (const legacy of historicalMisspellings) {
+  test(`historical misspelling resolves and redirects for ${legacy.category}`, () => {
+    const current = { id: legacy.id, title: 'Updated product title', category: legacy.category };
+    for (const prefix of ['', ...LANGUAGES.map((lang) => `/${lang}`)]) {
+      const lang = prefix.slice(1) || 'en';
+      const canonical = `/${lang}${productDetailPath(current, lang)}/`;
+      for (const categoryPrefix of ['', `${legacy.category}/`]) {
+        for (const slash of ['', '/']) {
+          const pathname = `${prefix}/products/${categoryPrefix}${legacy.slug}${slash}`;
+          assert.equal(findProductRoute(pathname)?.id, legacy.id);
+          assert.equal(productMatchesDetailPath(current, pathname), true);
+          assert.equal(productMatchesDetailPath({ ...current, id: 'other' }, pathname), false);
+          assert.equal(
+            productRedirectLocation(new URL(`${pathname}?utm_source=legacy&q=custom%20size`, ORIGIN)),
+            `${canonical}?utm_source=legacy&q=custom%20size`,
+          );
+        }
+      }
+      assert.equal(productRedirectLocation(new URL(canonical, ORIGIN)), null);
+    }
+    assert.equal(findProductRoute(`/en/products/wrong-category/${legacy.slug}/`), null);
+    assert.equal(findProductRoute(`/en/products/${legacy.category}/${legacy.slug}-unknown/`), null);
+  });
+}
+
 test('catalogs, categories, unknown URLs and unrelated routes are never remapped', () => {
   for (const prefix of ['', ...LANGUAGES.map((lang) => `/${lang}`)]) {
     for (const suffix of ['/products', '/products/', '/products/category', '/products/category/', '/products/category/led-lighted-mirror/']) {

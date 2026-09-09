@@ -389,3 +389,29 @@ final result: passed
 - Before/after evidence: shots/solution-readability-{before,after}-copy-1440.png and shots/solution-readability-{before,after}-proof-1440.png. Mobile captures: shots/solution-readability-after-copy-390.png and shots/solution-readability-after-proof-390.png. The previous stylesheet is preserved under ignored build/solution-readability-before/.
 
 final result: passed
+
+## Product Detail Visual Refinement - 2026-09-08
+
+- Updated the shared product detail template with a larger, uncropped photograph, ivory canvas, serif titles, open price treatment, a separate manufacturing proof row and sticky section links. Long introductory copy now sits with the product details when that section exists. Original product copy, pricing and SEO generation are retained.
+- Reworked the specifications into a readable sheet, with stacked key/value rows on phones and line-break opportunities after separators. Refined the inquiry panel and related solution links using the site's stone and amber palette. Fixed narrow translated video-card overflow within this page.
+- Added a manual product gallery with decoded image changes, thumbnails, arrow/Home/End keyboard selection and a native larger-image dialog. The viewer supports Tab/Shift+Tab containment, Escape, restored focus and scroll locking. New gallery labels cover all six languages.
+- Added finite photo and content entrances, thumbnail/control feedback, and related-link rule animation. Live reduced-motion changes remove animations. No animation dependency was added.
+- Browser verification used installed Playwright with headless Chrome because the agent-browser CLI was unavailable. Thirty-five layout checks passed: three English products at 320/390/768/1024/1440 px, plus LED and full-length mirrors in Chinese, Spanish, French, German and Italian at 320/1440 px. No horizontal overflow or clipped tested copy remained.
+- Exact before/after DOM comparisons on LED, full-length and irregular mirrors confirmed unchanged Title, Description, H1, canonical, hreflang, social metadata and Product/Breadcrumb JSON-LD.
+- Keyboard and touch checks passed for gallery navigation, wrapping, the viewer, section anchors and the mobile quote shortcut. Form validation displayed all three required-field errors and focused the first input; no inquiry was sent.
+- Browser-only fixtures verified empty/single-image products, missing specifications/details/prices, delayed image continuity, stale response protection, failed-image feedback, initial-image recovery and retry without replacing the previous image before decoding. No backend data was changed.
+- Final normal browsing produced zero console/page errors. TypeScript and the direct Vite production build passed; the existing bundle-size advisory remains.
+- Evidence: `shots/product-detail-after-hero-1440.png`, `shots/product-detail-after-hero-390.png`, `shots/product-detail-after-full-1440.png`, `shots/product-detail-after-full-390.png`, `shots/product-detail-after-information-1440.png`, `shots/product-detail-after-rfq-1440.png`, `shots/product-detail-after-rfq-390.png`, and `shots/product-detail-after-lightbox-1440.png`. Before captures and the source/DOM snapshot are retained locally under `shots/product-detail-before-*` and ignored `build/product-detail-before/`.
+
+final result: passed
+
+## Product URL Compatibility - 2026-09-09
+
+- Preserved three published English product slugs containing `rectanglar` after the canonical route index corrected them to `rectangular`. Explicit aliases resolve to product IDs independently of the regenerated route data.
+- Existing shared routing now sends these historical links directly to the localized canonical URL with HTTP 301 in the Worker and local servers. Both category-qualified and older flat paths are supported, including language prefixes, optional trailing slashes and query parameters. Incorrect categories and unknown slugs remain unmatched.
+- Three regression tests first reproduced the failures, then passed after the fix. All SEO and Worker tests passed, together with TypeScript and the direct Vite production build. The existing bundle-size advisory remains.
+- Handler verification confirmed six GET/HEAD redirects and successful destination responses. Browser verification confirmed all three old links open the intended products while preserving query parameters and fragment anchors, with no page errors.
+- Confirmed the product detail inquiry textarea has no placeholder and company/email hints use the quieter styling. The rejected catalog redesign remains fully reverted; the catalog retains 12 original cards and its original layout.
+- Verification data is retained locally in ignored `build/product-legacy-redirect-verification.json`.
+
+final result: passed

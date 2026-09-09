@@ -18,6 +18,14 @@ export interface RoutableProduct {
 export const PRODUCT_ROUTES = routeData as Record<string, ProductRoute>;
 const SUPPORTED_LANGUAGES = ['en', 'zh', 'es', 'fr', 'de', 'it'] as const;
 
+// Keep published URLs reachable after product-title spelling corrections.
+// These aliases stay separate from the regenerated canonical route index.
+const LEGACY_SLUG_IDS: Readonly<Record<string, string>> = {
+  'modern-minimalist-bulk-frameless-rectanglar-beveled-edge-bathroom-vanity-mirror-wall-mounted': '0a97a69f-9285-42be-b8ef-04b3e1ebfd00',
+  'low-moq-rectanglar-ip44-waterproof-led-lighted-bathroom-mirror-with-aluminum-alloy-frame': 'ed981223-b816-44ca-be5a-feee3512fe9b',
+  'manufacturer-rectanglar-smart-light-color-temperature-adjustable-vanity-mirror-cabinet-with-storage': 'fdbac784-0592-4680-bb92-cf2e10f6026b',
+};
+
 function routePath(route: ProductRoute, lang: string): string {
   const slug = route.slugs[lang as SupportedLanguage] || route.slugs.en;
   return `/products/${route.category}/${encodeURIComponent(slug)}`;
@@ -50,9 +58,9 @@ export function findProductRoute(pathname: string): (ProductRoute & { id: string
   if (!parsed) return null;
   const { slug, legacyId } = parseProductParam(parsed.param);
   if (legacyId && PRODUCT_ROUTES[legacyId]) return { id: legacyId, ...PRODUCT_ROUTES[legacyId] };
-  const candidates = Object.entries(PRODUCT_ROUTES).filter(([, route]) =>
+  const candidates = Object.entries(PRODUCT_ROUTES).filter(([id, route]) =>
     (!parsed.category || parsed.category === route.category) &&
-    Object.values(route.slugs).includes(slug),
+    (Object.values(route.slugs).includes(slug) || LEGACY_SLUG_IDS[slug] === id),
   );
   // Prefer the requested locale if two translations happen to overlap.
   const found = candidates.find(([, route]) => route.slugs[parsed.lang as SupportedLanguage] === slug) || candidates[0];

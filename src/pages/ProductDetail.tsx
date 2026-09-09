@@ -1,14 +1,16 @@
-import { m, AnimatePresence } from 'motion/react';
+import { m, useReducedMotion } from 'motion/react';
 import React, { useEffect, useRef, useState } from 'react';
 import { useParams, useLocation, Navigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { Loader2, CheckCircle2, ChevronLeft, ChevronRight, Send, ShieldCheck, Truck, Clock, Check } from 'lucide-react';
+import { Loader2, CheckCircle2, ChevronRight, ArrowUpRight, Send, ShieldCheck, Truck, Clock, Check } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import Markdown from '../components/Markdown';
 import SEO from '../components/SEO';
+import ProductGallery from '../components/ProductGallery';
+import './ProductDetail.css';
 import { resolveProductSeo, normalizeSpecs, type ProductSeoMetadata } from '../utils/productSeo';
 import VideoCard from '../components/VideoCard';
-import { optimizeImage, imageSrcSet } from '../utils/optimizeImage';
+import { optimizeImage } from '../utils/optimizeImage';
 import { PRODUCT_IMAGE_PLACEHOLDER, handleImageError } from '../utils/imagePlaceholder';
 import { useLocalizedPath } from '../hooks/useLocalizedPath';
 import { readInitialProduct } from '../utils/prerenderData';
@@ -61,14 +63,7 @@ const VIDEO_LIST_COLUMNS =
   'id, slug, source_type, video_url, embed_url, thumbnail_url, category, tags, duration_seconds, published_at, title, excerpt';
 
 function SectionHeading({ children }: { children: React.ReactNode }) {
-  return (
-    <h2 className="flex items-start gap-3 font-serif text-2xl leading-tight text-stone-900 sm:text-3xl">
-      {/* items-start, not center: these headings wrap on narrow screens and a
-          centred bar then floats away from the first line. */}
-      <span className="mt-0.5 h-7 w-1 shrink-0 rounded-full bg-amber-500" aria-hidden="true" />
-      {children}
-    </h2>
-  );
+  return <h2 className="pdp-section-heading font-serif">{children}</h2>;
 }
 
 export default function ProductDetail() {
@@ -82,7 +77,7 @@ export default function ProductDetail() {
   const [product, setProduct] = useState<Product | null>(initialProduct);
   const [resolvedRouteKey, setResolvedRouteKey] = useState(routeKey);
   const [loading, setLoading] = useState(initialProduct === null);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const reduceMotion = useReducedMotion();
   const [rfqStatus, setRfqStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [relatedVideos, setRelatedVideos] = useState<VideoListItem[]>([]);
   const [hasReachedProductRfq, setHasReachedProductRfq] = useState(false);
@@ -122,7 +117,6 @@ export default function ProductDetail() {
     setProduct(initialProduct);
     setLoading(initialProduct === null);
     setResolvedRouteKey(routeKey);
-    setCurrentImageIndex(0);
     const fetchProduct = async () => {
       if (!routeSlug && !legacyId) return;
       try {
@@ -310,24 +304,25 @@ export default function ProductDetail() {
     t('rfq.quoteIncludesOptions', 'Customization and target-market compliance options'),
   ];
 
-  const nextImage = () => {
-    setCurrentImageIndex((prev) => (prev + 1) % product.images.length);
-  };
-
-  const prevImage = () => {
-    setCurrentImageIndex((prev) => (prev - 1 + product.images.length) % product.images.length);
+  const jumpTo = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    const target = document.getElementById(event.currentTarget.hash.slice(1));
+    if (!target) return;
+    event.preventDefault();
+    target.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' });
+    target.focus({ preventScroll: true });
   };
 
   const fadeInUp = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
+    hidden: { opacity: reduceMotion ? 1 : 0, y: reduceMotion ? 0 : 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: reduceMotion ? 0 : 0.65 } }
   };
 
   const staggerContainer = {
-    hidden: { opacity: 0 },
+    hidden: { opacity: reduceMotion ? 1 : 0 },
     visible: {
       opacity: 1,
-      transition: { staggerChildren: 0.1 }
+      transition: { staggerChildren: reduceMotion ? 0 : 0.08 }
     }
   };
 
@@ -393,7 +388,7 @@ export default function ProductDetail() {
   ] : undefined;
 
   return (
-    <div className="bg-[#FAF9F6] min-h-screen pb-24 lg:pb-0">
+    <div lang={lang} className="product-detail min-h-screen">
       <SEO
         title={seoTitle}
         description={richDescription}
@@ -408,13 +403,13 @@ export default function ProductDetail() {
           price basis and the quote action. Specs, long-form details, solutions
           and videos each get their own full-width band below, instead of being
           stacked inside this column. */}
-      <section className="border-b border-stone-200 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-12 lg:pt-10 lg:pb-20">
+      <section className="pdp-hero">
+        <div className="pdp-container">
         <m.nav
           aria-label="Breadcrumb"
-          initial={{ opacity: 0, x: -20 }}
+          initial={{ opacity: reduceMotion ? 1 : 0, x: reduceMotion ? 0 : -12 }}
           animate={{ opacity: 1, x: 0 }}
-          className="hide-scrollbar flex items-center overflow-x-auto whitespace-nowrap text-xs font-medium text-stone-500 sm:text-sm"
+          className="pdp-breadcrumb"
         >
           <Link to={lp('/')} className="hover:text-amber-600 transition-colors">{t('navbar.home')}</Link>
           <ChevronRight className="mx-1.5 h-3.5 w-3.5 shrink-0 text-stone-300 sm:mx-2 sm:h-4 sm:w-4" />
@@ -424,237 +419,145 @@ export default function ProductDetail() {
               <ChevronRight className="mx-1.5 h-3.5 w-3.5 shrink-0 text-stone-300 sm:mx-2 sm:h-4 sm:w-4" />
               <Link
                 to={lp(catalogCategoryPath(product.category))}
-                className="hover:text-amber-600 transition-colors truncate max-w-[120px] sm:max-w-none"
+                className="hover:text-amber-600 transition-colors"
               >
                 {t(`products.categories.${product.category}`, product.category)}
               </Link>
             </>
           )}
           <ChevronRight className="mx-1.5 h-3.5 w-3.5 shrink-0 text-stone-300 sm:mx-2 sm:h-4 sm:w-4" />
-          <span className="text-stone-900 truncate max-w-[140px] sm:max-w-none">{display.title}</span>
+          <span aria-current="page">{display.title}</span>
         </m.nav>
 
-        <div className="mt-6 lg:mt-10 lg:grid lg:grid-cols-2 lg:gap-x-14 xl:gap-x-20">
-          {/* Left Column: Image Gallery */}
-          <div className="flex flex-col lg:col-start-1 lg:row-start-1">
-            <m.div 
-              initial={{ opacity: 0, scale: 0.97 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5 }}
-              className="relative aspect-square w-full rounded-3xl overflow-hidden bg-gradient-to-br from-stone-50 via-white to-stone-100 border border-stone-200 group"
-            >
-              <AnimatePresence mode="wait">
-                <m.div
-                  key={currentImageIndex}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="h-full w-full"
-                >
-                  {/* object-contain, matching ProductCard: a square crop would
-                      cut the top off arch and full-length mirrors. */}
-                  <img
-                    src={optimizeImage(product.images[currentImageIndex], { width: 900 }) || PRODUCT_IMAGE_PLACEHOLDER}
-                    srcSet={imageSrcSet(product.images[currentImageIndex], [600, 900, 1200])}
-                    sizes="(max-width: 1024px) 100vw, 45vw"
-                    onError={handleImageError}
-                    alt={display.title}
-                    className="h-full w-full object-contain object-center p-5 sm:p-8"
-                    width="900"
-                    height="900"
-                    referrerPolicy="no-referrer"
-                    decoding="async"
-                  />
-                </m.div>
-              </AnimatePresence>
-              
-              {product.images.length > 1 && (
-                <>
-                  <button 
-                    onClick={prevImage} 
-                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 p-3 rounded-full shadow-lg hover:bg-white text-stone-800 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 transition-all duration-300 hover:scale-110"
-                    aria-label={t('productDetail.previousImage', 'Previous image')}
-                  >
-                    <ChevronLeft className="w-5 h-5" />
-                  </button>
-                  <button 
-                    onClick={nextImage} 
-                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 p-3 rounded-full shadow-lg hover:bg-white text-stone-800 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 transition-all duration-300 hover:scale-110"
-                    aria-label={t('productDetail.nextImage', 'Next image')}
-                  >
-                    <ChevronRight className="w-5 h-5" />
-                  </button>
-                  <span className="pointer-events-none absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-stone-950/70 px-3 py-1 text-xs font-semibold tabular-nums text-white backdrop-blur-sm">
-                    {currentImageIndex + 1} / {product.images.length}
-                  </span>
-                </>
-              )}
-            </m.div>
-            
-            {/* Thumbnails — a swipeable rail on phones, a grid from sm up. */}
-            {product.images.length > 1 && (
-              <m.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="hide-scrollbar mt-4 flex gap-3 overflow-x-auto pb-1 sm:grid sm:grid-cols-5 sm:overflow-visible sm:pb-0"
-              >
-                {product.images.map((img, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setCurrentImageIndex(idx)}
-                    aria-current={currentImageIndex === idx || undefined}
-                    className={`relative aspect-square w-[4.5rem] shrink-0 rounded-xl overflow-hidden bg-white transition-all duration-200 sm:w-auto ${
-                      currentImageIndex === idx 
-                        ? 'ring-2 ring-amber-500 ring-offset-2' 
-                        : 'border border-stone-200 opacity-70 hover:opacity-100 hover:border-amber-300 hover:shadow-md'
-                    }`}
-                  >
-                    <img
-                      src={img}
-                      alt={t('productDetail.galleryView', {
-                        title: display.title,
-                        index: idx + 1,
-                        defaultValue: '{{title}} — view {{index}}',
-                      })}
-                      onError={handleImageError}
-                      className="w-full h-full object-contain p-1"
-                      width="160"
-                      height="160"
-                      referrerPolicy="no-referrer"
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  </button>
-                ))}
-              </m.div>
-            )}
-          </div>
+        <div className="pdp-hero-grid">
+          <ProductGallery key={product.id + ':' + lang} images={product.images} title={display.title} />
 
           {/* Right Column: identity, price basis and the quote action */}
           <m.div 
             variants={staggerContainer}
             initial="hidden"
             animate="visible"
-            className="mt-8 lg:col-start-2 lg:mt-0"
+            className="pdp-hero-copy"
           >
-            <m.div variants={fadeInUp} className="flex flex-wrap items-center gap-x-3 gap-y-2">
+            <m.div variants={fadeInUp} className="pdp-product-meta">
               {product.category && (
                 <Link
                   to={lp(catalogCategoryPath(product.category))}
-                  className="inline-flex items-center rounded-full bg-amber-50 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-amber-700 ring-1 ring-inset ring-amber-200 transition-colors hover:bg-amber-100"
+                  className="pdp-category"
                 >
                   {t(`products.categories.${product.category}`, product.category)}
                 </Link>
               )}
               {productReference && (
-                <span className="text-xs font-medium tracking-wide text-stone-400">
+                <span className="pdp-reference">
                   {t('productDetail.productReference', 'Product reference')}:{' '}
                   <span className="text-stone-600">{productReference}</span>
                 </span>
               )}
             </m.div>
 
-            <m.h1 variants={fadeInUp} className="mt-4 font-serif text-3xl tracking-tight text-stone-900 sm:text-4xl lg:text-[2.75rem] leading-[1.15]">
+            <m.h1 variants={fadeInUp} className="pdp-title font-serif">
               {pageHeading}
             </m.h1>
 
-            <m.p data-seo-description="" variants={fadeInUp} className="mt-5 text-base leading-relaxed text-stone-600 sm:text-lg">
+            <m.p data-seo-description="" variants={fadeInUp} className="pdp-description">
               {richDescription}
             </m.p>
-            {!useBuyerSummary && originalDescription !== richDescription ? (
-              <m.p variants={fadeInUp} className="mt-3 text-base leading-relaxed text-stone-600 sm:text-lg">
+            {!hasDetails && !useBuyerSummary && originalDescription !== richDescription ? (
+              <m.p variants={fadeInUp} className="pdp-description">
                 {originalDescription}
               </m.p>
             ) : null}
 
             {(product.price_range || product.msrp) && (
-              <m.div variants={fadeInUp} className="mt-7 rounded-2xl border border-stone-200 bg-stone-50/70 p-5">
+              <m.div variants={fadeInUp} className="pdp-price">
                 <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
                   {product.price_range && (
                     <div>
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-stone-500">
+                      <p className="pdp-price-label">
                         {t('products.priceRangeLabel', 'Indicative factory range')}
                       </p>
-                      <p className="mt-1 text-3xl font-semibold tabular-nums tracking-tight text-stone-900 sm:text-4xl">
+                      <p className="pdp-price-value">
                         {formatPrice(product.price_range)}
                       </p>
                     </div>
                   )}
                   {product.msrp && (
-                    <p className="pb-1.5 text-sm text-stone-500">
+                    <p className="pdp-msrp">
                       {t('products.msrp')}:{' '}
                       <span className="line-through decoration-stone-300">{formatPrice(product.msrp)}</span>
                     </p>
                   )}
                 </div>
                 {product.price_range && (
-                  <p className="mt-4 border-t border-stone-200 pt-3 text-xs leading-relaxed text-stone-500">
+                  <p className="pdp-price-note">
                     {t('products.priceQualifier', 'Final pricing depends on quantity and specifications')}
                   </p>
                 )}
               </m.div>
             )}
 
-            <m.div variants={fadeInUp} className="mt-7">
-              <div className="flex flex-col gap-3 sm:flex-row">
-                <a href="#product-rfq" className="btn-primary px-7 py-4 text-base sm:flex-1">
+            <m.div variants={fadeInUp} className="pdp-quote-actions">
+              <div className="pdp-action-buttons">
+                <a href="#product-rfq" onClick={jumpTo} className="btn-primary">
                   {t('productDetail.factoryQuoteCta', 'Get factory quote')}
-                  <Send className="h-4 w-4" aria-hidden="true" />
+                  <ArrowUpRight size={18} aria-hidden="true" />
                 </a>
                 {specs.length > 0 && (
-                  <a href="#product-specs" className="btn-secondary px-6 py-4 text-base">
+                  <a href="#product-specs" onClick={jumpTo} className="btn-secondary">
                     {t('productDetail.specifications')}
                   </a>
                 )}
               </div>
-              <p className="mt-3 text-sm leading-relaxed text-stone-500">
+              <p className="pdp-quote-note">
                 {t('productDetail.quoteBasis', 'Specification-based pricing · Ask about MOQ, samples and production lead time.')}
               </p>
             </m.div>
 
-            {/* Value Props */}
-            <m.ul variants={fadeInUp} className="mt-8 grid grid-cols-2 gap-3 border-t border-stone-200 pt-7">
-              {trustPoints.map(({ Icon, label }) => (
-                <li key={label} className="flex items-center gap-2.5 rounded-xl bg-stone-50 px-3 py-2.5 text-stone-700">
-                  <Icon className="h-4 w-4 shrink-0 text-amber-600" aria-hidden="true" />
-                  <span className="text-[13px] font-medium leading-snug">{label}</span>
-                </li>
-              ))}
-            </m.ul>
           </m.div>
 
         </div>
+        <m.ul variants={fadeInUp} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} className="pdp-trust-row">
+          {trustPoints.map(({ Icon, label }) => <li key={label}><span className="pdp-trust-icon"><Icon size={21} aria-hidden="true" /></span><span>{label}</span></li>)}
+        </m.ul>
         </div>
       </section>
 
+      <nav className="pdp-section-nav" aria-label={t('productDetail.productDetails')}>
+        <div className="pdp-container">
+          <div className="pdp-section-links">
+            {hasDetails && <a href="#product-description" onClick={jumpTo}>{t('productDetail.productDetails')}</a>}
+            {specs.length > 0 && <a href="#product-specs" onClick={jumpTo}>{t('productDetail.specifications')}</a>}
+            {relatedVideos.length > 0 && <a href="#product-videos" onClick={jumpTo}>{t('productDetail.relatedVideos')}</a>}
+          </div>
+          <a className="pdp-nav-quote" href="#product-rfq" onClick={jumpTo}>{t('productDetail.factoryQuoteCta')}<ArrowUpRight size={17} aria-hidden="true" /></a>
+        </div>
+      </nav>
+
       {/* ── Specifications + long-form details ── */}
       {(specs.length > 0 || hasDetails) && (
-        <section id="product-specs" className="scroll-mt-20 border-b border-stone-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 lg:py-20">
+        <section className="pdp-information">
+          <div className="pdp-container">
             {/* A lone block keeps a readable measure rather than stretching a
                 key/value list or a paragraph across the full container. */}
-            <div className={splitInfoBand ? 'lg:grid lg:grid-cols-12 lg:gap-x-12 xl:gap-x-16' : 'max-w-3xl'}>
+            <div className={`pdp-info-grid ${splitInfoBand ? 'is-split' : ''}`}>
               {specs.length > 0 && (
                 <m.div
                   variants={fadeInUp}
                   initial="hidden"
                   whileInView="visible"
                   viewport={{ once: true, amount: 0.1 }}
-                  className={splitInfoBand ? 'lg:col-span-5 lg:order-2 lg:sticky lg:top-24 lg:self-start' : ''}
+                  id="product-specs" tabIndex={-1} className="pdp-spec-sheet pdp-anchor"
                 >
                   <SectionHeading>{t('productDetail.specifications')}</SectionHeading>
-                  <dl className="mt-6 overflow-hidden rounded-2xl border border-stone-200 bg-white">
-                    {specs.map((spec, idx) => (
+                  <dl className="pdp-specs">
+                    {specs.map((spec) => (
                       <div
                         key={spec.key}
-                        className={`flex items-baseline justify-between gap-6 px-5 py-3.5 sm:px-6 ${
-                          idx % 2 === 0 ? 'bg-stone-50/60' : 'bg-white'
-                        }`}
+                        className="pdp-spec-row"
                       >
-                        <dt className="text-sm text-stone-500">{spec.key}</dt>
-                        <dd className="text-right text-sm font-semibold text-stone-900">{spec.value}</dd>
+                        <dt>{spec.key}</dt>
+                        <dd>{spec.value.split(/([/,;])/).map((part, index) => <React.Fragment key={index}>{part}{/^[/,;]$/.test(part) && <wbr />}</React.Fragment>)}</dd>
                       </div>
                     ))}
                   </dl>
@@ -667,10 +570,11 @@ export default function ProductDetail() {
                   initial="hidden"
                   whileInView="visible"
                   viewport={{ once: true, amount: 0.1 }}
-                  className={splitInfoBand ? 'mt-12 lg:col-span-7 lg:order-1 lg:mt-0' : 'mt-14'}
+                  id="product-description" tabIndex={-1} className="pdp-details pdp-anchor"
                 >
                   <SectionHeading>{t('productDetail.productDetails')}</SectionHeading>
-                  <Markdown className="prose prose-amber prose-stone mt-6 max-w-none rounded-2xl border border-stone-200 bg-white p-6 leading-relaxed text-stone-600 sm:p-8">
+                  {!useBuyerSummary && originalDescription !== richDescription && <p className="pdp-details-intro">{originalDescription}</p>}
+                  <Markdown className="pdp-prose prose prose-amber prose-stone max-w-none">
                     {display.details}
                   </Markdown>
                 </m.div>
@@ -684,27 +588,28 @@ export default function ProductDetail() {
              reasons to send it, instead of being squeezed into a column. ── */}
       <section
         id="product-rfq"
-        className="scroll-mt-20 bg-stone-900"
+        tabIndex={-1}
+        className="pdp-rfq pdp-anchor"
         aria-labelledby="product-rfq-title"
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 lg:py-20">
-          <div className="lg:grid lg:grid-cols-12 lg:gap-x-16">
-            <div className="lg:col-span-5">
-              <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-amber-400">
+        <div className="pdp-container">
+          <div className="pdp-rfq-grid">
+            <div className="pdp-rfq-copy">
+              <p className="pdp-eyebrow">
                 {solutionsUi.quoteEyebrow}
               </p>
-              <h2 id="product-rfq-title" className="mt-3 font-serif text-3xl leading-tight text-white sm:text-4xl">
+              <h2 id="product-rfq-title" className="pdp-rfq-heading font-serif">
                 {t('productDetail.requestQuote')}
               </h2>
-              <p className="mt-5 text-base leading-relaxed text-stone-300">
+              <p className="pdp-rfq-intro">
                 {t(
                   'productDetail.rfqIntro',
                   'Tell us the quantity and specifications you need. We will confirm factory pricing, MOQ, sample options and production lead time within 24 hours.'
                 )}
               </p>
-              <ul className="mt-8 space-y-3">
+              <ul className="pdp-quote-includes">
                 {quoteIncludes.map((item) => (
-                  <li key={item} className="flex items-start gap-3 text-sm leading-relaxed text-stone-200">
+                  <li key={item} className="flex items-start gap-3 text-stone-200">
                     <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber-500/20 text-amber-400">
                       <Check className="h-3 w-3" aria-hidden="true" />
                     </span>
@@ -712,7 +617,7 @@ export default function ProductDetail() {
                   </li>
                 ))}
               </ul>
-              <div className="mt-8 flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-4">
+              <div className="pdp-quoting-product">
                 <img
                   src={optimizeImage(product.images[0], { width: 120 }) || PRODUCT_IMAGE_PLACEHOLDER}
                   onError={handleImageError}
@@ -725,7 +630,7 @@ export default function ProductDetail() {
                   decoding="async"
                 />
                 <div className="min-w-0">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-stone-400">
+                  <p className="pdp-quoting-label">
                     {t('productDetail.quotingFor', 'Contacting sales about')}
                   </p>
                   <p className="mt-1 line-clamp-2 text-sm font-semibold leading-snug text-white">{display.title}</p>
@@ -733,11 +638,11 @@ export default function ProductDetail() {
               </div>
             </div>
 
-            <div className="mt-10 lg:col-span-7 lg:mt-0">
-              <div className="rounded-3xl bg-white p-6 shadow-2xl shadow-stone-950/40 sm:p-8">
+            <div className="pdp-rfq-form-wrap">
+              <div className="pdp-rfq-form">
               {rfqStatus === 'success' ? (
                 <m.div
-                  initial={{ opacity: 0, scale: 0.9 }}
+                  initial={{ opacity: reduceMotion ? 1 : 0, scale: reduceMotion ? 1 : 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   className="bg-green-50 border border-green-200 rounded-2xl p-8 flex flex-col items-center text-center"
                   role="status"
@@ -815,10 +720,6 @@ export default function ProductDetail() {
                     <textarea
                       id="message"
                       rows={4}
-                      placeholder={t('productDetail.inquiryPlaceholder', {
-                        title: display.title,
-                        defaultValue: "I'm interested in {{title}}. Please quote the estimated quantity and include MOQ, sample options and production lead time.",
-                      })}
                       {...register('message', { required: t('rfq.errors.messageRequired', 'Message is required') })}
                       aria-invalid={errors.message ? true : undefined}
                       aria-describedby={errors.message ? 'message-error' : undefined}
@@ -862,7 +763,7 @@ export default function ProductDetail() {
 
       {/* ── Related solutions and videos, now with room for real cards ── */}
       {(relatedSolutions.length > 0 || relatedVideos.length > 0) && (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 lg:py-20 space-y-14 lg:space-y-20">
+        <div className="pdp-related pdp-container">
           {relatedSolutions.length > 0 && (
             <m.section
               variants={fadeInUp}
@@ -871,18 +772,19 @@ export default function ProductDetail() {
               viewport={{ once: true, amount: 0.1 }}
             >
               <SectionHeading>{solutionsUi.relatedSolutions}</SectionHeading>
-              <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {relatedSolutions.map((solution) => (
+              <ul className="pdp-related-grid">
+                {relatedSolutions.map((solution, index) => (
                   <li key={solution.slug}>
                     <Link
                       to={lp(`/solutions/${solution.slug}`)}
-                      className="group flex h-full flex-col rounded-2xl border border-stone-200 bg-white p-6 transition-all duration-300 hover:-translate-y-1 hover:border-amber-300 hover:shadow-lg"
+                      className="pdp-related-card"
                     >
-                      <span className="font-serif text-lg leading-snug text-stone-900 transition-colors group-hover:text-amber-800">
+                      <span className="pdp-related-index" aria-hidden="true">{String(index + 1).padStart(2, '0')}<ArrowUpRight size={22} /></span>
+                      <span className="pdp-related-title font-serif">
                         {solution.shortTitle || solution.h1}
                       </span>
-                      <span className="mt-3 flex-1 text-sm leading-relaxed text-stone-600">{solution.blurb}</span>
-                      <span className="mt-5 inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-amber-700">
+                      <span className="pdp-related-description">{solution.blurb}</span>
+                      <span className="pdp-related-action">
                         {solutionsUi.exploreSolution}
                         <ChevronRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true" />
                       </span>
@@ -894,7 +796,7 @@ export default function ProductDetail() {
           )}
 
           {relatedVideos.length > 0 && (
-            <m.section
+            <m.section id="product-videos" tabIndex={-1} className="pdp-videos pdp-anchor"
               variants={fadeInUp}
               initial="hidden"
               whileInView="visible"
@@ -918,7 +820,7 @@ export default function ProductDetail() {
 
       {!hasReachedProductRfq && (
         <div
-          className="fixed inset-x-0 bottom-0 z-40 border-t border-stone-200 bg-white/95 px-4 pt-3 shadow-[0_-8px_24px_rgba(28,25,23,0.12)] backdrop-blur lg:hidden"
+          className="pdp-mobile-quote fixed inset-x-0 bottom-0 z-40 border-t border-stone-200 bg-white/95 px-4 pt-3 shadow-[0_-8px_24px_rgba(28,25,23,0.12)] backdrop-blur lg:hidden"
           style={{ paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom))' }}
           role="region"
           aria-label={t('productDetail.mobileQuoteLabel', 'Factory quote shortcut')}
@@ -928,7 +830,7 @@ export default function ProductDetail() {
               <p className="text-sm font-semibold text-stone-900">{t('productDetail.mobileFactoryPricing', 'Factory pricing')}</p>
               <p className="truncate text-xs text-stone-500">{t('productDetail.mobileQuoteMeta', 'MOQ · Samples · Lead time')}</p>
             </div>
-            <a href="#product-rfq" className="btn-primary shrink-0 px-5 py-2.5">
+            <a href="#product-rfq" onClick={jumpTo} className="btn-primary shrink-0 px-5 py-2.5">
               {t('productDetail.factoryQuoteCta', 'Get factory quote')}
             </a>
           </div>
