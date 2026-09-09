@@ -8,7 +8,7 @@ export const de = {
     seo: {
       homeTitle: "BOLEN Mirror | LED-Spiegelhersteller & OEM-Smart-Spiegel-Fabrik",
       homeDesc: "BOLEN Mirror ist ein führender LED-Spiegelhersteller, spezialisiert auf OEM-LED-Spiegel, Smart-Spiegel, Schminkspiegel und Badspiegel für globale Marken.",
-      catalogTitle: "LED-Spiegel Produktkatalog | BOLEN Mirror Hersteller",
+      catalogTitle: "Katalog des LED-Spiegelherstellers | 3 Jahre Garantie",
       catalogDesc: "Entdecken Sie unser umfangreiches Sortiment an OEM-LED-Spiegeln, Smart-Spiegeln, Schminkspiegeln und Badspiegeln von einem führenden LED-Spiegelhersteller. Hochwertige Fertigung für globale Marken.",
       categoryTitle: "{{category}} | BOLEN Mirror Hersteller",
       categoryDesc: "Entdecken Sie BOLEN {{category}} für OEM/ODM-Großhandel. LED-, Schmink- und Badspiegel direkt ab Werk für globale Marken und Hotelprojekte.",

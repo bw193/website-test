@@ -8,7 +8,7 @@ export const en = {
     seo: {
       homeTitle: "BOLEN Mirror | LED Mirror Manufacturer & OEM Smart Mirror Factory",
       homeDesc: "BOLEN Mirror is a leading LED mirror manufacturer specializing in OEM LED mirrors, smart mirrors, vanity mirrors, and bath mirrors for global brands.",
-      catalogTitle: "LED Mirror Products Catalog | BOLEN Mirror Manufacturer",
+      catalogTitle: "LED Mirror Manufacturer Catalog | 3-Year Warranty",
       catalogDesc: "Explore our wide range of OEM LED mirrors, smart mirrors, vanity mirrors, and bath mirrors from a leading LED mirror manufacturer. High-quality manufacturing for global brands.",
       categoryTitle: "{{category}} | BOLEN Mirror Manufacturer",
       categoryDesc: "Browse BOLEN {{category}} for OEM/ODM wholesale. Factory-direct LED, vanity, and bath mirrors for global brands and hotel projects.",

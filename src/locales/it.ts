@@ -8,7 +8,7 @@ export const it = {
     seo: {
       homeTitle: "BOLEN Mirror | Produttore di Specchi LED e Fabbrica OEM di Specchi Smart",
       homeDesc: "BOLEN Mirror è un produttore leader di specchi LED specializzato in specchi LED OEM, specchi smart, specchi da toeletta e specchi da bagno per marchi globali.",
-      catalogTitle: "Catalogo Prodotti Specchi LED | Produttore BOLEN Mirror",
+      catalogTitle: "Catalogo del produttore di specchi LED | Garanzia di 3 anni",
       catalogDesc: "Esplora la nostra ampia gamma di specchi LED OEM, specchi smart, specchi da toeletta e specchi da bagno da un produttore leader di specchi LED. Produzione di alta qualità per marchi globali.",
       categoryTitle: "{{category}} | Produttore BOLEN Mirror",
       categoryDesc: "Sfoglia {{category}} BOLEN per l’ingrosso OEM/ODM. Specchi LED, da toeletta e da bagno diretti dalla fabbrica per marchi globali e progetti alberghieri.",

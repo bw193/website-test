@@ -8,7 +8,7 @@ export const zh = {
     seo: {
       homeTitle: "BOLEN 镜业 | LED 智能镜制造商 & OEM 镜子工厂",
       homeDesc: "BOLEN Mirror 是领先的 LED 镜制造商，专业生产 OEM LED 镜、智能镜、化妆镜和浴室镜，服务全球品牌。",
-      catalogTitle: "LED 镜产品目录 | BOLEN 镜业制造商",
+      catalogTitle: "LED 镜制造商产品目录 | 3年质保",
       catalogDesc: "探索我们丰富的 OEM LED 镜、智能镜、化妆镜和浴室镜产品系列，来自领先的 LED 镜制造商，为全球品牌提供优质制造。",
       categoryTitle: "{{category}} | BOLEN 镜业制造商",
       categoryDesc: "浏览 BOLEN {{category}} OEM/ODM 批发系列。工厂直供 LED 镜、化妆镜与浴室镜，服务全球品牌与酒店项目。",

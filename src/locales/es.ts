@@ -8,7 +8,7 @@ export const es = {
     seo: {
       homeTitle: "BOLEN Mirror | Fabricante de Espejos LED y Fábrica OEM de Espejos Inteligentes",
       homeDesc: "BOLEN Mirror es un fabricante líder de espejos LED especializado en espejos LED OEM, espejos inteligentes, espejos de tocador y espejos de baño para marcas globales.",
-      catalogTitle: "Catálogo de Productos de Espejos LED | Fabricante BOLEN Mirror",
+      catalogTitle: "Catálogo del fabricante de espejos LED | 3 años de garantía",
       catalogDesc: "Explore nuestra amplia gama de espejos LED OEM, espejos inteligentes, espejos de tocador y espejos de baño de un fabricante líder de espejos LED. Fabricación de alta calidad para marcas globales.",
       categoryTitle: "{{category}} | Fabricante BOLEN Mirror",
       categoryDesc: "Explore {{category}} de BOLEN para mayoristas OEM/ODM. Espejos LED, de tocador y de baño de fábrica para marcas globales y proyectos hoteleros.",
