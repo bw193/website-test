@@ -843,8 +843,8 @@ function homeContent(
           `<a href="/${lang}${CATALOG_CATEGORY_PREFIX}/${slug}/">${escapeHtml(categoryDisplayName(lang, name))}</a>`
         ).join('\n        ')}
       </nav>
-      ${solutionLinks}
       ${featuredVideoBlock(lang, featuredVideo)}
+      ${solutionLinks}
       ${factoryGalleryBlock(lang, gallery)}
     </div>
   `.trim();

@@ -779,8 +779,9 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Featured Video — editor-picked video (site_settings.home_featured_video).
-          Click-to-play facade: nothing but the poster loads until asked. */}
+      {/* Featured Video — editor-picked video (site_settings.home_featured_video). */}
+      {featuredVideo && <FeaturedVideo video={featuredVideo} />}
+
       <section className="border-y border-stone-200 bg-white py-16 sm:py-20" aria-labelledby="sourcing-solutions-title">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
@@ -820,8 +821,6 @@ export default function Home() {
             </div>
           </div>
         </section>
-
-      {featuredVideo && <FeaturedVideo video={featuredVideo} />}
 
       {/* Manufacturing Advantage — 3 bullets (replaces former 4-step Process) */}
       <section aria-labelledby="home-advantage-title" className="py-24 bg-white border-t border-stone-100">
