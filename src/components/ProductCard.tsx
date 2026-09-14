@@ -112,7 +112,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
         <div className="mt-auto pt-4">
           {(priceRange || msrp) && (
-            <div className="mb-4">
+            <div className="mb-4" data-nosnippet="">
               {priceRange && (
                 <>
                   <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-stone-400">
