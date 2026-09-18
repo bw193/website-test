@@ -164,6 +164,36 @@
   mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
 }
 
+.certificate-marquee { width: 100%; overflow: hidden; }
+.certificate-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: certificateScroll 30s linear infinite;
+}
+.certificate-marquee-set {
+  display: flex;
+  flex: 0 0 auto;
+  /* Each half must cover the viewport or wide screens expose an empty tail
+     before the animation loops. Identical halves keep the seam aligned. */
+  min-width: 100vw;
+  align-items: center;
+  justify-content: space-around;
+}
+.certificate-marquee-item {
+  display: flex;
+  flex: none;
+  width: 12rem;
+  height: 8rem;
+  margin-inline: 2rem;
+  align-items: center;
+  justify-content: center;
+}
+@keyframes certificateScroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.certificate-marquee:hover .certificate-marquee-track { animation-play-state: paused; }
+
 /* CTA backdrop — an ultra-slow breathe so the closing band feels alive behind
    the copy without distracting from it. */
 @keyframes ctaDrift {
@@ -275,11 +305,23 @@
   /* Keep the gradient, drop the movement. */
   .band-aurora::before { animation: none; }
   .text-sheen { animation: none; }
-  /* The certificate marquee, the decorative blobs, and the GlobalMap's dash /
-     ping loops all ran indefinitely regardless of the user's preference. The
-     marquee in particular could only be paused by hovering, which is
-     unreachable by touch and by keyboard (WCAG 2.2.2). */
-  .animate-marquee,
+  /* Show every certificate without requiring motion to bring it into view. */
+  .certificate-marquee { mask-image: none; -webkit-mask-image: none; }
+  .certificate-marquee-track { width: 100%; animation: none; }
+  .certificate-marquee-set {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+    gap: 2rem;
+    width: 100%;
+    min-width: 0;
+    max-width: 80rem;
+    margin-inline: auto;
+    padding-inline: 1rem;
+    justify-items: center;
+  }
+  .certificate-marquee-set[aria-hidden="true"] { display: none; }
+  .certificate-marquee-item { margin: 0; }
+  /* Decorative blobs and the GlobalMap's dash / ping loops. */
   .animate-pulse,
   .animate-ping { animation: none !important; }
   /* .animate-spin is deliberately NOT disabled — loading spinners communicate

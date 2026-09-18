@@ -955,33 +955,15 @@ export default function Home() {
           <h2 id="home-certificates-title" className="text-3xl font-serif text-stone-900">{t('home.certificates.title')}</h2>
         </Reveal>
 
-        <div className="relative w-full overflow-hidden flex group marquee-mask">
-          <style>
-            {`
-              @keyframes marquee {
-                0% { transform: translateX(0%); }
-                100% { transform: translateX(-50%); }
-              }
-              .animate-marquee {
-                animation: marquee 30s linear infinite;
-              }
-              .group:hover .animate-marquee {
-                animation-play-state: paused;
-              }
-            `}
-          </style>
-
-          <div className="flex animate-marquee whitespace-nowrap w-max">
-            {/* First set of images */}
-            {CERTS.map((cert, idx) => (
-              <div key={`cert-1-${idx}`} className="mx-8 flex-none w-48 h-32 flex items-center justify-center grayscale opacity-70 hover:grayscale-0 hover:opacity-100 hover:scale-105 transition-all duration-300">
-                <img src={cert.url} alt={cert.alt} className="max-w-full max-h-full object-contain" width="192" height="128" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
-              </div>
-            ))}
-            {/* Duplicate set for seamless scrolling */}
-            {CERTS.map((cert, idx) => (
-              <div key={`cert-2-${idx}`} className="mx-8 flex-none w-48 h-32 flex items-center justify-center grayscale opacity-70 hover:grayscale-0 hover:opacity-100 hover:scale-105 transition-all duration-300">
-                <img src={cert.url} alt={cert.alt} className="max-w-full max-h-full object-contain" width="192" height="128" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
+        <div className="certificate-marquee marquee-mask">
+          <div className="certificate-marquee-track">
+            {[0, 1].map((copy) => (
+              <div key={copy} className="certificate-marquee-set" aria-hidden={copy === 1 ? true : undefined}>
+                {CERTS.map((cert) => (
+                  <div key={cert.url} className="certificate-marquee-item grayscale opacity-70 hover:grayscale-0 hover:opacity-100 hover:scale-105 transition-all duration-300">
+                    <img src={cert.url} alt={copy === 0 ? cert.alt : ''} className="max-w-full max-h-full object-contain" width="192" height="128" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
+                  </div>
+                ))}
               </div>
             ))}
           </div>
