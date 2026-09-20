@@ -34,10 +34,12 @@ for (const command of commands) {
 
   if (result.error) {
     console.error(`[build-site] Failed to start: ${command}`, result.error);
-    process.exit(1);
+    process.exitCode = 1;
+    break;
   }
 
   if (result.status !== 0) {
-    process.exit(result.status ?? 1);
+    process.exitCode = result.status ?? 1;
+    break;
   }
 }

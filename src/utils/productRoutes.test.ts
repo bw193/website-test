@@ -48,13 +48,18 @@ test('every built language URL resolves to its product ID and switches reciproca
   assert.equal(urls.size, Object.keys(PRODUCT_ROUTES).length * LANGUAGES.length);
 });
 
-test('compiled slugs follow the actual translations for every non-English product', () => {
+test('compiled slugs follow available translations and otherwise use the English fallback', () => {
   for (const lang of LANGUAGES.filter((value) => value !== 'en')) {
     const file = lang === 'zh' ? 'product-slugs.zh.json' : `products.${lang}.json`;
     const translations = JSON.parse(readFileSync(new URL(`../../public/i18n/${file}`, import.meta.url), 'utf8'));
     for (const [productId, route] of Object.entries(PRODUCT_ROUTES)) {
-      assert.equal(route.slugs[lang], toProductSlug(translations[productId].title, lang));
-      assert.notEqual(route.slugs[lang], route.slugs.en, `${lang}/${productId}: English URL remains`);
+      const title = translations[productId]?.title?.trim();
+      if (title) {
+        assert.equal(route.slugs[lang], toProductSlug(title, lang));
+        assert.notEqual(route.slugs[lang], route.slugs.en, `${lang}/${productId}: English URL remains`);
+      } else {
+        assert.equal(route.slugs[lang], route.slugs.en, `${lang}/${productId}: missing English URL fallback`);
+      }
     }
   }
 });

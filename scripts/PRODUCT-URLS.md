@@ -8,8 +8,11 @@ segment uses the existing source category slug; only the product slug is localiz
 with the public Supabase client and compiles `src/data/productRoutes.json` from
 the original English titles and `public/i18n/products.{es,fr,de,it}.json` titles.
 Chinese URL names live in `public/i18n/product-slugs.zh.json` and are deliberately
-separate from display copy. Keep these translation maps complete when adding
-products; the generator rejects missing translations and duplicate URLs.
+separate from display copy. If a product is new or a translated title is blank,
+the generator warns and uses its English slug for that language, matching the
+storefront's fallback. Available translations still determine localized slugs.
+Missing translations therefore do not block preview or builds; invalid titles,
+empty slugs and duplicate URLs still fail the build.
 
 The compact route index is shared by product cards, detail lookup, language
 switching, SEO, prerendering, sitemaps and the Cloudflare Worker. Products added
