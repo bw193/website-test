@@ -1,7 +1,11 @@
 import type { SupportedLanguage } from '../hooks/useLocalizedPath';
 import { toSlug } from './slug';
 import { productDetailPath } from './productRoutes';
+import catalogCategoriesSnapshot from '../data/catalogCategories.json';
 
+// Hardcoded seed used only when site_settings.categories is empty or
+// unreachable. Editors manage the real list in the admin portal; do not read
+// this for anything rendered on every page — use CATALOG_CATEGORIES below.
 export const DEFAULT_PRODUCT_CATEGORIES = [
   'New Arrival',
   'Hot Sale',
@@ -10,6 +14,18 @@ export const DEFAULT_PRODUCT_CATEGORIES = [
   'Full Length Dressing Mirror',
   'Irregular Mirror',
 ] as const;
+
+/**
+ * The live category list (site_settings.categories), snapshotted at build time
+ * by scripts/generate-catalog-categories.ts into src/data/catalogCategories.json.
+ * Synchronous and identical in every locale, so global chrome such as the
+ * footer can link categories without a Supabase fetch and without ever
+ * pointing at a category the editors have removed.
+ */
+export const CATALOG_CATEGORIES: readonly string[] = (() => {
+  const snapshot = parseCategoriesSetting(catalogCategoriesSnapshot);
+  return snapshot.length > 0 ? snapshot : [...DEFAULT_PRODUCT_CATEGORIES];
+})();
 
 export const CATALOG_CATEGORY_PREFIX = '/products/category';
 

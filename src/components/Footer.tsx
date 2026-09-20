@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useLocalizedPath } from '../hooks/useLocalizedPath';
 import { getLocalizedSeoLandingPages, getSeoSolutionsUi } from '../data/seoLandingI18n';
 import { INSIGHTS_PATH } from '../data/insights';
-import { catalogCategoryPath, DEFAULT_PRODUCT_CATEGORIES } from '../utils/catalogCategory';
+import { CATALOG_CATEGORIES, catalogCategoryPath, uniqueCategorySlugs } from '../utils/catalogCategory';
 
 export default function Footer() {
   const { lp, lang } = useLocalizedPath();
@@ -58,10 +58,13 @@ export default function Footer() {
             <h3 className="text-sm font-semibold uppercase tracking-wider mb-4 text-amber-500">{t('navbar.catalog', 'Product Catalog')}</h3>
             <ul className="space-y-2 text-stone-400 text-sm">
               <li><Link to={lp('/products')} className="hover:text-white transition-colors">{t('products.allCategories', 'All Categories')}</Link></li>
-              {DEFAULT_PRODUCT_CATEGORIES.map((category) => (
-                <li key={category}>
-                  <Link to={lp(catalogCategoryPath(category))} className="hover:text-white transition-colors">
-                    {t(`products.categories.${category}`, category)}
+              {/* The live, build-time category list — not DEFAULT_PRODUCT_CATEGORIES,
+                  which linked every page to the removed "New Arrival" category
+                  (a soft 404) and omitted "Mirror Cabinet". */}
+              {uniqueCategorySlugs(CATALOG_CATEGORIES).map(({ name, slug }) => (
+                <li key={slug}>
+                  <Link to={lp(catalogCategoryPath(name))} className="hover:text-white transition-colors">
+                    {t(`products.categories.${name}`, name)}
                   </Link>
                 </li>
               ))}

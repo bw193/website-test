@@ -30,6 +30,11 @@ interface PrerenderPayload {
   // Self-hosted (Cloudflare-CDN) responsive set for the LCP hero slide, baked
   // into dist/hero/ at build time. Absent if the build-time fetch failed.
   heroLcp?: { src: string; srcset: string };
+  // One responsive set per carousel slide (index-aligned with heroBgs), each
+  // self-hosted when the build-time download succeeded and a Supabase
+  // transform set otherwise. Lets the carousel advance without a cold
+  // Supabase transform for slides 2..n.
+  heroSlides?: Array<{ src: string; srcset: string }>;
   categories?: string[];
   // Editor-managed factory/company photo strip, baked into the home HTML so
   // crawlers see <figure>/<figcaption>/alt and the SPA mounts byte-identically.
@@ -111,18 +116,23 @@ export function readInitialHomeData<T>(): {
   heroW?: number;
   heroH?: number;
   heroLcp?: { src: string; srcset: string };
+  heroSlides?: Array<{ src: string; srcset: string }>;
   categories: string[];
   factoryGallery: FactoryGalleryItem[];
   featuredVideo: VideoListItem | null;
 } | null {
   const data = getPrerenderData();
   if (data?.route !== 'home' || !Array.isArray(data.products)) return null;
+  const heroSlides = Array.isArray(data.heroSlides)
+    ? data.heroSlides.filter((slide) => typeof slide?.src === 'string' && typeof slide?.srcset === 'string')
+    : undefined;
   return {
     products: data.products as T[],
     heroBgs: Array.isArray(data.heroBgs) ? data.heroBgs : [],
     heroW: typeof data.heroW === 'number' ? data.heroW : undefined,
     heroH: typeof data.heroH === 'number' ? data.heroH : undefined,
     heroLcp: data.heroLcp && typeof data.heroLcp.src === 'string' ? data.heroLcp : undefined,
+    heroSlides: heroSlides && heroSlides.length > 0 ? heroSlides : undefined,
     categories: Array.isArray(data.categories) ? data.categories : [],
     factoryGallery: Array.isArray(data.factoryGallery) ? data.factoryGallery : [],
     featuredVideo: data.featuredVideo?.slug ? data.featuredVideo : null,

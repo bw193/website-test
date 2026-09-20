@@ -149,13 +149,20 @@ export default function Home() {
   const [animateSlides, setAnimateSlides] = useState(false);
   const heroW = initialData?.heroW ?? DEFAULT_HERO_W;
   const heroH = initialData?.heroH ?? DEFAULT_HERO_H;
-  // Self-hosted (Cloudflare-CDN) responsive set for the LCP slide, baked at
-  // build time. Falls back to the Supabase transform endpoint if unavailable.
+  // Self-hosted (Cloudflare-CDN) responsive sets baked at build time: one per
+  // slide in `heroSlides`, with `heroLcp` as the first (preloaded) slide for
+  // older islands. Anything missing falls back to the Supabase transform
+  // endpoint, whose cold ~1-2s TTFB is exactly what the self-hosting avoids.
   const heroLcp = initialData?.heroLcp;
+  const heroSlides = initialData?.heroSlides;
   const heroImgSrc = (idx: number) =>
-    idx === 0 && heroLcp ? heroLcp.src : optimizeImage(heroBgs[idx], { width: 1280 });
+    heroSlides?.[idx]?.src ?? (idx === 0 && heroLcp ? heroLcp.src : optimizeImage(heroBgs[idx], { width: 1280 }));
   const heroImgSrcSet = (idx: number) =>
-    idx === 0 && heroLcp ? heroLcp.srcset : heroSrcSet(heroBgs[idx]);
+    heroSlides?.[idx]?.srcset ?? (idx === 0 && heroLcp ? heroLcp.srcset : heroSrcSet(heroBgs[idx]));
+  // Largest Contentful Paint is only final once the visitor interacts (Chrome
+  // stops reporting candidates at the first tap, scroll, or key press). Until
+  // then, every hero image the carousel paints is a fresh LCP candidate.
+  const [userHasInteracted, setUserHasInteracted] = useState(false);
   const [isLoading, setIsLoading] = useState(initialData === null);
   const [allProducts, setAllProducts] = useState<any[]>(initialData?.products ?? []);
   const [categories, setCategories] = useState<string[]>(
@@ -344,8 +351,23 @@ export default function Home() {
 
   const featuredProducts = allProducts.slice(0, 6);
 
+  // Arm auto-rotation only after the first interaction. Rotating on a timer
+  // from page load mounted a new full-width hero every 5s, and each paint
+  // became a new LCP candidate: the homepage recorded 6.2s / 11.3s / 16.7s LCP
+  // entries while the preloaded first slide had painted in ~100ms. A scroll,
+  // tap, wheel, touch, or key press finalizes LCP, after which rotating is free.
   useEffect(() => {
-    if (heroBgs.length <= 1) return;
+    if (heroBgs.length <= 1 || userHasInteracted) return;
+    const events = ['pointerdown', 'keydown', 'wheel', 'touchstart', 'scroll'] as const;
+    const onInteract = () => setUserHasInteracted(true);
+    for (const type of events) window.addEventListener(type, onInteract, { passive: true, once: true });
+    return () => {
+      for (const type of events) window.removeEventListener(type, onInteract);
+    };
+  }, [heroBgs.length, userHasInteracted]);
+
+  useEffect(() => {
+    if (heroBgs.length <= 1 || !userHasInteracted) return;
     // Auto-advancing the hero is motion the user did not initiate and cannot
     // pause, so honour the OS preference and leave it on the first slide (the
     // prev/next arrows still work).
@@ -357,7 +379,21 @@ export default function Home() {
     }, 5000); // Change image every 5 seconds
 
     return () => clearInterval(interval);
-  }, [heroBgs.length, currentBgIndex]);
+  }, [heroBgs.length, currentBgIndex, userHasInteracted]);
+
+  // Warm the next slide once rotation is armed so the keyed <img> swap below
+  // paints from cache instead of showing an empty hero while it downloads.
+  // Deliberately not before interaction: a speculative fetch would compete with
+  // the LCP slide and the critical JS for bandwidth.
+  useEffect(() => {
+    if (heroBgs.length <= 1 || !userHasInteracted) return;
+    const next = (currentBgIndex + 1) % heroBgs.length;
+    const warm = new Image();
+    warm.sizes = '100vw';
+    warm.srcset = heroImgSrcSet(next);
+    warm.src = heroImgSrc(next);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [heroBgs, currentBgIndex, userHasInteracted]);
 
   const nextBg = () => {
     setAnimateSlides(true);
@@ -472,7 +508,9 @@ export default function Home() {
               height={heroH}
               alt="BOLEN LED bathroom mirror manufacturing showcase"
               referrerPolicy="no-referrer"
-              {...({ fetchpriority: 'high' } as Record<string, string>)}
+              // Only the first slide is the LCP candidate and preloaded in <head>;
+              // later slides are decorative swaps and must not outrank other work.
+              {...({ fetchpriority: currentBgIndex === 0 ? 'high' : 'auto' } as Record<string, string>)}
               decoding="async"
             />
           )}

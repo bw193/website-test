@@ -169,10 +169,39 @@ async function repairStaleSequence(
   return baseWorker.fetch(repairedRequest, env);
 }
 
+// dist/admin/index.html, written by scripts/prerender-static.ts. The employee
+// portal is a client-only React app with dynamic routes (/admin/products/<id>),
+// so no per-route HTML exists for it. Since assets.not_found_handling is
+// "404-page", the asset layer would answer those paths with dist/404.html and
+// a 404 status; wrangler.jsonc routes /admin* through the Worker first so we
+// can serve the portal shell with 200 instead.
+const ADMIN_SHELL_PATH = '/admin/';
+
+function isAdminPath(pathname: string): boolean {
+  return pathname === '/admin' || pathname.startsWith('/admin/');
+}
+
+// /<lang>/products/category/ has no page of its own; React redirects it to the
+// catalog client-side, which a crawler would otherwise see as a 404 page.
+const CATEGORY_INDEX_PATTERN = /^\/(en|zh|es|fr|de|it)\/products\/category\/?$/;
+
 const worker = {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
-    if ((request.method === 'GET' || request.method === 'HEAD') && parseProductDetailPath(url.pathname)) {
+    const isRead = request.method === 'GET' || request.method === 'HEAD';
+    if (isRead && isAdminPath(url.pathname)) {
+      return env.ASSETS.fetch(
+        new Request(new URL(ADMIN_SHELL_PATH, url), { method: request.method, headers: request.headers }),
+      );
+    }
+    const categoryIndex = isRead ? url.pathname.match(CATEGORY_INDEX_PATTERN) : null;
+    if (categoryIndex) {
+      return new Response(null, {
+        status: 301,
+        headers: { Location: `/${categoryIndex[1]}/products/${url.search}` },
+      });
+    }
+    if (isRead && parseProductDetailPath(url.pathname)) {
       const target = productRedirectLocation(url);
       if (target) return new Response(null, { status: 301, headers: { Location: target } });
       return env.ASSETS.fetch(request);

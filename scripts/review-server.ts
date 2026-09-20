@@ -83,9 +83,16 @@ app.use(
 );
 
 app.use((request, response, next) => {
-  const target = productRedirectLocation(new URL(request.originalUrl, productionOrigin));
+  const requestUrl = new URL(request.originalUrl, productionOrigin);
+  const target = productRedirectLocation(requestUrl);
   if ((request.method === 'GET' || request.method === 'HEAD') && target) {
     response.redirect(301, target);
+    return;
+  }
+  // Mirrors worker/reliable-entry.ts: the bare category index 301s to the catalog.
+  const categoryIndex = requestUrl.pathname.match(/^\/(en|zh|es|fr|de|it)\/products\/category\/?$/);
+  if ((request.method === 'GET' || request.method === 'HEAD') && categoryIndex) {
+    response.redirect(301, `/${categoryIndex[1]}/products/${requestUrl.search}`);
     return;
   }
   next();
@@ -102,8 +109,16 @@ app.use(
   }),
 );
 
+// Same contract as production (wrangler.jsonc + worker/reliable-entry.ts):
+// the client-only employee portal gets its shell with 200 for every /admin
+// path; any other path without a prerendered file is a real 404 that still
+// boots the React NotFound view.
+app.get(['/admin', '/admin/*'], (_request, response) => {
+  response.sendFile(path.join(distPath, 'admin', 'index.html'));
+});
+
 app.get('*', (_request, response) => {
-  response.sendFile(path.join(distPath, 'index.html'));
+  response.status(404).sendFile(path.join(distPath, '404.html'));
 });
 
 const ipv4Server = app.listen(reviewPort, '127.0.0.1', () => {

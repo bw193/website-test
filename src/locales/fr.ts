@@ -371,7 +371,8 @@ export const fr = {
         "Led Lighted Mirror": "Miroir Lumineux LED",
         "Bathroom Mirror without led": "Miroir de Salle de Bain sans LED",
         "Full Length Dressing Mirror": "Miroir sur Pied",
-        "Irregular Mirror": "Miroir Irrégulier"
+        "Irregular Mirror": "Miroir Irrégulier",
+        "Mirror Cabinet": "Armoire à Miroir"
       },
       priceRange: "Gamme de Prix",
       priceRangeLabel: "Fourchette indicative usine",

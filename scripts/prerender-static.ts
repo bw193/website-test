@@ -97,6 +97,19 @@ import {
 } from '../src/utils/videoSchema';
 import { buildStorySchema } from '../src/utils/storySchema';
 import { INSIGHTS_PATH, insightDetailPath } from '../src/data/insights';
+import {
+  TERMS_CONTACT_EMAIL,
+  TERMS_CONTACT_HEADING,
+  TERMS_CONTACT_LEAD,
+  TERMS_HEADING,
+  TERMS_INTRO,
+  TERMS_KICKER,
+  TERMS_LAST_UPDATED,
+  TERMS_PATH,
+  TERMS_SCHEMA,
+  TERMS_SECTIONS,
+  TERMS_SEO,
+} from '../src/data/termsCopy';
 import { productDetailPath, productAlternatePaths } from '../src/utils/productRoutes';
 import type { BlogPost, BlogListItem, LocalizedBlogPost } from '../src/types/blog';
 import type { LocalizedVideoPost, VideoListItem, VideoPost } from '../src/types/video';
@@ -388,6 +401,12 @@ interface HeroImage {
   srcset: string;
   width: number;
   height: number;
+}
+
+/** One carousel slide's responsive source set (self-hosted or Supabase). */
+interface HeroSlide {
+  src: string;
+  srcset: string;
 }
 
 function buildHeroSrcSet(url: string): string {
@@ -1133,6 +1152,59 @@ function rfqContent(lang: Lang): string {
       <p>${escapeHtml(c.rfqIntro)}</p>
     </div>
   `.trim();
+}
+
+// English in every locale, exactly like src/pages/TermsAndConditions.tsx.
+function termsContent(): string {
+  const sections = TERMS_SECTIONS.map(
+    (section) => `<section><h2>${escapeHtml(section.title)}</h2><p>${escapeHtml(section.body)}</p></section>`
+  ).join('\n      ');
+  return `
+    <div data-prerender="terms">
+      <p>${escapeHtml(TERMS_KICKER)}</p>
+      <h1>${escapeHtml(TERMS_HEADING)}</h1>
+      <p>${escapeHtml(TERMS_LAST_UPDATED)}</p>
+      <p>${escapeHtml(TERMS_INTRO)}</p>
+      ${sections}
+      <section><h2>${escapeHtml(TERMS_CONTACT_HEADING)}</h2><p>${escapeHtml(TERMS_CONTACT_LEAD)} <a href="mailto:${escapeAttr(TERMS_CONTACT_EMAIL)}">${escapeHtml(TERMS_CONTACT_EMAIL)}</a>.</p></section>
+    </div>
+  `.trim();
+}
+
+// Copy mirrors src/pages/NotFound.tsx, which React renders on hydration. The
+// robots meta carries data-rh so Helmet adopts it instead of adding a second.
+const NOT_FOUND_TITLE = 'Page Not Found | BOLEN Mirror';
+const NOINDEX_META = `<meta ${RH} name="robots" content="noindex, nofollow" />`;
+
+/**
+ * dist/404.html: the SPA shell with a noindex head and a static not-found
+ * body. Cloudflare serves it with HTTP 404 for every path that has no asset
+ * (see wrangler.jsonc), so missing pages are real 404s for crawlers while the
+ * React app still boots and renders the styled, localized NotFound view.
+ */
+function notFoundHtml(template: string): string {
+  const headExtras = [`<title>${escapeHtml(NOT_FOUND_TITLE)}</title>`, NOINDEX_META].join('\n    ');
+  const bodyContent = `
+    <div data-prerender="not-found">
+      <p>404</p>
+      <h1>Page Not Found</h1>
+      <p>The page you're looking for doesn't exist or has been moved.</p>
+      <p><a href="/en/">Go Home</a> &middot; <a href="/en/products/">Browse Products</a></p>
+    </div>
+  `.trim();
+  return injectIntoTemplate(template, { lang: 'en', headExtras, bodyContent });
+}
+
+/**
+ * dist/admin/index.html: an unmodified SPA shell (loader intact — the portal
+ * has nothing to prerender) with the employee-portal title and a noindex meta
+ * that matches what AdminLogin / AdminDashboard emit via <SEO noindex>.
+ * worker/reliable-entry.ts serves this file with 200 for every /admin path.
+ */
+function adminShellHtml(template: string): string {
+  return template
+    .replace(/<title>[^<]*<\/title>/, `<title>${escapeHtml(enLocale.translation.admin.seo.portal)}</title>`)
+    .replace('</head>', `    ${NOINDEX_META}\n  </head>`);
 }
 
 // Schemas
@@ -2108,31 +2180,52 @@ async function main(): Promise<void> {
     ? { src: optimizeImage(heroPrimary, { width: 1280 }), srcset: buildHeroSrcSet(heroPrimary), width: heroSize.w, height: heroSize.h }
     : undefined;
 
-  // Self-host the LCP hero: download each responsive width from Supabase's
+  // Self-host EVERY hero slide: download each responsive width from Supabase's
   // transform endpoint at build time and write them into dist/hero/. Cloudflare
-  // Pages then serves them from its CDN with fast TTFB, instead of the live
-  // Supabase /render/image/ endpoint which can take ~2s on a cold transform —
-  // that cold TTFB was the dominant remaining mobile-LCP cost. Falls back to the
-  // Supabase URLs if the build-time fetch fails, so the build never breaks.
-  let heroLcp: { src: string; srcset: string } | undefined;
-  if (heroPrimary) {
-    try {
-      const heroDir = resolve(DIST, 'hero');
-      await mkdir(heroDir, { recursive: true });
-      const srcsetParts = await Promise.all(
-        HERO_WIDTHS.map(async (w) => {
-          const res = await fetch(optimizeImage(heroPrimary, { width: w }), { headers: { Accept: 'image/webp' } });
-          if (!res.ok) throw new Error(`hero ${w}w -> HTTP ${res.status}`);
-          await writeFile(resolve(heroDir, `lcp-${w}.webp`), Buffer.from(await res.arrayBuffer()));
-          return `/hero/lcp-${w}.webp ${w}w`;
-        })
-      );
-      heroLcp = { src: '/hero/lcp-1280.webp', srcset: srcsetParts.join(', ') };
-      console.log('[prerender-static] Self-hosted hero derivatives written to dist/hero/.');
-    } catch (err) {
-      console.warn('[prerender-static] Hero self-host failed; using Supabase transform URLs.', err);
-    }
+  // then serves them from its CDN with fast TTFB, instead of the live Supabase
+  // /render/image/ endpoint which can take ~1-2s on a cold transform.
+  //
+  // This used to cover only slide 1 (the preloaded LCP candidate). Slides 2..n
+  // were still fetched from Supabase at 1920px when the carousel advanced, and
+  // because the carousel auto-rotated before any user input, every one of
+  // those late paints became a new LCP candidate — the homepage measured 6.2s
+  // LCP with a 100ms first slide. Home.tsx now also waits for an interaction
+  // before rotating; self-hosting the remaining slides makes the eventual
+  // swap fast and keeps Supabase off the home page entirely.
+  //
+  // Each slide falls back to its Supabase transform URLs independently, so one
+  // failed download never breaks the build or degrades the other slides.
+  const heroSlides: HeroSlide[] = [];
+  if (heroBgs.length > 0) {
+    const heroDir = resolve(DIST, 'hero');
+    await mkdir(heroDir, { recursive: true });
+    const results = await Promise.all(
+      heroBgs.map(async (url, index): Promise<{ slide: HeroSlide; selfHosted: boolean }> => {
+        // Slide 1 keeps the historical `lcp-*` file names.
+        const base = index === 0 ? 'lcp' : `slide${index + 1}`;
+        try {
+          const srcsetParts = await Promise.all(
+            HERO_WIDTHS.map(async (w) => {
+              const res = await fetch(optimizeImage(url, { width: w }), { headers: { Accept: 'image/webp' } });
+              if (!res.ok) throw new Error(`hero slide ${index + 1} ${w}w -> HTTP ${res.status}`);
+              await writeFile(resolve(heroDir, `${base}-${w}.webp`), Buffer.from(await res.arrayBuffer()));
+              return `/hero/${base}-${w}.webp ${w}w`;
+            })
+          );
+          return { slide: { src: `/hero/${base}-1280.webp`, srcset: srcsetParts.join(', ') }, selfHosted: true };
+        } catch (err) {
+          console.warn(`[prerender-static] Hero slide ${index + 1} self-host failed; using Supabase transform URLs.`, err);
+          return { slide: { src: optimizeImage(url, { width: 1280 }), srcset: buildHeroSrcSet(url) }, selfHosted: false };
+        }
+      })
+    );
+    heroSlides.push(...results.map((r) => r.slide));
+    const hosted = results.filter((r) => r.selfHosted).length;
+    console.log(`[prerender-static] Self-hosted ${hosted}/${heroBgs.length} hero slide(s) in dist/hero/.`);
   }
+  // The preloaded first slide. Only meaningful when it is actually self-hosted;
+  // otherwise Home.tsx and the baked <img> fall back to the Supabase set below.
+  const heroLcp: HeroSlide | undefined = heroSlides[0]?.src.startsWith('/hero/') ? heroSlides[0] : undefined;
 
   // Prefer the self-hosted set for the baked <img>, the <head> preload, and the
   // data island; fall back to the Supabase transform set.
@@ -2197,6 +2290,7 @@ async function main(): Promise<void> {
         heroW: heroSize.w,
         heroH: heroSize.h,
         heroLcp,
+        heroSlides,
         categories,
         factoryGallery,
         featuredVideo,
@@ -2435,6 +2529,30 @@ async function main(): Promise<void> {
       routeCount++;
     }
 
+    // Terms and Conditions. Linked from every footer but previously never
+    // prerendered, so with not_found_handling = "404-page" it would have been
+    // served as the 404 page. Head mirrors <SEO> in TermsAndConditions.tsx.
+    {
+      const canonical = `${SITE_URL}/${lang}${TERMS_PATH}/`;
+      const headExtras = buildHead({
+        lang,
+        title: TERMS_SEO.title,
+        description: TERMS_SEO.description,
+        canonical,
+        ogImage: DEFAULT_OG_IMAGE,
+        ogType: 'website',
+        routePath: TERMS_PATH,
+        schema: [TERMS_SCHEMA],
+      });
+      const html = injectIntoTemplate(template, {
+        lang,
+        headExtras,
+        bodyContent: termsContent(),
+      });
+      await writeRoute(`${lang}${TERMS_PATH}`, html);
+      routeCount++;
+    }
+
     // Insights index
     {
       const canonical = `${SITE_URL}/${lang}${INSIGHTS_PATH}/`;
@@ -2639,6 +2757,14 @@ async function main(): Promise<void> {
       routeCount++;
     }
   }
+
+  // dist/404.html — served by Cloudflare with a real 404 status for any path
+  // that has no asset (wrangler.jsonc not_found_handling = "404-page").
+  await writeFile(resolve(DIST, '404.html'), notFoundHtml(template), 'utf-8');
+  // dist/admin/index.html — the client-only employee portal shell, served with
+  // 200 for every /admin path by worker/reliable-entry.ts.
+  await writeRoute('admin', adminShellHtml(template));
+  console.log('[prerender-static] Wrote dist/404.html and dist/admin/index.html.');
 
   await writeUuidRedirects(products);
 

@@ -253,8 +253,14 @@ ${urls.join('\n')}
     }));
     // Redirect bare root to /en
     app.get('/', (req, res) => res.redirect(302, '/en/'));
+    // Same contract as the Cloudflare deployment: the client-only employee
+    // portal shell for /admin*, a real 404 (dist/404.html) for anything else
+    // that has no prerendered file.
+    app.get(['/admin', '/admin/*'], (req, res) => {
+      res.sendFile(path.join(distPath, 'admin', 'index.html'));
+    });
     app.get('*', (req, res) => {
-      res.sendFile(path.join(distPath, 'index.html'));
+      res.status(404).sendFile(path.join(distPath, '404.html'));
     });
   }
 

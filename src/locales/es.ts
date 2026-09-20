@@ -371,7 +371,8 @@ export const es = {
         "Led Lighted Mirror": "Espejo con Luz LED",
         "Bathroom Mirror without led": "Espejo de Baño sin LED",
         "Full Length Dressing Mirror": "Espejo de Cuerpo Entero",
-        "Irregular Mirror": "Espejo Irregular"
+        "Irregular Mirror": "Espejo Irregular",
+        "Mirror Cabinet": "Armario con Espejo"
       },
       priceRange: "Rango de Precios",
       priceRangeLabel: "Rango orientativo de fábrica",

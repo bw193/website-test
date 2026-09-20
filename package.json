@@ -6,8 +6,9 @@
   "scripts": {
     "dev": "tsx server.ts",
     "build": "tsx scripts/build-site.ts",
-    "build:prerender": "tsx scripts/generate-product-routes.ts && playwright install chromium && vite build && tsx scripts/prerender.ts && tsx scripts/generate-sitemap.ts",
+    "build:prerender": "tsx scripts/generate-product-routes.ts && tsx scripts/generate-catalog-categories.ts && playwright install chromium && vite build && tsx scripts/prerender.ts && tsx scripts/generate-sitemap.ts",
     "generate-product-routes": "tsx scripts/generate-product-routes.ts",
+    "generate-catalog-categories": "tsx scripts/generate-catalog-categories.ts",
     "prerender": "tsx scripts/prerender.ts",
     "translate": "tsx scripts/translate-products.ts",
     "generate-sitemap": "tsx scripts/generate-sitemap.ts",

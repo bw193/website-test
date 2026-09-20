@@ -13,9 +13,19 @@
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",
-    "not_found_handling": "single-page-application",
+    // Every public route is prerendered to its own index.html, so a path with
+    // no asset really is a missing page. "single-page-application" answered
+    // those with dist/index.html and HTTP 200 (a soft 404 on every typo, dead
+    // link and removed product); "404-page" serves dist/404.html — generated
+    // by scripts/prerender-static.ts as a noindex SPA shell that still boots
+    // the React NotFound view — with a real 404 status.
+    "not_found_handling": "404-page",
     "run_worker_first": [
       "/api/*",
+      // The employee portal is a client-only React app with dynamic routes,
+      // so it has no per-route HTML; the Worker serves dist/admin/index.html
+      // with 200 for every /admin path instead of the 404 page.
+      "/admin", "/admin/*",
       "/products/*",
       "/en/products/*", "/zh/products/*", "/es/products/*",
       "/fr/products/*", "/de/products/*", "/it/products/*",

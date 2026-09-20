@@ -371,7 +371,8 @@ export const it = {
         "Led Lighted Mirror": "Specchio con Luce LED",
         "Bathroom Mirror without led": "Specchio da Bagno senza LED",
         "Full Length Dressing Mirror": "Specchio a Figura Intera",
-        "Irregular Mirror": "Specchio Irregolare"
+        "Irregular Mirror": "Specchio Irregolare",
+        "Mirror Cabinet": "Armadietto con Specchio"
       },
       priceRange: "Fascia di Prezzo",
       priceRangeLabel: "Fascia indicativa di fabbrica",

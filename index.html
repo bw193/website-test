@@ -3,7 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="robots" content="index, follow" />
+    <!-- No static robots meta here: "index, follow" is the default, and a
+         hardcoded copy shipped inside the SPA shell and the 404 page too,
+         telling crawlers to index missing pages. Pages that must stay out of
+         the index emit a noindex robots meta via src/components/SEO.tsx. -->
     <meta name="author" content="Jiaxing Chengtai Mirror Co., Ltd." />
     <!-- Google Search Console verified via DNS -->
     <!--

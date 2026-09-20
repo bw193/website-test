@@ -1170,3 +1170,58 @@ test('forwards non-API requests to the static asset binding', async () => {
   const response = await worker.fetch(new Request('https://bolenmirror.com/en/products/'), environment());
   assert.equal(await response.text(), 'asset');
 });
+
+// Emulates the "404-page" asset layer: dist/admin/index.html exists, nothing
+// else does, so every other path is answered with dist/404.html and HTTP 404.
+function notFoundAwareAssets(): { env: Env; requested: string[] } {
+  const requested: string[] = [];
+  const env = environment();
+  env.ASSETS = {
+    fetch: async (request: Request) => {
+      const { pathname } = new URL(request.url);
+      requested.push(pathname);
+      if (pathname === '/admin/') return new Response('admin shell', { status: 200 });
+      return new Response('not found page', { status: 404 });
+    },
+  };
+  return { env, requested };
+}
+
+test('deployed Worker serves the employee-portal shell with 200 for every /admin path', async () => {
+  for (const pathname of ['/admin', '/admin/', '/admin/login', '/admin/products/new', '/admin/products/5e8e0cf4-f9ed-4486-9aa3-d0a75ebfbb93']) {
+    const { env, requested } = notFoundAwareAssets();
+    const response = await reliableWorker.fetch(new Request(`https://bolenmirror.com${pathname}`), env);
+    assert.equal(response.status, 200, pathname);
+    assert.equal(await response.text(), 'admin shell');
+    assert.deepEqual(requested, ['/admin/']);
+  }
+});
+
+test('deployed Worker lets missing pages stay real 404s from the asset layer', async () => {
+  for (const pathname of ['/en/this-does-not-exist/', '/xx/', '/EN/products/', '/administrator/', '/en/products/nope/nope/']) {
+    const { env } = notFoundAwareAssets();
+    const response = await reliableWorker.fetch(new Request(`https://bolenmirror.com${pathname}`), env);
+    assert.equal(response.status, 404, pathname);
+    assert.equal(await response.text(), 'not found page');
+  }
+});
+
+test('deployed Worker redirects the bare category index to the catalog with 301', async () => {
+  for (const lang of ['en', 'zh', 'es', 'fr', 'de', 'it']) {
+    for (const suffix of ['', '/']) {
+      const response = await reliableWorker.fetch(
+        new Request(`https://bolenmirror.com/${lang}/products/category${suffix}?q=led`),
+        environment(),
+      );
+      assert.equal(response.status, 301);
+      assert.equal(response.headers.get('Location'), `/${lang}/products/?q=led`);
+    }
+  }
+  // Real category pages are untouched.
+  const category = await reliableWorker.fetch(
+    new Request('https://bolenmirror.com/en/products/category/led-lighted-mirror/'),
+    environment(),
+  );
+  assert.equal(category.status, 200);
+  assert.equal(await category.text(), 'asset');
+});

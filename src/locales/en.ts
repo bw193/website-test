@@ -373,7 +373,8 @@ export const en = {
         "Led Lighted Mirror": "Led Lighted Mirror",
         "Bathroom Mirror without led": "Bathroom Mirror without led",
         "Full Length Dressing Mirror": "Full Length Dressing Mirror",
-        "Irregular Mirror": "Irregular Mirror"
+        "Irregular Mirror": "Irregular Mirror",
+        "Mirror Cabinet": "Mirror Cabinet"
       },
       priceRange: "Price Range",
       priceRangeLabel: "Indicative factory range",
