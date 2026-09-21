@@ -45,6 +45,7 @@ import {
 } from '../src/utils/video';
 import { optimizeImage } from '../src/utils/optimizeImage';
 import { polishEnglishProductTitle } from '../src/utils/productCopy';
+import { normalizeProductDetails } from '../src/utils/productDetails';
 import {
   buildProductBuyerSummary,
   normalizeSpecs,
@@ -1049,7 +1050,7 @@ function productDetailContent(lang: Lang, product: Product, tr: LangTranslations
   // scripts/translate-products.ts). It was fetched but never rendered, which
   // left every product page under 40 words of crawlable content.
   const details = localized.details?.trim()
-    ? `<h2>${escapeHtml(c.detailsHeading)}</h2>\n      ${renderMarkdown(localized.details)}`
+    ? `<h2>${escapeHtml(c.detailsHeading)}</h2>\n      ${renderMarkdown(normalizeProductDetails(localized.details))}`
     : '';
 
   const specs = normalizeSpecs(localized.specifications);

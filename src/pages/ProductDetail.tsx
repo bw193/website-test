@@ -22,6 +22,7 @@ import { recommendVideosForProduct, toVideoListItem } from '../utils/video';
 import type { VideoListItem, VideoPost } from '../types/video';
 import { trackEvent } from '../utils/analytics';
 import { polishEnglishProductTitle } from '../utils/productCopy';
+import { normalizeProductDetails } from '../utils/productDetails';
 import { recommendSolutionsForProduct } from '../data/seoLandingPages';
 import { getSeoSolutionsUi, localizeSeoLandingPage } from '../data/seoLandingI18n';
 
@@ -575,7 +576,7 @@ export default function ProductDetail() {
                   <SectionHeading>{t('productDetail.productDetails')}</SectionHeading>
                   {!useBuyerSummary && originalDescription !== richDescription && <p className="pdp-details-intro">{originalDescription}</p>}
                   <Markdown className="pdp-prose prose prose-amber prose-stone max-w-none">
-                    {display.details}
+                    {normalizeProductDetails(display.details)}
                   </Markdown>
                 </m.div>
               )}
