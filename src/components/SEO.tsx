@@ -2,6 +2,7 @@ import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
 import { useCurrentLang } from '../hooks/useLocalizedPath';
+import { toMediaUrl } from '../utils/media';
 
 interface SEOProps {
   title?: string;
@@ -48,6 +49,8 @@ export default function SEO({
   const suffix = path === '/' ? '' : path;
   const canonicalUrl = `${SITE_URL}/${currentLang}${suffix}/`;
   const alternateUrl = (lang: string) => `${SITE_URL}/${lang}${alternatePaths?.[lang] ?? suffix}/`;
+  // Supabase-hosted images are shared from the site's own /media/ copy.
+  const ogImageUrl = toMediaUrl(ogImage);
 
   // react-helmet-async iterates <Helmet> children with React.Children but does NOT
   // recurse into nested arrays/expressions, so every alternate link and JSON-LD
@@ -75,7 +78,7 @@ export default function SEO({
       <meta property="og:url" content={canonicalUrl} />
       <meta property="og:title" content={title} />
       <meta property="og:description" content={description} />
-      <meta property="og:image" content={ogImage} />
+      <meta property="og:image" content={ogImageUrl} />
       <meta property="og:site_name" content="BOLEN Mirror" />
       {ogVideo && <meta property="og:video" content={ogVideo.url} />}
       {ogVideo && <meta property="og:video:secure_url" content={ogVideo.url} />}
@@ -85,7 +88,7 @@ export default function SEO({
       <meta name="twitter:url" content={canonicalUrl} />
       <meta name="twitter:title" content={title} />
       <meta name="twitter:description" content={description} />
-      <meta name="twitter:image" content={ogImage} />
+      <meta name="twitter:image" content={ogImageUrl} />
 
       {schemaArray[0] && (
         <script type="application/ld+json">{JSON.stringify(schemaArray[0])}</script>

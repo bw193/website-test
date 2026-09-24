@@ -29,8 +29,10 @@
          scripts/prerender-static.ts (home only). No hardcoded hero preload here:
          the old one pointed at the wrong file (the OG image, not the actual
          hero) and was force-fetched at 1920px on every route. -->
-    <link rel="icon" type="image/png" href="https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/logo2.png" />
-    <title>BOLEN Mirror | LED Mirror Manufacturer & OEM Smart Mirror Factory</title>
+    <!-- Same-origin copy (worker/media.ts): Supabase serves the original with
+         X-Robots-Tag: none. -->
+    <link rel="icon" type="image/png" href="/media/comp%20image/logo2.png" />
+    <title>LED Mirror & Bathroom Mirror Manufacturer in China | BOLEN</title>
 
     <!-- Inline critical CSS for the non-prerendered loading shell. Generated
          route HTML removes the loader element so crawlers, no-JS users, and

@@ -6,9 +6,11 @@ import { useLocalizedPath } from '../hooks/useLocalizedPath';
 import { getSeoSolutionsUi } from '../data/seoLandingI18n';
 import { INSIGHTS_PATH } from '../data/insights';
 import { localizedProductPathname } from '../utils/productRoutes';
+import { toMediaPath } from '../utils/media';
 
-const LOGO_URL =
-  'https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/logo.png';
+const LOGO_URL = toMediaPath(
+  'https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/logo.png'
+);
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = React.useState(false);

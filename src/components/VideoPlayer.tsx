@@ -3,6 +3,7 @@ import { Play, VideoOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import VideoPoster from './VideoPoster';
 import { optimizeImage } from '../utils/optimizeImage';
+import { toMediaPath } from '../utils/media';
 import { buildPlaybackEmbedSrc, formatVideoDuration, getVideoPlayback } from '../utils/video';
 import type { LocalizedVideoPost, VideoListItem } from '../types/video';
 
@@ -146,7 +147,7 @@ export default function VideoPlayer({ video, className = '', autoPlay = false, p
           <video
             className="absolute inset-0 h-full w-full object-contain"
             src={playback.src}
-            poster={video.thumbnail_url || undefined}
+            poster={toMediaPath(video.thumbnail_url) || undefined}
             controls
             autoPlay
             playsInline

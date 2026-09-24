@@ -6,8 +6,8 @@ export const it = {
     // cannot drift. Previously the pages passed hardcoded English, which
     // overwrote the correctly-localized prerendered meta on 5 locales.
     seo: {
-      homeTitle: "BOLEN Mirror | Produttore di Specchi LED e Fabbrica OEM di Specchi Smart",
-      homeDesc: "BOLEN Mirror è un produttore leader di specchi LED specializzato in specchi LED OEM, specchi smart, specchi da toeletta e specchi da bagno per marchi globali.",
+      homeTitle: "Produttore di specchi LED e specchi da bagno in Cina | BOLEN",
+      homeDesc: "BOLEN produce specchi da bagno LED, specchi da toeletta illuminati e armadietti con specchio in Cina: OEM/ODM, su misura e all'ingrosso, con garanzia di 3 anni.",
       catalogTitle: "Catalogo del produttore di specchi LED | Garanzia di 3 anni",
       catalogDesc: "Esplora la nostra ampia gamma di specchi LED OEM, specchi smart, specchi da toeletta e specchi da bagno da un produttore leader di specchi LED. Produzione di alta qualità per marchi globali.",
       categoryTitle: "{{category}} | Produttore BOLEN Mirror",
@@ -225,6 +225,7 @@ export const it = {
       heroKicker: "Produttore di specchi LED · Partner OEM/ODM",
       heroTitle1: "Specchi di alta gamma,",
       heroTitle2: "realizzati su misura per il tuo brand.",
+      heroImageAlt: "Fabbrica BOLEN di specchi da bagno LED a Jiaxing, Cina: produttore di specchi OEM/ODM con oltre 20 anni di esperienza",
       heroDesc: "<1>BOLEN</1> aiuta brand di tutto il mondo a portare sul mercato collezioni di specchi dal carattere distintivo. Dalla progettazione e personalizzazione alla produzione con rigorosi controlli di qualità e alla consegna in tutto il mondo, rendiamo la produzione di alta gamma semplice, affidabile e scalabile.",
       heroPrimaryCta: "Richiedi prezzi e MOQ",
       heroSecondaryCta: "Scopri i prodotti",

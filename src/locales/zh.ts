@@ -6,8 +6,8 @@ export const zh = {
     // cannot drift. Previously the pages passed hardcoded English, which
     // overwrote the correctly-localized prerendered meta on 5 locales.
     seo: {
-      homeTitle: "BOLEN 镜业 | LED 智能镜制造商 & OEM 镜子工厂",
-      homeDesc: "BOLEN Mirror 是领先的 LED 镜制造商，专业生产 OEM LED 镜、智能镜、化妆镜和浴室镜，服务全球品牌。",
+      homeTitle: "LED 镜与浴室镜制造商 | 中国 OEM/ODM 工厂 | BOLEN 镜业",
+      homeDesc: "BOLEN（嘉兴诚泰镜业有限公司）是中国嘉兴的 LED 镜工厂，自 2005 年起生产 LED 浴室镜、带灯化妆镜和镜柜，支持 OEM/ODM、定制与批发，提供 3 年质保。",
       catalogTitle: "LED 镜制造商产品目录 | 3年质保",
       catalogDesc: "探索我们丰富的 OEM LED 镜、智能镜、化妆镜和浴室镜产品系列，来自领先的 LED 镜制造商，为全球品牌提供优质制造。",
       categoryTitle: "{{category}} | BOLEN 镜业制造商",
@@ -227,6 +227,7 @@ export const zh = {
       heroKicker: "LED镜制造商 · OEM/ODM合作伙伴",
       heroTitle1: "高端镜品，",
       heroTitle2: "为您的品牌量身打造。",
+      heroImageAlt: "BOLEN 位于中国嘉兴的 LED 浴室镜工厂——拥有 20 多年经验的 OEM/ODM 镜子制造商",
       heroDesc: "<1>BOLEN</1>助力全球品牌将独具特色的镜类产品系列推向市场。从设计与定制，到严格品控的生产制造和全球交付，我们让高端制造更简单、更可靠，也更易于规模化。",
       heroPrimaryCta: "获取报价与起订量",
       heroSecondaryCta: "浏览产品",

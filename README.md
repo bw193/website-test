@@ -42,3 +42,7 @@ Automatically redacted conversations are retained for up to 90 days. Authorized 
 The first deployment receives a `workers.dev` address. Attach the production domain in the Cloudflare Workers dashboard after confirming that the domain's DNS zone is managed by the intended Cloudflare account.
 
 `GEMINI_API_KEY` is optional and is used only by `npm run translate`; it is not used by the public AI receptionist.
+
+## Media URLs
+
+Product photos, factory images, logos and video posters live in Supabase Storage, which sends `X-Robots-Tag: none` (noindex) with every file. The site therefore references them as `/media/<bucket>/<path>` on its own domain; `worker/media.ts` serves those paths without the header and caches them at the edge. Build image URLs with `optimizeImage`, `toMediaPath` or `toMediaUrl` (`src/utils/`) rather than hardcoding Supabase URLs. Video files are not proxied, and each `/media/` request counts as a Worker request.

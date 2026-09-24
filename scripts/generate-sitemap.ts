@@ -7,6 +7,7 @@ import type { BlogPost, LocalizedMap } from '../src/types/blog';
 import type { VideoSourceType } from '../src/types/video';
 import { getBlogAvailableLanguages, pickLocalized } from '../src/utils/blog';
 import { deriveVideoThumbnailUrl, getVideoPlayback, normalizeVideoSourceType } from '../src/utils/video';
+import { toMediaUrl } from '../src/utils/media';
 import { SEO_LANDING_PAGES } from '../src/data/seoLandingPages';
 import { productDetailPath, productAlternatePaths } from '../src/utils/productRoutes';
 import {
@@ -114,7 +115,8 @@ function buildVideoBlock(video: SitemapVideoPost, lang: string): string | null {
     embed_url: video.embed_url,
   });
   const thumbnail = deriveVideoThumbnailUrl(video);
-  const thumbnailLoc = isHttpUrl(thumbnail) ? thumbnail : '';
+  // The site's own /media/ copy: Supabase serves the original as noindex.
+  const thumbnailLoc = isHttpUrl(thumbnail) ? toMediaUrl(thumbnail) : '';
   const playbackTag =
     playback.kind === 'video' && isHttpUrl(playback.src)
       ? `      <video:content_loc>${escapeXml(playback.src)}</video:content_loc>`

@@ -1,6 +1,7 @@
 import type { SupportedLanguage } from '../hooks/useLocalizedPath';
 import { toSlug } from './slug';
 import { productDetailPath } from './productRoutes';
+import { toMediaUrl } from './media';
 import catalogCategoriesSnapshot from '../data/catalogCategories.json';
 
 // Hardcoded seed used only when site_settings.categories is empty or
@@ -391,7 +392,7 @@ export function buildCatalogCategorySchema(opts: {
       position: index + 1,
       name: product.name || product.title,
       url: `${SITE_URL}/${opts.lang}${productDetailPath({ ...product, category: product.category || opts.slug }, opts.lang)}/`,
-      ...(product.image ? { image: product.image } : {}),
+      ...(product.image ? { image: toMediaUrl(product.image) } : {}),
     })),
   };
   return [

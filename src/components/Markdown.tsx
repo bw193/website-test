@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { Marked } from 'marked';
+import { toMediaPath } from '../utils/media';
 
 /**
  * Renders trusted, admin-authored markdown (product `details`, blog bodies,
@@ -59,7 +60,7 @@ const renderer = {
     return `<a href="${escapeAttr(href)}"${title}${rel}>${token.text}</a>`;
   },
   image(token: { href: string; title?: string | null; text: string }): string {
-    const src = safeUrl(token.href);
+    const src = safeUrl(toMediaPath(token.href));
     if (!src) return '';
     const title = token.title ? ` title="${escapeAttr(token.title)}"` : '';
     return `<img src="${escapeAttr(src)}" alt="${escapeAttr(token.text || '')}"${title} loading="lazy" decoding="async" />`;

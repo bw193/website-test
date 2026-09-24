@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import SEO from '../components/SEO';
 import { useCurrentLang, useLocalizedPath } from '../hooks/useLocalizedPath';
 import { readInitialCatalogData } from '../utils/prerenderData';
+import { optimizeImage } from '../utils/optimizeImage';
 import { useProductTranslator } from '../utils/productI18n';
 import { polishEnglishProductTitle } from '../utils/productCopy';
 import {
@@ -35,8 +36,10 @@ interface Product {
 
 // Own factory photography for the catalog header backdrop (replaces a generic
 // Unsplash stock photo). Requested at 2000px because it renders full-bleed.
-const CATALOG_BACKDROP =
-  'https://mxmmffwntosvwaviippd.supabase.co/storage/v1/render/image/public/comp%20image/factory4.jpg?width=2000&resize=contain';
+const CATALOG_BACKDROP = optimizeImage(
+  'https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/factory4.jpg',
+  { width: 2000 }
+);
 
 const PAGE_SIZE = 12;
 const GRID_CLASS = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-10';

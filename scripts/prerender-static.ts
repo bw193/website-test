@@ -44,6 +44,8 @@ import {
   videoMimeType,
 } from '../src/utils/video';
 import { optimizeImage } from '../src/utils/optimizeImage';
+import { mediaSourceUrl, toMediaPath, toMediaUrl } from '../src/utils/media';
+import { buildHomeSchema } from '../src/utils/homeSchema';
 import { polishEnglishProductTitle } from '../src/utils/productCopy';
 import { normalizeProductDetails } from '../src/utils/productDetails';
 import {
@@ -147,6 +149,17 @@ const LOCALE_PRODUCTS = {
   it: itLocale.translation.products,
 } as const;
 
+// Hero kicker/heading/alt, so the static home <h1> and hero <img> match what
+// src/pages/Home.tsx renders.
+const LOCALE_HOME = {
+  en: enLocale.translation.home,
+  zh: zhLocale.translation.home,
+  es: esLocale.translation.home,
+  fr: frLocale.translation.home,
+  de: deLocale.translation.home,
+  it: itLocale.translation.home,
+} as const;
+
 const LOCALE_STORY = {
   en: enLocale.translation.ourStoryPage,
   zh: zhLocale.translation.ourStoryPage,
@@ -191,7 +204,6 @@ interface Product {
 const COPY: Record<
   Lang,
   {
-    homeH1: string;
     homeIntro: string;
     catalogH1: string;
     catalogIntro: string;
@@ -219,9 +231,8 @@ const COPY: Record<
   }
 > = {
   en: {
-    homeH1: 'BOLEN — LED Mirror Manufacturer & OEM Smart Mirror Factory',
     homeIntro:
-      'Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) operates a 46,800 m² facility with 200+ skilled specialists, manufacturing LED, smart, vanity, bathroom, and decorative mirrors for OEM/ODM programs.',
+      'Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) is an LED mirror and bathroom mirror manufacturer in Jiaxing, China. Its 46,800 m² factory and 200+ specialists make LED bathroom mirrors, LED vanity mirrors, lighted mirrors and mirror cabinets for OEM/ODM, custom and wholesale orders.',
     catalogH1: 'Product Catalog',
     catalogIntro:
       'Browse our extensive collection of premium mirrors, featuring smart LED technology, elegant vanity designs, and customizable options.',
@@ -244,9 +255,8 @@ const COPY: Record<
       'Premium {title} by BOLEN Mirror (Jiaxing Chengtai Mirror Co., Ltd.) — OEM/ODM LED, smart, vanity, and bath mirrors. Contact sales for bulk pricing.',
   },
   zh: {
-    homeH1: 'BOLEN — LED 镜制造商 & OEM 智能镜工厂',
     homeIntro:
-      '嘉兴诚泰镜业有限公司（BOLEN）拥有 46,800 平方米生产基地和 200+ 名专业人员，为 OEM/ODM 项目制造 LED 镜、智能镜、化妆镜、浴室镜及装饰镜。',
+      '嘉兴诚泰镜业有限公司（BOLEN）是位于中国嘉兴的 LED 镜与浴室镜制造商，拥有 46,800 平方米工厂和 200 多名专业人员，为 OEM/ODM、定制和批发订单生产 LED 浴室镜、LED 化妆镜、带灯镜和镜柜。',
     catalogH1: '产品目录',
     catalogIntro: '浏览我们丰富的优质镜面系列，包括智能 LED 技术、优雅的化妆镜设计和可定制选项。',
     productSuffix: '| BOLEN 镜业',
@@ -267,9 +277,8 @@ const COPY: Record<
       '{title} — 嘉兴诚泰镜业有限公司（BOLEN）优质出品，专业提供 OEM/ODM LED 镜、智能镜、化妆镜和浴室镜。欢迎询价获取批发价格。',
   },
   es: {
-    homeH1: 'BOLEN — Fabricante de Espejos LED y Fábrica OEM de Espejos Inteligentes',
     homeIntro:
-      'Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) opera una planta de 46.800 m² con más de 200 especialistas y fabrica espejos LED, inteligentes, de tocador, de baño y decorativos para programas OEM/ODM.',
+      'Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) es un fabricante de espejos LED y espejos de baño en Jiaxing, China. Su fábrica de 46.800 m² y más de 200 especialistas producen espejos de baño LED, espejos de tocador LED, espejos con luz y armarios con espejo para pedidos OEM/ODM, a medida y al por mayor.',
     catalogH1: 'Catálogo de Productos',
     catalogIntro:
       'Explore nuestra extensa colección de espejos premium, con tecnología LED inteligente, elegantes diseños de tocador y opciones personalizables.',
@@ -292,9 +301,8 @@ const COPY: Record<
       '{title} de primera calidad, fabricado por BOLEN Mirror (Jiaxing Chengtai Mirror Co., Ltd.) — espejos LED, inteligentes, de tocador y de baño OEM/ODM. Solicite una cotización para precios al por mayor.',
   },
   fr: {
-    homeH1: 'BOLEN — Fabricant de Miroirs LED et Usine OEM de Miroirs Intelligents',
     homeIntro:
-      "Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) exploite un site de 46 800 m² avec plus de 200 spécialistes et fabrique des miroirs LED, intelligents, de toilette, de salle de bain et décoratifs pour des programmes OEM/ODM.",
+      "Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) est un fabricant de miroirs LED et de miroirs de salle de bain à Jiaxing, en Chine. Son usine de 46 800 m² et ses plus de 200 spécialistes produisent des miroirs de salle de bain LED, des miroirs de toilette LED, des miroirs lumineux et des armoires à miroir pour des commandes OEM/ODM, sur mesure et en gros.",
     catalogH1: 'Catalogue de Produits',
     catalogIntro:
       "Parcourez notre vaste collection de miroirs haut de gamme, dotés d'une technologie LED intelligente, de designs élégants et d'options personnalisables.",
@@ -317,9 +325,8 @@ const COPY: Record<
       "{title} haut de gamme, fabriqué par BOLEN Mirror (Jiaxing Chengtai Mirror Co., Ltd.) — miroirs LED, intelligents, de toilette et de salle de bain OEM/ODM. Demandez un devis pour les tarifs en gros.",
   },
   de: {
-    homeH1: 'BOLEN — LED-Spiegelhersteller & OEM-Smart-Spiegel-Fabrik',
     homeIntro:
-      'Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) betreibt eine 46.800 m² große Anlage mit mehr als 200 Fachkräften und fertigt LED-, Smart-, Schmink-, Bad- und Dekorationsspiegel für OEM/ODM-Programme.',
+      'Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) ist ein Hersteller von LED-Spiegeln und Badspiegeln in Jiaxing, China. Das 46.800 m² große Werk mit mehr als 200 Fachkräften fertigt LED-Badspiegel, LED-Schminkspiegel, beleuchtete Spiegel und Spiegelschränke für OEM/ODM-, Sonder- und Großhandelsaufträge.',
     catalogH1: 'Produktkatalog',
     catalogIntro:
       'Durchsuchen Sie unsere umfangreiche Kollektion hochwertiger Spiegel mit intelligenter LED-Technologie, eleganten Schminkdesigns und anpassbaren Optionen.',
@@ -342,9 +349,8 @@ const COPY: Record<
       'Hochwertiger {title} von BOLEN Mirror (Jiaxing Chengtai Mirror Co., Ltd.) — OEM/ODM-LED-, Smart-, Schmink- und Badspiegel. Fordern Sie ein Angebot für Großhandelspreise an.',
   },
   it: {
-    homeH1: 'BOLEN — Produttore di Specchi LED e Fabbrica OEM di Specchi Smart',
     homeIntro:
-      "Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) gestisce uno stabilimento di 46.800 m² con oltre 200 specialisti e produce specchi LED, smart, da toeletta, da bagno e decorativi per programmi OEM/ODM.",
+      "Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) è un produttore di specchi LED e specchi da bagno a Jiaxing, in Cina. Lo stabilimento di 46.800 m² con oltre 200 specialisti realizza specchi da bagno LED, specchi da toeletta LED, specchi illuminati e armadietti con specchio per ordini OEM/ODM, su misura e all'ingrosso.",
     catalogH1: 'Catalogo Prodotti',
     catalogIntro:
       'Sfoglia la nostra vasta collezione di specchi premium, con tecnologia LED intelligente, eleganti design da toeletta e opzioni personalizzabili.',
@@ -539,7 +545,8 @@ function ogTwitterBlock(
   const t = escapeAttr(title);
   const d = escapeAttr(description);
   const u = escapeAttr(canonical);
-  const img = escapeAttr(ogImage);
+  // Same value src/components/SEO.tsx writes: the site's own /media/ copy.
+  const img = escapeAttr(toMediaUrl(ogImage));
   // Tag order mirrors src/components/SEO.tsx so Helmet adopts these nodes.
   const videoTags = ogVideo
     ? [
@@ -671,6 +678,8 @@ const PRERENDER_FALLBACK_CSS = [
   '[data-prerender]{max-width:52rem;margin:0 auto;padding:2rem 1.25rem 4rem;',
   'font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:#1c1917;line-height:1.65}',
   '[data-prerender] h1{font-size:1.875rem;line-height:1.2;margin:0 0 1rem;font-weight:600}',
+  // The home <h1> opens with the hero kicker, as in Home.tsx.
+  '[data-prerender=home] h1>span{display:block;font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;color:#d97706;margin-bottom:.5rem}',
   '[data-prerender] h2{font-size:1.25rem;margin:2rem 0 .75rem;font-weight:600}',
   '[data-prerender] img{max-width:100%;height:auto;border-radius:.75rem;display:block;margin:1.5rem 0}',
   '[data-prerender] nav{font-size:.875rem;color:#78716c;margin-bottom:1.5rem}',
@@ -825,12 +834,13 @@ function homeContent(
   categories: string[] = [...DEFAULT_PRODUCT_CATEGORIES]
 ): string {
   const c = COPY[lang];
+  const h = LOCALE_HOME[lang];
   // Bake the LCP hero straight into the static HTML so the browser discovers
   // and fetches it during HTML parse — before any JS runs. React renders a
   // byte-identical <img> on mount, so the painted pixels never change.
   const heroBlock = hero
     ? `<div class="relative bg-stone-900 overflow-hidden">
-        <img src="${escapeAttr(hero.src)}" srcset="${escapeAttr(hero.srcset)}" sizes="100vw" width="${hero.width}" height="${hero.height}" alt="BOLEN LED bathroom mirror manufacturing showcase" class="w-full h-auto block" fetchpriority="high" decoding="async" referrerpolicy="no-referrer" />
+        <img src="${escapeAttr(hero.src)}" srcset="${escapeAttr(hero.srcset)}" sizes="100vw" width="${hero.width}" height="${hero.height}" alt="${escapeAttr(h.heroImageAlt)}" class="w-full h-auto block" fetchpriority="high" decoding="async" referrerpolicy="no-referrer" />
       </div>
       `
     : '';
@@ -850,7 +860,7 @@ function homeContent(
         </section>`;
   return `
     <div data-prerender="home">
-      ${heroBlock}<h1>${escapeHtml(c.homeH1)}</h1>
+      ${heroBlock}<h1><span>${escapeHtml(h.heroKicker)}</span> ${escapeHtml(h.heroTitle1)} ${escapeHtml(h.heroTitle2)}</h1>
       <p>${escapeHtml(c.homeIntro)}</p>
       <nav aria-label="Site sections">
         <a href="/${lang}/products/">${escapeHtml(c.navCatalog)}</a>
@@ -930,7 +940,7 @@ function seoLandingContent(
       const displayTitle = lang === 'en' ? display.title : hasTranslation ? display.title : fallbackCopy.title;
       const href = `/${lang}${productDetailPath(product, lang)}/`;
       const image = product.images?.[0]
-        ? `<img src="${escapeAttr(product.images[0])}" alt="${escapeAttr(displayTitle)}" width="400" height="400" loading="lazy" />`
+        ? `<img src="${escapeAttr(toMediaPath(product.images[0]))}" alt="${escapeAttr(displayTitle)}" width="400" height="400" loading="lazy" />`
         : '';
       const summary = lang === 'en' || hasTranslation ? buildProductBuyerSummary(display) : fallbackCopy.summary;
       return `<li><a href="${escapeAttr(href)}">${image}<strong>${escapeHtml(displayTitle)}</strong></a>${summary ? `<p>${escapeHtml(summary)}</p>` : ''}</li>`;
@@ -984,7 +994,7 @@ function catalogContent(
       const title = tr[p.id]?.title || p.title;
       const img = p.images?.[0];
       const imgTag = img
-        ? `<img src="${escapeAttr(img)}" alt="${escapeAttr(title)}" width="400" height="400" loading="lazy" />`
+        ? `<img src="${escapeAttr(toMediaPath(img))}" alt="${escapeAttr(title)}" width="400" height="400" loading="lazy" />`
         : '';
       return `<li><a href="${escapeAttr(href)}">${imgTag}<span>${escapeHtml(title)}</span></a></li>`;
     })
@@ -1032,7 +1042,7 @@ function productDetailContent(lang: Lang, product: Product, tr: LangTranslations
   const localized = localizeProduct(product, tr);
   const img = product.images?.[0];
   const imgTag = img
-    ? `<img src="${escapeAttr(img)}" alt="${escapeAttr(localized.title)}" width="600" height="600" />`
+    ? `<img src="${escapeAttr(toMediaPath(img))}" alt="${escapeAttr(localized.title)}" width="600" height="600" />`
     : '';
   // The `description` column holds model codes ("CTL609"), not prose. Render it
   // as a model number when it is short, and as an actual description only when
@@ -1214,7 +1224,7 @@ function adminShellHtml(template: string): string {
 // `isEqualNode` check on mount adopts the prerendered script tags instead of
 // removing them and appending a duplicate copy. Mirror the source object
 // shapes in:
-//   - src/pages/Home.tsx        (Organization, WebSite)
+//   - src/utils/homeSchema.ts   (Organization, WebSite — shared, not mirrored)
 //   - src/pages/Products.tsx    (CollectionPage)
 //   - src/pages/ProductDetail.tsx (Product, BreadcrumbList)
 //   - src/pages/OurStory.tsx    (AboutPage)
@@ -1222,64 +1232,9 @@ function adminShellHtml(template: string): string {
 // Key order matters: JSON.stringify follows insertion order, and `isEqualNode`
 // compares serialized script contents.
 
+// Shared with src/pages/Home.tsx (src/utils/homeSchema.ts).
 function homeSchema(lang: Lang, gallery: FactoryGalleryItem[] = [], featuredVideo?: VideoListItem): any[] {
-  const base: any[] = [
-    {
-      '@context': 'https://schema.org',
-      '@type': 'Organization',
-      name: 'Jiaxing Chengtai Mirror Co., Ltd. (BOLEN)',
-      url: 'https://bolenmirror.com',
-      logo: 'https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/logo.png',
-      description:
-        'Leading LED mirror manufacturer specializing in OEM LED mirrors, smart mirrors, vanity mirrors, and bath mirrors for global brands.',
-      contactPoint: {
-        '@type': 'ContactPoint',
-        telephone: '+86-18058603602',
-        email: 'sales@bolenmirror.com',
-        contactType: 'customer service',
-        areaServed: 'Worldwide',
-        availableLanguage: ['en', 'zh', 'es', 'fr', 'de', 'it'],
-      },
-      address: {
-        '@type': 'PostalAddress',
-        streetAddress: 'No. 1, Building 2, No. 1, Chuangye Road, Wangdian Town',
-        addressLocality: 'Jiaxing',
-        addressRegion: 'Zhejiang',
-        addressCountry: 'CN',
-      },
-      sameAs: [],
-    },
-    {
-      '@context': 'https://schema.org',
-      '@type': 'WebSite',
-      name: 'BOLEN Mirror',
-      url: 'https://bolenmirror.com',
-      potentialAction: {
-        '@type': 'SearchAction',
-        target: 'https://bolenmirror.com/products?q={search_term_string}',
-        'query-input': 'required name=search_term_string',
-      },
-    },
-  ];
-  if (gallery.length > 0) {
-    base.push({
-      '@context': 'https://schema.org',
-      '@type': 'ImageGallery',
-      name: 'Inside the BOLEN Mirror Factory',
-      description:
-        'Editor-managed photo set of the Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) production facility — LED, smart, vanity, and bath mirror manufacturing.',
-      url: 'https://bolenmirror.com/#factory-showcase',
-      image: gallery.map((it) => ({
-        '@type': 'ImageObject',
-        contentUrl: it.url,
-        url: it.url,
-        description: it.alt,
-        ...(it.caption ? { caption: it.caption } : {}),
-      })),
-    });
-  }
-  if (featuredVideo) base.push(buildVideoObjectSchema(featuredVideo, lang));
-  return base;
+  return buildHomeSchema(lang, { factoryGallery: gallery, featuredVideo });
 }
 
 function catalogSchema(lang: Lang): any[] {
@@ -1409,7 +1364,7 @@ function productDetailSchema(lang: Lang, product: Product, display: Product, seo
       '@context': 'https://schema.org/',
       '@type': 'Product',
       name: seo.h1,
-      image: product.images || [],
+      image: (product.images || []).map((image) => toMediaUrl(image)),
       description: seo.description,
       sku: product.id,
       brand: {
@@ -1740,6 +1695,13 @@ async function fetchBlogPosts(): Promise<BlogPost[]> {
   return (data || []) as BlogPost[];
 }
 
+// Inline markdown images use the same-origin /media/ copies, as in Markdown.tsx.
+marked.use({
+  walkTokens(token) {
+    if (token.type === 'image') token.href = toMediaPath(token.href);
+  },
+});
+
 function renderMarkdown(md: string): string {
   if (!md) return '';
   return marked.parse(md, { async: false }) as string;
@@ -1752,7 +1714,7 @@ function blogIndexContent(lang: Lang, items: BlogListItem[]): string {
       const href = `/${lang}${insightDetailPath(p.slug)}/`;
       const cover = normalizeBlogCover(p.cover_image);
       const img = cover
-        ? `<img src="${escapeAttr(cover)}" alt="" width="600" height="400" loading="lazy" />`
+        ? `<img src="${escapeAttr(toMediaPath(cover))}" alt="" width="600" height="400" loading="lazy" />`
         : '';
       return `<li><a href="${escapeAttr(href)}">${img}<h2>${escapeHtml(p.title)}</h2></a><p>${escapeHtml(
         p.excerpt
@@ -1780,7 +1742,7 @@ function blogPostContent(
   const hc = COPY[lang];
   const cover = normalizeBlogCover(post.cover_image);
   const img = cover
-    ? `<img src="${escapeAttr(cover)}" alt="${escapeAttr(post.title)}" width="1200" height="675" />`
+    ? `<img src="${escapeAttr(toMediaPath(cover))}" alt="${escapeAttr(post.title)}" width="1200" height="675" />`
     : '';
   const relatedProductsBlock = relatedProducts.length
     ? `<section aria-label="${escapeAttr(BLOG_RELATED_HEADING[lang])}">
@@ -1791,7 +1753,7 @@ function blogPostContent(
               (r) =>
                 `<li><a href="${escapeAttr(r.href)}">${
                   r.img
-                    ? `<img src="${escapeAttr(r.img)}" alt="${escapeAttr(r.title)}" width="200" height="200" loading="lazy" />`
+                    ? `<img src="${escapeAttr(toMediaPath(r.img))}" alt="${escapeAttr(r.title)}" width="200" height="200" loading="lazy" />`
                     : ''
                 }${escapeHtml(r.title)}</a></li>`
             )
@@ -1808,7 +1770,7 @@ function blogPostContent(
               const relatedCover = normalizeBlogCover(related.img);
               return `<li><a href="${escapeAttr(related.href)}">${
                 relatedCover
-                  ? `<img src="${escapeAttr(relatedCover)}" alt="" width="300" height="200" loading="lazy" />`
+                  ? `<img src="${escapeAttr(toMediaPath(relatedCover))}" alt="" width="300" height="200" loading="lazy" />`
                   : ''
               }${escapeHtml(related.title)}</a></li>`;
             })
@@ -2003,7 +1965,7 @@ function videoIndexContent(lang: Lang, items: VideoListItem[]): string {
     .map((video, index) => {
       const href = `/${lang}/videos/${video.slug}/`;
       const img = video.thumbnail_url
-        ? `<img src="${escapeAttr(video.thumbnail_url)}" alt="${escapeAttr(video.title)}" width="640" height="360" loading="${
+        ? `<img src="${escapeAttr(toMediaPath(video.thumbnail_url))}" alt="${escapeAttr(video.title)}" width="640" height="360" loading="${
             index < 3 ? 'eager' : 'lazy'
           }" />`
         : '';
@@ -2044,7 +2006,7 @@ function videoPostContent(
   const c = VIDEO_COPY[lang];
   const hc = COPY[lang];
   const media = video.thumbnail_url
-    ? `<img src="${escapeAttr(video.thumbnail_url)}" alt="${escapeAttr(video.title)}" width="1200" height="675" />`
+    ? `<img src="${escapeAttr(toMediaPath(video.thumbnail_url))}" alt="${escapeAttr(video.title)}" width="1200" height="675" />`
     : '';
   const relatedBlock = related.length
     ? `<section aria-label="${escapeAttr(c.relatedProducts)}">
@@ -2055,7 +2017,7 @@ function videoPostContent(
               (r) =>
                 `<li><a href="${escapeAttr(r.href)}">${
                   r.img
-                    ? `<img src="${escapeAttr(r.img)}" alt="${escapeAttr(r.title)}" width="200" height="200" loading="lazy" />`
+                    ? `<img src="${escapeAttr(toMediaPath(r.img))}" alt="${escapeAttr(r.title)}" width="200" height="200" loading="lazy" />`
                     : ''
                 }${escapeHtml(r.title)}</a></li>`
             )
@@ -2072,7 +2034,7 @@ function videoPostContent(
               (item) =>
                 `<li><a href="/${lang}/videos/${escapeAttr(item.slug)}/">${
                   item.thumbnail_url
-                    ? `<img src="${escapeAttr(item.thumbnail_url)}" alt="${escapeAttr(item.title)}" width="320" height="180" loading="lazy" />`
+                    ? `<img src="${escapeAttr(toMediaPath(item.thumbnail_url))}" alt="${escapeAttr(item.title)}" width="320" height="180" loading="lazy" />`
                     : ''
                 }${escapeHtml(item.title)}</a>${videoMetaLine(item, lang)}</li>`
             )
@@ -2207,7 +2169,11 @@ async function main(): Promise<void> {
         try {
           const srcsetParts = await Promise.all(
             HERO_WIDTHS.map(async (w) => {
-              const res = await fetch(optimizeImage(url, { width: w }), { headers: { Accept: 'image/webp' } });
+              // optimizeImage returns a same-origin /media/ path; download
+              // straight from Supabase, since the Worker is not running here.
+              const res = await fetch(mediaSourceUrl(optimizeImage(url, { width: w })), {
+                headers: { Accept: 'image/webp' },
+              });
               if (!res.ok) throw new Error(`hero slide ${index + 1} ${w}w -> HTTP ${res.status}`);
               await writeFile(resolve(heroDir, `${base}-${w}.webp`), Buffer.from(await res.arrayBuffer()));
               return `/hero/${base}-${w}.webp ${w}w`;

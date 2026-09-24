@@ -4,6 +4,7 @@
 
 import { INSIGHTS_PATH, insightDetailPath } from '../data/insights';
 import { normalizeBlogCover } from './blog';
+import { toMediaUrl } from './media';
 
 const SITE_URL = 'https://bolenmirror.com';
 
@@ -11,7 +12,7 @@ const PUBLISHER = {
   '@type': 'Organization',
   name: 'Jiaxing Chengtai Mirror Co., Ltd. (BOLEN)',
   url: SITE_URL,
-  logo: 'https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/logo.png',
+  logo: toMediaUrl('https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/logo.png'),
 };
 
 export interface BlogPostingSchemaInput {
@@ -104,7 +105,7 @@ export function buildBlogPostingSchema(
     isPartOf: { '@type': 'Blog', '@id': `${SITE_URL}/${lang}${INSIGHTS_PATH}/` },
     url,
   };
-  if (cover) schema.image = [cover];
+  if (cover) schema.image = [toMediaUrl(cover)];
   if (post.category) schema.articleSection = post.category;
   if (post.tags?.length) schema.keywords = post.tags.join(', ');
   if (post.published_at) schema.datePublished = post.published_at;

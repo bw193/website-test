@@ -11,6 +11,7 @@ import './ProductDetail.css';
 import { resolveProductSeo, normalizeSpecs, type ProductSeoMetadata } from '../utils/productSeo';
 import VideoCard from '../components/VideoCard';
 import { optimizeImage } from '../utils/optimizeImage';
+import { toMediaUrl } from '../utils/media';
 import { PRODUCT_IMAGE_PLACEHOLDER, handleImageError } from '../utils/imagePlaceholder';
 import { useLocalizedPath } from '../hooks/useLocalizedPath';
 import { readInitialProduct } from '../utils/prerenderData';
@@ -352,7 +353,7 @@ export default function ProductDetail() {
       "@context": "https://schema.org/",
       "@type": "Product",
       "name": pageHeading,
-      "image": product.images,
+      "image": product.images?.map((image: string) => toMediaUrl(image)),
       "description": richDescription,
       "sku": product.id,
       "brand": {

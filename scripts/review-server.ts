@@ -1,6 +1,7 @@
 import express from 'express';
 import path from 'node:path';
 import { productRedirectLocation } from '../src/utils/productRoutes';
+import { handleMediaRequest } from '../worker/media';
 
 const app = express();
 const reviewPort = Number.parseInt(process.env.REVIEW_PORT || '4173', 10);
@@ -81,6 +82,21 @@ app.use(
     }
   },
 );
+
+// Same-origin copies of the Supabase-hosted images, answered by the same
+// handler production uses (worker/media.ts), minus the edge cache.
+app.get('/media/*', async (request, response) => {
+  const media = await handleMediaRequest(
+    new Request(new URL(request.originalUrl, productionOrigin), {
+      method: request.method,
+      headers: { Accept: request.header('Accept') || '*/*' },
+    }),
+    undefined,
+    { cache: null },
+  );
+  media.headers.forEach((value, name) => response.setHeader(name, value));
+  response.status(media.status).send(Buffer.from(await media.arrayBuffer()));
+});
 
 app.use((request, response, next) => {
   const requestUrl = new URL(request.originalUrl, productionOrigin);

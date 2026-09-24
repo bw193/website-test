@@ -22,6 +22,9 @@
     "not_found_handling": "404-page",
     "run_worker_first": [
       "/api/*",
+      // Same-origin copies of the Supabase-hosted images (worker/media.ts),
+      // served without Supabase's `X-Robots-Tag: none` so Google can index them.
+      "/media/*",
       // The employee portal is a client-only React app with dynamic routes,
       // so it has no per-route HTML; the Worker serves dist/admin/index.html
       // with 200 for every /admin path instead of the 404 page.

@@ -4,6 +4,7 @@
 // <script> tags on mount instead of replacing them.
 
 import type { LocalizedVideoPost, VideoListItem } from '../types/video';
+import { toMediaUrl } from './media';
 import { FALLBACK_VIDEO_THUMB, getVideoPlayback, toIsoDuration } from './video';
 
 const SITE_URL = 'https://bolenmirror.com';
@@ -11,7 +12,7 @@ const PUBLISHER = {
   '@type': 'Organization',
   name: 'Jiaxing Chengtai Mirror Co., Ltd. (BOLEN)',
   url: SITE_URL,
-  logo: 'https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/logo.png',
+  logo: toMediaUrl('https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/logo.png'),
 };
 
 const SCHEMA_COPY: Record<string, { home: string; videos: string; indexName: string; indexDescription: string }> = {
@@ -81,7 +82,7 @@ function videoObjectCore(video: LocalizedVideoPost | VideoListItem, lang: string
     '@type': 'VideoObject',
     name: video.title,
     description: video.excerpt || video.title,
-    thumbnailUrl: [video.thumbnail_url || FALLBACK_VIDEO_THUMB],
+    thumbnailUrl: [toMediaUrl(video.thumbnail_url || FALLBACK_VIDEO_THUMB)],
     uploadDate: video.published_at || ('updated_at' in video ? video.updated_at : undefined) || undefined,
     publisher: PUBLISHER,
     inLanguage: lang,

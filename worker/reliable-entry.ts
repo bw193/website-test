@@ -1,4 +1,5 @@
 import baseWorker, { type Env } from './index.ts';
+import { handleMediaRequest, isMediaPath, type WaitUntil } from './media.ts';
 import { parseProductDetailPath, productRedirectLocation } from '../src/utils/productRoutes';
 
 const AI_API_PATH = '/api/ai-receptionist';
@@ -186,9 +187,11 @@ function isAdminPath(pathname: string): boolean {
 const CATEGORY_INDEX_PATTERN = /^\/(en|zh|es|fr|de|it)\/products\/category\/?$/;
 
 const worker = {
-  async fetch(request: Request, env: Env): Promise<Response> {
+  async fetch(request: Request, env: Env, ctx?: WaitUntil): Promise<Response> {
     const url = new URL(request.url);
     const isRead = request.method === 'GET' || request.method === 'HEAD';
+    // Indexable copies of the Supabase-hosted images; see worker/media.ts.
+    if (isRead && isMediaPath(url.pathname)) return handleMediaRequest(request, ctx);
     if (isRead && isAdminPath(url.pathname)) {
       return env.ASSETS.fetch(
         new Request(new URL(ADMIN_SHELL_PATH, url), { method: request.method, headers: request.headers }),

@@ -18,8 +18,8 @@
     "preview:cloudflare": "npm run build && wrangler dev",
     "deploy:cloudflare": "npm run build && wrangler deploy",
     "cf:types": "wrangler types",
-    "test:worker": "tsx --test worker/index.test.ts",
-    "test:seo": "tsx --test src/utils/catalogCategory.test.ts src/utils/productSeo.test.ts src/utils/productRoutes.test.ts src/utils/productDetails.test.ts scripts/lib/product-routes.test.ts",
+    "test:worker": "tsx --test worker/index.test.ts worker/media.test.ts",
+    "test:seo": "tsx --test src/utils/catalogCategory.test.ts src/utils/productSeo.test.ts src/utils/productRoutes.test.ts src/utils/productDetails.test.ts src/utils/media.test.ts src/utils/homeSchema.test.ts scripts/lib/product-routes.test.ts",
     "verify:seo:rendered": "tsx scripts/verify-product-seo.ts",
     "clean": "rm -rf dist",
     "lint": "tsc --noEmit"

@@ -6,8 +6,8 @@ export const de = {
     // cannot drift. Previously the pages passed hardcoded English, which
     // overwrote the correctly-localized prerendered meta on 5 locales.
     seo: {
-      homeTitle: "BOLEN Mirror | LED-Spiegelhersteller & OEM-Smart-Spiegel-Fabrik",
-      homeDesc: "BOLEN Mirror ist ein führender LED-Spiegelhersteller, spezialisiert auf OEM-LED-Spiegel, Smart-Spiegel, Schminkspiegel und Badspiegel für globale Marken.",
+      homeTitle: "LED-Spiegel- und Badspiegel-Hersteller aus China | BOLEN",
+      homeDesc: "BOLEN fertigt LED-Badspiegel, beleuchtete Schminkspiegel und Spiegelschränke in Jiaxing, China – OEM/ODM, Maßanfertigung und Großhandel, 3 Jahre Garantie.",
       catalogTitle: "Katalog des LED-Spiegelherstellers | 3 Jahre Garantie",
       catalogDesc: "Entdecken Sie unser umfangreiches Sortiment an OEM-LED-Spiegeln, Smart-Spiegeln, Schminkspiegeln und Badspiegeln von einem führenden LED-Spiegelhersteller. Hochwertige Fertigung für globale Marken.",
       categoryTitle: "{{category}} | BOLEN Mirror Hersteller",
@@ -225,6 +225,7 @@ export const de = {
       heroKicker: "LED-Spiegelhersteller · OEM/ODM-Partner",
       heroTitle1: "Premium-Spiegel,",
       heroTitle2: "passgenau für Ihre Marke.",
+      heroImageAlt: "BOLEN Fabrik für LED-Badspiegel in Jiaxing, China – OEM/ODM-Spiegelhersteller mit über 20 Jahren Erfahrung",
       heroDesc: "<1>BOLEN</1> unterstützt Marken weltweit dabei, unverwechselbare Spiegelkollektionen auf den Markt zu bringen. Von Design und Individualisierung über qualitätsgesicherte Fertigung bis hin zur weltweiten Lieferung machen wir Premiumfertigung einfach, zuverlässig und skalierbar.",
       heroPrimaryCta: "Preise & MOQ anfragen",
       heroSecondaryCta: "Produkte entdecken",

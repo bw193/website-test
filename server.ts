@@ -13,6 +13,7 @@ import { INSIGHTS_PATH, insightDetailPath } from './src/data/insights';
 import { getBlogAvailableLanguages } from './src/utils/blog';
 import type { BlogPost } from './src/types/blog';
 import { productDetailPath, productAlternatePaths, productRedirectLocation } from './src/utils/productRoutes';
+import { handleMediaRequest } from './worker/media';
 
 dotenv.config();
 
@@ -192,6 +193,21 @@ ${urls.join('\n')}
       console.error('Error generating sitemap:', error);
       res.status(500).end();
     }
+  });
+
+  // Same-origin copies of the Supabase-hosted images, answered by the same
+  // handler production uses (worker/media.ts), minus the edge cache.
+  app.get('/media/*', async (req, res) => {
+    const response = await handleMediaRequest(
+      new Request(new URL(req.originalUrl, DOMAIN), {
+        method: req.method,
+        headers: { Accept: req.get('Accept') || '*/*' },
+      }),
+      undefined,
+      { cache: null },
+    );
+    response.headers.forEach((value, name) => res.setHeader(name, value));
+    res.status(response.status).send(Buffer.from(await response.arrayBuffer()));
   });
 
   const SUPPORTED_LANGUAGES = ['en', 'zh', 'es', 'fr', 'de', 'it'];

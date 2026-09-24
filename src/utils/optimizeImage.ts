@@ -1,29 +1,21 @@
 /**
- * Returns the image URL as-is for now.
+ * Resized image URLs via Supabase's image transforms (/render/image/), which
+ * return WebP to browsers that accept it.
  *
- * To enable Supabase image transforms (Pro plan required), set
- * VITE_SUPABASE_IMAGE_TRANSFORMS=true — this switches URLs from
- * /storage/v1/object/public/ to /storage/v1/render/image/public/
- * and appends width/format/quality params for WebP serving.
+ * Images in the site's own buckets are addressed through the same-origin
+ * /media/ proxy (see ./media.ts) so Google can index them; any other Supabase
+ * object keeps the direct /render/image/ URL, and non-Supabase URLs are
+ * returned unchanged.
  */
+
+import { toMediaTransformPath } from './media';
 
 const TRANSFORMS_ENABLED = true;
 
-export function optimizeImage(
-  url: string | undefined | null,
-  options: { width?: number; height?: number; quality?: number; resize?: 'cover' | 'contain' } = {}
-): string {
-  if (!url) return '';
-  if (!TRANSFORMS_ENABLED) return url;
-  if (!url.includes('supabase.co/storage/v1/object/public/')) return url;
-
+function transformParams(
+  options: { width?: number; height?: number; quality?: number; resize?: 'cover' | 'contain' }
+): URLSearchParams {
   const { width, height, quality = 80, resize = 'contain' } = options;
-
-  let transformed = url.replace(
-    '/storage/v1/object/public/',
-    '/storage/v1/render/image/public/'
-  );
-
   const params = new URLSearchParams();
   if (width) params.set('width', String(width));
   if (height) params.set('height', String(height));
@@ -31,9 +23,23 @@ export function optimizeImage(
   // Most product/blog images should preserve their source framing. Video cards
   // can opt into `cover` with a fixed width/height to get true poster crops.
   params.set('resize', resize);
+  return params;
+}
 
-  transformed += (transformed.includes('?') ? '&' : '?') + params.toString();
-  return transformed;
+export function optimizeImage(
+  url: string | undefined | null,
+  options: { width?: number; height?: number; quality?: number; resize?: 'cover' | 'contain' } = {}
+): string {
+  if (!url) return '';
+  if (!TRANSFORMS_ENABLED) return url;
+
+  const params = transformParams(options);
+  const mediaPath = toMediaTransformPath(url, params);
+  if (mediaPath) return mediaPath;
+
+  if (!url.includes('supabase.co/storage/v1/object/public/')) return url;
+  const transformed = url.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/');
+  return `${transformed}${transformed.includes('?') ? '&' : '?'}${params.toString()}`;
 }
 
 /**

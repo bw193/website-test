@@ -6,8 +6,8 @@ export const fr = {
     // cannot drift. Previously the pages passed hardcoded English, which
     // overwrote the correctly-localized prerendered meta on 5 locales.
     seo: {
-      homeTitle: "BOLEN Mirror | Fabricant de Miroirs LED et Usine OEM de Miroirs Intelligents",
-      homeDesc: "BOLEN Mirror est un fabricant leader de miroirs LED spécialisé dans les miroirs LED OEM, les miroirs intelligents, les miroirs de toilette et les miroirs de salle de bain pour les marques mondiales.",
+      homeTitle: "Fabricant de miroirs LED et de salle de bain en Chine | BOLEN",
+      homeDesc: "Fabricant de miroirs de salle de bain LED, miroirs de toilette lumineux et armoires à miroir à Jiaxing (Chine) : OEM/ODM, sur mesure et en gros, garantie 3 ans.",
       catalogTitle: "Catalogue du fabricant de miroirs LED | Garantie 3 ans",
       catalogDesc: "Explorez notre large gamme de miroirs LED OEM, miroirs intelligents, miroirs de toilette et miroirs de salle de bain d'un fabricant leader de miroirs LED. Fabrication de haute qualité pour les marques mondiales.",
       categoryTitle: "{{category}} | Fabricant BOLEN Mirror",
@@ -225,6 +225,7 @@ export const fr = {
       heroKicker: "Fabricant de miroirs LED · Partenaire OEM/ODM",
       heroTitle1: "Des miroirs haut de gamme,",
       heroTitle2: "conçus sur mesure pour votre marque.",
+      heroImageAlt: "Usine BOLEN de miroirs de salle de bain LED à Jiaxing, en Chine : fabricant de miroirs OEM/ODM depuis plus de 20 ans",
       heroDesc: "<1>BOLEN</1> accompagne des marques du monde entier dans la commercialisation de collections de miroirs distinctives. De la conception et de la personnalisation à la production soumise à un contrôle qualité rigoureux et à la livraison mondiale, nous rendons la fabrication haut de gamme simple, fiable et adaptée à tous les volumes.",
       heroPrimaryCta: "Demander prix et MOQ",
       heroSecondaryCta: "Découvrir nos produits",

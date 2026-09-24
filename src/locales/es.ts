@@ -6,8 +6,8 @@ export const es = {
     // cannot drift. Previously the pages passed hardcoded English, which
     // overwrote the correctly-localized prerendered meta on 5 locales.
     seo: {
-      homeTitle: "BOLEN Mirror | Fabricante de Espejos LED y Fábrica OEM de Espejos Inteligentes",
-      homeDesc: "BOLEN Mirror es un fabricante líder de espejos LED especializado en espejos LED OEM, espejos inteligentes, espejos de tocador y espejos de baño para marcas globales.",
+      homeTitle: "Fabricante de espejos LED y espejos de baño en China | BOLEN",
+      homeDesc: "BOLEN fabrica espejos de baño LED, espejos de tocador con luz y armarios con espejo en Jiaxing, China: OEM/ODM, a medida y al por mayor, 3 años de garantía.",
       catalogTitle: "Catálogo del fabricante de espejos LED | 3 años de garantía",
       catalogDesc: "Explore nuestra amplia gama de espejos LED OEM, espejos inteligentes, espejos de tocador y espejos de baño de un fabricante líder de espejos LED. Fabricación de alta calidad para marcas globales.",
       categoryTitle: "{{category}} | Fabricante BOLEN Mirror",
@@ -225,6 +225,7 @@ export const es = {
       heroKicker: "Fabricante de espejos LED · Socio OEM/ODM",
       heroTitle1: "Espejos de alta gama,",
       heroTitle2: "hechos a medida para su marca.",
+      heroImageAlt: "Fábrica de espejos de baño LED de BOLEN en Jiaxing, China: fabricante de espejos OEM/ODM con más de 20 años de experiencia",
       heroDesc: "<1>BOLEN</1> ayuda a marcas de todo el mundo a llevar al mercado colecciones de espejos con identidad propia. Desde el diseño y la personalización hasta la producción con rigurosos controles de calidad y la entrega en todo el mundo, hacemos que la fabricación de alta gama sea sencilla, fiable y escalable.",
       heroPrimaryCta: "Solicitar precio y MOQ",
       heroSecondaryCta: "Explore nuestros productos",

@@ -10,10 +10,11 @@ import Reveal from '../components/Reveal';
 import FeaturedVideo from '../components/FeaturedVideo';
 import FactoryShowcase from '../components/FactoryShowcase';
 import { optimizeImage } from '../utils/optimizeImage';
+import { toMediaPath } from '../utils/media';
 import { useLocalizedPath } from '../hooks/useLocalizedPath';
 import { readInitialHomeData, type FactoryGalleryItem } from '../utils/prerenderData';
 import { parseFeaturedVideoSlug, toVideoListItem, VIDEO_LIST_COLUMNS } from '../utils/video';
-import { buildVideoObjectSchema } from '../utils/videoSchema';
+import { buildHomeSchema } from '../utils/homeSchema';
 import { runWhenIdle } from '../utils/idle';
 import type { VideoListItem, VideoPost } from '../types/video';
 import { getLocalizedSeoLandingPages, getSeoSolutionsUi } from '../data/seoLandingI18n';
@@ -438,61 +439,13 @@ export default function Home() {
 
   return (
     <div className="bg-[#FAF9F6] text-stone-800 font-sans overflow-hidden">
-      <SEO title={t('seo.homeTitle')} description={t('seo.homeDesc')} schema={[
-        {
-          "@context": "https://schema.org",
-          "@type": "Organization",
-          "name": "Jiaxing Chengtai Mirror Co., Ltd. (BOLEN)",
-          "url": "https://bolenmirror.com",
-          "logo": "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/logo.png",
-          "description": "Leading LED mirror manufacturer specializing in OEM LED mirrors, smart mirrors, vanity mirrors, and bath mirrors for global brands.",
-          "contactPoint": {
-            "@type": "ContactPoint",
-            "telephone": "+86-18058603602",
-            "email": "sales@bolenmirror.com",
-            "contactType": "customer service",
-            "areaServed": "Worldwide",
-            "availableLanguage": ["en", "zh", "es", "fr", "de", "it"]
-          },
-          "address": {
-            "@type": "PostalAddress",
-            "streetAddress": "No. 1, Building 2, No. 1, Chuangye Road, Wangdian Town",
-            "addressLocality": "Jiaxing",
-            "addressRegion": "Zhejiang",
-            "addressCountry": "CN"
-          },
-          "sameAs": []
-        },
-        {
-          "@context": "https://schema.org",
-          "@type": "WebSite",
-          "name": "BOLEN Mirror",
-          "url": "https://bolenmirror.com",
-          "potentialAction": {
-            "@type": "SearchAction",
-            "target": "https://bolenmirror.com/products?q={search_term_string}",
-            "query-input": "required name=search_term_string"
-          }
-        },
-        ...(factoryGallery.length > 0 ? [{
-          "@context": "https://schema.org",
-          "@type": "ImageGallery",
-          "name": "Inside the BOLEN Mirror Factory",
-          "description": "Editor-managed photo set of the Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) production facility — LED, smart, vanity, and bath mirror manufacturing.",
-          "url": "https://bolenmirror.com/#factory-showcase",
-          "image": factoryGallery.map((it) => ({
-            "@type": "ImageObject",
-            "contentUrl": it.url,
-            "url": it.url,
-            "description": it.alt,
-            ...(it.caption ? { "caption": it.caption } : {}),
-          })),
-        }] : []),
-        // Key order must stay in lockstep with homeSchema() in
-        // scripts/prerender-static.ts so Helmet adopts the prerendered
-        // <script> tags instead of replacing them on mount.
-        ...(featuredVideo ? [buildVideoObjectSchema(featuredVideo, lang)] : [])
-      ]} />
+      {/* JSON-LD comes from the builder scripts/prerender-static.ts also uses,
+          so Helmet adopts the prerendered <script> tags instead of replacing them. */}
+      <SEO
+        title={t('seo.homeTitle')}
+        description={t('seo.homeDesc')}
+        schema={buildHomeSchema(lang, { factoryGallery, featuredVideo })}
+      />
       {/* Hero Section */}
       <div className="relative bg-stone-900 overflow-hidden group">
         {/* Image in natural flow to preserve aspect ratio */}
@@ -506,7 +459,7 @@ export default function Home() {
               sizes="100vw"
               width={heroW}
               height={heroH}
-              alt="BOLEN LED bathroom mirror manufacturing showcase"
+              alt={t('home.heroImageAlt')}
               referrerPolicy="no-referrer"
               // Only the first slide is the LCP candidate and preloaded in <head>;
               // later slides are decorative swaps and must not outrank other work.
@@ -690,16 +643,19 @@ export default function Home() {
             <div className="mt-4 grid gap-5 sm:mt-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-center lg:gap-10">
               {/* Kicker and h1 are one unit — keeping the kicker outside the grid
                   left it pinned to the top while the h1 dropped to meet the right
-                  column, opening a dead gap between them. */}
-              <div>
-                <Reveal as="p" variant="left" className="text-[10px] sm:text-xs font-semibold uppercase tracking-[0.2em] text-amber-600">
+                  column, opening a dead gap between them. The kicker is inside
+                  the <h1> so the page heading names what BOLEN is ("LED Mirror
+                  Manufacturer · OEM/ODM Partner"), not only the slogan. Both
+                  lines keep their own block styles, so nothing moves visually. */}
+              <h1>
+                <Reveal as="span" variant="left" className="block text-[10px] sm:text-xs font-semibold uppercase tracking-[0.2em] text-amber-600">
                   {t('home.heroKicker')}
-                </Reveal>
-                <Reveal as="h1" variant="left" delay={90} className="mt-2 font-serif text-3xl sm:text-4xl lg:text-4xl lg:leading-[1.12]">
-                  {t('home.heroTitle1')}
+                </Reveal>{' '}
+                <Reveal as="span" variant="left" delay={90} className="mt-2 block font-serif text-3xl sm:text-4xl lg:text-4xl lg:leading-[1.12]">
+                  {t('home.heroTitle1')}{' '}
                   <span className="block italic text-sheen">{t('home.heroTitle2')}</span>
                 </Reveal>
-              </div>
+              </h1>
               <div className="lg:border-l lg:border-stone-300/70 lg:pl-10">
                 <Reveal as="p" variant="right" delay={180} className="text-sm text-stone-600 font-light">
                   {/* heroDesc contains <1>BOLEN</1>, so it must go through Trans
@@ -999,7 +955,7 @@ export default function Home() {
               <div key={copy} className="certificate-marquee-set" aria-hidden={copy === 1 ? true : undefined}>
                 {CERTS.map((cert) => (
                   <div key={cert.url} className="certificate-marquee-item grayscale opacity-70 hover:grayscale-0 hover:opacity-100 hover:scale-105 transition-all duration-300">
-                    <img src={cert.url} alt={copy === 0 ? cert.alt : ''} className="max-w-full max-h-full object-contain" width="192" height="128" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
+                    <img src={toMediaPath(cert.url)} alt={copy === 0 ? cert.alt : ''} className="max-w-full max-h-full object-contain" width="192" height="128" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
                   </div>
                 ))}
               </div>

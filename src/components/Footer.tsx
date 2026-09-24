@@ -6,6 +6,7 @@ import { useLocalizedPath } from '../hooks/useLocalizedPath';
 import { getLocalizedSeoLandingPages, getSeoSolutionsUi } from '../data/seoLandingI18n';
 import { INSIGHTS_PATH } from '../data/insights';
 import { CATALOG_CATEGORIES, catalogCategoryPath, uniqueCategorySlugs } from '../utils/catalogCategory';
+import { toMediaPath } from '../utils/media';
 
 export default function Footer() {
   const { lp, lang } = useLocalizedPath();
@@ -22,7 +23,7 @@ export default function Footer() {
           <div>
             <div className="flex items-center gap-2 mb-4">
               <img
-                src="https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/logo.png"
+                src={toMediaPath('https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/logo.png')}
                 alt=""
                 aria-hidden="true"
                 className="h-8 w-8 object-contain"
