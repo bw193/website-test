@@ -232,7 +232,7 @@ const COPY: Record<
 > = {
   en: {
     homeIntro:
-      'Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) is an LED mirror and bathroom mirror manufacturer in Jiaxing, China. Its 46,800 m² factory and 200+ specialists make LED bathroom mirrors, LED vanity mirrors, lighted mirrors and mirror cabinets for OEM/ODM, custom and wholesale orders.',
+      'BOLEN is an LED mirror and bathroom mirror manufacturer and supplier with its own 46,800 m² factory. Since 2005 its 200+ specialists have made LED bathroom mirrors, vanity mirrors, lighted mirrors and mirror cabinets for OEM/ODM, custom and wholesale orders from brands, distributors and hotel projects.',
     catalogH1: 'Product Catalog',
     catalogIntro:
       'Browse our extensive collection of premium mirrors, featuring smart LED technology, elegant vanity designs, and customizable options.',
@@ -256,7 +256,7 @@ const COPY: Record<
   },
   zh: {
     homeIntro:
-      '嘉兴诚泰镜业有限公司（BOLEN）是位于中国嘉兴的 LED 镜与浴室镜制造商，拥有 46,800 平方米工厂和 200 多名专业人员，为 OEM/ODM、定制和批发订单生产 LED 浴室镜、LED 化妆镜、带灯镜和镜柜。',
+      'BOLEN 镜业是 LED 镜与浴室镜制造商和供应商，拥有 46,800 平方米自有工厂。自 2005 年起，200 多名专业人员为品牌、经销商和酒店项目生产 LED 浴室镜、化妆镜、带灯镜和镜柜，承接 OEM/ODM、定制和批发订单。',
     catalogH1: '产品目录',
     catalogIntro: '浏览我们丰富的优质镜面系列，包括智能 LED 技术、优雅的化妆镜设计和可定制选项。',
     productSuffix: '| BOLEN 镜业',
@@ -278,7 +278,7 @@ const COPY: Record<
   },
   es: {
     homeIntro:
-      'Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) es un fabricante de espejos LED y espejos de baño en Jiaxing, China. Su fábrica de 46.800 m² y más de 200 especialistas producen espejos de baño LED, espejos de tocador LED, espejos con luz y armarios con espejo para pedidos OEM/ODM, a medida y al por mayor.',
+      'BOLEN es un fabricante y proveedor de espejos LED y espejos de baño con fábrica propia de 46.800 m². Desde 2005, sus más de 200 especialistas producen espejos de baño LED, espejos de tocador, espejos con luz y armarios con espejo para pedidos OEM/ODM, a medida y al por mayor de marcas, distribuidores y proyectos hoteleros.',
     catalogH1: 'Catálogo de Productos',
     catalogIntro:
       'Explore nuestra extensa colección de espejos premium, con tecnología LED inteligente, elegantes diseños de tocador y opciones personalizables.',
@@ -302,7 +302,7 @@ const COPY: Record<
   },
   fr: {
     homeIntro:
-      "Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) est un fabricant de miroirs LED et de miroirs de salle de bain à Jiaxing, en Chine. Son usine de 46 800 m² et ses plus de 200 spécialistes produisent des miroirs de salle de bain LED, des miroirs de toilette LED, des miroirs lumineux et des armoires à miroir pour des commandes OEM/ODM, sur mesure et en gros.",
+      "BOLEN est un fabricant et fournisseur de miroirs LED et de miroirs de salle de bain, avec sa propre usine de 46 800 m². Depuis 2005, ses plus de 200 spécialistes produisent des miroirs de salle de bain LED, des miroirs de toilette, des miroirs lumineux et des armoires à miroir pour les commandes OEM/ODM, sur mesure et en gros de marques, de distributeurs et de projets hôteliers.",
     catalogH1: 'Catalogue de Produits',
     catalogIntro:
       "Parcourez notre vaste collection de miroirs haut de gamme, dotés d'une technologie LED intelligente, de designs élégants et d'options personnalisables.",
@@ -326,7 +326,7 @@ const COPY: Record<
   },
   de: {
     homeIntro:
-      'Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) ist ein Hersteller von LED-Spiegeln und Badspiegeln in Jiaxing, China. Das 46.800 m² große Werk mit mehr als 200 Fachkräften fertigt LED-Badspiegel, LED-Schminkspiegel, beleuchtete Spiegel und Spiegelschränke für OEM/ODM-, Sonder- und Großhandelsaufträge.',
+      'BOLEN ist Hersteller und Lieferant von LED-Spiegeln und Badspiegeln mit eigener, 46.800 m² großer Fabrik. Seit 2005 fertigen mehr als 200 Fachkräfte LED-Badspiegel, Schminkspiegel, beleuchtete Spiegel und Spiegelschränke für OEM/ODM-, Sonder- und Großhandelsaufträge von Marken, Händlern und Hotelprojekten.',
     catalogH1: 'Produktkatalog',
     catalogIntro:
       'Durchsuchen Sie unsere umfangreiche Kollektion hochwertiger Spiegel mit intelligenter LED-Technologie, eleganten Schminkdesigns und anpassbaren Optionen.',
@@ -350,7 +350,7 @@ const COPY: Record<
   },
   it: {
     homeIntro:
-      "Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) è un produttore di specchi LED e specchi da bagno a Jiaxing, in Cina. Lo stabilimento di 46.800 m² con oltre 200 specialisti realizza specchi da bagno LED, specchi da toeletta LED, specchi illuminati e armadietti con specchio per ordini OEM/ODM, su misura e all'ingrosso.",
+      "BOLEN è un produttore e fornitore di specchi LED e specchi da bagno con una propria fabbrica di 46.800 m². Dal 2005 i suoi oltre 200 specialisti realizzano specchi da bagno LED, specchi da toeletta, specchi illuminati e armadietti con specchio per ordini OEM/ODM, su misura e all'ingrosso di marchi, distributori e progetti alberghieri.",
     catalogH1: 'Catalogo Prodotti',
     catalogIntro:
       'Sfoglia la nostra vasta collezione di specchi premium, con tecnologia LED intelligente, eleganti design da toeletta e opzioni personalizzabili.',
@@ -700,27 +700,27 @@ interface FactoryGalleryItem {
 const FACTORY_COPY: Record<Lang, { heading: string; intro: string }> = {
   en: {
     heading: 'Inside Our Factory',
-    intro: 'A look inside our 46,800 m² Jiaxing facility — LED, smart, vanity, bath, and decorative mirror production from material preparation to packed shipment.',
+    intro: 'A look inside our 46,800 m² facility — LED, smart, vanity, bath, and decorative mirror production from material preparation to packed shipment.',
   },
   zh: {
     heading: '走进我们的工厂',
-    intro: '走进我们位于嘉兴的 46,800 平方米生产基地——从材料准备到打包出货，制造 LED 镜、智能镜、化妆镜、浴室镜及装饰镜。',
+    intro: '走进我们 46,800 平方米的生产基地——从材料准备到打包出货，制造 LED 镜、智能镜、化妆镜、浴室镜及装饰镜。',
   },
   es: {
     heading: 'Dentro de Nuestra Fábrica',
-    intro: 'Un recorrido por nuestra planta de 46.800 m² en Jiaxing: producción de espejos LED, inteligentes, de tocador, de baño y decorativos, desde la preparación de materiales hasta el envío embalado.',
+    intro: 'Un recorrido por nuestra planta de 46.800 m²: producción de espejos LED, inteligentes, de tocador, de baño y decorativos, desde la preparación de materiales hasta el envío embalado.',
   },
   fr: {
     heading: 'À l\'Intérieur de Notre Usine',
-    intro: 'Visite de notre site de 46 800 m² à Jiaxing — production de miroirs LED, intelligents, de toilette, de salle de bain et décoratifs, de la préparation des matériaux à l\'expédition emballée.',
+    intro: 'Visite de notre site de 46 800 m² — production de miroirs LED, intelligents, de toilette, de salle de bain et décoratifs, de la préparation des matériaux à l\'expédition emballée.',
   },
   de: {
     heading: 'Einblick in unsere Fabrik',
-    intro: 'Ein Blick in unsere 46.800 m² große Produktionsstätte in Jiaxing — Fertigung von LED-, Smart-, Schmink-, Bad- und Dekorationsspiegeln, von der Materialvorbereitung bis zum verpackten Versand.',
+    intro: 'Ein Blick in unsere 46.800 m² große Produktionsstätte — Fertigung von LED-, Smart-, Schmink-, Bad- und Dekorationsspiegeln, von der Materialvorbereitung bis zum verpackten Versand.',
   },
   it: {
     heading: 'Dentro la Nostra Fabbrica',
-    intro: 'Uno sguardo dentro il nostro stabilimento di 46.800 m² a Jiaxing — produzione di specchi LED, smart, da toeletta, da bagno e decorativi, dalla preparazione dei materiali alla spedizione imballata.',
+    intro: 'Uno sguardo dentro il nostro stabilimento di 46.800 m² — produzione di specchi LED, smart, da toeletta, da bagno e decorativi, dalla preparazione dei materiali alla spedizione imballata.',
   },
 };
 

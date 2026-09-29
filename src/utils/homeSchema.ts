@@ -39,17 +39,24 @@ export function buildHomeSchema(
       url: `${SITE_ORIGIN}/`,
       logo: { '@type': 'ImageObject', url: toMediaUrl(LOGO_URL), width: 320, height: 320 },
       description:
-        'LED mirror and bathroom mirror manufacturer in Jiaxing, China, supplying OEM/ODM, custom and wholesale LED bathroom mirrors, LED vanity mirrors, lighted mirrors and mirror cabinets to brands, distributors and hotel projects since 2005.',
+        'LED mirror and bathroom mirror manufacturer and supplier with its own 46,800 m² factory. Since 2005 BOLEN has made OEM/ODM, custom and wholesale LED bathroom mirrors, vanity mirrors, lighted mirrors and mirror cabinets for brands, distributors, hotels and commercial projects.',
       foundingDate: '2005',
       numberOfEmployees: { '@type': 'QuantitativeValue', minValue: 200 },
+      // One entry per product / buyer cluster the site targets.
       knowsAbout: [
         'LED mirrors',
         'LED bathroom mirrors',
+        'Bathroom mirrors',
+        'Vanity mirrors',
         'LED vanity mirrors',
         'Lighted and illuminated mirrors',
-        'Bathroom mirrors',
         'Mirror cabinets',
+        'LED mirror cabinets',
+        'Hotel bathroom mirrors',
+        'Commercial bathroom mirrors',
+        'Custom mirrors',
         'OEM/ODM mirror manufacturing',
+        'Wholesale mirror supply',
       ],
       areaServed: 'Worldwide',
       contactPoint: {
@@ -86,7 +93,7 @@ export function buildHomeSchema(
       '@type': 'ImageGallery',
       name: 'Inside the BOLEN Mirror Factory',
       description:
-        'Photos of the BOLEN (Jiaxing Chengtai Mirror Co., Ltd.) LED mirror factory in Jiaxing, China: production lines, sample room and offices.',
+        'Photos of the BOLEN LED mirror and bathroom mirror factory: production lines, sample room and offices.',
       url: `${SITE_ORIGIN}/${lang}/#factory-showcase`,
       // creator / creditText / copyrightNotice make the photos eligible for
       // image-credit details in Google Images.

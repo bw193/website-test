@@ -6,11 +6,16 @@ export const en = {
     // cannot drift. Previously the pages passed hardcoded English, which
     // overwrote the correctly-localized prerendered meta on 5 locales.
     seo: {
-      // Home targets the broad head terms (LED mirror / bathroom mirror
-      // manufacturer, China, OEM/ODM, wholesale); the /solutions/ pages own
-      // the narrower "LED bathroom mirror manufacturer".
-      homeTitle: "LED Mirror & Bathroom Mirror Manufacturer in China | BOLEN",
-      homeDesc: "BOLEN makes LED bathroom mirrors, lighted vanity mirrors and mirror cabinets in Jiaxing, China: OEM/ODM, custom and wholesale supply with a 3-year warranty.",
+      // Home targets the head terms of the keyword brief: LED / bathroom
+      // mirror + manufacturer and supplier in the title (wording set by the
+      // owner); factory, OEM/ODM, custom, wholesale, vanity, lighted and
+      // mirror cabinets in the description. Narrower clusters (LED bathroom
+      // mirror, wholesale, custom, OEM/ODM, cabinets, hotel, commercial)
+      // belong to the /solutions/ pages. At the owner's request, the home SEO
+      // copy (titles, descriptions, alt text, JSON-LD, crawler fallback) never
+      // names China or Jiaxing, in any language.
+      homeTitle: "LED & Bathroom Mirror Manufacturer, Supplier | Bolen",
+      homeDesc: "BOLEN is an LED mirror factory supplying OEM/ODM, custom and wholesale LED bathroom mirrors, lighted vanity mirrors and mirror cabinets. 3-year warranty.",
       catalogTitle: "LED Mirror Manufacturer Catalog | 3-Year Warranty",
       catalogDesc: "Explore our wide range of OEM LED mirrors, smart mirrors, vanity mirrors, and bath mirrors from a leading LED mirror manufacturer. High-quality manufacturing for global brands.",
       categoryTitle: "{{category}} | BOLEN Mirror Manufacturer",
@@ -232,7 +237,7 @@ export const en = {
       heroTitle2: "Built Around Your Brand.",
       // One alt for every hero slide: editors change the banners without
       // per-image alt text, so it describes what they all show.
-      heroImageAlt: "BOLEN LED bathroom mirror factory in Jiaxing, China – OEM/ODM mirror manufacturer with 20+ years of experience",
+      heroImageAlt: "BOLEN mirror factory – LED mirror and bathroom mirror manufacturer and OEM/ODM supplier with 20+ years of experience",
       heroDesc: "<1>BOLEN</1> helps global brands bring distinctive mirror collections to market. From design and customization to quality-controlled production and worldwide delivery, we make premium manufacturing simple, reliable, and scalable.",
       heroPrimaryCta: "Get Pricing & MOQ",
       heroSecondaryCta: "Explore Products",
