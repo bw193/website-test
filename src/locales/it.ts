@@ -319,12 +319,12 @@ export const it = {
         title: "Processo Produttivo",
         desc: "Sei fasi rigorosamente controllate portano ogni ordine dalla specifica alla spedizione.",
         steps: {
-          s1: { title: "Analisi dei Requisiti", desc: "Soluzioni su misura basate sulla tua visione specifica e sulle esigenze del mercato." },
-          s2: { title: "Design Personalizzato", desc: "Conferma di ogni dettaglio prima della produzione, garantendo che il prodotto finale soddisfi le tue aspettative." },
-          s3: { title: "Produzione di Precisione", desc: "Integrazione di linee automatizzate con precisione manuale per qualità ed efficienza ottimali." },
-          s4: { title: "Ispezione Qualità al 100%", desc: "Controlli di qualità rigorosi su aspetto, funzione e artigianalità dello specchio." },
-          s5: { title: "Imballaggio Personalizzato", desc: "Branding completamente personalizzabile per aumentare la tua competitività sul mercato." },
-          s6: { title: "Tempi di Consegna Stabili", desc: "Pianificazione affidabile e logistica efficiente per garantire la consegna puntuale." }
+          s1: { timing: "1–3 giorni", title: "Preventivo e Specifiche", desc: "Inviaci il modello di specchio, il disegno, la quantità prevista e ogni esigenza di personalizzazione. Rispondiamo entro 24 ore con preventivo dettagliato, specifiche e tempi di consegna." },
+          s2: { timing: "7–15 giorni", title: "Conferma e Campione", desc: "Aggiorniamo il disegno in base al tuo feedback, poi realizziamo un campione fisico — funzione LED, dimensioni e imballaggio — o un campione di preserie per l'approvazione finale." },
+          s3: { timing: "15–25 giorni", title: "Produzione in Serie", desc: "Sei linee interne coprono l'intero ciclo: taglio e molatura del vetro → pulizia e satinatura → assemblaggio accessori → controllo qualità in linea → confezionamento in serie → imballaggio per l'export. Produzione interamente verticalizzata." },
+          s4: { timing: "Durante il processo", title: "Controllo Qualità Multifase", desc: "Materie prime, accessori elettronici, prodotto finito e imballaggio — ispezionati in ogni fase. Le unità difettose vengono rilavorate subito e non arrivano mai alla spedizione." },
+          s5: { timing: "In parallelo", title: "Personalizzazione", desc: "Interamente su misura per il tuo marchio: modello di specchio, dimensioni, funzione LED, logo private label, manuale d'uso stampato e cartoni personalizzati con il tuo brand." },
+          s6: { timing: "7–15 giorni", title: "Imballaggio e Spedizione", desc: "Schiuma multistrato con casse in legno rinforzate o imballaggio su pallet — carico più rapido, costi di movimentazione ridotti. Carico sicuro dei container, sdoganamento e trasporto marittimo fino al tuo porto." }
         }
       },
       whyUs: {

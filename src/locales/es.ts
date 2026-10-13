@@ -319,12 +319,12 @@ export const es = {
         title: "Proceso de Fabricación",
         desc: "Seis fases estrechamente controladas llevan cada pedido de la especificación al envío.",
         steps: {
-          s1: { title: "Análisis de Requisitos", desc: "Soluciones a medida según su visión específica y las necesidades del mercado." },
-          s2: { title: "Diseño Personalizado", desc: "Confirmamos cada detalle antes de la producción, asegurando que el producto final cumpla sus expectativas." },
-          s3: { title: "Fabricación de Precisión", desc: "Integramos líneas automatizadas con precisión manual para una calidad y eficiencia óptimas." },
-          s4: { title: "Inspección de Calidad al 100%", desc: "Controles de calidad estrictos sobre la apariencia, función y artesanía del espejo." },
-          s5: { title: "Embalaje Personalizado", desc: "Marca totalmente personalizable para impulsar su competitividad en el mercado." },
-          s6: { title: "Plazo Estable", desc: "Planificación fiable y logística eficiente para garantizar la entrega a tiempo." }
+          s1: { timing: "1–3 días", title: "Presupuesto y Especificaciones", desc: "Envíenos el estilo de espejo, el plano, la cantidad objetivo y cualquier necesidad de personalización. Respondemos en 24 horas con un presupuesto detallado, especificaciones y plazo de entrega." },
+          s2: { timing: "7–15 días", title: "Confirmación y Muestra", desc: "Actualizamos el plano según sus comentarios y fabricamos una muestra física (función LED, tamaño y embalaje) o una muestra de preproducción para la aprobación final." },
+          s3: { timing: "15–25 días", title: "Producción en Serie", desc: "Seis líneas propias cubren todo el proceso: corte y canteado del vidrio → limpieza y esmerilado → montaje de accesorios → control de calidad en línea → embalaje en serie → embalaje de exportación. Integración vertical completa." },
+          s4: { timing: "Durante el proceso", title: "Control de Calidad por Etapas", desc: "Materia prima, accesorios electrónicos, producto terminado y embalaje: todo se inspecciona en cada etapa. Las unidades defectuosas se reprocesan de inmediato y nunca llegan al envío." },
+          s5: { timing: "En paralelo", title: "Personalización", desc: "Totalmente adaptado a su marca: estilo de espejo, tamaño, función LED, logotipo de marca propia, manual de usuario impreso y cajas de cartón con su marca." },
+          s6: { timing: "7–15 días", title: "Embalaje y Envío", desc: "Espuma multicapa con cajas de madera reforzadas o embalaje en palé: carga más rápida y menor coste de manipulación. Carga segura en contenedor, despacho de aduanas y flete marítimo hasta su puerto." }
         }
       },
       whyUs: {

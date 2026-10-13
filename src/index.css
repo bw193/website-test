@@ -287,12 +287,76 @@
 .factory-thumb:active { transform: scale(0.96); }
 .factory-nav:active { transform: scale(0.94); }
 
+/* Manufacturing Process timeline (Home). When the track scrolls in, its lines
+   draw from 01 toward 04 and each marker and its copy arrive as the line
+   reaches them (--process-delay per element, set from PROCESS_STEPS). Then a
+   soft ping leaves each marker in the same order, with a glint running along
+   the line between them, so the process reads as flowing. */
+.process-track.reveal-in { animation: none; }
+.process-track.reveal-in .process-line { animation: processDrawX 400ms cubic-bezier(0.65, 0, 0.35, 1) var(--process-delay, 0ms) backwards; }
+.process-track.reveal-in .process-line-y { animation: processDrawY 400ms cubic-bezier(0.65, 0, 0.35, 1) var(--process-delay, 0ms) backwards; }
+.process-track.reveal-in .process-rise { animation: processRise 400ms cubic-bezier(0.65, 0, 0.35, 1) var(--process-delay, 0ms) backwards; }
+.process-track.reveal-in .process-fall { animation: processFall 400ms cubic-bezier(0.65, 0, 0.35, 1) var(--process-delay, 0ms) backwards; }
+.process-track.reveal-in .process-marker { animation: processPop 520ms cubic-bezier(0.34, 1.56, 0.64, 1) var(--process-delay, 0ms) backwards; }
+.process-track.reveal-in .process-copy { animation: processCopyIn 650ms cubic-bezier(0.22, 1, 0.36, 1) calc(var(--process-delay, 0ms) + 150ms) backwards; }
+.process-marker::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border: 1.5px solid rgb(245 158 11 / 0.7);
+  border-radius: 9999px;
+  opacity: 0;
+  pointer-events: none;
+}
+.process-track.reveal-in .process-marker::after { animation: processPing 4.8s cubic-bezier(0, 0, 0.2, 1) calc(var(--process-delay, 0ms) + 1800ms) infinite; }
+.process-line::after,
+.process-line-y::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+.process-line::after {
+  inset: 0 auto 0 0;
+  width: 40%;
+  background: linear-gradient(90deg, transparent, rgb(245 158 11), transparent);
+  transform: translateX(-100%);
+}
+.process-line-y::after {
+  inset: 0 0 auto 0;
+  height: 40%;
+  background: linear-gradient(180deg, transparent, rgb(245 158 11), transparent);
+  transform: translateY(-100%);
+}
+.process-track.reveal-in .process-line::after { animation: processFlowX 4.8s linear calc(var(--process-delay, 0ms) + 1800ms) infinite; }
+.process-track.reveal-in .process-line-y::after { animation: processFlowY 4.8s linear calc(var(--process-delay, 0ms) + 1800ms) infinite; }
+@keyframes processDrawX { from { transform: scaleX(0); } }
+@keyframes processDrawY { from { transform: scaleY(0); } }
+@keyframes processRise { from { clip-path: inset(100% 0 0 0); } }
+@keyframes processFall { from { clip-path: inset(0 0 100% 0); } }
+@keyframes processPop { from { opacity: 0; transform: scale(0.4); } }
+@keyframes processCopyIn { from { opacity: 0; transform: translateY(12px); } }
+@keyframes processPing {
+  0% { opacity: 0.8; transform: scale(1); }
+  25%, 100% { opacity: 0; transform: scale(1.7); }
+}
+/* The glint crosses a segment in ~0.4s, landing as the next marker pings. */
+@keyframes processFlowX {
+  0% { transform: translateX(-100%); }
+  8%, 100% { transform: translateX(250%); }
+}
+@keyframes processFlowY {
+  0% { transform: translateY(-100%); }
+  8%, 100% { transform: translateY(250%); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   #factory-showcase *,
   #factory-showcase *::after {
     animation: none !important;
     transition: none !important;
   }
+  .process-track *,
+  .process-track *::after { animation: none !important; }
   #factory-showcase .factory-photo-surface,
   #factory-showcase .factory-thumb,
   #factory-showcase .factory-thumb img,

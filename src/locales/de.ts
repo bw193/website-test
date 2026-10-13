@@ -319,12 +319,12 @@ export const de = {
         title: "Fertigungsprozess",
         desc: "Sechs streng kontrollierte Stufen bringen jeden Auftrag von der Spezifikation bis zum Versand.",
         steps: {
-          s1: { title: "Anforderungsanalyse", desc: "Maßgeschneiderte Lösungen, basierend auf Ihrer spezifischen Vision und den Marktanforderungen." },
-          s2: { title: "Individuelles Design", desc: "Bestätigung jedes Details vor der Produktion, damit das Endprodukt Ihren Erwartungen entspricht." },
-          s3: { title: "Präzisionsfertigung", desc: "Integration automatisierter Linien mit manueller Präzision für optimale Qualität und Effizienz." },
-          s4: { title: "100% Qualitätsprüfung", desc: "Strenge Qualitätskontrollen zu Aussehen, Funktion und Verarbeitung des Spiegels." },
-          s5: { title: "Individuelle Verpackung", desc: "Vollständig anpassbares Branding zur Steigerung Ihrer Wettbewerbsfähigkeit am Markt." },
-          s6: { title: "Stabile Lieferzeiten", desc: "Zuverlässige Planung und effiziente Logistik garantieren die pünktliche Lieferung." }
+          s1: { timing: "1–3 Tage", title: "Angebot & Spezifikation", desc: "Senden Sie uns das gewünschte Spiegelmodell, Ihre Zeichnung, die Zielmenge und alle Anpassungswünsche. Innerhalb von 24 Stunden erhalten Sie ein detailliertes Angebot mit Spezifikationen und Lieferzeit." },
+          s2: { timing: "7–15 Tage", title: "Freigabe & Muster", desc: "Wir passen die Zeichnung an Ihr Feedback an und fertigen dann ein physisches Muster – LED-Funktion, Größe und Verpackung – oder ein Vorserienmuster zur finalen Freigabe." },
+          s3: { timing: "15–25 Tage", title: "Serienfertigung", desc: "Sechs eigene Fertigungslinien decken den gesamten Ablauf ab: Glaszuschnitt & Kantenschliff → Reinigung & Mattierung → Zubehörmontage → Inline-Qualitätskontrolle → Massenverpackung → Exportverpackung. Vollständig vertikal integriert." },
+          s4: { timing: "Durchgehend", title: "Mehrstufige Qualitätskontrolle", desc: "Rohmaterial, elektronisches Zubehör, Fertigprodukt und Verpackung – in jeder Phase geprüft. Fehlerhafte Einheiten werden sofort nachgearbeitet und gelangen nie in den Versand." },
+          s5: { timing: "Parallel", title: "Individualisierung", desc: "Vollständig auf Ihre Marke zugeschnitten: Spiegelmodell, Größe, LED-Funktion, Private-Label-Logo, gedruckte Bedienungsanleitung und Kartons in Ihrem Markendesign." },
+          s6: { timing: "7–15 Tage", title: "Verpackung & Versand", desc: "Mehrlagiger Schaumstoff mit verstärkten Holzkisten oder Palettenverpackung – schnellere Verladung, geringere Handlingkosten. Sichere Containerbeladung, Zollabfertigung und Seefracht bis zu Ihrem Zielhafen." }
         }
       },
       whyUs: {

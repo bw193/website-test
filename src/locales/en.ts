@@ -331,12 +331,12 @@ export const en = {
         title: "Manufacturing Process",
         desc: "Six tightly controlled stages take every order from spec to shipment.",
         steps: {
-          s1: { title: "Requirement Analysis", desc: "Tailored solutions based on your specific vision and market needs." },
-          s2: { title: "Custom Design", desc: "Confirm every detail before production, ensuring the final product meets your expectations." },
-          s3: { title: "Precision Manufacturing", desc: "Integrating automated lines with manual precision for optimal quality and efficiency." },
-          s4: { title: "100% Quality Inspection", desc: "Strict quality checks on the mirror's appearance, function, and craftsmanship." },
-          s5: { title: "Custom Packaging", desc: "Fully customizable branding to boost your market competitiveness." },
-          s6: { title: "Stable Lead Time", desc: "Reliable scheduling and efficient logistics to guarantee on-time delivery." }
+          s1: { timing: "1–3 days", title: "Quote & Spec", desc: "Send us your mirror style, drawing, target quantity, and any customization needs. We reply within 24 hours with a detailed quote, specs, and lead time." },
+          s2: { timing: "7–15 days", title: "Confirm & Sample", desc: "We update the drawing to match your feedback, then produce a physical sample — LED function, size, and packaging — or a pre-production sample for final sign-off." },
+          s3: { timing: "15–25 days", title: "Mass Production", desc: "Six in-house lines run end-to-end: glass cutting & edging → cleaning & frosting → accessory assembly → in-line QC → bulk packing → export packing. Fully vertical." },
+          s4: { timing: "Along the way", title: "Multi-stage QC", desc: "Raw material, electronic accessories, finished product, and packaging — inspected at every stage. Defective units are reworked immediately; they never reach shipping." },
+          s5: { timing: "In parallel", title: "Customization", desc: "Fully tailored to your brand: mirror style, size, LED function, private-label logo, printed user manual, and custom branded cartons." },
+          s6: { timing: "7–15 days", title: "Pack & Ship", desc: "Multi-layer foam with reinforced wooden crates or pallet packaging — faster loading, lower handling cost. Safe container loading, customs clearance, and ocean freight to your port." }
         }
       },
       whyUs: {

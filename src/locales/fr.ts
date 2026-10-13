@@ -319,12 +319,12 @@ export const fr = {
         title: "Processus de Fabrication",
         desc: "Six étapes rigoureusement contrôlées mènent chaque commande de la spécification à l'expédition.",
         steps: {
-          s1: { title: "Analyse des Besoins", desc: "Solutions sur mesure basées sur votre vision spécifique et les besoins du marché." },
-          s2: { title: "Conception Personnalisée", desc: "Confirmation de chaque détail avant la production pour garantir que le produit final répond à vos attentes." },
-          s3: { title: "Fabrication de Précision", desc: "Intégration des lignes automatisées et de la précision manuelle pour une qualité et une efficacité optimales." },
-          s4: { title: "Inspection Qualité 100%", desc: "Contrôles qualité stricts sur l'apparence, la fonction et la fabrication du miroir." },
-          s5: { title: "Emballage Personnalisé", desc: "Image de marque entièrement personnalisable pour renforcer votre compétitivité sur le marché." },
-          s6: { title: "Délai Stable", desc: "Planification fiable et logistique efficace pour garantir une livraison à temps." }
+          s1: { timing: "1–3 jours", title: "Devis et Spécifications", desc: "Envoyez-nous le modèle de miroir souhaité, votre plan, la quantité visée et vos besoins de personnalisation. Nous répondons sous 24 heures avec un devis détaillé, les spécifications et le délai de livraison." },
+          s2: { timing: "7–15 jours", title: "Validation et Échantillon", desc: "Nous mettons à jour le plan selon vos retours, puis réalisons un échantillon physique — fonction LED, dimensions et emballage — ou un échantillon de présérie pour la validation finale." },
+          s3: { timing: "15–25 jours", title: "Production en Série", desc: "Six lignes internes couvrent toute la chaîne : découpe et façonnage du verre → nettoyage et dépolissage → assemblage des accessoires → contrôle qualité en ligne → conditionnement en série → emballage export. Intégration verticale totale." },
+          s4: { timing: "En continu", title: "Contrôle Qualité Multi-étapes", desc: "Matières premières, accessoires électroniques, produit fini et emballage — inspectés à chaque étape. Les unités défectueuses sont immédiatement retravaillées et ne sont jamais expédiées." },
+          s5: { timing: "En parallèle", title: "Personnalisation", desc: "Entièrement adapté à votre marque : modèle de miroir, dimensions, fonction LED, logo en marque blanche, notice d'utilisation imprimée et cartons aux couleurs de votre marque." },
+          s6: { timing: "7–15 jours", title: "Emballage et Expédition", desc: "Mousse multicouche avec caisses en bois renforcées ou emballage sur palette — chargement plus rapide, coûts de manutention réduits. Chargement sécurisé des conteneurs, dédouanement et fret maritime jusqu'à votre port." }
         }
       },
       whyUs: {
