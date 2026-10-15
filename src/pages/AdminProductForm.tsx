@@ -1,15 +1,14 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useMemo, useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { supabase, hasSupabaseConfig } from '../supabase';
 import { useForm, useFieldArray, Controller, useWatch } from 'react-hook-form';
 import { Loader2, ArrowLeft, Plus, Trash2, Upload, Image as ImageIcon, Tag, DollarSign, FileText, GripVertical, Settings, Eye, EyeOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import MDEditor from '@uiw/react-md-editor';
-import '@uiw/react-md-editor/markdown-editor.css';
-import '@uiw/react-markdown-preview/markdown.css';
 import SEO from '../components/SEO';
 import { ProductSimilarityHints } from '../components/admin/ProductSimilarityPanel';
 import ProductSeoEditor from '../components/admin/ProductSeoEditor';
+import ProductDetailsEditor from '../components/admin/ProductDetailsEditor';
+import { collectUsedDescriptions, findDescriptionImageProblems } from '../utils/descriptionImages';
 import { normalizeProductSeo, type ProductSeoMetadata } from '../utils/productSeo';
 import {
   findSimilarTo,
@@ -17,6 +16,15 @@ import {
   similarityPercent,
   type SimilarityProduct,
 } from '../utils/productSimilarity';
+
+type ProductWithPhotos = { id: string; title: string; details: string };
+
+/** Products with photos in their details, whose descriptions no other product may reuse. */
+async function fetchProductsWithPhotos(): Promise<ProductWithPhotos[]> {
+  const { data, error } = await supabase.from('products').select('id, title, details').like('details', '%![%');
+  if (error) throw error;
+  return data || [];
+}
 
 interface ProductForm {
   title: string;
@@ -48,6 +56,10 @@ export default function AdminProductForm() {
   ]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [catalog, setCatalog] = useState<SimilarityProduct[]>([]);
+  // A photo's description may not be reused on this product (src/utils/descriptionImages.ts).
+  const [productsWithPhotos, setProductsWithPhotos] = useState<ProductWithPhotos[]>([]);
+  const usedDescriptions = useMemo(() => collectUsedDescriptions(productsWithPhotos, id), [productsWithPhotos, id]);
+  const [photoSaveBlocked, setPhotoSaveBlocked] = useState(0);
 
   const { register, control, handleSubmit, reset, getValues, setValue, formState: { errors } } = useForm<ProductForm>({
     defaultValues: {
@@ -177,6 +189,18 @@ export default function AdminProductForm() {
   }, []);
 
   useEffect(() => {
+    let cancelled = false;
+    fetchProductsWithPhotos()
+      .then((products) => {
+        if (!cancelled) setProductsWithPhotos(products);
+      })
+      .catch((error) => console.error('Error fetching photo descriptions', error));
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
     const handle = window.setTimeout(() => {
       setSimilarMatches(
         findSimilarTo(
@@ -258,6 +282,18 @@ export default function AdminProductForm() {
   const onSubmit = async (data: ProductForm) => {
     setSaving(true);
     try {
+      // Every photo in the details needs a description of its own. The other
+      // products are read again, so a description saved since this page opened counts.
+      if (data.details?.includes('![')) {
+        const latest = await fetchProductsWithPhotos().catch(() => null);
+        if (latest) setProductsWithPhotos(latest);
+        const used = latest ? collectUsedDescriptions(latest, id) : usedDescriptions;
+        if (findDescriptionImageProblems(data.details, used).length > 0) {
+          setPhotoSaveBlocked((count) => count + 1);
+          return;
+        }
+      }
+
       const currentMatches = findSimilarTo(
         {
           id: id || '',
@@ -447,26 +483,19 @@ export default function AdminProductForm() {
 
                 <div>
                   <label className="block text-sm font-medium text-stone-700 mb-1.5">{t('admin.productForm.longDetails')}</label>
-                  <div className="border border-stone-200 rounded-xl overflow-hidden">
-                    <Controller
-                      name="details"
-                      control={control}
-                      render={({ field }) => (
-                        <div data-color-mode="light">
-                          <MDEditor
-                            value={field.value || ''}
-                            onChange={field.onChange}
-                            preview="edit"
-                            height={400}
-                            className="w-full !border-0"
-                            textareaProps={{
-                              placeholder: t('admin.productForm.detailsPlaceholder', 'Detailed product description, features, and installation guide...')
-                            }}
-                          />
-                        </div>
-                      )}
-                    />
-                  </div>
+                  <Controller
+                    name="details"
+                    control={control}
+                    render={({ field }) => (
+                      <ProductDetailsEditor
+                        value={field.value || ''}
+                        onChange={field.onChange}
+                        placeholder={t('admin.productForm.detailsPlaceholder', 'Detailed product description, features, and installation guide...')}
+                        usedElsewhere={usedDescriptions}
+                        saveBlocked={photoSaveBlocked}
+                      />
+                    )}
+                  />
                 </div>
               </div>
             </div>

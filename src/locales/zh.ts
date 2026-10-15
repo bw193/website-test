@@ -1093,6 +1093,37 @@ export const zh = {
           match: "相似度 {{score}}%",
           likelyDuplicate: "可能重复",
           saveConfirm: "该产品与「{{title}}」很相似（匹配度 {{score}}%）。仍要保存吗？"
+        },
+        photos: {
+          insertImage: "插入图片",
+          hint: "“插入图片”会把图片放在光标所在位置。每张图片都需要单独的描述，描述会作为说明文字显示在图片下方。",
+          titleInsert: "插入图片",
+          titleEdit: "编辑图片描述",
+          choose: "选择图片",
+          chooseHint: "JPG、PNG 或 WebP",
+          replace: "换一张图片",
+          uploadFailed: "上传失败，请重试。",
+          unsupported: "无法使用此文件，请选择 JPG、PNG 或 WebP 图片。",
+          descLabel: "图片描述",
+          descHint: "用英文写清这张图片展示了本产品的什么，至少 {{min}} 个单词。描述会显示在图片下方，也会被 Google 读取，请针对本产品撰写，不要从其他产品复制。",
+          descPlaceholder: "例如：Layer structure of the 5 mm copper-free silver mirror used in this backlit LED mirror",
+          count: "{{words}} 个单词（至少 {{min}}）· {{chars}}/{{max}} 字符",
+          insert: "插入",
+          save: "保存",
+          listTitle: "描述中的图片",
+          photoNumber: "第 {{n}} 张图片",
+          noDescription: "尚无描述",
+          edit: "编辑描述",
+          remove: "删除图片",
+          removeConfirm: "要从描述中删除这张图片吗？",
+          saveBlocked: "保存前请先修正下方标出的图片。",
+          errors: {
+            missing: "请为这张图片填写描述。",
+            tooShort: "请至少写 {{min}} 个单词。",
+            tooLong: "请不要超过 {{max}} 个字符。",
+            repeatedHere: "本描述中的另一张图片已使用相同文字。",
+            usedElsewhere: "“{{title}}”已使用这段描述，请为本产品另写一段。"
+          }
         }
       }
     }

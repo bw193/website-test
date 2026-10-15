@@ -48,6 +48,7 @@ import { mediaSourceUrl, toMediaPath, toMediaUrl } from '../src/utils/media';
 import { buildHomeSchema } from '../src/utils/homeSchema';
 import { polishEnglishProductTitle } from '../src/utils/productCopy';
 import { normalizeProductDetails } from '../src/utils/productDetails';
+import { renderMarkdownToHtml } from '../src/components/Markdown';
 import {
   buildProductBuyerSummary,
   normalizeSpecs,
@@ -1059,8 +1060,9 @@ function productDetailContent(lang: Lang, product: Product, tr: LangTranslations
   // `details` is the real marketing copy (and is translated per-language by
   // scripts/translate-products.ts). It was fetched but never rendered, which
   // left every product page under 40 words of crawlable content.
+  // Same renderer as the product page, so photos come out as captioned figures.
   const details = localized.details?.trim()
-    ? `<h2>${escapeHtml(c.detailsHeading)}</h2>\n      ${renderMarkdown(normalizeProductDetails(localized.details))}`
+    ? `<h2>${escapeHtml(c.detailsHeading)}</h2>\n      ${renderMarkdownToHtml(normalizeProductDetails(localized.details), { descriptionImages: true })}`
     : '';
 
   const specs = normalizeSpecs(localized.specifications);

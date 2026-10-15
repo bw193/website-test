@@ -90,7 +90,8 @@ export function markdownToPlainText(md: string): string {
   return md
     .replace(/```[\s\S]*?```/g, ' ')
     .replace(/`([^`]*)`/g, '$1')
-    .replace(/!\[[^\]]*\]\([^)]*\)/g, ' ')
+    // Photo descriptions escape brackets ("\]"), which must not end the alt text.
+    .replace(/!\[(?:\\.|[^\\\]])*\]\((?:\\.|[^\\)])*\)/g, ' ')
     .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
     .replace(/^\s{0,3}#{1,6}\s+/gm, '')
     .replace(/^\s{0,3}[-*+]\s+/gm, '')

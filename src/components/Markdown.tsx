@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { Marked } from 'marked';
 import { toMediaPath } from '../utils/media';
+import { descriptionFiguresExtension } from '../utils/descriptionImages';
 
 /**
  * Renders trusted, admin-authored markdown (product `details`, blog bodies,
@@ -72,18 +73,27 @@ const renderer = {
 const md = new Marked({ async: false, gfm: true, breaks: false });
 md.use({ renderer });
 
-export function renderMarkdownToHtml(source: string): string {
+// Product details: each photo becomes a captioned figure (src/utils/descriptionImages.ts).
+const detailsMd = new Marked({ async: false, gfm: true, breaks: false });
+detailsMd.use({ renderer }, descriptionFiguresExtension(safeUrl));
+
+export function renderMarkdownToHtml(source: string, options: { descriptionImages?: boolean } = {}): string {
   if (!source) return '';
-  return md.parse(source) as string;
+  return (options.descriptionImages ? detailsMd : md).parse(source) as string;
 }
 
 interface MarkdownProps {
   children: string | null | undefined;
   className?: string;
+  /** Render photos as figures captioned with their description (product details). */
+  descriptionImages?: boolean;
 }
 
-export default function Markdown({ children, className }: MarkdownProps) {
-  const html = useMemo(() => renderMarkdownToHtml(children || ''), [children]);
+export default function Markdown({ children, className, descriptionImages = false }: MarkdownProps) {
+  const html = useMemo(
+    () => renderMarkdownToHtml(children || '', { descriptionImages }),
+    [children, descriptionImages],
+  );
   if (!html) return null;
   return <div className={className} dangerouslySetInnerHTML={{ __html: html }} />;
 }

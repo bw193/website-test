@@ -113,6 +113,7 @@ Rules:
 - Translate "title", "description", "details", and every specification "key" and "value".
 - Keep UNCHANGED: brand names (BOLEN, Chengtai), model/SKU codes, measurements and numbers (e.g. "60*100CM", "5MM", "IP44"), and certification names (CE, RoHS, IP66, ISO 9001).
 - Preserve any Markdown in "details".
+- In "details", keep every photo line ![description](url) where it is, with its url unchanged; translate only the description (it is the photo's caption), keeping any backslash escapes.
 - Keep the same JSON structure. "specifications" must stay an array of {"key","value"} in the same order.
 - Return ONLY a JSON object shaped exactly like:
   { ${TARGET_LANGS.map((l) => `"${l}": { ...translated fields... }`).join(', ')} }

@@ -1106,6 +1106,37 @@ export const en = {
           match: "{{score}}% similar",
           likelyDuplicate: "Possible duplicate",
           saveConfirm: "This looks similar to “{{title}}” ({{score}}% match). Save anyway?"
+        },
+        photos: {
+          insertImage: "Insert image",
+          hint: "Insert image adds a photo where the cursor is. Every photo needs its own description, shown under it as a caption.",
+          titleInsert: "Insert image",
+          titleEdit: "Edit photo description",
+          choose: "Choose a photo",
+          chooseHint: "JPG, PNG or WebP",
+          replace: "Choose another photo",
+          uploadFailed: "Upload failed. Please try again.",
+          unsupported: "This file can’t be used. Choose a JPG, PNG or WebP photo.",
+          descLabel: "Photo description",
+          descHint: "Say what this photo shows for this product, in at least {{min}} words. It appears under the photo and Google reads it, so write it for this product instead of copying it from another one.",
+          descPlaceholder: "e.g. Layer structure of the 5 mm copper-free silver mirror used in this backlit LED mirror",
+          count: "{{words}} words (min {{min}}) · {{chars}}/{{max}} characters",
+          insert: "Insert",
+          save: "Save",
+          listTitle: "Photos in this description",
+          photoNumber: "Photo {{n}}",
+          noDescription: "No description yet",
+          edit: "Edit description",
+          remove: "Remove photo",
+          removeConfirm: "Remove this photo from the description?",
+          saveBlocked: "Fix the photos marked below before saving.",
+          errors: {
+            missing: "Write a description for this photo.",
+            tooShort: "Use at least {{min}} words.",
+            tooLong: "Keep it to {{max}} characters.",
+            repeatedHere: "Another photo in this description already has this text.",
+            usedElsewhere: "Already used on “{{title}}”. Write one for this product."
+          }
         }
       }
     }

@@ -1,5 +1,5 @@
 import { m, useReducedMotion } from 'motion/react';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useParams, useLocation, Navigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { Loader2, CheckCircle2, ChevronRight, ArrowUpRight, Send, ShieldCheck, Truck, Clock, Check } from 'lucide-react';
@@ -68,6 +68,37 @@ function SectionHeading({ children }: { children: React.ReactNode }) {
   return <h2 className="pdp-section-heading font-serif">{children}</h2>;
 }
 
+// Where the sticky spec sheet stops: below the navbar and the section links,
+// matching .pdp-anchor's scroll-margin-top.
+const SPEC_SHEET_TOP = 156;
+
+/**
+ * Beside long details (photos make them several screens tall) the spec sheet
+ * stays in view. One taller than the window would hide its last rows, so it
+ * sticks by its bottom edge instead: this keeps --pdp-spec-top in step with
+ * its height and the window's.
+ */
+function useStickySpecSheet() {
+  const cleanup = useRef<(() => void) | null>(null);
+  return useCallback((sheet: HTMLDivElement | null) => {
+    cleanup.current?.();
+    cleanup.current = null;
+    if (!sheet || typeof ResizeObserver === 'undefined') return;
+    const update = () => {
+      const top = Math.min(SPEC_SHEET_TOP, window.innerHeight - sheet.offsetHeight - 24);
+      sheet.style.setProperty('--pdp-spec-top', `${top}px`);
+    };
+    const observer = new ResizeObserver(update);
+    observer.observe(sheet);
+    window.addEventListener('resize', update);
+    update();
+    cleanup.current = () => {
+      observer.disconnect();
+      window.removeEventListener('resize', update);
+    };
+  }, []);
+}
+
 export default function ProductDetail() {
   const { id: routeParam, productCategory } = useParams<{ id: string; productCategory: string }>();
   const location = useLocation();
@@ -86,6 +117,7 @@ export default function ProductDetail() {
   const { t } = useTranslation();
   const translate = useProductTranslator(lang);
   const successHeadingRef = useRef<HTMLHeadingElement>(null);
+  const specSheetRef = useStickySpecSheet();
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<RFQForm>();
 
@@ -550,6 +582,7 @@ export default function ProductDetail() {
                   whileInView="visible"
                   viewport={{ once: true, amount: 0.1 }}
                   id="product-specs" tabIndex={-1} className="pdp-spec-sheet pdp-anchor"
+                  ref={specSheetRef}
                 >
                   <SectionHeading>{t('productDetail.specifications')}</SectionHeading>
                   <dl className="pdp-specs">
@@ -576,7 +609,7 @@ export default function ProductDetail() {
                 >
                   <SectionHeading>{t('productDetail.productDetails')}</SectionHeading>
                   {!useBuyerSummary && originalDescription !== richDescription && <p className="pdp-details-intro">{originalDescription}</p>}
-                  <Markdown className="pdp-prose prose prose-amber prose-stone max-w-none">
+                  <Markdown className="pdp-prose prose prose-amber prose-stone max-w-none" descriptionImages>
                     {normalizeProductDetails(display.details)}
                   </Markdown>
                 </m.div>
