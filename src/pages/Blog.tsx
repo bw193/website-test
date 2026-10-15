@@ -140,36 +140,11 @@ export default function Blog() {
         })}
       />
 
-      <header className="mx-auto max-w-6xl px-4 pb-10 pt-16 sm:px-6 sm:pt-20 lg:px-8">
-        <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
-          <div className="max-w-2xl">
-            <p className="text-sm font-medium text-amber-800">
-              {t('blog.kicker', 'Practical guidance from the factory floor')}
-            </p>
-            <h1 className="mt-3 font-serif text-4xl leading-tight text-stone-900 sm:text-5xl">
-              {headingLead}{lang === 'zh' ? '' : ' '}
-              <span className="text-stone-500">{headingAccent}</span>
-            </h1>
-            <p className="mt-4 max-w-xl text-lg leading-8 text-stone-700">
-              {t(
-                'blog.intro',
-                'Buying guidance, technology explanations, and manufacturing know-how for LED mirrors, smart mirrors, and OEM/ODM programs.'
-              )}
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-3">
-            <Link to={lp('/rfq')} className="btn-primary">
-              {solutionsUi.discussProject}
-            </Link>
-            <Link to={lp('/solutions')} className="btn-secondary">
-              {solutionsUi.navLabel}
-            </Link>
-          </div>
-        </div>
-      </header>
+      {/* The page opens on the featured insight; the heading stays for screen readers and search. */}
+      <h1 className="sr-only">{pageHeading}</h1>
 
       {loading && posts.length === 0 ? (
-        <section className="mx-auto max-w-6xl border-t border-stone-200 px-4 py-12 sm:px-6 lg:px-8">
+        <section className="mx-auto max-w-6xl px-4 pb-12 pt-16 sm:px-6 sm:pt-20 lg:px-8">
           <div className="animate-pulse border-b border-stone-200 pb-12">
             <div className="h-3 w-24 bg-stone-200" />
             <div className="mt-5 h-10 max-w-2xl bg-stone-200" />
@@ -186,7 +161,7 @@ export default function Blog() {
           </div>
         </section>
       ) : posts.length === 0 ? (
-        <section className="mx-auto max-w-6xl border-t border-stone-200 px-4 py-24 sm:px-6 lg:px-8">
+        <section className="mx-auto max-w-6xl px-4 py-24 sm:px-6 lg:px-8">
           <p className="text-lg text-stone-600">
             {t('blog.empty', 'No insights published yet. Check back soon.')}
           </p>
@@ -194,7 +169,7 @@ export default function Blog() {
       ) : (
         <>
           {featured && (
-            <section className="mx-auto max-w-6xl border-t border-stone-200 px-4 py-12 sm:px-6 lg:px-8">
+            <section className="mx-auto max-w-6xl px-4 pb-12 pt-16 sm:px-6 sm:pt-20 lg:px-8">
               <article>
                 <Link
                   to={lp(insightDetailPath(featured.slug))}

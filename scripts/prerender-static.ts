@@ -1599,22 +1599,19 @@ async function fetchSiteSettings(): Promise<{
 
 const BLOG_COPY: Record<
   Lang,
-  { metaTitle: string; metaDesc: string; h1: string; intro: string; journal: string }
+  { metaTitle: string; metaDesc: string; h1: string; journal: string }
 > = {
   en: {
     metaTitle: 'BOLEN Mirror Insights | LED Mirror Sourcing & Manufacturing',
     metaDesc:
       'Practical sourcing guides, technology explainers, and OEM/ODM manufacturing insights for LED, smart, bathroom, and custom mirrors.',
     h1: 'Mirror sourcing insights',
-    intro:
-      'Buying guidance, technology explanations, and manufacturing know-how for LED mirrors, smart mirrors, and OEM/ODM programs.',
     journal: 'Insights',
   },
   zh: {
     metaTitle: 'BOLEN 镜类采购洞察 | LED 镜技术与制造指南',
     metaDesc: '面向 LED 镜、智能镜、浴室镜与定制镜采购的实用指南、技术解析及 OEM/ODM 制造洞察。',
     h1: '镜类采购洞察',
-    intro: '围绕 LED 镜、智能镜与 OEM/ODM 项目的选购建议、技术解析和制造知识。',
     journal: '洞察',
   },
   es: {
@@ -1622,8 +1619,6 @@ const BLOG_COPY: Record<
     metaDesc:
       'Guías prácticas de compra, explicaciones técnicas y perspectivas de fabricación OEM/ODM para espejos LED, inteligentes y a medida.',
     h1: 'Perspectivas para la compra de espejos',
-    intro:
-      'Consejos de compra, explicaciones técnicas y conocimientos de fabricación para espejos LED, inteligentes y programas OEM/ODM.',
     journal: 'Perspectivas',
   },
   fr: {
@@ -1631,8 +1626,6 @@ const BLOG_COPY: Record<
     metaDesc:
       "Guides d'achat pratiques, explications techniques et conseils de fabrication OEM/ODM pour les miroirs LED, intelligents et sur mesure.",
     h1: "Conseils d'achat de miroirs",
-    intro:
-      "Conseils d'achat, explications techniques et savoir-faire de fabrication pour les miroirs LED, intelligents et les programmes OEM/ODM.",
     journal: 'Conseils',
   },
   de: {
@@ -1640,8 +1633,6 @@ const BLOG_COPY: Record<
     metaDesc:
       'Praxisnahe Einkaufsratgeber, Technik-Erklärungen und OEM/ODM-Fertigungseinblicke für LED-, Smart- und Maßspiegel.',
     h1: 'Einblicke in die Spiegelbeschaffung',
-    intro:
-      'Einkaufsratgeber, Technik-Erklärungen und Fertigungswissen für LED-Spiegel, Smart-Spiegel und OEM/ODM-Programme.',
     journal: 'Einblicke',
   },
   it: {
@@ -1649,8 +1640,6 @@ const BLOG_COPY: Record<
     metaDesc:
       "Guide pratiche all'acquisto, spiegazioni tecniche e approfondimenti OEM/ODM per specchi LED, smart e su misura.",
     h1: "Approfondimenti per l'acquisto di specchi",
-    intro:
-      "Consigli d'acquisto, spiegazioni tecniche e know-how produttivo per specchi LED, smart e programmi OEM/ODM.",
     journal: 'Approfondimenti',
   },
 };
@@ -1726,7 +1715,6 @@ function blogIndexContent(lang: Lang, items: BlogListItem[]): string {
   return `
     <div data-prerender="blog">
       <h1>${escapeHtml(c.h1)}</h1>
-      <p>${escapeHtml(c.intro)}</p>
       <ul aria-label="Articles">
         ${list}
       </ul>
