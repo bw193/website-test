@@ -99,6 +99,9 @@
 .pdp-prose { margin-top: 28px; font-size: 17px; line-height: 1.9; color: var(--color-stone-700); }
 .pdp-prose :is(h2, h3, h4) { font-family: var(--font-sans); line-height: 1.45; font-weight: 600; color: var(--color-stone-900); }
 .pdp-prose li { padding-left: 6px; }
+/* A bold label line ("Specifications:") sits with the list it introduces. */
+.pdp-prose p:has(> strong:only-child) { margin-bottom: 0; }
+.pdp-prose p:has(> strong:only-child) + :is(ul, ol) { margin-top: .5em; }
 .pdp-prose li::marker { color: var(--color-amber-600); }
 .pdp-prose img { width: auto; max-width: 100%; border-radius: 16px; }
 /* Photos staff add to the details; the caption is the photo's description. */
