@@ -315,7 +315,7 @@ export const de = {
         }
       },
       manufacturingProcess: {
-        subtitle: "Vom Briefing bis zur Palette",
+        subtitle: "So arbeiten wir",
         title: "Fertigungsprozess",
         desc: "Sechs streng kontrollierte Stufen bringen jeden Auftrag von der Spezifikation bis zum Versand.",
         steps: {

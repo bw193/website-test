@@ -315,7 +315,7 @@ export const it = {
         }
       },
       manufacturingProcess: {
-        subtitle: "Dal Brief al Pallet",
+        subtitle: "Come lavoriamo",
         title: "Processo Produttivo",
         desc: "Sei fasi rigorosamente controllate portano ogni ordine dalla specifica alla spedizione.",
         steps: {

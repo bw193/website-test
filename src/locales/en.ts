@@ -327,7 +327,7 @@ export const en = {
         }
       },
       manufacturingProcess: {
-        subtitle: "From Brief to Pallet",
+        subtitle: "How We Work",
         title: "Manufacturing Process",
         desc: "Six tightly controlled stages take every order from spec to shipment.",
         steps: {

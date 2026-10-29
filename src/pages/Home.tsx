@@ -64,53 +64,63 @@ const CERTS = [
 ];
 
 /**
- * Manufacturing Process timeline, drawn as a -==- track: one line leaves 01,
- * splits into two parallel lines and merges back into one before 04. The
- * lower line carries the sequential phases (02 Confirm & Sample, 03 Mass
- * Production); the upper one carries what runs alongside them — customization
- * above 02, QC above 03. Array order puts each upper step right after the
- * phase it runs with (stacked layout, screen readers).
+ * Manufacturing Process, drawn as a -==- track: one line leaves 01, splits
+ * into two parallel lanes and merges back into one before 04. The upper lane
+ * carries the sequential phases (02 Confirm & Sample, 03 Mass Production),
+ * the lower one what runs alongside them (customization under 02, QC under
+ * 03). Array order puts each alongside step right after the phase it runs
+ * with, which is the stacked order and the screen-reader order.
  *
- * Stacked layout (below lg): the lower line is the first lane and the upper
- * line the second; `a`/`b` are this row's piece of each, `split` peels the
- * second lane off under 01 and `merge` brings it back above 04. From lg: `lg`
- * places the step in a two-row grid with every marker centred in its column
- * (upper line on top: headings aligned, markers level, text above them),
- * `lgNext` draws the line to the next phase, and `lgFork` draws the upper line
- * from its split (in the gap between 01 and 02) to its merge (in the gap
- * between 03 and 04). Offsets assume gap-x-8 / gap-y-8.
+ * From xl the track runs across the grid in ManufacturingProcess; `slot`
+ * places the step there (PROCESS_SLOT). Below xl it runs down the left, with
+ * the phases' lane at x=16, the alongside lane at x=44 and the line 01 and 04
+ * sit on at x=30; `offset` puts the marker on its lane. `rails` are this
+ * row's pieces of those lines (32px markers, 6px clear of each),
+ * `split`/`merge` the curves at the foot of the row.
  *
- * `delay` (ms) is when the drawing line reaches the step's marker in the
- * entrance animation; each line starts as its marker lands (index.css,
- * "Manufacturing Process timeline").
+ * `at` is where the step sits along the track, from 01 (0) to 04 (1). The
+ * entrance and the light that then runs along the track both reach a step at
+ * that fraction of their run (index.css, "Manufacturing Process").
  */
-type ProcessSegment = 'nodeToGap' | 'nodeToEnd' | 'fullToGap';
-const PROCESS_SEGMENT: Record<ProcessSegment, string> = {
-  nodeToGap: 'top-12 bottom-2', // 8px under this row's marker to 8px above the next row's
-  nodeToEnd: 'top-12 bottom-0', // ...running on into a row with no marker in this lane
-  fullToGap: 'top-0 bottom-2',
-};
+type ProcessSlot = 'start' | 'upper' | 'lower' | 'end';
 const PROCESS_STEPS: {
   key: 's1' | 's2' | 's3' | 's4' | 's5' | 's6';
-  marker: React.ReactNode;
-  upper?: boolean;
-  a?: ProcessSegment;
-  b?: ProcessSegment;
+  num?: string;
+  icon?: typeof Palette;
+  slot: ProcessSlot;
+  col?: string;
+  offset: string;
+  rails: string[];
   split?: boolean;
   merge?: boolean;
-  lg: string;
-  lgNext?: boolean;
-  lgFork?: 'split' | 'merge';
-  delay: number;
+  at: number;
 }[] = [
-  { key: 's1', marker: '01', a: 'nodeToGap', split: true, lg: 'lg:col-start-1 lg:row-start-2', lgNext: true, delay: 0 },
-  { key: 's2', marker: '02', a: 'nodeToEnd', b: 'fullToGap', lg: 'lg:col-start-2 lg:row-start-2', lgNext: true, delay: 250 },
-  { key: 's5', marker: <Palette className="h-4 w-4 lg:h-5 lg:w-5" />, upper: true, a: 'fullToGap', b: 'nodeToEnd', lg: 'lg:col-start-2 lg:row-start-1', lgFork: 'split', delay: 300 },
-  { key: 's3', marker: '03', a: 'nodeToEnd', b: 'fullToGap', lg: 'lg:col-start-3 lg:row-start-2', lgNext: true, delay: 500 },
-  { key: 's4', marker: <ShieldCheck className="h-4 w-4 lg:h-5 lg:w-5" />, upper: true, a: 'fullToGap', merge: true, lg: 'lg:col-start-3 lg:row-start-1', lgFork: 'merge', delay: 550 },
-  { key: 's6', marker: '04', lg: 'lg:col-start-4 lg:row-start-2', delay: 800 },
+  { key: 's1', num: '01', slot: 'start', offset: 'ml-3.5', rails: ['left-[29px] top-[38px] bottom-5'], split: true, at: 0 },
+  { key: 's2', num: '02', slot: 'upper', col: 'xl:col-start-4', offset: 'ml-0', rails: ['left-[15px] top-[38px] bottom-0', 'left-[43px] -top-1.5 bottom-1.5'], at: 0.29 },
+  { key: 's5', icon: Palette, slot: 'lower', col: 'xl:col-start-4', offset: 'ml-7', rails: ['left-[15px] top-0 bottom-1.5', 'left-[43px] top-[38px] bottom-0'], at: 0.29 },
+  { key: 's3', num: '03', slot: 'upper', col: 'xl:col-start-6', offset: 'ml-0', rails: ['left-[15px] top-[38px] bottom-0', 'left-[43px] top-0 bottom-1.5'], at: 0.71 },
+  { key: 's4', icon: ShieldCheck, slot: 'lower', col: 'xl:col-start-6', offset: 'ml-7', rails: ['left-[15px] top-0 bottom-5', 'left-[43px] top-[38px] bottom-5'], merge: true, at: 0.71 },
+  { key: 's6', num: '04', slot: 'end', offset: 'ml-3.5', rails: [], at: 1 },
 ];
-const processDelay = (ms: number) => ({ '--process-delay': `${ms}ms` }) as React.CSSProperties;
+// Per slot, from xl: the step's cell, then its marker's and copy's place in
+// it. Every marker is centred in its column with its copy centred on it;
+// 01's and 04's copy sits beside them, centred on the line they share (it
+// spans just the three lane rows and overflows them evenly).
+const PROCESS_SLOT: Record<ProcessSlot, { li: string; marker: string; copy: string }> = {
+  start: { li: 'xl:col-[1/3] xl:row-[1/6]', marker: 'xl:col-start-2 xl:row-start-3', copy: 'xl:col-start-1 xl:row-[2/5] xl:self-center xl:pr-5 xl:pt-0 xl:text-center' },
+  upper: { li: 'xl:row-[1/3]', marker: 'xl:row-start-2 xl:justify-self-center', copy: 'xl:row-start-1 xl:pb-3 xl:pt-0 xl:text-center' },
+  lower: { li: 'xl:row-[4/6]', marker: 'xl:row-start-1 xl:justify-self-center', copy: 'xl:row-start-2 xl:pt-3 xl:text-center' },
+  end: { li: 'xl:col-[8/10] xl:row-[1/6]', marker: 'xl:col-start-1 xl:row-start-3', copy: 'xl:col-start-2 xl:row-[2/5] xl:self-center xl:pl-5 xl:pt-0 xl:text-center' },
+};
+// From xl, the track's two routes (01 → upper lane → 04, 01 → lower lane →
+// 04) in the coordinates of grid columns 2–8 at the container's 1216px:
+// 01's marker ends at x=40, the lanes run from x=104 to x=676 at y=20 and
+// y=100, and 04's marker starts at x=740.
+const PROCESS_ROUTES = [
+  'M48 60H56C80 60 80 20 104 20H676C700 20 700 60 724 60H732',
+  'M48 60H56C80 60 80 100 104 100H676C700 100 700 60 724 60H732',
+];
+const processAt = (at: number) => ({ '--process-at': String(at) }) as React.CSSProperties;
 
 /**
  * Editorial kicker used above every section heading — the amber hairline gives
@@ -128,6 +138,69 @@ function SectionKicker({ children, centered = false }: { children: React.ReactNo
       {children}
       {centered && <span aria-hidden="true" className="h-px w-8 bg-amber-500/70" />}
     </span>
+  );
+}
+
+/**
+ * The Manufacturing Process band (see PROCESS_STEPS). From xl the track is a
+ * nine-column grid: 01's copy | 01 | split | 02 & customization | gap | 03 & QC
+ * | merge | 04 | 04's copy, over five rows: upper copy, upper lane, the line
+ * 01 and 04 sit on, lower lane, lower copy. The <ol> and its items are
+ * subgrids of it, so the track (drawn beside the <ol>) lines up with the
+ * markers; the lanes run behind the middle markers, whose ring in the band
+ * colour keeps them clear.
+ */
+function ManufacturingProcess() {
+  const { t } = useTranslation();
+  return (
+    <section aria-labelledby="home-process-title" className="bg-stone-100 py-12 lg:py-14">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <Reveal className="mx-auto mb-8 max-w-3xl text-center xl:mb-10">
+          <SectionKicker centered>{t('home.manufacturingProcess.subtitle')}</SectionKicker>
+          <h2 id="home-process-title" className="mb-3 font-serif text-4xl text-stone-900 sm:text-5xl">{t('home.manufacturingProcess.title')}</h2>
+          <p className="text-lg font-light text-stone-600">{t('home.manufacturingProcess.desc')}</p>
+        </Reveal>
+
+        <Reveal className="process-track mx-auto max-w-2xl xl:grid xl:max-w-none xl:grid-cols-[minmax(0,0.9fr)_2.5rem_4rem_minmax(0,1.1fr)_2.5rem_minmax(0,1.1fr)_4rem_2.5rem_minmax(0,0.9fr)] xl:grid-rows-[auto_2.5rem_2.5rem_2.5rem_auto]">
+          <ol className="xl:col-[1/-1] xl:row-[1/-1] xl:grid xl:grid-cols-subgrid xl:grid-rows-subgrid">
+            {PROCESS_STEPS.map((step) => {
+              const slot = PROCESS_SLOT[step.slot];
+              const Icon = step.icon;
+              return (
+                <li key={step.key} style={processAt(step.at)} className={`group relative grid grid-cols-[3.75rem_minmax(0,1fr)] gap-x-3 pb-7 last:pb-0 xl:grid-cols-subgrid xl:grid-rows-subgrid xl:gap-0 xl:pb-0 ${slot.li} ${step.col ?? ''}`}>
+                  {step.rails.map((rail) => (
+                    <span key={rail} aria-hidden="true" className={`process-line-y absolute w-0.5 origin-top overflow-hidden rounded-full bg-bronze-200 xl:hidden ${rail}`} />
+                  ))}
+                  {(step.split || step.merge) && (
+                    <svg aria-hidden="true" viewBox="0 0 60 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="absolute bottom-0 left-0 h-5 w-[60px] overflow-visible text-bronze-200 xl:hidden">
+                      {(step.split ? ['M30 0C30 7 16 7 16 14', 'M30 0C30 7 44 7 44 14'] : ['M16 0C16 7 30 7 30 14', 'M44 0C44 7 30 7 30 14']).map((d) => (
+                        <path key={d} className="process-curve" pathLength={1} d={d} />
+                      ))}
+                    </svg>
+                  )}
+                  <span aria-hidden="true" className={`process-marker relative z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 border-bronze-400 bg-white text-amber-800 shadow-sm transition duration-300 group-hover:scale-110 group-hover:bg-bronze-400 group-hover:text-white group-hover:shadow-md xl:ml-0 xl:h-10 xl:w-10 xl:self-center xl:ring-8 xl:ring-stone-100 ${step.offset} ${slot.marker}`}>
+                    {Icon ? <Icon className="h-4 w-4 xl:h-5 xl:w-5" /> : <span className="font-serif text-[13px] font-bold lining-nums xl:text-sm">{step.num}</span>}
+                  </span>
+                  <div className={`process-copy min-w-0 pt-1 ${slot.copy}`}>
+                    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">{t(`home.manufacturingProcess.steps.${step.key}.timing`)}</p>
+                    <h3 className="mt-0.5 text-lg font-semibold text-stone-900 transition-colors duration-300 group-hover:text-amber-800">{t(`home.manufacturingProcess.steps.${step.key}.title`)}</h3>
+                    <p className="mt-1.5 text-[15px] leading-relaxed text-pretty text-stone-600">{t(`home.manufacturingProcess.steps.${step.key}.desc`)}</p>
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
+          <svg aria-hidden="true" viewBox="0 0 780 120" preserveAspectRatio="none" fill="none" strokeLinecap="round" className="hidden h-full w-full overflow-visible xl:col-[2/9] xl:row-[2/5] xl:block">
+            {PROCESS_ROUTES.map((d) => (
+              <path key={d} d={d} pathLength={1} strokeWidth="2" className="process-route stroke-bronze-200" />
+            ))}
+            {PROCESS_ROUTES.map((d) => (
+              <path key={`flow-${d}`} d={d} pathLength={1} strokeWidth="3" className="process-flow stroke-amber-500" />
+            ))}
+          </svg>
+        </Reveal>
+      </div>
+    </section>
   );
 }
 
@@ -826,42 +899,7 @@ export default function Home() {
       {featuredVideo && <FeaturedVideo video={featuredVideo} />}
 
       {/* Manufacturing Process — a -==- track of six steps (see PROCESS_STEPS). */}
-      <section aria-labelledby="home-process-title" className="py-16 bg-stone-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Reveal className="text-center max-w-3xl mx-auto mb-10">
-            <SectionKicker centered>{t('home.manufacturingProcess.subtitle')}</SectionKicker>
-            <h2 id="home-process-title" className="text-4xl font-serif text-stone-900 sm:text-5xl mb-4">{t('home.manufacturingProcess.title')}</h2>
-            <p className="text-lg text-stone-600 font-light">{t('home.manufacturingProcess.desc')}</p>
-          </Reveal>
-
-          <Reveal as="ol" variant="blur" className="process-track mx-auto max-w-4xl lg:grid lg:max-w-none lg:grid-cols-4 lg:gap-x-8 lg:gap-y-8">
-            {PROCESS_STEPS.map((step) => (
-              <li key={step.key} className={`group relative grid grid-cols-[2.5rem_2.5rem_minmax(0,1fr)] gap-x-3 gap-y-2 pb-6 last:pb-0 md:grid-cols-[2.5rem_2.5rem_minmax(0,12rem)_minmax(0,1fr)] md:pb-8 lg:pb-0 lg:text-center ${step.upper ? 'lg:flex lg:flex-col lg:gap-0' : 'lg:block'} ${step.lg}`}>
-                {step.a && <span aria-hidden="true" style={processDelay(step.delay + 50)} className={`process-line-y absolute left-5 w-px origin-top overflow-hidden bg-amber-500/50 lg:hidden ${PROCESS_SEGMENT[step.a]}`} />}
-                {step.b && <span aria-hidden="true" style={processDelay(step.delay + 50)} className={`process-line-y absolute left-[4.5rem] w-px origin-top overflow-hidden bg-amber-500/50 lg:hidden ${PROCESS_SEGMENT[step.b]}`} />}
-                {step.split && <span aria-hidden="true" style={processDelay(step.delay + 75)} className="process-fall absolute left-5 top-14 bottom-0 w-[53px] rounded-tr-2xl border-r border-t border-amber-500/50 lg:hidden" />}
-                {step.merge && <span aria-hidden="true" style={processDelay(step.delay + 50)} className="process-fall absolute left-5 top-12 bottom-4 w-[53px] rounded-br-2xl border-b border-r border-amber-500/50 lg:hidden" />}
-                {step.lgNext && <span aria-hidden="true" style={processDelay(step.delay + 50)} className="process-line absolute left-[calc(50%_+_2rem)] -right-1/2 top-6 hidden h-px origin-left overflow-hidden bg-amber-500/50 lg:block" />}
-                {step.lgFork === 'split' && (
-                  <>
-                    <span aria-hidden="true" style={processDelay(step.delay - 200)} className="process-rise absolute -left-4 right-1/2 top-[calc(100%_-_1.5rem)] -bottom-14 hidden rounded-tl-2xl border-l border-t border-amber-500/50 lg:block" />
-                    <span aria-hidden="true" style={processDelay(step.delay + 50)} className="process-line absolute left-[calc(50%_+_2rem)] -right-1/2 top-[calc(100%_-_1.5rem)] hidden h-px origin-left overflow-hidden bg-amber-500/50 lg:block" />
-                  </>
-                )}
-                {step.lgFork === 'merge' && <span aria-hidden="true" style={processDelay(step.delay + 50)} className="process-fall absolute left-1/2 -right-4 top-[calc(100%_-_1.5rem)] -bottom-14 hidden rounded-tr-2xl border-r border-t border-amber-500/50 lg:block" />}
-                <div aria-hidden="true" style={processDelay(step.delay)} className={`process-marker relative row-span-2 flex h-10 w-10 items-center justify-center rounded-full border-2 border-amber-500/70 text-amber-700 transition-all duration-300 group-hover:scale-110 group-hover:border-amber-500 group-hover:bg-amber-500 group-hover:text-white group-hover:shadow-lg group-hover:shadow-amber-500/30 md:row-span-1 lg:mx-auto lg:h-12 lg:w-12 ${step.upper ? 'z-10 col-start-2 bg-amber-50 ring-8 ring-stone-100 lg:order-last lg:mt-auto' : 'col-start-1 bg-white font-serif text-sm font-bold lining-nums lg:text-base'}`}>
-                  {step.marker}
-                </div>
-                <div style={processDelay(step.delay)} className={`process-copy col-start-3 ${step.upper ? '' : 'lg:mt-4'}`}>
-                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">{t(`home.manufacturingProcess.steps.${step.key}.timing`)}</p>
-                  <h3 className="mt-1 text-lg font-semibold text-stone-900 hyphens-auto">{t(`home.manufacturingProcess.steps.${step.key}.title`)}</h3>
-                </div>
-                <p style={processDelay(step.delay + 40)} className={`process-copy col-start-3 text-[15px] leading-relaxed text-pretty text-stone-700 break-words md:col-start-4 md:row-start-1 md:pl-3 lg:mt-1.5 lg:pl-0 lg:text-balance ${step.upper ? 'lg:mb-4' : ''}`}>{t(`home.manufacturingProcess.steps.${step.key}.desc`)}</p>
-              </li>
-            ))}
-          </Reveal>
-        </div>
-      </section>
+      <ManufacturingProcess />
 
       <section className="border-y border-stone-200 bg-white py-16 sm:py-20" aria-labelledby="sourcing-solutions-title">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

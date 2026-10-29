@@ -315,7 +315,7 @@ export const es = {
         }
       },
       manufacturingProcess: {
-        subtitle: "Del Brief al Palé",
+        subtitle: "Cómo trabajamos",
         title: "Proceso de Fabricación",
         desc: "Seis fases estrechamente controladas llevan cada pedido de la especificación al envío.",
         steps: {

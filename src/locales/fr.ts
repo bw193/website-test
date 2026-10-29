@@ -315,7 +315,7 @@ export const fr = {
         }
       },
       manufacturingProcess: {
-        subtitle: "Du Brief à la Palette",
+        subtitle: "Notre méthode",
         title: "Processus de Fabrication",
         desc: "Six étapes rigoureusement contrôlées mènent chaque commande de la spécification à l'expédition.",
         steps: {

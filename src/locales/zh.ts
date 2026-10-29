@@ -317,7 +317,7 @@ export const zh = {
         }
       },
       manufacturingProcess: {
-        subtitle: "从需求到出货",
+        subtitle: "合作流程",
         title: "制造工艺",
         desc: "六个严格把控的环节，让每个订单从规划到发货环环相扣。",
         steps: {
