@@ -88,7 +88,7 @@ export const en = {
       turnLimitDescription: "Please contact our sales team to continue this conversation.",
       turnLimitDescriptionWithLimit: "This session includes up to {{maxTurns}} AI questions. Please contact our sales team for more help.",
       turnUsage: "AI questions used: {{completedTurns}} of {{maxTurns}}.",
-      privacyNote: "We store an automatically redacted copy of this AI chat for up to 90 days. Do not type contact, ID, payment, or account details into chat. An email submitted through the separate continuation form is stored with your consent and is visible only to authorized administrators.",
+      privacyNote: "We store an automatically redacted copy of this AI chat for up to 90 days. Do not type contact, ID, payment, or account details into chat. An email submitted through the separate continuation form is stored with your consent and is visible only to authorized administrators and approved employees.",
       privacyNoteCompact: "Redacted chat is stored for up to 90 days. Do not enter sensitive information.",
       privacyContact: "Privacy request",
       openLabel: "Open BOLEN AI assistant",
@@ -963,7 +963,7 @@ export const en = {
         }
       },
       aiChats: {
-        subtitle: "Administrators and approved employees can view redacted conversations for up to 90 days. Separately submitted follow-up emails are visible only to administrators.",
+        subtitle: "Administrators and approved employees can view redacted conversations and separately submitted follow-up emails for up to 90 days.",
         refresh: "Refresh",
         search: "Search by page or conversation ID…",
         languageFilter: "Filter by language",

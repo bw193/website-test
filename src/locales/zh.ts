@@ -80,7 +80,7 @@ export const zh = {
       turnLimitDescription: "请联系销售团队继续咨询。",
       turnLimitDescriptionWithLimit: "本会话最多可咨询 {{maxTurns}} 次；如需更多帮助，请联系销售团队。",
       turnUsage: "AI 咨询次数：已用 {{completedTurns}} / {{maxTurns}}。",
-      privacyNote: "我们会保存一份自动脱敏的 AI 对话，最长 90 天。请勿在聊天正文中填写联系方式、证件、付款或账户信息；通过独立继续表单提交的邮箱会在您同意后单独保存，仅限获授权管理员查看。",
+      privacyNote: "我们会保存一份自动脱敏的 AI 对话，最长 90 天。请勿在聊天正文中填写联系方式、证件、付款或账户信息；通过独立继续表单提交的邮箱会在您同意后单独保存，仅限获授权管理员和已审核员工查看。",
       privacyNoteCompact: "脱敏对话最长保存 90 天，请勿填写敏感信息。",
       privacyContact: "隐私请求",
       openLabel: "打开 BOLEN AI 助手",
@@ -950,7 +950,7 @@ export const zh = {
         }
       },
       aiChats: {
-        subtitle: "管理员和已审核员工均可查看脱敏聊天记录，记录最长保留 90 天；单独提交的跟进邮箱仅限管理员查看。",
+        subtitle: "管理员和已审核员工均可查看脱敏聊天记录及单独提交的跟进邮箱，最长保留 90 天。",
         refresh: "刷新",
         search: "按页面或会话 ID 搜索…",
         languageFilter: "按语言筛选",

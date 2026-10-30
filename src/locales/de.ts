@@ -78,7 +78,7 @@ export const de = {
       turnLimitDescription: "Kontaktieren Sie unseren Vertrieb, um das Gespräch fortzusetzen.",
       turnLimitDescriptionWithLimit: "Diese Sitzung umfasst bis zu {{maxTurns}} KI-Fragen. Kontaktieren Sie unseren Vertrieb für weitere Hilfe.",
       turnUsage: "Verwendete KI-Fragen: {{completedTurns}} von {{maxTurns}}.",
-      privacyNote: "Wir speichern eine automatisch bereinigte Kopie dieses KI-Chats für höchstens 90 Tage. Geben Sie im Chat keine Kontakt-, Ausweis-, Zahlungs- oder Kontodaten ein. Eine über das separate Formular übermittelte E-Mail wird mit Ihrer Einwilligung gespeichert und ist nur für autorisierte Administratoren sichtbar.",
+      privacyNote: "Wir speichern eine automatisch bereinigte Kopie dieses KI-Chats für höchstens 90 Tage. Geben Sie im Chat keine Kontakt-, Ausweis-, Zahlungs- oder Kontodaten ein. Eine über das separate Formular übermittelte E-Mail wird mit Ihrer Einwilligung gespeichert und ist nur für autorisierte Administratoren und freigeschaltete Mitarbeitende sichtbar.",
       privacyNoteCompact: "Der bereinigte Chat wird bis zu 90 Tage gespeichert. Keine sensiblen Daten eingeben.",
       privacyContact: "Datenschutzanfrage",
       openLabel: "BOLEN KI-Assistent öffnen",

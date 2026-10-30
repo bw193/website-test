@@ -957,7 +957,7 @@ export default function AiReceptionist() {
                   )
                 : copy(
                     'privacyNote',
-                    'We store an automatically redacted copy of this AI chat for up to 90 days. Do not type contact, ID, payment, or account details into chat. An email submitted through the separate continuation form is stored with your consent and is visible only to authorized administrators.',
+                    'We store an automatically redacted copy of this AI chat for up to 90 days. Do not type contact, ID, payment, or account details into chat. An email submitted through the separate continuation form is stored with your consent and is visible only to authorized administrators and approved employees.',
                   )}{' '}
               <a
                 href="mailto:sales@bolenmirror.com?subject=AI%20chat%20privacy%20request"

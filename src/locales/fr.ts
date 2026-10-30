@@ -78,7 +78,7 @@ export const fr = {
       turnLimitDescription: "Contactez notre équipe commerciale pour poursuivre.",
       turnLimitDescriptionWithLimit: "Cette session comprend jusqu’à {{maxTurns}} questions IA. Contactez notre équipe commerciale pour plus d’aide.",
       turnUsage: "Questions IA utilisées : {{completedTurns}} sur {{maxTurns}}.",
-      privacyNote: "Nous conservons une copie automatiquement anonymisée de ce chat pendant 90 jours au maximum. Ne saisissez pas de coordonnées ni de données d’identité, de paiement ou de compte dans le chat. L’e-mail envoyé via le formulaire séparé est conservé avec votre consentement et visible uniquement par les administrateurs autorisés.",
+      privacyNote: "Nous conservons une copie automatiquement anonymisée de ce chat pendant 90 jours au maximum. Ne saisissez pas de coordonnées ni de données d’identité, de paiement ou de compte dans le chat. L’e-mail envoyé via le formulaire séparé est conservé avec votre consentement et visible uniquement par les administrateurs autorisés et les employés approuvés.",
       privacyNoteCompact: "Le chat anonymisé est conservé jusqu’à 90 jours. Ne saisissez aucune donnée sensible.",
       privacyContact: "Demande de confidentialité",
       openLabel: "Ouvrir l’assistant IA BOLEN",

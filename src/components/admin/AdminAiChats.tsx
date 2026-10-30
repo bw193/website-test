@@ -68,7 +68,7 @@ function shortReference(sessionId: string) {
 export default function AdminAiChats() {
   const { t, i18n } = useTranslation();
   const { role, isMasterAdmin } = useAuth();
-  const canViewContacts = role === 'admin' || isMasterAdmin;
+  const canViewContacts = role === 'admin' || role === 'employee' || isMasterAdmin;
   const [conversations, setConversations] = useState<AiConversation[]>([]);
   const [messages, setMessages] = useState<AiMessage[]>([]);
   const [contact, setContact] = useState<AiChatContact | null>(null);
@@ -191,7 +191,7 @@ export default function AdminAiChats() {
         title={t('admin.dashboard.tabs.aiChats', 'AI Chats')}
         subtitle={t(
           'admin.aiChats.subtitle',
-          'Administrators and approved employees can view redacted conversations for up to 90 days. Separately submitted follow-up emails are visible only to administrators.',
+          'Administrators and approved employees can view redacted conversations and separately submitted follow-up emails for up to 90 days.',
         )}
         action={
           <button type="button" onClick={() => void fetchConversations()} className={adminSecondaryBtn} disabled={loading}>
