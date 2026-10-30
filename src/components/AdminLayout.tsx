@@ -153,16 +153,12 @@ export default function AdminLayout() {
         icon: Inbox,
         badge: newRfqCount,
       },
-      ...(canManageTeam
-        ? [
-            {
-              tab: 'ai-chats' as const,
-              to: adminPath('ai-chats'),
-              label: t('admin.dashboard.tabs.aiChats', 'AI Chats'),
-              icon: MessageSquareText,
-            },
-          ]
-        : []),
+      {
+        tab: 'ai-chats',
+        to: adminPath('ai-chats'),
+        label: t('admin.dashboard.tabs.aiChats', 'AI Chats'),
+        icon: MessageSquareText,
+      },
     ];
     const admin: NavItem[] = [
       ...(canManageTeam

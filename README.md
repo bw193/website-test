@@ -37,7 +37,7 @@ The default model is selected in `worker/index.ts`. Cloudflare's daily free Work
 
 Edit `buildSystemPrompt()` in `worker/index.ts` to change the assistant's verified company background, answer scope, RFQ handoff, and response style. Keep personal contact details in the structured RFQ flow rather than the saved chat transcript.
 
-Automatically redacted conversations are retained for up to 90 days. Authorized administrators can review them at `/admin?tab=ai-chats`; anonymous visitors and employees without administrator access cannot read the chat tables.
+Automatically redacted conversations are retained for up to 90 days. Administrators and approved employees can review them at `/admin?tab=ai-chats`; anonymous visitors, pending accounts, and rejected accounts cannot read the chat tables. Separately submitted follow-up emails remain administrator-only. Browser access to transcripts is read-only.
 
 The first deployment receives a `workers.dev` address. Attach the production domain in the Cloudflare Workers dashboard after confirming that the domain's DNS zone is managed by the intended Cloudflare account.
 

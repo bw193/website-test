@@ -950,7 +950,7 @@ export const zh = {
         }
       },
       aiChats: {
-        subtitle: "自动移除常见联系方式的聊天仅限管理员查看，并会在 90 天后到期。",
+        subtitle: "管理员和已审核员工均可查看脱敏聊天记录，记录最长保留 90 天；单独提交的跟进邮箱仅限管理员查看。",
         refresh: "刷新",
         search: "按页面或会话 ID 搜索…",
         languageFilter: "按语言筛选",

@@ -10,6 +10,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../supabase';
 import {
   EmptyState,
@@ -66,6 +67,8 @@ function shortReference(sessionId: string) {
 
 export default function AdminAiChats() {
   const { t, i18n } = useTranslation();
+  const { role, isMasterAdmin } = useAuth();
+  const canViewContacts = role === 'admin' || isMasterAdmin;
   const [conversations, setConversations] = useState<AiConversation[]>([]);
   const [messages, setMessages] = useState<AiMessage[]>([]);
   const [contact, setContact] = useState<AiChatContact | null>(null);
@@ -147,11 +150,13 @@ export default function AdminAiChats() {
           .select('id,conversation_id,sequence_no,role,content,created_at')
           .eq('conversation_id', selectedId)
           .order('sequence_no', { ascending: true }),
-        supabase
-          .from('ai_chat_contacts')
-          .select('conversation_id,email,consented_at')
-          .eq('conversation_id', selectedId)
-          .maybeSingle(),
+        canViewContacts
+          ? supabase
+              .from('ai_chat_contacts')
+              .select('conversation_id,email,consented_at')
+              .eq('conversation_id', selectedId)
+              .maybeSingle()
+          : Promise.resolve({ data: null, error: null }),
       ]);
 
       if (cancelled) return;
@@ -175,7 +180,7 @@ export default function AdminAiChats() {
     return () => {
       cancelled = true;
     };
-  }, [selectedId, t]);
+  }, [selectedId, canViewContacts, t]);
 
   const selectedConversation =
     filteredConversations.find((conversation) => conversation.id === selectedId) || null;
@@ -186,7 +191,7 @@ export default function AdminAiChats() {
         title={t('admin.dashboard.tabs.aiChats', 'AI Chats')}
         subtitle={t(
           'admin.aiChats.subtitle',
-          'Redacted transcripts and separately submitted follow-up emails are visible only to administrators and expire after 90 days.',
+          'Administrators and approved employees can view redacted conversations for up to 90 days. Separately submitted follow-up emails are visible only to administrators.',
         )}
         action={
           <button type="button" onClick={() => void fetchConversations()} className={adminSecondaryBtn} disabled={loading}>
@@ -302,32 +307,34 @@ export default function AdminAiChats() {
                       <dd className="font-mono" title={selectedConversation.session_id}>{shortReference(selectedConversation.session_id)}</dd>
                     </div>
                   </dl>
-                  <div className="mt-4 flex items-start gap-3 rounded-xl border border-stone-200 bg-stone-50 px-3.5 py-3">
-                    <Mail className="mt-0.5 h-4 w-4 shrink-0 text-stone-400" aria-hidden="true" />
-                    <div className="min-w-0">
-                      <p className="text-xs font-semibold uppercase tracking-wide text-stone-500">
-                        {t('admin.aiChats.contactEmail', 'Follow-up email')}
-                      </p>
-                      {contact ? (
-                        <>
-                          <a
-                            href={`mailto:${contact.email}`}
-                            className="mt-1 block break-all text-sm font-semibold text-stone-900 underline decoration-stone-300 underline-offset-2 hover:decoration-stone-700"
-                          >
-                            {contact.email}
-                          </a>
-                          <p className="mt-1 text-[11px] text-stone-400">
-                            {t('admin.aiChats.consentedAt', 'Follow-up consent recorded')}: {' '}
-                            {formatDateTime(contact.consented_at, i18n.language)}
-                          </p>
-                        </>
-                      ) : (
-                        <p className="mt-1 text-sm text-stone-500">
-                          {t('admin.aiChats.noContactEmail', 'Not provided')}
+                  {canViewContacts && (
+                    <div className="mt-4 flex items-start gap-3 rounded-xl border border-stone-200 bg-stone-50 px-3.5 py-3">
+                      <Mail className="mt-0.5 h-4 w-4 shrink-0 text-stone-400" aria-hidden="true" />
+                      <div className="min-w-0">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-stone-500">
+                          {t('admin.aiChats.contactEmail', 'Follow-up email')}
                         </p>
-                      )}
+                        {contact ? (
+                          <>
+                            <a
+                              href={`mailto:${contact.email}`}
+                              className="mt-1 block break-all text-sm font-semibold text-stone-900 underline decoration-stone-300 underline-offset-2 hover:decoration-stone-700"
+                            >
+                              {contact.email}
+                            </a>
+                            <p className="mt-1 text-[11px] text-stone-400">
+                              {t('admin.aiChats.consentedAt', 'Follow-up consent recorded')}: {' '}
+                              {formatDateTime(contact.consented_at, i18n.language)}
+                            </p>
+                          </>
+                        ) : (
+                          <p className="mt-1 text-sm text-stone-500">
+                            {t('admin.aiChats.noContactEmail', 'Not provided')}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
 
                 <div className="mt-5 space-y-3" aria-live="polite">

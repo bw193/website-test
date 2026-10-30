@@ -963,7 +963,7 @@ export const en = {
         }
       },
       aiChats: {
-        subtitle: "Automatically redacted conversations are visible only to administrators and expire after 90 days.",
+        subtitle: "Administrators and approved employees can view redacted conversations for up to 90 days. Separately submitted follow-up emails are visible only to administrators.",
         refresh: "Refresh",
         search: "Search by page or conversation ID…",
         languageFilter: "Filter by language",

@@ -140,7 +140,7 @@ export default function AdminDashboard() {
 
   const requestedTab = (searchParams.get('tab') as AdminTab | null) || 'overview';
   const activeTab: AdminTab =
-    (requestedTab === 'employees' || requestedTab === 'ai-chats') && !canManageTeam
+    requestedTab === 'employees' && !canManageTeam
       ? 'overview'
       : ADMIN_TABS.includes(requestedTab)
         ? requestedTab
