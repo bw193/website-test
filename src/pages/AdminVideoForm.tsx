@@ -11,16 +11,26 @@ import {
   Tag,
   Upload,
   Wand2,
+  X,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import * as tus from 'tus-js-client';
 import SEO from '../components/SEO';
+import VideoPoster from '../components/VideoPoster';
 import { supabase, hasSupabaseConfig } from '../supabase';
 import { supabaseConfig } from '../supabaseConfig';
 import type { VideoSourceType } from '../types/video';
 import { buildEmbedUrl, youtubePosterUrl } from '../utils/video';
-import { captureVideoFrame, deriveEmbedThumbnail, isDerivedEmbedThumbnail } from '../utils/videoThumbnail';
+import {
+  captureVideoFrame,
+  CUSTOM_THUMBNAIL_FOLDER,
+  deriveEmbedThumbnail,
+  isCustomVideoThumbnail,
+  isDerivedEmbedThumbnail,
+  VideoFrameUnavailableError,
+  type VideoReaderProgress,
+} from '../utils/videoThumbnail';
 import { toSlug } from '../utils/slug';
 
 const DEFAULT_VIDEO_CATEGORIES = ['Product Demo', 'Factory Tour', 'Installation', 'Technology', 'Quality Control'];
@@ -29,6 +39,8 @@ const TARGET_UPLOAD_LIMIT_BYTES = 500 * 1024 * 1024;
 const FREE_PLAN_LIMIT_BYTES = 50 * 1024 * 1024;
 const RESUMABLE_THRESHOLD_BYTES = 6 * 1024 * 1024;
 const RESUMABLE_CHUNK_BYTES = 6 * 1024 * 1024;
+const COVER_EXTENSIONS: Record<string, string> = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
+const COVER_MAX_BYTES = 8 * 1024 * 1024;
 
 interface VideoFormValues {
   title: string;
@@ -101,12 +113,15 @@ export default function AdminVideoForm() {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const videoInputRef = useRef<HTMLInputElement>(null);
+  const coverInputRef = useRef<HTMLInputElement>(null);
 
   const [loading, setLoading] = useState(!!id);
   const [saving, setSaving] = useState(false);
   const [uploadingVideo, setUploadingVideo] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [generatingCover, setGeneratingCover] = useState(false);
+  const [uploadingCover, setUploadingCover] = useState(false);
+  const [readerProgress, setReaderProgress] = useState<VideoReaderProgress | null>(null);
   const [categories, setCategories] = useState<string[]>(DEFAULT_VIDEO_CATEGORIES);
   const [storedVideo, setStoredVideo] = useState<StoredVideo | null>(null);
 
@@ -289,6 +304,9 @@ export default function AdminVideoForm() {
     return publicUrl;
   };
 
+  const frameUnavailableMessage = () =>
+    t('admin.videos.frameUnavailable', "Couldn't read the picture in this video, so no cover was made. Upload a cover image instead.");
+
   const handleVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!hasSupabaseConfig) {
       alert(t('admin.productForm.alerts.supabaseNotConfigured'));
@@ -304,18 +322,32 @@ export default function AdminVideoForm() {
     setUploadingVideo(true);
     setUploadProgress(null);
     try {
-      const snapshot = await captureVideoFrame(file);
-      const [videoPublicUrl, thumbnailPublicUrl] = await Promise.all([
+      // The cover is captured in this browser, which may not be able to read the
+      // picture (VideoFrameUnavailableError). That must not stop the upload.
+      const [videoPublicUrl, cover] = await Promise.all([
         uploadVideoFile(file),
-        uploadBlobToBucket(snapshot.thumbnail, 'thumbnails', 'jpg'),
+        captureVideoFrame(file, { onReaderProgress: setReaderProgress }).then(
+          async (snapshot) => ({
+            url: await uploadBlobToBucket(snapshot.thumbnail, 'thumbnails', 'jpg'),
+            durationSeconds: snapshot.durationSeconds,
+          }),
+          (err: unknown) => ({
+            url: '',
+            durationSeconds: err instanceof VideoFrameUnavailableError ? err.durationSeconds : null,
+          })
+        ),
       ]);
 
       setValue('source_type', 'upload', { shouldDirty: true });
       setValue('video_url', videoPublicUrl, { shouldDirty: true });
       setValue('embed_url', '', { shouldDirty: true });
-      setValue('thumbnail_url', thumbnailPublicUrl, { shouldDirty: true });
-      if (snapshot.durationSeconds) {
-        setValue('duration_seconds', String(snapshot.durationSeconds), { shouldDirty: true });
+      if (cover.durationSeconds) {
+        setValue('duration_seconds', String(cover.durationSeconds), { shouldDirty: true });
+      }
+      // A cover uploaded by hand stays; any other cover belonged to the old video.
+      if (!isCustomVideoThumbnail(getValues('thumbnail_url'))) {
+        setValue('thumbnail_url', cover.url, { shouldDirty: true });
+        if (!cover.url) alert(frameUnavailableMessage());
       }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : t('admin.videos.uploadError', 'Failed to upload video.');
@@ -323,6 +355,7 @@ export default function AdminVideoForm() {
     } finally {
       setUploadingVideo(false);
       setUploadProgress(null);
+      setReaderProgress(null);
       if (videoInputRef.current) videoInputRef.current.value = '';
     }
   };
@@ -350,17 +383,54 @@ export default function AdminVideoForm() {
         return;
       }
 
-      const snapshot = await captureVideoFrame(url);
+      const snapshot = await captureVideoFrame(url, { onReaderProgress: setReaderProgress });
       const thumbnailPublicUrl = await uploadBlobToBucket(snapshot.thumbnail, 'thumbnails', 'jpg');
       setValue('thumbnail_url', thumbnailPublicUrl, { shouldDirty: true });
       if (snapshot.durationSeconds) {
         setValue('duration_seconds', String(snapshot.durationSeconds), { shouldDirty: true });
       }
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : t('admin.videos.coverUnavailable', 'Could not generate a cover from this URL.');
-      alert(`${t('admin.videos.coverUnavailable', 'Could not generate a cover from this URL.')}\n${message}`);
+      if (err instanceof VideoFrameUnavailableError) {
+        alert(frameUnavailableMessage());
+      } else {
+        const message = err instanceof Error ? err.message : t('admin.videos.coverUnavailable', 'Could not generate a cover from this URL.');
+        alert(`${t('admin.videos.coverUnavailable', 'Could not generate a cover from this URL.')}\n${message}`);
+      }
     } finally {
       setGeneratingCover(false);
+      setReaderProgress(null);
+    }
+  };
+
+  const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!hasSupabaseConfig) {
+      alert(t('admin.productForm.alerts.supabaseNotConfigured'));
+      return;
+    }
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const extension = COVER_EXTENSIONS[file.type];
+    if (!extension) {
+      alert(t('admin.blog.coverInvalidType', 'Choose a PNG, JPG, or WEBP image.'));
+      e.target.value = '';
+      return;
+    }
+    if (file.size > COVER_MAX_BYTES) {
+      alert(t('admin.blog.coverTooLarge', 'Cover images must be 8 MB or smaller.'));
+      e.target.value = '';
+      return;
+    }
+
+    setUploadingCover(true);
+    try {
+      const publicUrl = await uploadBlobToBucket(file, CUSTOM_THUMBNAIL_FOLDER, extension);
+      setValue('thumbnail_url', publicUrl, { shouldDirty: true });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : t('admin.productForm.unknownError', 'Unknown error');
+      alert(t('admin.productForm.alerts.uploadFailed', { message }));
+    } finally {
+      setUploadingCover(false);
+      if (coverInputRef.current) coverInputRef.current.value = '';
     }
   };
 
@@ -474,7 +544,7 @@ export default function AdminVideoForm() {
               </button>
               <button
                 onClick={handleSubmit(onSubmit)}
-                disabled={saving || uploadingVideo || generatingCover}
+                disabled={saving || uploadingVideo || generatingCover || uploadingCover}
                 className="inline-flex items-center justify-center rounded-xl border border-transparent bg-stone-900 px-5 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-stone-800 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
@@ -607,18 +677,6 @@ export default function AdminVideoForm() {
                   </div>
                 )}
 
-                {(sourceType === 'direct' || sourceType === 'embed') && (
-                  <button
-                    type="button"
-                    onClick={handleGenerateCoverFromUrl}
-                    disabled={generatingCover || !videoUrl.trim()}
-                    className="inline-flex items-center gap-2 rounded-xl border border-stone-300 bg-white px-4 py-2.5 text-sm font-semibold text-stone-800 hover:bg-stone-50 disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    {generatingCover ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
-                    {generatingCover ? t('admin.videos.generatingCover', 'Generating cover...') : t('admin.videos.generateCover', 'Generate cover')}
-                  </button>
-                )}
-
                 {sourceType === 'embed' && (
                   <p className="rounded-xl bg-stone-50 p-3 text-xs leading-relaxed text-stone-500">
                     {t('admin.videos.embedHelp', 'Paste a YouTube or Vimeo URL (watch, Shorts, or youtu.be). The embed and cover are filled in automatically.')}
@@ -634,17 +692,87 @@ export default function AdminVideoForm() {
                   </h4>
                   {durationSeconds ? <span className="text-xs text-stone-500">{durationSeconds}s</span> : null}
                 </div>
-                <div className="aspect-video overflow-hidden rounded-xl border border-stone-200 bg-white">
-                  {thumbUrl ? (
-                    <img src={thumbUrl} alt="" className="h-full w-full object-cover" referrerPolicy="no-referrer" />
-                  ) : (
-                    <div className="flex h-full flex-col items-center justify-center px-6 text-center text-stone-400">
-                      <ImageIcon className="mb-2 h-8 w-8" />
-                      <p className="text-xs leading-relaxed">
-                        {t('admin.videos.autoCoverHelp', 'The cover is generated from the video.')}
-                      </p>
+                {/* Preview beside the controls on mid-size screens; stacked in the side column and on phones. */}
+                <div className="sm:grid sm:grid-cols-[14rem_minmax(0,1fr)] sm:items-start sm:gap-5 lg:block">
+                  {/* Same frame and fit as the video cards, so this is what visitors see. */}
+                  <div className="mx-auto max-w-[18rem] sm:mx-0 lg:mx-auto">
+                    {thumbUrl ? (
+                      <VideoPoster
+                        key={thumbUrl}
+                        src={thumbUrl}
+                        alt=""
+                        loading="eager"
+                        widths={[420, 640]}
+                        sizes="18rem"
+                        className="rounded-xl border border-stone-200"
+                      />
+                    ) : (
+                      <div className="flex aspect-[4/5] flex-col items-center justify-center rounded-xl border border-dashed border-stone-300 bg-white px-6 text-center text-stone-400">
+                        <ImageIcon className="mb-2 h-8 w-8" />
+                        <p className="text-xs leading-relaxed">
+                          {t('admin.videos.autoCoverHelp', 'No cover yet. Upload an image or generate one from the video.')}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  <div>
+                    <input
+                      ref={coverInputRef}
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      className="hidden"
+                      onChange={handleCoverUpload}
+                    />
+                    <div className="mt-3 grid grid-cols-2 gap-2 sm:mt-0 lg:mt-3">
+                      <button
+                        type="button"
+                        onClick={() => coverInputRef.current?.click()}
+                        disabled={uploadingCover}
+                        className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-stone-300 bg-white px-3 py-2 text-xs font-semibold text-stone-800 hover:bg-stone-50 disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        {uploadingCover ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Upload className="h-3.5 w-3.5" />}
+                        {uploadingCover ? t('admin.blog.uploading') : t('admin.videos.uploadCover', 'Upload image')}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleGenerateCoverFromUrl}
+                        disabled={generatingCover || uploadingVideo || !videoUrl.trim()}
+                        className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-stone-300 bg-white px-3 py-2 text-xs font-semibold text-stone-800 hover:bg-stone-50 disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        {generatingCover ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Wand2 className="h-3.5 w-3.5" />}
+                        {generatingCover ? t('admin.videos.generatingCover', 'Generating...') : t('admin.videos.generateCover', 'From video')}
+                      </button>
                     </div>
-                  )}
+                    {readerProgress && (
+                      <p role="status" className="mt-3 flex items-start gap-2 text-xs font-medium leading-relaxed text-stone-700">
+                        <Loader2 className="mt-0.5 h-3.5 w-3.5 shrink-0 animate-spin" />
+                        <span>
+                          {readerProgress.stage === 'read'
+                            ? t('admin.videos.readerReading', 'Reading the picture from the video...')
+                            : readerProgress.ratio === null
+                              ? t('admin.videos.readerPreparing', 'Preparing the video reader (one-time download)...')
+                              : t('admin.videos.readerDownloading', {
+                                  percent: Math.round(readerProgress.ratio * 100),
+                                  defaultValue: 'Preparing the video reader (one-time download)... {{percent}}%',
+                                })}
+                        </span>
+                      </p>
+                    )}
+                    <p className="mt-3 text-xs leading-relaxed text-stone-500">
+                      {t('admin.videos.coverHelp', 'Shown at 4:5 on video cards. JPG, PNG or WEBP, up to 8\u00a0MB.')}
+                    </p>
+                    {thumbUrl && (
+                      <button
+                        type="button"
+                        onClick={() => setValue('thumbnail_url', '', { shouldDirty: true })}
+                        className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-stone-600 hover:text-stone-900"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                        {t('admin.blog.removeCover', 'Remove cover')}
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

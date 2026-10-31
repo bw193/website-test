@@ -1,9 +1,37 @@
 import { isYouTubeShortsUrl, parseYouTubeId } from './video';
+import type { VideoReaderProgress } from './videoFrameReader';
+
+export type { VideoReaderProgress };
 
 const FRAME_SAMPLE_COUNT = 5;
 const MIN_ACCEPTABLE_LUMA = 22;
 const THUMBNAIL_POSTER_WIDTH = 960;
 const THUMBNAIL_POSTER_HEIGHT = 1200;
+
+/** Storage folder for covers staff upload by hand; regenerating covers leaves these alone. */
+export const CUSTOM_THUMBNAIL_FOLDER = 'thumbnails/custom';
+
+export function isCustomVideoThumbnail(url: string | null | undefined): boolean {
+  return Boolean(url && url.includes(`/${CUSTOM_THUMBNAIL_FOLDER}/`));
+}
+
+/**
+ * The browser loaded the video but cannot draw its picture. An H.265/HEVC
+ * phone recording does this in browsers without an HEVC decoder (many Chrome
+ * and Firefox installs): the audio and duration load, the picture is 0×0, and
+ * every captured "frame" is the empty canvas — which used to be saved as a
+ * black cover. captureVideoFrame() then reads the frames with FFmpeg instead,
+ * and only throws this when that fails too. The duration travels with it.
+ */
+export class VideoFrameUnavailableError extends Error {
+  durationSeconds: number | null;
+
+  constructor(durationSeconds: number | null) {
+    super('This browser cannot show the picture in this video, so no cover was made.');
+    this.name = 'VideoFrameUnavailableError';
+    this.durationSeconds = durationSeconds;
+  }
+}
 
 function randomFrameTimes(duration: number | null): number[] {
   if (!duration || !Number.isFinite(duration) || duration <= 1) return [0];
@@ -55,11 +83,7 @@ function drawVideoToCanvasCover(
   ctx.drawImage(video, (targetWidth - drawWidth) / 2, (targetHeight - drawHeight) / 2, drawWidth, drawHeight);
 }
 
-function drawVideoPosterFrame(ctx: CanvasRenderingContext2D, video: HTMLVideoElement, canvas: HTMLCanvasElement): void {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  drawVideoToCanvasCover(ctx, video, canvas.width, canvas.height);
-
+function shadePoster(ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement): void {
   const shade = ctx.createLinearGradient(0, 0, 0, canvas.height);
   shade.addColorStop(0, 'rgba(12,10,9,0.04)');
   shade.addColorStop(0.62, 'rgba(12,10,9,0.02)');
@@ -94,7 +118,41 @@ function canvasToJpeg(canvas: HTMLCanvasElement): Promise<Blob> {
   });
 }
 
-export async function captureVideoFrame(source: File | string): Promise<{ thumbnail: Blob; durationSeconds: number | null }> {
+/**
+ * Draws a candidate frame for each sample time with `drawFrame` and returns the
+ * first bright enough one as a JPEG poster, or else the brightest.
+ */
+async function pickPosterFrame(
+  duration: number | null,
+  drawFrame: (ctx: CanvasRenderingContext2D, time: number) => Promise<void>
+): Promise<Blob> {
+  const canvas = document.createElement('canvas');
+  canvas.width = THUMBNAIL_POSTER_WIDTH;
+  canvas.height = THUMBNAIL_POSTER_HEIGHT;
+
+  const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('Could not create a thumbnail canvas.');
+
+  let bestFrame: Blob | null = null;
+  let bestLuma = -1;
+  for (const time of randomFrameTimes(duration)) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    await drawFrame(ctx, time);
+    shadePoster(ctx, canvas);
+    const luma = frameLuma(ctx, canvas.width, canvas.height);
+    const frame = await canvasToJpeg(canvas);
+    if (luma > bestLuma) {
+      bestLuma = luma;
+      bestFrame = frame;
+    }
+    if (luma >= MIN_ACCEPTABLE_LUMA) break;
+  }
+
+  if (!bestFrame) throw new Error('Could not generate a thumbnail from this video.');
+  return bestFrame;
+}
+
+async function captureWithBrowser(source: File | string): Promise<{ thumbnail: Blob; durationSeconds: number | null }> {
   const video = document.createElement('video');
   const objectUrl = source instanceof File ? URL.createObjectURL(source) : '';
   const src = objectUrl || source;
@@ -110,40 +168,60 @@ export async function captureVideoFrame(source: File | string): Promise<{ thumbn
     await waitForVideoEvent(video, 'loadedmetadata');
 
     const durationSeconds = Number.isFinite(video.duration) ? Math.round(video.duration) : null;
-    const frameTimes = randomFrameTimes(Number.isFinite(video.duration) ? video.duration : null);
+    if (!video.videoWidth || !video.videoHeight) throw new VideoFrameUnavailableError(durationSeconds);
+    const duration = Number.isFinite(video.duration) ? video.duration : null;
 
-    const canvas = document.createElement('canvas');
-    canvas.width = THUMBNAIL_POSTER_WIDTH;
-    canvas.height = THUMBNAIL_POSTER_HEIGHT;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) throw new Error('Could not create a thumbnail canvas.');
-
-    let bestFrame: Blob | null = null;
-    let bestLuma = -1;
-    for (const time of frameTimes) {
-      if (time > 0 && Number.isFinite(video.duration)) {
+    const thumbnail = await pickPosterFrame(duration, async (ctx, time) => {
+      if (time > 0 && duration !== null) {
         await seekVideo(video, time);
       } else {
         await ensureVideoData(video);
       }
-      drawVideoPosterFrame(ctx, video, canvas);
-      const luma = frameLuma(ctx, canvas.width, canvas.height);
-      const frame = await canvasToJpeg(canvas);
-      if (luma > bestLuma) {
-        bestLuma = luma;
-        bestFrame = frame;
-      }
-      if (luma >= MIN_ACCEPTABLE_LUMA) break;
-    }
-
-    if (!bestFrame) throw new Error('Could not generate a thumbnail from this video.');
-
-    return { thumbnail: bestFrame, durationSeconds };
+      drawVideoToCanvasCover(ctx, video, THUMBNAIL_POSTER_WIDTH, THUMBNAIL_POSTER_HEIGHT);
+    });
+    return { thumbnail, durationSeconds };
   } finally {
     video.removeAttribute('src');
     video.load();
     if (objectUrl) URL.revokeObjectURL(objectUrl);
+  }
+}
+
+async function captureWithReader(
+  source: File | string,
+  onProgress?: (progress: VideoReaderProgress) => void
+): Promise<{ thumbnail: Blob; durationSeconds: number | null }> {
+  const { withVideoReader } = await import('./videoFrameReader');
+  return withVideoReader(source, onProgress, async (reader) => {
+    const thumbnail = await pickPosterFrame(reader.durationSeconds, async (ctx, time) => {
+      const pixels = await reader.frameAt(time, THUMBNAIL_POSTER_WIDTH, THUMBNAIL_POSTER_HEIGHT);
+      ctx.putImageData(new ImageData(pixels, THUMBNAIL_POSTER_WIDTH, THUMBNAIL_POSTER_HEIGHT), 0, 0);
+    });
+    return {
+      thumbnail,
+      durationSeconds: reader.durationSeconds === null ? null : Math.round(reader.durationSeconds),
+    };
+  });
+}
+
+/**
+ * A 4:5 JPEG poster from a frame of the video, plus its duration. Browsers that
+ * cannot decode the clip (VideoFrameUnavailableError, or a load error) fall back
+ * to FFmpeg, which downloads once and reports progress through `onReaderProgress`.
+ */
+export async function captureVideoFrame(
+  source: File | string,
+  { onReaderProgress }: { onReaderProgress?: (progress: VideoReaderProgress) => void } = {}
+): Promise<{ thumbnail: Blob; durationSeconds: number | null }> {
+  try {
+    return await captureWithBrowser(source);
+  } catch (browserError) {
+    try {
+      return await captureWithReader(source, onReaderProgress);
+    } catch (readerError) {
+      console.error('The video reader could not make a cover either', readerError);
+      throw browserError;
+    }
   }
 }
 

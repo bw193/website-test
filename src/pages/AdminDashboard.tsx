@@ -22,8 +22,15 @@ import {
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 import SEO from '../components/SEO';
-import { captureVideoFrame, deriveEmbedThumbnail } from '../utils/videoThumbnail';
-import { buildEmbedUrl, deriveVideoThumbnailUrl, FALLBACK_VIDEO_THUMB, formatVideoDuration } from '../utils/video';
+import VideoPoster from '../components/VideoPoster';
+import {
+  captureVideoFrame,
+  deriveEmbedThumbnail,
+  isCustomVideoThumbnail,
+  VideoFrameUnavailableError,
+  type VideoReaderProgress,
+} from '../utils/videoThumbnail';
+import { buildEmbedUrl, deriveVideoThumbnailUrl, formatVideoDuration } from '../utils/video';
 import { PRODUCT_IMAGE_PLACEHOLDER, handleImageError } from '../utils/imagePlaceholder';
 import { ADMIN_TABS, type AdminShellContext, type AdminTab } from '../components/AdminLayout';
 import {
@@ -175,6 +182,7 @@ export default function AdminDashboard() {
   const [employeeRoleFilter, setEmployeeRoleFilter] = useState<RoleFilter>('all');
   const [regeneratingVideoId, setRegeneratingVideoId] = useState<string | null>(null);
   const [regeneratingAllVideos, setRegeneratingAllVideos] = useState(false);
+  const [readerProgress, setReaderProgress] = useState<VideoReaderProgress | null>(null);
   const [stats, setStats] = useState({
     products: 0,
     totalRfqs: 0,
@@ -319,7 +327,9 @@ export default function AdminDashboard() {
       thumbnailUrl = await deriveEmbedThumbnail(sourceUrl);
       if (!thumbnailUrl) throw new Error(t('admin.videos.thumbnailDeriveError', 'Could not derive a thumbnail for this embedded video.'));
     } else {
-      const snapshot = await captureVideoFrame(sourceUrl);
+      const snapshot = await captureVideoFrame(sourceUrl, { onReaderProgress: setReaderProgress }).finally(() =>
+        setReaderProgress(null)
+      );
       thumbnailUrl = await uploadVideoThumbnail(snapshot.thumbnail, post.slug);
       durationSeconds = snapshot.durationSeconds ?? durationSeconds;
     }
@@ -340,20 +350,40 @@ export default function AdminDashboard() {
   };
 
   const handleRegenerateVideoThumbnail = async (post: VideoPostRow) => {
+    if (
+      isCustomVideoThumbnail(post.thumbnail_url) &&
+      !window.confirm(
+        t(
+          'admin.videos.replaceCustomCoverConfirm',
+          'This video has a cover that was uploaded by hand. Replace it with a frame from the video?'
+        )
+      )
+    ) {
+      return;
+    }
     setRegeneratingVideoId(post.id);
     try {
       await regenerateVideoThumbnail(post);
       alert(t('admin.videos.thumbnailRegenerated', 'Thumbnail regenerated.'));
     } catch (error) {
       console.error('Error regenerating video thumbnail', error);
-      alert(error instanceof Error ? error.message : t('admin.videos.thumbnailRegenerateError', 'Failed to regenerate thumbnail.'));
+      alert(
+        error instanceof VideoFrameUnavailableError
+          ? t('admin.videos.frameUnavailable', "Couldn't read the picture in this video, so no cover was made. Upload a cover image instead.")
+          : error instanceof Error
+            ? error.message
+            : t('admin.videos.thumbnailRegenerateError', 'Failed to regenerate thumbnail.')
+      );
     } finally {
       setRegeneratingVideoId(null);
     }
   };
 
   const handleRegenerateAllVideoThumbnails = async () => {
-    const candidates = videoPosts.filter((post) => post.video_url || post.embed_url);
+    // Covers uploaded by hand were chosen on purpose; only automatic ones are redone.
+    const candidates = videoPosts.filter(
+      (post) => (post.video_url || post.embed_url) && !isCustomVideoThumbnail(post.thumbnail_url)
+    );
     if (!candidates.length) {
       alert(t('admin.videos.noRegeneratableVideos', 'No videos with source URLs found.'));
       return;
@@ -362,7 +392,7 @@ export default function AdminDashboard() {
       !window.confirm(
         t(
           'admin.videos.regenerateAllConfirm',
-          'Regenerate thumbnails for {{count}} videos? This uploads new JPG thumbnails and updates the video records.',
+          'Regenerate thumbnails for {{count}} videos? This uploads new JPG thumbnails and updates the video records. Covers uploaded by hand are kept.',
           { count: candidates.length }
         )
       )
@@ -771,20 +801,20 @@ export default function AdminDashboard() {
                   const busy = regeneratingAllVideos || regeneratingVideoId === post.id;
                   return (
                     <article key={post.id} className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
-                      <div className="relative aspect-video bg-stone-100">
-                        <img
-                          src={deriveVideoThumbnailUrl(post) || FALLBACK_VIDEO_THUMB}
-                          alt=""
-                          className="h-full w-full object-cover"
-                          referrerPolicy="no-referrer"
-                          onError={handleImageError}
-                        />
+                      {/* Letterboxes the 4:5 covers instead of cropping them to a strip. */}
+                      <VideoPoster
+                        src={deriveVideoThumbnailUrl(post)}
+                        alt=""
+                        aspect="video"
+                        widths={[420, 640]}
+                        sizes="(min-width: 1280px) 25vw, (min-width: 640px) 45vw, 100vw"
+                      >
                         {duration && (
                           <span className="absolute bottom-2 right-2 rounded-md bg-stone-950/80 px-1.5 py-0.5 text-[11px] font-semibold text-white">
                             {duration}
                           </span>
                         )}
-                      </div>
+                      </VideoPoster>
                       <div className="flex flex-col gap-3 p-4">
                         <div className="min-w-0">
                           <p className="truncate font-semibold text-stone-900">{localizedTitle(post.title, post.slug)}</p>
@@ -816,7 +846,10 @@ export default function AdminDashboard() {
                             className={`${adminSecondaryBtn} flex-1 py-2 text-xs`}
                           >
                             {regeneratingVideoId === post.id ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="mr-1.5 h-3.5 w-3.5" />}
-                            {t('admin.videos.regenerateThumbnail', 'Cover')}
+                            {/* The first HEVC cover downloads the video reader; show how far along it is. */}
+                            {regeneratingVideoId === post.id && readerProgress?.stage === 'download' && readerProgress.ratio !== null
+                              ? `${Math.round(readerProgress.ratio * 100)}%`
+                              : t('admin.videos.regenerateThumbnail', 'Cover')}
                           </button>
                           <Link to={`/admin/videos/${post.id}`} className={`${adminPrimaryBtn} flex-1 py-2 text-xs`}>
                             <Edit className="mr-1.5 h-3.5 w-3.5" />
@@ -1278,15 +1311,15 @@ function OverviewTab({
             <div className="grid grid-cols-2 gap-3 p-4">
               {videoPosts.map((post) => (
                 <Link key={post.id} to={`/admin/videos/${post.id}`} className="group min-w-0">
-                  <div className="aspect-video overflow-hidden rounded-xl bg-stone-100">
-                    <img
-                      src={deriveVideoThumbnailUrl(post) || FALLBACK_VIDEO_THUMB}
-                      alt=""
-                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                      referrerPolicy="no-referrer"
-                      onError={handleImageError}
-                    />
-                  </div>
+                  <VideoPoster
+                    src={deriveVideoThumbnailUrl(post)}
+                    alt=""
+                    aspect="video"
+                    widths={[420]}
+                    sizes="(min-width: 1024px) 12rem, 50vw"
+                    className="rounded-xl"
+                    imgClassName="transition-transform duration-300 group-hover:scale-105"
+                  />
                   <p className="mt-2 truncate text-sm font-semibold text-stone-900">{localizedTitle(post.title, post.slug)}</p>
                 </Link>
               ))}
