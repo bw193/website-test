@@ -10,7 +10,7 @@ export const TERMS_PATH = '/terms-and-conditions';
 export const TERMS_SEO = {
   title: 'Terms and Conditions | BOLEN Mirror',
   description:
-    'Terms and conditions for using the BOLEN Mirror website and requesting product information or quotations.',
+    'BOLEN Mirror terms and conditions, including refunds or order credits for defective products, spare parts with shipments, and lifetime technical support.',
 } as const;
 
 // Key order matters: the prerender and react-helmet-async both JSON.stringify
@@ -20,14 +20,14 @@ export const TERMS_SCHEMA = {
   '@context': 'https://schema.org',
   '@type': 'WebPage',
   name: 'Terms and Conditions',
-  description: 'Terms and conditions for using the BOLEN Mirror website.',
+  description: TERMS_SEO.description,
 } as const;
 
 export const TERMS_KICKER = 'Legal';
 export const TERMS_HEADING = 'Terms and Conditions';
-export const TERMS_LAST_UPDATED = 'Last updated: August 19, 2026';
+export const TERMS_LAST_UPDATED = 'Last updated: November 5, 2026';
 export const TERMS_INTRO =
-  'These terms govern your use of the BOLEN Mirror website, operated by Jiaxing Chengtai Mirror Co., Ltd. By using this website, you agree to these terms.';
+  'These terms govern your use of the BOLEN Mirror website, operated by Jiaxing Chengtai Mirror Co., Ltd., and describe our return and after-sales support policies. By using this website, you agree to these terms.';
 export const TERMS_CONTACT_HEADING = 'Contact';
 export const TERMS_CONTACT_LEAD = 'If you have questions about these terms, contact us at';
 export const TERMS_CONTACT_EMAIL = 'sales@bolenmirror.com';
@@ -40,6 +40,18 @@ export const TERMS_SECTIONS: ReadonlyArray<{ title: string; body: string }> = [
   {
     title: 'Product information and quotations',
     body: 'Product images, specifications, availability, and other information are provided for general reference and may change without notice. Website content does not constitute a binding offer. Prices, minimum order quantities, lead times, specifications, and commercial terms are confirmed in a written quotation or contract.',
+  },
+  {
+    title: 'Return policy',
+    body: 'Defective products are eligible for a refund or a credit toward your next order. To arrange a refund or order credit, contact us at sales@bolenmirror.com with your order details and a description of the issue.',
+  },
+  {
+    title: 'Spare parts',
+    body: 'Spare parts are included with your shipment to support product maintenance and repairs.',
+  },
+  {
+    title: 'Lifetime technical support',
+    body: 'We provide technical support throughout the entire lifespan of our products, including assistance with installation, use, troubleshooting, and maintenance. Contact us at sales@bolenmirror.com for technical support.',
   },
   {
     title: 'Intellectual property',
