@@ -373,7 +373,8 @@ export const es = {
         "Bathroom Mirror without led": "Espejo de Baño sin LED",
         "Full Length Dressing Mirror": "Espejo de Cuerpo Entero",
         "Irregular Mirror": "Espejo Irregular",
-        "Mirror Cabinet": "Armario con Espejo"
+        "Mirror Cabinet": "Armario con Espejo",
+        "Bathroom Vanity": "Mueble de Baño"
       },
       priceRange: "Rango de Precios",
       priceRangeLabel: "Rango orientativo de fábrica",

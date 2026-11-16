@@ -373,7 +373,8 @@ export const de = {
         "Bathroom Mirror without led": "Badspiegel ohne LED",
         "Full Length Dressing Mirror": "Ganzkörperspiegel",
         "Irregular Mirror": "Unregelmäßiger Spiegel",
-        "Mirror Cabinet": "Spiegelschrank"
+        "Mirror Cabinet": "Spiegelschrank",
+        "Bathroom Vanity": "Badunterschrank"
       },
       priceRange: "Preisspanne",
       priceRangeLabel: "Unverbindliche Werkspreisspanne",

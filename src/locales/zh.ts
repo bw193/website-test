@@ -375,7 +375,8 @@ export const zh = {
         "Bathroom Mirror without led": "无LED浴室镜",
         "Full Length Dressing Mirror": "全身穿衣镜",
         "Irregular Mirror": "异形镜",
-        "Mirror Cabinet": "镜柜"
+        "Mirror Cabinet": "镜柜",
+        "Bathroom Vanity": "浴室柜"
       },
       priceRange: "价格区间",
       priceRangeLabel: "参考工厂价格",

@@ -373,7 +373,8 @@ export const it = {
         "Bathroom Mirror without led": "Specchio da Bagno senza LED",
         "Full Length Dressing Mirror": "Specchio a Figura Intera",
         "Irregular Mirror": "Specchio Irregolare",
-        "Mirror Cabinet": "Armadietto con Specchio"
+        "Mirror Cabinet": "Armadietto con Specchio",
+        "Bathroom Vanity": "Mobile Bagno"
       },
       priceRange: "Fascia di Prezzo",
       priceRangeLabel: "Fascia indicativa di fabbrica",
