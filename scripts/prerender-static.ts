@@ -102,17 +102,10 @@ import {
 import { buildStorySchema } from '../src/utils/storySchema';
 import { INSIGHTS_PATH, insightDetailPath } from '../src/data/insights';
 import {
+  buildTermsSchema,
+  getTermsCopy,
   TERMS_CONTACT_EMAIL,
-  TERMS_CONTACT_HEADING,
-  TERMS_CONTACT_LEAD,
-  TERMS_HEADING,
-  TERMS_INTRO,
-  TERMS_KICKER,
-  TERMS_LAST_UPDATED,
   TERMS_PATH,
-  TERMS_SCHEMA,
-  TERMS_SECTIONS,
-  TERMS_SEO,
 } from '../src/data/termsCopy';
 import { productDetailPath, productAlternatePaths } from '../src/utils/productRoutes';
 import type { BlogPost, BlogListItem, LocalizedBlogPost } from '../src/types/blog';
@@ -1167,19 +1160,20 @@ function rfqContent(lang: Lang): string {
   `.trim();
 }
 
-// English in every locale, exactly like src/pages/TermsAndConditions.tsx.
-function termsContent(): string {
-  const sections = TERMS_SECTIONS.map(
+// Localized per locale, matching src/pages/TermsAndConditions.tsx.
+function termsContent(lang: Lang): string {
+  const copy = getTermsCopy(lang);
+  const sections = copy.sections.map(
     (section) => `<section><h2>${escapeHtml(section.title)}</h2><p>${escapeHtml(section.body)}</p></section>`
   ).join('\n      ');
   return `
     <div data-prerender="terms">
-      <p>${escapeHtml(TERMS_KICKER)}</p>
-      <h1>${escapeHtml(TERMS_HEADING)}</h1>
-      <p>${escapeHtml(TERMS_LAST_UPDATED)}</p>
-      <p>${escapeHtml(TERMS_INTRO)}</p>
+      <p>${escapeHtml(copy.kicker)}</p>
+      <h1>${escapeHtml(copy.heading)}</h1>
+      <p>${escapeHtml(copy.lastUpdated)}</p>
+      <p>${escapeHtml(copy.intro)}</p>
       ${sections}
-      <section><h2>${escapeHtml(TERMS_CONTACT_HEADING)}</h2><p>${escapeHtml(TERMS_CONTACT_LEAD)} <a href="mailto:${escapeAttr(TERMS_CONTACT_EMAIL)}">${escapeHtml(TERMS_CONTACT_EMAIL)}</a>.</p></section>
+      <section><h2>${escapeHtml(copy.contactHeading)}</h2><p>${escapeHtml(copy.contactLead)} <a href="mailto:${escapeAttr(TERMS_CONTACT_EMAIL)}">${escapeHtml(TERMS_CONTACT_EMAIL)}</a>.</p></section>
     </div>
   `.trim();
 }
@@ -2491,20 +2485,21 @@ async function main(): Promise<void> {
     // served as the 404 page. Head mirrors <SEO> in TermsAndConditions.tsx.
     {
       const canonical = `${SITE_URL}/${lang}${TERMS_PATH}/`;
+      const termsCopy = getTermsCopy(lang);
       const headExtras = buildHead({
         lang,
-        title: TERMS_SEO.title,
-        description: TERMS_SEO.description,
+        title: termsCopy.seo.title,
+        description: termsCopy.seo.description,
         canonical,
         ogImage: DEFAULT_OG_IMAGE,
         ogType: 'website',
         routePath: TERMS_PATH,
-        schema: [TERMS_SCHEMA],
+        schema: [buildTermsSchema(lang)],
       });
       const html = injectIntoTemplate(template, {
         lang,
         headExtras,
-        bodyContent: termsContent(),
+        bodyContent: termsContent(lang),
       });
       await writeRoute(`${lang}${TERMS_PATH}`, html);
       routeCount++;

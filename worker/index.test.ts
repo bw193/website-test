@@ -1225,3 +1225,14 @@ test('deployed Worker redirects the bare category index to the catalog with 301'
   assert.equal(category.status, 200);
   assert.equal(await category.text(), 'asset');
 });
+
+test('deployed Worker redirects www.bolenmirror.com to bolenmirror.com with 301', async () => {
+  for (const method of ['GET', 'HEAD']) {
+    const response = await reliableWorker.fetch(
+      new Request('https://www.bolenmirror.com/en/products/?page=2', { method }),
+      environment(),
+    );
+    assert.equal(response.status, 301);
+    assert.equal(response.headers.get('Location'), 'https://bolenmirror.com/en/products/?page=2');
+  }
+});

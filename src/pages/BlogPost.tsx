@@ -75,7 +75,7 @@ export default function BlogPost() {
         const data = postResult.data;
         const list = listResult.data;
         if (active) {
-          setPost(data ? localizePost(data as RawBlogPost, lang) : null);
+          setPost(data ? localizePost(data as RawBlogPost, lang) : initialPost);
         }
         if (active && list) {
           const items = (list as RawBlogPost[])

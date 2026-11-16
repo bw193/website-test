@@ -130,7 +130,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
               )}
             </div>
           )}
-          <Link to={quoteUrl} className="btn-primary w-full whitespace-nowrap">
+          <Link to={quoteUrl} rel="nofollow" className="btn-primary w-full whitespace-nowrap">
             {t('blog.ctaQuote', 'Contact Sales')}
             <ArrowUpRight className="h-3.5 w-3.5 shrink-0" />
           </Link>

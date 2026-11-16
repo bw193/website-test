@@ -190,6 +190,15 @@ const worker = {
   async fetch(request: Request, env: Env, ctx?: WaitUntil): Promise<Response> {
     const url = new URL(request.url);
     const isRead = request.method === 'GET' || request.method === 'HEAD';
+    if (isRead && url.hostname.toLowerCase() === 'www.bolenmirror.com') {
+      const canonicalUrl = new URL(url.toString());
+      canonicalUrl.hostname = 'bolenmirror.com';
+      canonicalUrl.protocol = 'https:';
+      return new Response(null, {
+        status: 301,
+        headers: { Location: canonicalUrl.toString() },
+      });
+    }
     // Indexable copies of the Supabase-hosted images; see worker/media.ts.
     if (isRead && isMediaPath(url.pathname)) return handleMediaRequest(request, ctx);
     if (isRead && isAdminPath(url.pathname)) {

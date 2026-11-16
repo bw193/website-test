@@ -56,7 +56,8 @@ export default function Products() {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [searchParams, setSearchParams] = useSearchParams();
   const { categorySlug } = useParams<{ categorySlug?: string }>();
-  const searchQuery = searchParams.get('q') || '';
+  const rawSearchQuery = searchParams.get('q') || '';
+  const searchQuery = rawSearchQuery.trim() === '{search_term_string}' ? '' : rawSearchQuery;
   const { t } = useTranslation();
   const lang = useCurrentLang();
   const translateProduct = useProductTranslator(lang);
@@ -101,7 +102,7 @@ export default function Products() {
 
         if (productsError) throw productsError;
         if (!active) return;
-        setProducts(productsData || []);
+        setProducts(productsData?.length ? productsData : (initialCatalog?.products ?? []));
 
         // Fetch categories
         const { data: settingsData, error: settingsError } = await supabase

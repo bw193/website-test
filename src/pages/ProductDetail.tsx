@@ -175,7 +175,7 @@ export default function ProductDetail() {
           if (error) throw error;
           resolved = (data as Product[] | null)?.find((p) => productMatchesDetailPath(p, location.pathname)) ?? null;
         }
-        if (!cancelled) setProduct(resolved);
+        if (!cancelled) setProduct(resolved ?? initialProduct);
       } catch (error) {
         console.error("Error fetching product", error);
       } finally {

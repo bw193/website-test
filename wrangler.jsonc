@@ -8,6 +8,10 @@
     {
       "pattern": "bolenmirror.com/*",
       "zone_name": "bolenmirror.com"
+    },
+    {
+      "pattern": "www.bolenmirror.com/*",
+      "zone_name": "bolenmirror.com"
     }
   ],
   "assets": {
