@@ -185,6 +185,8 @@ function isAdminPath(pathname: string): boolean {
 // /<lang>/products/category/ has no page of its own; React redirects it to the
 // catalog client-side, which a crawler would otherwise see as a 404 page.
 const CATEGORY_INDEX_PATTERN = /^\/(en|zh|es|fr|de|it)\/products\/category\/?$/;
+const RETIRED_CATEGORY_PATTERN =
+  /^\/(en|zh|es|fr|de|it)\/products\/category\/(framed-led-mirror|frameless-led-mirror|rectangle-led-mirror|new-arrival|uncategorized)\/?$/;
 
 const worker = {
   async fetch(request: Request, env: Env, ctx?: WaitUntil): Promise<Response> {
@@ -212,6 +214,16 @@ const worker = {
         status: 301,
         headers: { Location: `/${categoryIndex[1]}/products/${url.search}` },
       });
+    }
+    const retiredCategory = isRead ? url.pathname.match(RETIRED_CATEGORY_PATTERN) : null;
+    if (retiredCategory) {
+      const lang = retiredCategory[1];
+      const slug = retiredCategory[2];
+      const dest =
+        slug === 'new-arrival' || slug === 'uncategorized'
+          ? `/${lang}/products/${url.search}`
+          : `/${lang}/products/category/led-lighted-mirror/${url.search}`;
+      return new Response(null, { status: 301, headers: { Location: dest } });
     }
     if (isRead && parseProductDetailPath(url.pathname)) {
       const target = productRedirectLocation(url);

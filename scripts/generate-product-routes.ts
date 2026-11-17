@@ -28,7 +28,60 @@ async function main() {
   for (const { id, title, languages } of missingTranslations) {
     console.warn(`[product-routes] Missing ${languages.join(', ')} URL translations for ${id} (${title.trim()}); using the English slug.`);
   }
-  await writeFile(resolve(ROOT, 'src/data/productRoutes.json'), `${JSON.stringify(routes, null, 2)}\n`);
+
+  // Guard against uncommitted-translation loss & preserve displaced slugs as 301 aliases.
+  const routesPath = resolve(ROOT, 'src/data/productRoutes.json');
+  const legacyPath = resolve(ROOT, 'src/data/legacyProductAliases.json');
+  const previousRoutes = JSON.parse(await readFile(routesPath, 'utf8').catch(() => '{}')) as Record<
+    string,
+    { category: string; slugs: Record<string, string> }
+  >;
+  const legacyData = JSON.parse(
+    await readFile(legacyPath, 'utf8').catch(() => '{"activeSlugIds":{},"discontinuedCategoryBySlug":{}}'),
+  ) as {
+    activeSlugIds: Record<string, string>;
+    discontinuedCategoryBySlug: Record<string, string>;
+  };
+
+  const regressions: string[] = [];
+  const activeCanonicalSlugs = new Map<string, string>();
+  for (const [id, route] of Object.entries(routes)) {
+    for (const s of Object.values(route.slugs)) activeCanonicalSlugs.set(s, id);
+  }
+
+  let addedAliases = 0;
+  for (const [id, prev] of Object.entries(previousRoutes)) {
+    const next = routes[id];
+    if (!next) continue;
+    for (const lang of LANGUAGES) {
+      const oldSlug = prev.slugs?.[lang];
+      const newSlug = next.slugs[lang];
+      if (!oldSlug || oldSlug === newSlug) continue;
+      if (lang !== 'en' && oldSlug !== prev.slugs.en && newSlug === next.slugs.en) {
+        regressions.push(`${id} (${lang}: ${oldSlug} -> English fallback)`);
+      }
+      if (!activeCanonicalSlugs.has(oldSlug) && legacyData.activeSlugIds[oldSlug] !== id) {
+        legacyData.activeSlugIds[oldSlug] = id;
+        addedAliases += 1;
+      }
+    }
+  }
+
+  if (regressions.length > 0 && process.env.ALLOW_ROUTE_REGRESSION !== '1') {
+    throw new Error(
+      `Refusing to overwrite ${regressions.length} existing localized URL(s) with English fallbacks (run npm run translate or set ALLOW_ROUTE_REGRESSION=1): ${regressions.slice(0, 5).join('; ')}`,
+    );
+  }
+
+  if (addedAliases > 0) {
+    legacyData.activeSlugIds = Object.fromEntries(
+      Object.entries(legacyData.activeSlugIds).sort(([a], [b]) => a.localeCompare(b)),
+    );
+    await writeFile(legacyPath, `${JSON.stringify(legacyData, null, 2)}\n`);
+    console.log(`[product-routes] Preserved ${addedAliases} displaced product slug(s) in legacyProductAliases.json.`);
+  }
+
+  await writeFile(routesPath, `${JSON.stringify(routes, null, 2)}\n`);
   console.log(`[product-routes] Generated ${products.length * LANGUAGES.length} detail URLs across ${LANGUAGES.length} languages.`);
 }
 

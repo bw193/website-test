@@ -41,7 +41,7 @@ const CATALOG_BACKDROP = optimizeImage(
   { width: 2000 }
 );
 
-const PAGE_SIZE = 12;
+const INITIAL_EAGER_COUNT = 12;
 const GRID_CLASS = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-10';
 
 export default function Products() {
@@ -53,7 +53,6 @@ export default function Products() {
       : [...DEFAULT_PRODUCT_CATEGORIES]
   );
   const [loading, setLoading] = useState(initialCatalog === null);
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [searchParams, setSearchParams] = useSearchParams();
   const { categorySlug } = useParams<{ categorySlug?: string }>();
   const rawSearchQuery = searchParams.get('q') || '';
@@ -174,13 +173,6 @@ export default function Products() {
                           (p.description && p.description.toLowerCase().includes(searchQuery.toLowerCase()));
     return matchesCategory && matchesSearch;
   });
-  const visibleProducts = filteredProducts.slice(0, visibleCount);
-
-  // A new search or filter starts at the first batch. All matching products
-  // remain reachable through the incremental Show more control below.
-  useEffect(() => {
-    setVisibleCount(PAGE_SIZE);
-  }, [searchQuery, categorySlug]);
 
   const categoryChip = (active: boolean) =>
     `relative pb-3 text-sm font-medium tracking-wide transition-colors whitespace-nowrap ${
@@ -204,7 +196,7 @@ export default function Products() {
                 description: seoDescription,
                 homeLabel: t('navbar.home'),
                 catalogLabel: t('navbar.catalog'),
-                products: loading ? undefined : visibleProducts.map((product) => {
+                products: loading ? undefined : filteredProducts.map((product) => {
                   const name = translateProduct(product).title || product.title;
                   return {
                     id: product.id,
@@ -385,23 +377,18 @@ export default function Products() {
               <m.div 
                 key="grid"
                 className={GRID_CLASS}
-                initial="hidden"
-                animate="show"
-                variants={{
-                  hidden: { opacity: 0 },
-                  show: {
-                    opacity: 1,
-                    transition: { staggerChildren: 0.08 }
-                  }
-                }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.25 }}
               >
-                {visibleProducts.map((product) => (
-                  <m.div
+                {filteredProducts.map((product, index) => (
+                  <div
                     key={product.id}
-                    variants={{
-                      hidden: { opacity: 0, y: 20 },
-                      show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
-                    }}
+                    style={
+                      index >= INITIAL_EAGER_COUNT
+                        ? { contentVisibility: 'auto', containIntrinsicSize: '0 460px' }
+                        : undefined
+                    }
                   >
                     <ProductCard
                       id={product.id}
@@ -412,26 +399,11 @@ export default function Products() {
                       priceRange={product.price_range}
                       msrp={product.msrp}
                     />
-                  </m.div>
+                  </div>
                 ))}
               </m.div>
             )}
           </AnimatePresence>
-        )}
-
-        {!loading && filteredProducts.length > visibleCount && (
-          <div className="mt-16 flex flex-col items-center gap-3">
-            <button
-              type="button"
-              onClick={() => setVisibleCount((count) => count + PAGE_SIZE)}
-              className="rounded-full border border-stone-300 bg-white px-8 py-3 text-sm font-semibold text-stone-900 transition-colors hover:border-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
-            >
-              {t('products.showMore', 'Show more')}
-            </button>
-            <span className="text-xs tracking-wide text-stone-400">
-              {Math.min(visibleCount, filteredProducts.length)} / {filteredProducts.length}
-            </span>
-          </div>
         )}
       </div>
     </div>

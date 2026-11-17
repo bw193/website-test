@@ -1,3 +1,4 @@
+import legacyAliases from '../data/legacyProductAliases.json';
 import routeData from '../data/productRoutes.json';
 import type { SupportedLanguage } from '../hooks/useLocalizedPath';
 import { parseProductParam, toSlug } from './slug';
@@ -18,13 +19,29 @@ export interface RoutableProduct {
 export const PRODUCT_ROUTES = routeData as Record<string, ProductRoute>;
 const SUPPORTED_LANGUAGES = ['en', 'zh', 'es', 'fr', 'de', 'it'] as const;
 
-// Keep published URLs reachable after product-title spelling corrections.
-// These aliases stay separate from the regenerated canonical route index.
-const LEGACY_SLUG_IDS: Readonly<Record<string, string>> = {
-  'modern-minimalist-bulk-frameless-rectanglar-beveled-edge-bathroom-vanity-mirror-wall-mounted': '0a97a69f-9285-42be-b8ef-04b3e1ebfd00',
-  'low-moq-rectanglar-ip44-waterproof-led-lighted-bathroom-mirror-with-aluminum-alloy-frame': 'ed981223-b816-44ca-be5a-feee3512fe9b',
-  'manufacturer-rectanglar-smart-light-color-temperature-adjustable-vanity-mirror-cabinet-with-storage': 'fdbac784-0592-4680-bb92-cf2e10f6026b',
-};
+// Historical English & localized slugs (spelling fixes, August title renames,
+// and Oct 14 published translations) mapped to their active product IDs, plus
+// discontinued product slugs mapped to their closest active category page.
+const LEGACY_SLUG_IDS: Readonly<Record<string, string>> = legacyAliases.activeSlugIds;
+const DISCONTINUED_CATEGORY_BY_SLUG: Readonly<Record<string, string>> =
+  legacyAliases.discontinuedCategoryBySlug;
+
+const KNOWN_PRODUCT_CATEGORIES = new Set<string>([
+  ...Object.values(PRODUCT_ROUTES).map((route) => route.category),
+  'hot-sale',
+  'led-lighted-mirror',
+  'bathroom-mirror-without-led',
+  'full-length-dressing-mirror',
+  'irregular-mirror',
+  'mirror-cabinet',
+  'bathroom-vanity',
+  'rectangle-led-mirror',
+  'framed-led-mirror',
+  'frameless-led-mirror',
+  'magnifying-makeup-mirror',
+  'new-arrival',
+  'uncategorized',
+]);
 
 function routePath(route: ProductRoute, lang: string): string {
   const slug = route.slugs[lang as SupportedLanguage] || route.slugs.en;
@@ -52,18 +69,24 @@ export function parseProductDetailPath(pathname: string): {
   return { lang: match[1] || 'en', category: match[3] ? match[2] : undefined, param: match[3] || match[2] };
 }
 
-/** Match canonical routes, old English slugs and UUID links to the same row. */
+/** Match canonical routes, old slugs, category moves and UUID links to the same row. */
 export function findProductRoute(pathname: string): (ProductRoute & { id: string }) | null {
   const parsed = parseProductDetailPath(pathname);
   if (!parsed) return null;
+  if (parsed.category && !KNOWN_PRODUCT_CATEGORIES.has(parsed.category)) return null;
   const { slug, legacyId } = parseProductParam(parsed.param);
   if (legacyId && PRODUCT_ROUTES[legacyId]) return { id: legacyId, ...PRODUCT_ROUTES[legacyId] };
-  const candidates = Object.entries(PRODUCT_ROUTES).filter(([id, route]) =>
-    (!parsed.category || parsed.category === route.category) &&
-    (Object.values(route.slugs).includes(slug) || LEGACY_SLUG_IDS[slug] === id),
+  const aliasId = Object.hasOwn(LEGACY_SLUG_IDS, slug) ? LEGACY_SLUG_IDS[slug] : undefined;
+  if (aliasId && PRODUCT_ROUTES[aliasId]) return { id: aliasId, ...PRODUCT_ROUTES[aliasId] };
+  const candidates = Object.entries(PRODUCT_ROUTES).filter(([, route]) =>
+    Object.values(route.slugs).includes(slug),
   );
-  // Prefer the requested locale if two translations happen to overlap.
-  const found = candidates.find(([, route]) => route.slugs[parsed.lang as SupportedLanguage] === slug) || candidates[0];
+  // Prefer exact category + requested locale when multiple candidates exist.
+  const sameCategory = parsed.category
+    ? candidates.filter(([, route]) => route.category === parsed.category)
+    : candidates;
+  const pool = sameCategory.length ? sameCategory : candidates;
+  const found = pool.find(([, route]) => route.slugs[parsed.lang as SupportedLanguage] === slug) || pool[0];
   return found ? { id: found[0], ...found[1] } : null;
 }
 
@@ -88,5 +111,18 @@ export function productRedirectLocation(url: URL): string | null {
   const parsed = parseProductDetailPath(url.pathname);
   if (!parsed) return null;
   const target = localizedProductPathname(url.pathname, parsed.lang);
-  return target && target !== url.pathname ? `${target}${url.search}` : null;
+  if (target) return target !== url.pathname ? `${target}${url.search}` : null;
+  if (parsed.category && !KNOWN_PRODUCT_CATEGORIES.has(parsed.category)) return null;
+  const { slug, legacyId } = parseProductParam(parsed.param);
+  const discontinuedCategory =
+    (legacyId && Object.hasOwn(DISCONTINUED_CATEGORY_BY_SLUG, legacyId)
+      ? DISCONTINUED_CATEGORY_BY_SLUG[legacyId]
+      : undefined) ||
+    (Object.hasOwn(DISCONTINUED_CATEGORY_BY_SLUG, slug)
+      ? DISCONTINUED_CATEGORY_BY_SLUG[slug]
+      : undefined);
+  if (discontinuedCategory) {
+    return `/${parsed.lang}/products/category/${discontinuedCategory}/${url.search}`;
+  }
+  return null;
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Globe } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useLocalizedPath } from '../hooks/useLocalizedPath';
@@ -15,7 +15,6 @@ const LOGO_URL = toMediaPath(
 export default function Navbar() {
   const [isOpen, setIsOpen] = React.useState(false);
   const [langMenuOpen, setLangMenuOpen] = React.useState(false);
-  const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
   const { lang, lp } = useLocalizedPath();
@@ -33,14 +32,16 @@ export default function Navbar() {
 
   const currentLang = languages.find(l => l.code === lang) || languages[0];
 
-  const changeLanguage = (code: string) => {
-    // Replace current language prefix in URL with new language
-    const pathWithoutLang = location.pathname.replace(/^\/[a-z]{2}(?=\/|$)/, '');
+  const languageHref = (code: string) => {
     const productPath = localizedProductPathname(location.pathname, code);
-    navigate(productPath
-      ? `${productPath}${location.search}${location.hash}`
-      : `/${code}${pathWithoutLang || '/'}`);
-    setLangMenuOpen(false);
+    if (productPath) return `${productPath}${location.search}${location.hash}`;
+    const pathWithoutLang = location.pathname.replace(/^\/[a-z]{2}(?=\/|$)/, '');
+    const suffix = !pathWithoutLang || pathWithoutLang === '/'
+      ? '/'
+      : pathWithoutLang.endsWith('/')
+        ? pathWithoutLang
+        : `${pathWithoutLang}/`;
+    return `/${code}${suffix}${location.search}${location.hash}`;
   };
 
   // Both menus are dismissible by Escape and by clicking outside. Previously
@@ -105,16 +106,18 @@ export default function Navbar() {
   const languageMenu = (
     <div className="absolute right-0 mt-2 w-32 bg-white rounded-md shadow-lg py-1 z-50 ring-1 ring-black ring-opacity-5" role="menu" aria-label="Language selection">
       {languages.map((l) => (
-        <button
+        <Link
           key={l.code}
-          onClick={() => changeLanguage(l.code)}
+          to={languageHref(l.code)}
+          hrefLang={l.code}
+          onClick={() => setLangMenuOpen(false)}
           role="menuitem"
           className={`block w-full text-left px-4 py-2 text-sm ${
             currentLang.code === l.code ? 'bg-amber-50 text-amber-600 font-medium' : 'text-stone-700 hover:bg-stone-50'
           }`}
         >
           {l.label}
-        </button>
+        </Link>
       ))}
     </div>
   );
@@ -203,36 +206,34 @@ export default function Navbar() {
         </div>
       </div>
 
-      {isOpen && (
-        <div className="lg:hidden" id="mobile-menu">
-          <div className="pt-2 pb-3 space-y-1">
-            {navLinks.map((link) => (
-              <Link
-                key={link.path}
-                to={lp(link.path)}
-                onClick={() => setIsOpen(false)}
-                aria-current={isActive(link.path) ? 'page' : undefined}
-                className={`block pl-3 pr-4 py-3 border-l-4 text-base font-medium ${
-                  isActive(link.path)
-                    ? 'bg-amber-50 border-amber-600 text-amber-700'
-                    : 'border-transparent text-stone-500 hover:bg-stone-50 hover:border-stone-300 hover:text-stone-700'
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
-            <div className="px-3 pt-3">
-              <Link
-                to={lp('/rfq')}
-                onClick={() => setIsOpen(false)}
-                className="flex w-full items-center justify-center rounded-full bg-amber-500 px-4 py-3 text-base font-semibold text-stone-950 hover:bg-amber-400"
-              >
-                {t('productDetail.requestQuote')}
-              </Link>
-            </div>
+      <div className={isOpen ? 'lg:hidden' : 'hidden'} id="mobile-menu">
+        <div className="pt-2 pb-3 space-y-1">
+          {navLinks.map((link) => (
+            <Link
+              key={link.path}
+              to={lp(link.path)}
+              onClick={() => setIsOpen(false)}
+              aria-current={isActive(link.path) ? 'page' : undefined}
+              className={`block pl-3 pr-4 py-3 border-l-4 text-base font-medium ${
+                isActive(link.path)
+                  ? 'bg-amber-50 border-amber-600 text-amber-700'
+                  : 'border-transparent text-stone-500 hover:bg-stone-50 hover:border-stone-300 hover:text-stone-700'
+              }`}
+            >
+              {link.label}
+            </Link>
+          ))}
+          <div className="px-3 pt-3">
+            <Link
+              to={lp('/rfq')}
+              onClick={() => setIsOpen(false)}
+              className="flex w-full items-center justify-center rounded-full bg-amber-500 px-4 py-3 text-base font-semibold text-stone-950 hover:bg-amber-400"
+            >
+              {t('productDetail.requestQuote')}
+            </Link>
           </div>
         </div>
-      )}
+      </div>
     </nav>
   );
 }

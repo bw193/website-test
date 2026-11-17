@@ -282,12 +282,24 @@ export function getCatalogCategoryPageCopy(
     : fallback;
 }
 
+const RETIRED_CATEGORY_SLUG_TARGETS: Readonly<Record<string, string>> = {
+  'framed-led-mirror': 'led-lighted-mirror',
+  'frameless-led-mirror': 'led-lighted-mirror',
+  'rectangle-led-mirror': 'led-lighted-mirror',
+  'new-arrival': 'hot-sale',
+};
+
 export function toCategorySlug(name: string): string {
   return toSlug(name || '');
 }
 
 export function catalogCategoryPath(name: string): string {
-  return `${CATALOG_CATEGORY_PREFIX}/${toCategorySlug(name)}`;
+  const slug = toCategorySlug(name);
+  if (!slug || slug === 'uncategorized') return '/products';
+  const targetSlug = Object.hasOwn(RETIRED_CATEGORY_SLUG_TARGETS, slug)
+    ? RETIRED_CATEGORY_SLUG_TARGETS[slug]
+    : slug;
+  return `${CATALOG_CATEGORY_PREFIX}/${targetSlug}`;
 }
 
 export function parseCategoriesSetting(value: unknown): string[] {

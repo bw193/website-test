@@ -6,7 +6,9 @@ import {
   PRODUCT_ROUTES, findProductRoute, localizedProductPathname, parseProductDetailPath,
   productAlternatePaths, productDetailPath, productMatchesDetailPath, productRedirectLocation,
 } from './productRoutes';
-import { buildCatalogCategorySchema } from './catalogCategory';
+import {
+   buildCatalogCategorySchema, catalogCategoryPath,
+} from './catalogCategory';
 
 const LANGUAGES = ['en', 'zh', 'es', 'fr', 'de', 'it'] as const;
 const ORIGIN = 'https://bolenmirror.com';
@@ -145,4 +147,53 @@ test('category ItemList uses the same translated destination as product cards', 
   assert.equal(itemList[0].url, `${ORIGIN}/de${germanPath}/`);
   assert.equal(schemas[0].url, `${ORIGIN}/de/products/category/led-lighted-mirror/`);
   assert.equal(productAlternatePaths(product).de, germanPath);
+});
+
+test('all 209 historical localized and renamed product aliases resolve and 301-redirect to canonical URLs', () => {
+  const legacy = JSON.parse(
+    readFileSync(new URL('../data/legacyProductAliases.json', import.meta.url), 'utf8'),
+  ) as {
+    activeSlugIds: Record<string, string>;
+    discontinuedCategoryBySlug: Record<string, string>;
+  };
+
+  const activeEntries = Object.entries(legacy.activeSlugIds);
+  assert.ok(activeEntries.length >= 209);
+  for (const [oldSlug, productId] of activeEntries) {
+    assert.ok(PRODUCT_ROUTES[productId], `Unknown active product ID for alias ${oldSlug}`);
+    const oldCategory = PRODUCT_ROUTES[productId].category;
+    const oldUrl = new URL(`/de/products/${oldCategory}/${encodeURIComponent(oldSlug)}/?utm_source=gsc`, ORIGIN);
+    const canonicalPath = `/de${productDetailPath({ id: productId, title: '' }, 'de')}/`;
+    assert.equal(findProductRoute(oldUrl.pathname)?.id, productId);
+    assert.equal(
+      productRedirectLocation(oldUrl),
+      oldUrl.pathname === canonicalPath ? null : `${canonicalPath}?utm_source=gsc`,
+    );
+  }
+});
+
+test('category-changed active products redirect across known categories and discontinued products redirect to category hubs', () => {
+  const archId = 'dd492c7a-e9bd-4fc4-90b1-4fb34a62d11d';
+  const oldUncategorizedUrl = new URL(
+    `/zh/products/uncategorized/${PRODUCT_ROUTES[archId].slugs.en}/?ref=gsc`,
+    ORIGIN,
+  );
+  assert.equal(
+    productRedirectLocation(oldUncategorizedUrl),
+    `/zh${productDetailPath({ id: archId, title: '' }, 'zh')}/?ref=gsc`,
+  );
+
+  const discontinuedUrl = new URL(
+    '/es/products/hot-sale/espejo-de-pie-de-madera-maciza-de-estilo-rustico-moderno-espejo-vestidor-rectangular-de-cuerpo-entero-para-decorar-el-salon-y-el-dormitorio/',
+    ORIGIN,
+  );
+  assert.equal(
+    productRedirectLocation(discontinuedUrl),
+    '/es/products/category/full-length-dressing-mirror/',
+  );
+
+  assert.equal(catalogCategoryPath('Framed LED Mirror'), '/products/category/led-lighted-mirror');
+  assert.equal(catalogCategoryPath('Frameless LED Mirror'), '/products/category/led-lighted-mirror');
+  assert.equal(catalogCategoryPath('Rectangle LED Mirror'), '/products/category/led-lighted-mirror');
+  assert.equal(catalogCategoryPath('Uncategorized'), '/products');
 });

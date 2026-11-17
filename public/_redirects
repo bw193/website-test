@@ -1,44 +1,21 @@
-# Bare root → default language so crawlers see a 301, not a thin SPA shell.
+# Bare root & static legacy non-prefixed public URLs → /en/*/
+# IMPORTANT: Keep ALL exact static rules ABOVE any wildcard (* / :splat / :slug)
+# rules below. Cloudflare Workers Static Assets treats every rule after the
+# first dynamic rule as dynamic (capped at 100 rules).
 /              /en/                    301
-
-# Legacy non-prefixed public URLs → /en/*/ (preserves any inbound links from
-# before language routing; trailing slash matches Cloudflare Pages directory
-# serving so there's no second redirect hop).
 /products      /en/products/           301
-/products/*    /en/products/:splat/    301
 /our-story     /en/our-story/          301
 /rfq           /en/rfq/                301
 /solutions     /en/solutions/          301
-/solutions/*   /en/solutions/:splat/   301
 /videos        /en/videos/             301
-/videos/*      /en/videos/:splat/      301
 /insights      /en/insights/           301
-/insights/:slug  /en/insights/:slug/   301
-/insights/:slug/ /en/insights/:slug/   301
-
-# Public Journal URLs moved to the clearer Insights directory. Keep these
-# permanent, one-hop redirects so existing links retain their search signals.
 /blog          /en/insights/           301
-/blog/:slug    /en/insights/:slug/     301
-/blog/:slug/   /en/insights/:slug/     301
 /en/blog       /en/insights/           301
-/en/blog/:slug  /en/insights/:slug/    301
-/en/blog/:slug/ /en/insights/:slug/    301
 /zh/blog       /zh/insights/           301
-/zh/blog/:slug  /zh/insights/:slug/    301
-/zh/blog/:slug/ /zh/insights/:slug/    301
 /es/blog       /es/insights/           301
-/es/blog/:slug  /es/insights/:slug/    301
-/es/blog/:slug/ /es/insights/:slug/    301
 /fr/blog       /fr/insights/           301
-/fr/blog/:slug  /fr/insights/:slug/    301
-/fr/blog/:slug/ /fr/insights/:slug/    301
 /de/blog       /de/insights/           301
-/de/blog/:slug  /de/insights/:slug/    301
-/de/blog/:slug/ /de/insights/:slug/    301
 /it/blog       /it/insights/           301
-/it/blog/:slug  /it/insights/:slug/    301
-/it/blog/:slug/ /it/insights/:slug/    301
 
 # The bare category index has no page of its own (React only redirected it
 # client-side, so crawlers saw the 404 page). worker/reliable-entry.ts issues
@@ -55,6 +32,89 @@
 /de/products/category/  /de/products/  301
 /it/products/category   /it/products/  301
 /it/products/category/  /it/products/  301
+
+# Retired product sub-categories and uncategorized buckets → closest active hub.
+/en/products/category/framed-led-mirror     /en/products/category/led-lighted-mirror/  301
+/en/products/category/framed-led-mirror/    /en/products/category/led-lighted-mirror/  301
+/zh/products/category/framed-led-mirror     /zh/products/category/led-lighted-mirror/  301
+/zh/products/category/framed-led-mirror/    /zh/products/category/led-lighted-mirror/  301
+/es/products/category/framed-led-mirror     /es/products/category/led-lighted-mirror/  301
+/es/products/category/framed-led-mirror/    /es/products/category/led-lighted-mirror/  301
+/fr/products/category/framed-led-mirror     /fr/products/category/led-lighted-mirror/  301
+/fr/products/category/framed-led-mirror/    /fr/products/category/led-lighted-mirror/  301
+/de/products/category/framed-led-mirror     /de/products/category/led-lighted-mirror/  301
+/de/products/category/framed-led-mirror/    /de/products/category/led-lighted-mirror/  301
+/it/products/category/framed-led-mirror     /it/products/category/led-lighted-mirror/  301
+/it/products/category/framed-led-mirror/    /it/products/category/led-lighted-mirror/  301
+/en/products/category/frameless-led-mirror  /en/products/category/led-lighted-mirror/  301
+/en/products/category/frameless-led-mirror/ /en/products/category/led-lighted-mirror/  301
+/zh/products/category/frameless-led-mirror  /zh/products/category/led-lighted-mirror/  301
+/zh/products/category/frameless-led-mirror/ /zh/products/category/led-lighted-mirror/  301
+/es/products/category/frameless-led-mirror  /es/products/category/led-lighted-mirror/  301
+/es/products/category/frameless-led-mirror/ /es/products/category/led-lighted-mirror/  301
+/fr/products/category/frameless-led-mirror  /fr/products/category/led-lighted-mirror/  301
+/fr/products/category/frameless-led-mirror/ /fr/products/category/led-lighted-mirror/  301
+/de/products/category/frameless-led-mirror  /de/products/category/led-lighted-mirror/  301
+/de/products/category/frameless-led-mirror/ /de/products/category/led-lighted-mirror/  301
+/it/products/category/frameless-led-mirror  /it/products/category/led-lighted-mirror/  301
+/it/products/category/frameless-led-mirror/ /it/products/category/led-lighted-mirror/  301
+/en/products/category/rectangle-led-mirror  /en/products/category/led-lighted-mirror/  301
+/en/products/category/rectangle-led-mirror/ /en/products/category/led-lighted-mirror/  301
+/zh/products/category/rectangle-led-mirror  /zh/products/category/led-lighted-mirror/  301
+/zh/products/category/rectangle-led-mirror/ /zh/products/category/led-lighted-mirror/  301
+/es/products/category/rectangle-led-mirror  /es/products/category/led-lighted-mirror/  301
+/es/products/category/rectangle-led-mirror/ /es/products/category/led-lighted-mirror/  301
+/fr/products/category/rectangle-led-mirror  /fr/products/category/led-lighted-mirror/  301
+/fr/products/category/rectangle-led-mirror/ /fr/products/category/led-lighted-mirror/  301
+/de/products/category/rectangle-led-mirror  /de/products/category/led-lighted-mirror/  301
+/de/products/category/rectangle-led-mirror/ /de/products/category/led-lighted-mirror/  301
+/it/products/category/rectangle-led-mirror  /it/products/category/led-lighted-mirror/  301
+/it/products/category/rectangle-led-mirror/ /it/products/category/led-lighted-mirror/  301
+/en/products/category/new-arrival           /en/products/                              301
+/en/products/category/new-arrival/          /en/products/                              301
+/zh/products/category/new-arrival           /zh/products/                              301
+/zh/products/category/new-arrival/          /zh/products/                              301
+/es/products/category/new-arrival           /es/products/                              301
+/es/products/category/new-arrival/          /es/products/                              301
+/fr/products/category/new-arrival           /fr/products/                              301
+/fr/products/category/new-arrival/          /fr/products/                              301
+/de/products/category/new-arrival           /de/products/                              301
+/de/products/category/new-arrival/          /de/products/                              301
+/it/products/category/new-arrival           /it/products/                              301
+/it/products/category/new-arrival/          /it/products/                              301
+/en/products/category/uncategorized         /en/products/                              301
+/en/products/category/uncategorized/        /en/products/                              301
+/zh/products/category/uncategorized         /zh/products/                              301
+/zh/products/category/uncategorized/        /zh/products/                              301
+/es/products/category/uncategorized         /es/products/                              301
+/es/products/category/uncategorized/        /es/products/                              301
+/fr/products/category/uncategorized         /fr/products/                              301
+/fr/products/category/uncategorized/        /fr/products/                              301
+/de/products/category/uncategorized         /de/products/                              301
+/de/products/category/uncategorized/        /de/products/                              301
+/it/products/category/uncategorized         /it/products/                              301
+/it/products/category/uncategorized/        /it/products/                              301
+
+# Dynamic wildcard / placeholder rules MUST stay at the bottom (19 rules < 100 limit).
+/products/*      /en/products/:splat/    301
+/solutions/*     /en/solutions/:splat/   301
+/videos/*        /en/videos/:splat/      301
+/insights/:slug  /en/insights/:slug/     301
+/insights/:slug/ /en/insights/:slug/     301
+/blog/:slug      /en/insights/:slug/     301
+/blog/:slug/     /en/insights/:slug/     301
+/en/blog/:slug   /en/insights/:slug/     301
+/en/blog/:slug/  /en/insights/:slug/     301
+/zh/blog/:slug   /zh/insights/:slug/     301
+/zh/blog/:slug/  /zh/insights/:slug/     301
+/es/blog/:slug   /es/insights/:slug/     301
+/es/blog/:slug/  /es/insights/:slug/     301
+/fr/blog/:slug   /fr/insights/:slug/     301
+/fr/blog/:slug/  /fr/insights/:slug/     301
+/de/blog/:slug   /de/insights/:slug/     301
+/de/blog/:slug/  /de/insights/:slug/     301
+/it/blog/:slug   /it/insights/:slug/     301
+/it/blog/:slug/  /it/insights/:slug/     301
 
 # Missing pages are handled by wrangler.jsonc's `not_found_handling: "404-page"`
 # (dist/404.html, generated by scripts/prerender-static.ts, served with HTTP 404)

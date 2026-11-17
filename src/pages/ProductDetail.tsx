@@ -401,14 +401,22 @@ export default function ProductDetail() {
             }))
           }
         : {}),
-      "offers": {
-        "@type": "AggregateOffer",
-        "url": productFullUrl,
-        "priceCurrency": "USD",
-        "lowPrice": lowPrice,
-        "highPrice": highPrice,
-        "offerCount": 1
-      }
+      "offers":
+        lowPrice > 0
+          ? {
+              "@type": "AggregateOffer",
+              "url": productFullUrl,
+              "priceCurrency": "USD",
+              "lowPrice": lowPrice,
+              "highPrice": highPrice,
+              "offerCount": 1,
+              "availability": "https://schema.org/InStock"
+            }
+          : {
+              "@type": "Offer",
+              "url": productFullUrl,
+              "availability": "https://schema.org/InStock"
+            }
     },
     {
       "@context": "https://schema.org",

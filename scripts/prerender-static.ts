@@ -80,6 +80,7 @@ import {
 import {
   buildCatalogCategorySchema,
   CATALOG_CATEGORY_PREFIX,
+  catalogCategoryPath,
   DEFAULT_PRODUCT_CATEGORIES,
   getCatalogCategoryPageCopy,
   getCatalogCategorySeoTitle,
@@ -1079,7 +1080,7 @@ function productDetailContent(lang: Lang, product: Product, tr: LangTranslations
         &raquo;
         <a href="/${lang}/products/">${escapeHtml(c.breadcrumbCatalog)}</a>
         ${product.category
-          ? `&raquo; <a href="/${lang}${CATALOG_CATEGORY_PREFIX}/${toCategorySlug(product.category)}/">${escapeHtml(categoryDisplayName(lang, product.category))}</a>`
+          ? `&raquo; <a href="/${lang}${catalogCategoryPath(product.category)}/">${escapeHtml(categoryDisplayName(lang, product.category))}</a>`
           : ''}
         &raquo;
         <span>${escapeHtml(localized.title)}</span>
@@ -1379,14 +1380,22 @@ function productDetailSchema(lang: Lang, product: Product, display: Product, seo
             })),
           }
         : {}),
-      offers: {
-        '@type': 'AggregateOffer',
-        url: productFullUrl,
-        priceCurrency: 'USD',
-        lowPrice,
-        highPrice,
-        offerCount: 1,
-      },
+      offers:
+        lowPrice > 0
+          ? {
+              '@type': 'AggregateOffer',
+              url: productFullUrl,
+              priceCurrency: 'USD',
+              lowPrice,
+              highPrice,
+              offerCount: 1,
+              availability: 'https://schema.org/InStock',
+            }
+          : {
+              '@type': 'Offer',
+              url: productFullUrl,
+              availability: 'https://schema.org/InStock',
+            },
     },
     {
       '@context': 'https://schema.org',

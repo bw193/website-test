@@ -1236,3 +1236,31 @@ test('deployed Worker redirects www.bolenmirror.com to bolenmirror.com with 301'
     assert.equal(response.headers.get('Location'), 'https://bolenmirror.com/en/products/?page=2');
   }
 });
+
+test('deployed Worker redirects retired category paths, Oct 14 localized slugs, and category-moved products with 301', async () => {
+  const framedCategory = await reliableWorker.fetch(
+    new Request('https://bolenmirror.com/en/products/category/framed-led-mirror/'),
+    environment(),
+  );
+  assert.equal(framedCategory.status, 301);
+  assert.equal(framedCategory.headers.get('Location'), '/en/products/category/led-lighted-mirror/');
+
+  const uncategorizedIndex = await reliableWorker.fetch(
+    new Request('https://bolenmirror.com/zh/products/category/uncategorized/'),
+    environment(),
+  );
+  assert.equal(uncategorizedIndex.status, 301);
+  assert.equal(uncategorizedIndex.headers.get('Location'), '/zh/products/');
+
+  const oct14De = await reliableWorker.fetch(
+    new Request(
+      'https://bolenmirror.com/de/products/led-lighted-mirror/intelligenter-runder-led-wandspiegel-ohne-rahmen-touch-dimmung-und-3-lichtfarben-kupferfreier-silberspiegel-ip54-fuer-badrenovierung/',
+    ),
+    environment(),
+  );
+  assert.equal(oct14De.status, 301);
+  assert.equal(
+    oct14De.headers.get('Location'),
+    `/de${productDetailPath({ id: '687904a3-0935-4962-8f0a-698b357f581e', title: '' }, 'de')}/`,
+  );
+});

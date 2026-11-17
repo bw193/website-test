@@ -1,24 +1,47 @@
 import React from 'react';
 import { Mail, Phone, MapPin } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLocalizedPath } from '../hooks/useLocalizedPath';
 import { getLocalizedSeoLandingPages, getSeoSolutionsUi } from '../data/seoLandingI18n';
 import { INSIGHTS_PATH } from '../data/insights';
 import { CATALOG_CATEGORIES, catalogCategoryPath, uniqueCategorySlugs } from '../utils/catalogCategory';
+import { localizedProductPathname } from '../utils/productRoutes';
 import { toMediaPath } from '../utils/media';
+
+const FOOTER_LANGUAGES = [
+  { code: 'en', label: 'English' },
+  { code: 'zh', label: '中文' },
+  { code: 'es', label: 'Español' },
+  { code: 'fr', label: 'Français' },
+  { code: 'de', label: 'Deutsch' },
+  { code: 'it', label: 'Italiano' },
+] as const;
 
 export default function Footer() {
   const { lp, lang } = useLocalizedPath();
+  const location = useLocation();
   const solutionsUi = getSeoSolutionsUi(lang);
   const { t } = useTranslation();
   const footerSolutions = getLocalizedSeoLandingPages(lang).filter((page) =>
     ['led-bathroom-mirror-manufacturer', 'oem-odm-mirror-manufacturing', 'hotel-bathroom-mirrors'].includes(page.slug)
   );
 
+  const languageHref = (code: string) => {
+    const productPath = localizedProductPathname(location.pathname, code);
+    if (productPath) return `${productPath}${location.search}${location.hash}`;
+    const pathWithoutLang = location.pathname.replace(/^\/[a-z]{2}(?=\/|$)/, '');
+    const suffix = !pathWithoutLang || pathWithoutLang === '/'
+      ? '/'
+      : pathWithoutLang.endsWith('/')
+        ? pathWithoutLang
+        : `${pathWithoutLang}/`;
+    return `/${code}${suffix}${location.search}${location.hash}`;
+  };
+
   return (
-    <footer className="bg-stone-900 text-white">
-      <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+    <footer className="border-t border-stone-800/80 bg-stone-950 text-white">
+      <div className="max-w-7xl mx-auto pt-14 pb-20 sm:pb-12 px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <div className="flex items-center gap-2 mb-4">
@@ -89,18 +112,35 @@ export default function Footer() {
             </ul>
           </div>
         </div>
-        <div className="mt-8 border-t border-stone-800 pt-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-stone-500">
+        <div className="mt-10 border-t border-stone-800/90 pt-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-stone-500 sm:pr-40">
           <p>
             &copy; {new Date().getFullYear()} Jiaxing Chengtai Mirror Co., Ltd. (Brand: BOLEN). {t('footer.rights', 'All rights reserved.')}
           </p>
           {/* Moved out of the public header, where it sat beside the nav links
               and gave an internal staff entry point the same prominence as the
               RFQ call to action. */}
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+            <nav aria-label="Languages" className="flex flex-wrap items-center gap-x-3 gap-y-1">
+              {FOOTER_LANGUAGES.map((item) => (
+                <Link
+                  key={item.code}
+                  to={languageHref(item.code)}
+                  hrefLang={item.code}
+                  className={
+                    item.code === lang
+                      ? 'text-stone-300 font-medium'
+                      : 'text-stone-500 hover:text-white transition-colors'
+                  }
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
+            <span className="text-stone-700" aria-hidden="true">|</span>
             <Link to={lp('/terms-and-conditions')} className="text-stone-500 hover:text-white transition-colors">
               {t('footer.terms', 'Terms and Conditions')}
             </Link>
-            <Link to="/admin/login" className="text-stone-600 hover:text-stone-400 transition-colors">
+            <Link to="/admin/login" rel="nofollow" className="text-stone-600 hover:text-stone-400 transition-colors">
               {t('navbar.employeeLogin')}
             </Link>
           </div>
