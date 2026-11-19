@@ -194,6 +194,39 @@ const LOCALE_STORY = {
   it: itLocale.translation.ourStoryPage,
 } as const;
 
+const LOCALE_FOOTER = {
+  en: enLocale.translation.footer,
+  zh: zhLocale.translation.footer,
+  es: esLocale.translation.footer,
+  fr: frLocale.translation.footer,
+  de: deLocale.translation.footer,
+  it: itLocale.translation.footer,
+} as const;
+
+const FALLBACK_FOOTER_LEGAL: Record<'en' | 'zh' | 'es' | 'fr' | 'de' | 'it', { privacy: string; terms: string }> = {
+  en: { privacy: 'Privacy Policy', terms: 'Terms and Conditions' },
+  zh: { privacy: '隐私政策', terms: '条款与条件' },
+  es: { privacy: 'Política de Privacidad', terms: 'Términos y Condiciones' },
+  fr: { privacy: 'Politique de Confidentialité', terms: 'Conditions Générales' },
+  de: { privacy: 'Datenschutzerklärung', terms: 'Allgemeine Geschäftsbedingungen' },
+  it: { privacy: 'Informativa sulla Privacy', terms: 'Termini e Condizioni' },
+};
+
+type SeoLandingWithAnchors = SeoLandingPage & {
+  homeAnchor?: string;
+  relatedAnchor?: string;
+  footerAnchor?: string;
+};
+
+function getFooterLegalLabels(lang: 'en' | 'zh' | 'es' | 'fr' | 'de' | 'it'): { privacy: string; terms: string } {
+  const footer = LOCALE_FOOTER[lang] as Record<string, unknown>;
+  const fallback = FALLBACK_FOOTER_LEGAL[lang];
+  return {
+    privacy: typeof footer.privacy === 'string' && footer.privacy ? footer.privacy : fallback.privacy,
+    terms: typeof footer.terms === 'string' && footer.terms ? footer.terms : fallback.terms,
+  };
+}
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = resolve(__dirname, '..');
 const DIST = resolve(PROJECT_ROOT, 'dist');
@@ -1051,23 +1084,24 @@ function homeContent(
   const c = COPY[lang];
   const h = LOCALE_HOME[lang];
   const addr = PHYSICAL_ADDRESS[lang];
+  const legal = getFooterLegalLabels(lang);
   const heroBlock = hero
     ? `<div class="relative bg-stone-900 overflow-hidden">
         <img src="${escapeAttr(hero.src)}" srcset="${escapeAttr(hero.srcset)}" sizes="100vw" width="${hero.width}" height="${hero.height}" alt="${escapeAttr(cleanImageAlt(h.heroImageAlt))}" class="w-full h-auto block" fetchpriority="high" decoding="async" referrerpolicy="no-referrer" />
       </div>
       `
     : '';
-  const solutionPages = getLocalizedSeoLandingPages(lang);
+  const solutionPages = getLocalizedSeoLandingPages(lang) as SeoLandingWithAnchors[];
   const solutionsUi = getSeoSolutionsUi(lang);
   const solutionLinks = `<section aria-labelledby="manufacturing-solutions-title">
           <h2 id="manufacturing-solutions-title">${escapeHtml(solutionsUi.homeHeading)}</h2>
           <p>${escapeHtml(solutionsUi.homeIntro)}</p>
           <ul>
             ${HOME_SOLUTION_SLUGS.map((slug) => solutionPages.find((page) => page.slug === slug))
-              .filter((page): page is SeoLandingPage => Boolean(page))
+              .filter((page): page is SeoLandingWithAnchors => Boolean(page))
               .map(
                 (page) =>
-                  `<li><a href="/${lang}/solutions/${escapeAttr(page.slug)}/"><strong>${escapeHtml(page.shortTitle || page.h1)}</strong></a> — ${escapeHtml(page.blurb || page.description)}</li>`
+                  `<li><a href="/${lang}/solutions/${escapeAttr(page.slug)}/"><strong>${escapeHtml(page.homeAnchor || page.shortTitle || page.h1)}</strong></a> — ${escapeHtml(page.blurb || page.description)}</li>`
               ).join('\n            ')}
           </ul>
         </section>`;
@@ -1092,6 +1126,7 @@ function homeContent(
       <footer>
         <p><strong>Jiaxing Chengtai Mirror Co., Ltd. (BOLEN)</strong></p>
         <address>${escapeHtml(addr.label)}: ${escapeHtml(addr.value)} &middot; <a href="mailto:sales@bolenmirror.com">sales@bolenmirror.com</a> &middot; <a href="tel:+8618058603602">+86 18058603602</a></address>
+        <p><a href="/${lang}/privacy-policy/">${escapeHtml(legal.privacy)}</a> &middot; <a href="/${lang}/terms-and-conditions/">${escapeHtml(legal.terms)}</a></p>
       </footer>
     </div>
   `.trim();
@@ -1169,8 +1204,8 @@ function seoLandingContent(
   const related = page.relatedSlugs
     .map((slug) => SEO_LANDING_BY_SLUG[slug])
     .filter((candidate): candidate is SeoLandingPage => Boolean(candidate))
-    .map((candidate) => localizeSeoLandingPage(candidate, lang))
-    .map((candidate) => `<li><a href="/${lang}/solutions/${escapeAttr(candidate.slug)}/">${escapeHtml(candidate.shortTitle || candidate.h1)}</a></li>`)
+    .map((candidate) => localizeSeoLandingPage(candidate, lang) as SeoLandingWithAnchors)
+    .map((candidate) => `<li><a href="/${lang}/solutions/${escapeAttr(candidate.slug)}/">${escapeHtml(candidate.relatedAnchor || candidate.shortTitle || candidate.h1)}</a></li>`)
     .join('\n        ');
 
   return `
@@ -1335,10 +1370,10 @@ function relatedSolutionsBlock(
 ): string {
   const ui = getSeoSolutionsUi(lang);
   const items = recommendSolutionsForProduct(seed)
-    .map((page) => localizeSeoLandingPage(page, lang))
+    .map((page) => localizeSeoLandingPage(page, lang) as SeoLandingWithAnchors)
     .map(
       (page) =>
-        `<li><a href="/${lang}/solutions/${escapeAttr(page.slug)}/">${escapeHtml(page.shortTitle || page.h1)}</a></li>`
+        `<li><a href="/${lang}/solutions/${escapeAttr(page.slug)}/">${escapeHtml(page.relatedAnchor || page.shortTitle || page.h1)}</a></li>`
     )
     .join('\n        ');
   if (!items) return '';
