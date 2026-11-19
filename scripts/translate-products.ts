@@ -97,6 +97,21 @@ function hashFields(f: Fields): string {
 
 function sanitizeText(lang: TargetLang, value: string): string {
   let out = value.replace(/\*\* +([^*\n]+?)\*\*/g, '**$1**').replace(/\*\*([^*\n]+?) +\*\*/g, '**$1**');
+  // Normalize CommonMark §6.2 punctuation-flanking bold spans (especially CJK `**...：**` / `**...）**`)
+  out = out.replace(/\*\*([^*\n]+?)\*\*/g, (full, rawInner: string, offset: number, str: string) => {
+    let inner = rawInner.trim();
+    if (!inner) return full;
+    let suffixOutside = '';
+    if (inner.endsWith('：') && inner.length > 1) {
+      inner = inner.slice(0, -1).trim();
+      suffixOutside = '：';
+    }
+    const prev = offset > 0 ? str[offset - 1] : '';
+    const next = suffixOutside ? suffixOutside[0] : offset + full.length < str.length ? str[offset + full.length] : '';
+    const lead = /[\p{L}\p{N}]/u.test(prev) && /^[^\s\p{L}\p{N}]/u.test(inner) ? ' ' : '';
+    const trail = !suffixOutside && /[^\s\p{L}\p{N}]$/u.test(inner) && /[\p{L}\p{N}]/u.test(next) ? ' ' : '';
+    return `${lead}**${inner}**${suffixOutside}${trail}`;
+  });
   if (lang === 'fr') {
     out = out
       .replace(/\bde plain-pied\b/gi, 'en pied')
