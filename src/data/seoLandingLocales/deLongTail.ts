@@ -48,7 +48,7 @@ export const deLongTailSeoLandingTranslations = {
     ],
   },
   'irregular-shaped-mirror-manufacturer': {
-    title: 'Formspiegel-Hersteller mit 3 Jahren Garantie',
+    title: 'Formspiegel-Hersteller | Organische & asymmetrische CNC-Spiegel | BOLEN',
     description: 'Organische, asymmetrische, ovale und individuelle Spiegel mit technischer Prüfung, LED, Muster und Schutzverpackung von BOLEN.',
     eyebrow: 'Organische und geometrische Formprogramme',
     h1: 'Hersteller unregelmäßiger Spiegel für individuelle Kollektionen',
@@ -98,17 +98,17 @@ export const deLongTailSeoLandingTranslations = {
     description: 'Antibeschlag-LED-Spiegel mit geprüfter Heizfläche, Steuerung, Elektrik, Funktionstests und OEM-Verpackung von BOLEN.',
     eyebrow: 'Klare Sicht in feuchten Badezimmern',
     h1: 'Hersteller für Antibeschlag-LED-Spiegel mit Heizfläche je Modell',
-    intro: 'BOLEN fertigt Antibeschlag-LED-Spiegel für Händler, Marken, Hotels und Projekte. Zuverlässiges Entnebeln hängt von Größe und Position der Heizfolie, Spiegelmaß, Steuerung, Komponenten und Raumbedingungen ab. Diese Variablen werden je Modell bestätigt.',
+    intro: 'BOLEN fertigt Antibeschlag-LED-Spiegel für Händler, Marken, Hotels und Projekte. Eine verlässliche beschlagfreie Sicht hängt von Größe und Position der Spiegelheizung, Spiegelmaß, Steuerung, Komponenten und Raumbedingungen ab. Diese Variablen werden je Modell bestätigt.',
     proofPoints: [
       { value: 'Flächenprüfung', label: 'Heizzone passend zum Spiegel' },
       { value: 'Steueroptionen', label: 'Gemeinsam oder unabhängig' },
-      { value: 'Funktionstests', label: 'Licht und Entnebelung prüfen' },
+      { value: 'Funktionstests', label: 'Licht und Spiegelheizung prüfen' },
       { value: 'OEM-Unterstützung', label: 'Symbole, Anleitung, Etiketten und Verpackung' },
     ],
     sections: [
       { heading: 'Das Antibeschlagsystem richtig spezifizieren', paragraphs: ['Eine Heizfolie hinter dem Glas erwärmt eine definierte Zone und reduziert Kondensat. Die klare Fläche entspricht meist der Folienabdeckung, nicht dem gesamten Spiegel. Nutzbereich, erwartete Aufwärmung, Format und gemeinsame oder getrennte Steuerung sollten festgelegt werden.', 'BOLEN prüft die Position zu Lichtflächen, Rahmen, Sensoren, Display und Befestigungen, damit eine nutzbare Zone ohne Konflikte entsteht.'], bullets: ['Folienmaß und Position je Modell', 'Touch oder ausgewählte getrennte Steuerung', 'Integration mit Dimmung und Farbtemperatur', 'Anleitung und Etikett für die Freigabe'] },
       { heading: 'Antibeschlag-Spiegel für Hotels und Sortimente', paragraphs: ['Hotels und Wohnungen bevorzugen oft einfache Steuerung und Ersatzkompatibilität; Handelsmarken kombinieren Antibeschlag mit Smart-Funktionen. Wir prüfen Licht, Rahmen, Bedienung, Montage und Verpackung je Kanal.'] },
-      { heading: 'Tests und Konformität je Konfiguration', paragraphs: ['Der freigegebene Bauteilsatz steuert Licht-, Schalter- und Entnebelungstests. Spannung, Schutzart und Zertifizierung variieren je Markt und Modell und werden vor dem Angebot festgelegt.'] },
+      { heading: 'Tests und Konformität je Konfiguration', paragraphs: ['Der freigegebene Bauteilsatz steuert Licht-, Schalter- und Spiegelheizungstests. Spannung, Schutzart und Zertifizierung variieren je Markt und Modell und werden vor dem Angebot festgelegt.'] },
     ],
     faq: [
       { question: 'Wie funktioniert ein Antibeschlagspiegel?', answer: 'Eine Folie hinter dem Spiegel erwärmt eine Glaszone und reduziert Kondensation. Fläche und Aufwärmung hängen von Abdeckung, Größe und Raum ab.' },

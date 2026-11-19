@@ -820,7 +820,7 @@ export default function ProductDetail() {
                     >
                       <span className="pdp-related-index" aria-hidden="true">{String(index + 1).padStart(2, '0')}<ArrowUpRight size={22} /></span>
                       <span className="pdp-related-title font-serif">
-                        {solution.shortTitle || solution.h1}
+                        {solution.relatedAnchor || solution.shortTitle || solution.h1}
                       </span>
                       <span className="pdp-related-description">{solution.blurb}</span>
                       <span className="pdp-related-action">

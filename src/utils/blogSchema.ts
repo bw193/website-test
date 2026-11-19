@@ -108,8 +108,8 @@ const BLOG_CATEGORY_LABELS: Record<string, Record<string, string>> = {
   },
 };
 
-function isOrganizationAuthorName(name: string): boolean {
-  const normalized = name.trim();
+export function isCompanyBlogAuthor(author: string | null | undefined): boolean {
+  const normalized = (author || '').trim();
   if (!normalized) return true;
   return /^(?:bolen(?:\s+(?:mirror|editorial|team|staff|factory|group|optical.*))?|jiaxing\s+chengtai.*|嘉兴诚泰.*)$/i.test(
     normalized,
@@ -118,7 +118,7 @@ function isOrganizationAuthorName(name: string): boolean {
 
 function buildBlogAuthorNode(rawAuthor: string | null | undefined): Record<string, unknown> {
   const trimmed = (rawAuthor || '').trim();
-  if (isOrganizationAuthorName(trimmed)) {
+  if (isCompanyBlogAuthor(trimmed)) {
     return {
       '@type': 'Organization',
       name: trimmed || 'BOLEN Editorial',

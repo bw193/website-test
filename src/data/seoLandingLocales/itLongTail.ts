@@ -48,7 +48,7 @@ export const itLongTailSeoLandingTranslations = {
     ],
   },
   'irregular-shaped-mirror-manufacturer': {
-    title: 'Produttore di specchi di forma irregolare con garanzia di 3 anni',
+    title: 'Produttore di specchi irregolari e organici su misura | BOLEN',
     description: 'Crea specchi organici, asimmetrici, ovali o personalizzati con revisione tecnica, LED, campione e imballaggio protettivo BOLEN.',
     eyebrow: 'Programmi di forme organiche e geometriche',
     h1: 'Produttore di specchi irregolari per collezioni su misura',
@@ -83,7 +83,7 @@ export const itLongTailSeoLandingTranslations = {
       { value: 'Adatto al mercato', label: 'Componenti verificati per destinazione' },
     ],
     sections: [
-      { heading: 'Seleziona le funzioni intorno all’utente', paragraphs: ['Uno specchio smart deve risolvere un bisogno, non accumulare funzioni. Bluetooth può unirsi a dimmer, CCT, antiappannamento, orologio, temperatura, sensore, touch o ingrandimento. Non tutte le strutture supportano ogni combinazione.', 'Conta anche la sequenza: icone, memoria, display standby, portata sensore, posizione audio e relazione luce-antivaho vengono confermati nel campione e nel manuale.'], bullets: ['Altoparlante Bluetooth e opzioni audio selezionate', 'Dimmer e temperatura colore', 'Antiappannamento, orologio e temperatura', 'Touch, sensore e ingrandimento sui modelli compatibili'] },
+      { heading: 'Seleziona le funzioni intorno all’utente', paragraphs: ['Uno specchio smart deve risolvere un bisogno, non accumulare funzioni. Bluetooth può unirsi a dimmer, CCT, antiappannamento, orologio, temperatura, sensore, touch o ingrandimento. Non tutte le strutture supportano ogni combinazione.', 'Conta anche la sequenza: icone, memoria, display standby, portata sensore, posizione audio e relazione luce-antiappannamento vengono confermati nel campione e nel manuale.'], bullets: ['Altoparlante Bluetooth e opzioni audio selezionate', 'Dimmer e temperatura colore', 'Antiappannamento, orologio e temperatura', 'Touch, sensore e ingrandimento sui modelli compatibili'] },
       { heading: 'Configurazione elettrica e documenti per mercato', paragraphs: ['Driver, modulo Bluetooth, interruttori, riscaldatore, cavi e spine vengono verificati insieme. Tensione, frequenza, protezione e documenti si definiscono prima del preventivo. La copertura viene confermata per modello.'] },
       { heading: 'Campionatura OEM prima del volume', paragraphs: ['Invia dimensioni, forma, funzioni, controllo, mercato, quantità e marchio. Verifichiamo piattaforma e campione e confermiamo test, aspetto, manuale e imballaggio prima di produzione e riordini.'] },
     ],

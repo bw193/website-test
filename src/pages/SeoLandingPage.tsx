@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState, type MouseEvent } from 'react';
 import { ArrowDown, ArrowRight, ArrowUpRight, Check, ChevronRight, Plus } from 'lucide-react';
-import { Link, Navigate, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import SEO from '../components/SEO';
+import NotFound from './NotFound';
 import ProductCard, { capImageAlt } from '../components/ProductCard';
 import ProductCardSkeleton from '../components/ProductCardSkeleton';
 import Reveal from '../components/Reveal';
@@ -20,6 +21,8 @@ import {
 import { useLocalizedPath } from '../hooks/useLocalizedPath';
 import { readInitialSeoLandingData } from '../utils/prerenderData';
 import { buildProductBuyerSummary } from '../utils/productSeo';
+import { polishEnglishProductTitle } from '../utils/productCopy';
+import { useProductTranslator } from '../utils/productI18n';
 import { productDetailPath } from '../utils/productRoutes';
 import { optimizeImage } from '../utils/optimizeImage';
 import { SOLUTION_DETAIL_COPY } from '../data/solutionDetailCopy';
@@ -89,6 +92,7 @@ function SolutionDetail() {
   const { slug = '' } = useParams<{ slug: string }>();
   const enhancedMotion = slug === 'custom-mirror-manufacturer';
   const { lang, lp } = useLocalizedPath();
+  const translateProduct = useProductTranslator(lang);
   const sourcePage = SEO_LANDING_BY_SLUG[slug];
   const page = useMemo(() => sourcePage ? localizeSeoLandingPage(sourcePage, lang) : undefined, [sourcePage, lang]);
   const ui = getSeoSolutionsUi(lang);
@@ -149,12 +153,20 @@ function SolutionDetail() {
   const galleryItems = useMemo(() => featuredProducts
     .filter((product) => Boolean(product.images?.[0]))
     .slice(0, 3)
-    .map((product) => ({
-      id: product.id,
-      image: product.images[0],
-      title: lang === 'en' ? product.title : getSeoLandingProductCardCopy(product, lang).title,
-      href: `/${lang}${productDetailPath(product, lang)}/`,
-    })), [featuredProducts, lang]);
+    .map((product) => {
+      const translated = translateProduct(product);
+      const hasTranslatedTitle = Boolean(translated.title && translated.title !== product.title);
+      const localizedTitle = lang === 'en'
+        ? (prerenderCopyMatchesLanguage && product.display_title) || polishEnglishProductTitle(product.title)
+        : (prerenderCopyMatchesLanguage && product.display_title) ||
+          (hasTranslatedTitle ? translated.title! : getSeoLandingProductCardCopy(product, lang).title);
+      return {
+        id: product.id,
+        image: product.images[0],
+        title: localizedTitle,
+        href: `/${lang}${productDetailPath(product, lang)}/`,
+      };
+    }), [featuredProducts, lang, prerenderCopyMatchesLanguage, translateProduct]);
   const showProducts = loading || featuredProducts.length > 0;
 
   useEffect(() => {
@@ -216,7 +228,7 @@ function SolutionDetail() {
     target.focus({ preventScroll: true });
   };
 
-  if (!page) return <Navigate to={lp('/solutions')} replace />;
+  if (!page) return <NotFound />;
 
   const canonical = `${SITE_URL}/${lang}/solutions/${page.slug}/`;
   const schemaCopy = SERVICE_SCHEMA_COPY[lang] || SERVICE_SCHEMA_COPY.en;
@@ -292,7 +304,7 @@ function SolutionDetail() {
 
       <header className="solution-hero">
         <div className="solution-container">
-          <nav className="solution-breadcrumb" aria-label="Breadcrumb">
+          <nav className="solution-breadcrumb" aria-label={ui.breadcrumbLabel}>
             <Link to={lp('/')}>{ui.home}</Link><ChevronRight aria-hidden="true" />
             <Link to={lp('/solutions')}>{ui.solutions}</Link><ChevronRight aria-hidden="true" />
             <span aria-current="page">{page.shortTitle || page.h1}</span>
@@ -329,7 +341,7 @@ function SolutionDetail() {
               )}
             </div>
           </div>
-          <ul className="solution-proof">
+          <ul className="solution-proof" aria-label={ui.proofPointsLabel}>
             {page.proofPoints.map((point, index) => (
               <Reveal as="li" key={point.label} delay={index * 75}>
                 <strong>{point.value}</strong><span>{point.label}</span>
@@ -371,16 +383,20 @@ function SolutionDetail() {
                 ? Array.from({ length: 6 }).map((_, index) => <ProductCardSkeleton key={index} />)
                 : featuredProducts.map((product, index) => {
                     const cardCopy = getSeoLandingProductCardCopy(product, lang);
+                    const translated = translateProduct(product);
+                    const hasTranslatedTitle = Boolean(translated.title && translated.title !== product.title);
                     const displayTitleOverride = prerenderCopyMatchesLanguage
                       ? product.display_title
-                      : lang === 'zh'
-                        ? cardCopy.title
-                        : undefined;
+                      : lang === 'en' || hasTranslatedTitle
+                        ? undefined
+                        : cardCopy.title;
                     const buyerSummary = prerenderCopyMatchesLanguage
                       ? product.buyer_summary
                       : lang === 'en'
                         ? buildProductBuyerSummary(product)
-                        : cardCopy.summary;
+                        : hasTranslatedTitle
+                          ? buildProductBuyerSummary(translated)
+                          : cardCopy.summary;
                     return (
                       <Reveal key={product.id} delay={index * 80}>
                         <ProductCard

@@ -11,6 +11,7 @@ import VideoShare from '../components/VideoShare';
 import { useLocalizedPath } from '../hooks/useLocalizedPath';
 import { readInitialVideoPost } from '../utils/prerenderData';
 import { optimizeImage } from '../utils/optimizeImage';
+import { toMediaUrl } from '../utils/media';
 import { formatBlogDate } from '../utils/blog';
 import {
   formatVideoDuration,
@@ -217,7 +218,7 @@ export default function VideoDetail() {
   const playback = getVideoPlayback(video);
   const ogVideo =
     playback.kind === 'video'
-      ? { url: playback.src, type: videoMimeType(playback.src) || 'video/mp4' }
+      ? { url: toMediaUrl(playback.src), type: videoMimeType(playback.src) || 'video/mp4' }
       : playback.kind === 'embed'
         ? { url: playback.src, type: 'text/html' }
         : undefined;

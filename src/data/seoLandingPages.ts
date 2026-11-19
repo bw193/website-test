@@ -49,7 +49,7 @@ export const SEO_LANDING_PAGES: SeoLandingPage[] = [
     proofPoints: [
       { value: '5mm EN 1036', label: 'Copper-free silver glass (>720h salt-spray tested)' },
       { value: 'CRI ≥ 90 · IP44/54', label: '2700K–6500K stepless CCT & sealed bathroom drivers' },
-      { value: 'MOQ 50–100 pcs', label: 'Per size/SKU with 7–12 day engineering samples' },
+      { value: '10 / 50–100 pcs', label: 'Trial from 10 pcs stocked; 50–100 pcs custom OEM (7–12d samples)' },
       { value: '25–35 days', label: 'Mass production & ISTA-3A drop-tested cartons' },
     ],
     sections: [
@@ -76,7 +76,7 @@ export const SEO_LANDING_PAGES: SeoLandingPage[] = [
       {
         heading: 'Specification review, 7–12 day sampling, and export packing',
         paragraphs: [
-          'Send your target vanity widths (e.g., 600×800 mm, 900×800 mm, 1200×800 mm, or inch equivalents), lighting style, destination voltage, and estimated volume. Standard OEM vanity mirror MOQ is 50–100 pcs per size, with engineering samples ready in 7–12 days, mass production completed in 25–35 days, and ISTA-3A drop-tested 5-ply cartons engineered for retail or project transit.',
+          'Send your target vanity widths (e.g., 600×800 mm, 900×800 mm, 1200×800 mm, or inch equivalents), lighting style, destination voltage, and estimated volume. Trial orders on existing catalog models start from 10 pcs, while custom OEM vanity sizes and private-label runs start at 50–100 pcs per dimension—with engineering samples ready in 7–12 days, mass production completed in 25–35 days, and ISTA-3A drop-tested 5-ply cartons engineered for retail or project transit.',
         ],
       },
     ],
@@ -94,7 +94,7 @@ export const SEO_LANDING_PAGES: SeoLandingPage[] = [
       {
         question: 'What are your standard MOQ and production lead times?',
         answer:
-          'Standard MOQ is 50–100 pcs per model/dimension depending on frame construction. Engineering samples take 7–12 days and mass production takes 25–35 days after sample approval.',
+          'Trial orders on selected existing catalog models start from 10 pcs, while custom OEM/ODM sizes and private-label specifications start at 50–100 pcs per dimension depending on frame construction. Engineering samples take 7–12 days and mass production takes 25–35 days after sample approval.',
       },
     ],
     productTerms: ['copper-free', '5mm', 'stepless dimming', 'frosted', 'halo', '3000–6000k', 'demister'],
@@ -109,12 +109,12 @@ export const SEO_LANDING_PAGES: SeoLandingPage[] = [
     eyebrow: 'CAD drawing & bespoke material fabrication',
     h1: 'Custom Mirror Manufacturer for Brands, Hotels and Distributors',
     intro:
-      'BOLEN converts architectural elevations, CAD drawings, and physical reference samples into engineered mirror constructions across our 46,800 m² facility. Combining ±1.0 mm CNC glass profiling on 5mm EN 1036 copper-free glass with custom 6063-T5 anodized aluminum, stainless steel, or solid wood frames, we build bespoke LED and non-LED mirrors with 7–12 day prototyping and MOQ 50–100 pcs.',
+      'BOLEN converts architectural elevations, CAD drawings, and physical reference samples into engineered mirror constructions across our 46,800 m² facility. Combining ±1.0 mm CNC glass profiling on 5mm EN 1036 copper-free glass with custom 6063-T5 anodized aluminum, stainless steel, or solid wood frames, we support pilot orders from 10 pcs on existing catalog platforms and bespoke OEM builds from 50–100 pcs with 7–12 day prototyping.',
     proofPoints: [
       { value: '±1.0 mm CNC', label: 'Precision cutting on 4mm/5mm EN 1036 silver glass' },
       { value: '6063-T5 & Wood', label: 'Anodized, brushed brass, matte black & wood frames' },
       { value: '7–12 days', label: 'Custom CAD drawing & physical prototype turnaround' },
-      { value: 'MOQ 50–100 pcs', label: '25–35 day mass production & ISTA-3A packaging' },
+      { value: '10 / 50–100 pcs', label: 'Stocked trials from 10 pcs; bespoke OEM runs 50–100 pcs' },
     ],
     sections: [
       {
@@ -135,7 +135,7 @@ export const SEO_LANDING_PAGES: SeoLandingPage[] = [
         heading: 'Engineering feasibility from CAD drawings before tooling',
         paragraphs: [
           'Send a DWG/DXF/PDF elevation, Pantone/RAL finish target, or physical benchmark sample. Within 24–48 hours our engineering team reviews structural rigidity, hanging load distribution, LED lumen output, and UL 962 / CE EN 60598 clearance rules, returning a production shop drawing for sign-off prior to cutting the 7–12 day prototype.',
-          'Adapting our existing 200+ extrusion profiles keeps MOQ at 50–100 pcs without tooling fees, while custom aluminum extrusion dies or molded backplates are transparently costed with typical MOQ of 200+ pcs.',
+          'Stocked catalog designs can be trialed from 10 pcs, adapting our existing 200+ extrusion profiles keeps bespoke OEM MOQ at 50–100 pcs without tooling fees, and dedicated custom aluminum extrusion dies or molded backplates are transparently costed from 200+ pcs.',
         ],
       },
       {
@@ -154,7 +154,7 @@ export const SEO_LANDING_PAGES: SeoLandingPage[] = [
       {
         question: 'What are the sampling time, MOQ, and mass-production lead time?',
         answer:
-          'Custom prototypes take 7–12 days after shop-drawing sign-off. Standard MOQ is 50–100 pcs per custom size using existing frame profiles (200+ pcs for new extrusion dies), with 25–35 days mass-production lead time.',
+          'Custom prototypes take 7–12 days after shop-drawing sign-off. Existing catalog models can trial from 10 pcs, bespoke OEM builds on existing frame profiles start at 50–100 pcs (200+ pcs for new extrusion dies), and mass production takes 25–35 days.',
       },
       {
         question: 'What warranty applies to custom LED vs non-LED decorative mirrors?',
@@ -177,7 +177,7 @@ export const SEO_LANDING_PAGES: SeoLandingPage[] = [
     proofPoints: [
       { value: 'CRI ≥ 90–95', label: '2700K–4000K hospitality vanity lighting & 5mm EN 1036 glass' },
       { value: 'IP44 / IP54', label: 'UL 962, CE EN 60598 & SAA hardwired electrical options' },
-      { value: 'MOQ 50 pcs', label: 'Per room-type schedule with 7–12 day mock-up room samples' },
+      { value: '10 / 50 pcs', label: 'Catalog suites from 10 pcs; custom FF&E room schedules from 50 pcs' },
       { value: '25–35 days', label: 'Phased floor-by-floor palletization & 1–2% spare parts' },
     ],
     sections: [
@@ -211,7 +211,7 @@ export const SEO_LANDING_PAGES: SeoLandingPage[] = [
       {
         question: 'Can BOLEN build mock-up room samples from hotel FF&E drawings?',
         answer:
-          'Yes. We review architectural elevations and room schedules within 24–48 hours and produce mock-up room samples in 7–12 days prior to 25–35 day bulk production (typical MOQ 50 pcs per room type).',
+          'Yes. We review architectural elevations and room schedules within 24–48 hours and produce mock-up room samples in 7–12 days. Boutique runs on existing catalog models start from 10 pcs, while bespoke room-type FF&E schedules typically start at 50 pcs per type with 25–35 day bulk production.',
       },
       {
         question: 'Are hardwired wall-switch, anti-fog, and UL/CE hospitality specs supported?',
@@ -240,7 +240,7 @@ export const SEO_LANDING_PAGES: SeoLandingPage[] = [
     proofPoints: [
       { value: '5mm + CAT II Film', label: 'EN 1036 copper-free glass with shatter-safe backing' },
       { value: 'IP44 / IP54 · RoHS', label: 'UL 962, CE EN 60598 & SAA commercial electrical compliance' },
-      { value: 'MOQ 50–100 pcs', label: 'Repeatable unit-type specs for multi-family & office builds' },
+      { value: '10 / 50–100 pcs', label: 'Existing washroom models from 10 pcs; custom tender builds 50–100 pcs' },
       { value: '25–35 days', label: 'Batch-labeled pallets & ISTA-3A transit protection' },
     ],
     sections: [
@@ -260,7 +260,7 @@ export const SEO_LANDING_PAGES: SeoLandingPage[] = [
       {
         heading: 'Specification-transparent value engineering & MOQ',
         paragraphs: [
-          'Commercial tenders win on predictable landed cost without compromising code compliance. Starting at MOQ 50–100 pcs per unit type, BOLEN itemizes cost drivers—glass thickness, frame profile, driver certification, and pallet vs individual ISTA-3A carton packing—so estimators can balance budget across penthouse, standard apartment, and common-area washrooms.',
+          'Commercial tenders win on predictable landed cost without compromising code compliance. Existing catalog mirrors can be ordered from 10 pcs for pilot washrooms, while custom multi-unit tender specs start at 50–100 pcs per unit type—itemizing glass thickness, frame profile, driver certification, and pallet vs individual ISTA-3A carton packing across penthouse, standard apartment, and common-area tiers.',
         ],
       },
       {
@@ -279,7 +279,7 @@ export const SEO_LANDING_PAGES: SeoLandingPage[] = [
       {
         question: 'What are the MOQ and lead times for apartment and commercial tenders?',
         answer:
-          'Standard MOQ is 50–100 pcs per mirror specification, with 7–12 day submittal samples and 25–35 day mass-production lead times coordinated to phased site schedules.',
+          'Standard catalog designs start from 10 pcs for smaller commercial fit-outs, while custom multi-unit tender specifications start at 50–100 pcs per mirror spec—with 7–12 day submittal samples and 25–35 day phased mass production.',
       },
       {
         question: 'Are both non-LED and UL/CE certified LED commercial mirrors available?',
@@ -303,7 +303,7 @@ export const SEO_LANDING_PAGES: SeoLandingPage[] = [
     proofPoints: [
       { value: 'IP44 · CRI ≥ 90', label: '2700K–6500K front/ambient LED, demister & shaver/USB options' },
       { value: 'EN 1036 + 110°', label: 'Copper-free mirror doors, tempered shelves & soft-close hinges' },
-      { value: 'MOQ 30–50 pcs', label: 'Flexible mirror cabinet MOQ with 10–14 day sampling' },
+      { value: '10 / 30–50 pcs', label: 'Stocked cabinets from 10 pcs; custom OEM runs 30–50 pcs (10–14d samples)' },
       { value: '25–35 days', label: 'ISTA-3A reinforced honeycomb/EPE export packaging' },
     ],
     sections: [
@@ -328,9 +328,9 @@ export const SEO_LANDING_PAGES: SeoLandingPage[] = [
         ],
       },
       {
-        heading: 'Heavy-duty ISTA-3A cabinet packaging & MOQ 30–50 pcs',
+        heading: 'Heavy-duty ISTA-3A cabinet packaging & flexible MOQ',
         paragraphs: [
-          'Because mirror cabinets weigh 14–32 kg, BOLEN packages every unit with immobilized internal shelf blocks, 35 mm molded EPE foam, honeycomb board panels, corner guards, and 5-ply export cartons tested to ISTA-3A standards. Standard OEM cabinet MOQ is 30–50 pcs per size with 25–35 days production lead time.',
+          'Because mirror cabinets weigh 14–32 kg, BOLEN packages every unit with immobilized internal shelf blocks, 35 mm molded EPE foam, honeycomb board panels, corner guards, and 5-ply export cartons tested to ISTA-3A standards. Existing catalog cabinet models allow pilot trials from 10 pcs, while custom OEM cabinet sizes start at 30–50 pcs per size with 25–35 days production lead time.',
         ],
       },
     ],
@@ -343,7 +343,7 @@ export const SEO_LANDING_PAGES: SeoLandingPage[] = [
       {
         question: 'What is the MOQ and lead time for custom LED mirror cabinets?',
         answer:
-          'Standard MOQ for LED mirror cabinets is 30–50 pcs per size/model, with 10–14 day engineering samples and 25–35 day mass production.',
+          'Pilot orders on existing catalog cabinet models start from 10 pcs; custom OEM dimensions or feature builds start at 30–50 pcs per size/model, with 10–14 day engineering samples and 25–35 day mass production.',
       },
       {
         question: 'How are heavy mirror cabinets protected against shipping breakage?',
@@ -367,7 +367,7 @@ export const SEO_LANDING_PAGES: SeoLandingPage[] = [
     proofPoints: [
       { value: 'ISO 9001 · 2005', label: '46,800 m² plant, 6 lines & zero-substitution BOM lock' },
       { value: 'UL / CE / SAA', label: 'UL 962, CE EN 60598, CB, UKCA & RoHS compliance dossiers' },
-      { value: 'MOQ 50–100 pcs', label: 'ODM platform adaptation or dedicated OEM tooling' },
+      { value: '10 / 50–100 pcs', label: 'Existing catalog trials from 10 pcs; ODM/OEM runs 50–100 pcs' },
       { value: '3-Yr / 2-Yr', label: '3-yr LED/electrical & 2-yr structural warranty + spare parts' },
     ],
     sections: [
@@ -394,7 +394,7 @@ export const SEO_LANDING_PAGES: SeoLandingPage[] = [
       {
         heading: 'Predictable 25–35 day lead times near Shanghai & Ningbo ports',
         paragraphs: [
-          'Located 60 km from Shanghai and Ningbo deep-water ports, BOLEN completes mass production in 25–35 days after Golden Sample sign-off, supporting FOB, CIF, or DDP container schedules and NDA-protected exclusivity on buyer-funded tooling.',
+          'Located in Jiaxing (60 km from Shanghai Port and ~120 km from Ningbo Port), BOLEN completes mass production in 25–35 days after Golden Sample sign-off, supporting FOB, CIF, or DDP container schedules and NDA-protected exclusivity on buyer-funded tooling.',
         ],
       },
     ],
@@ -402,7 +402,7 @@ export const SEO_LANDING_PAGES: SeoLandingPage[] = [
       {
         question: 'How do MOQ and lead times compare between ODM adaptation and custom OEM tooling?',
         answer:
-          'Adapting an ODM platform requires 0 tooling cost, MOQ 50–100 pcs per SKU, 7–12 day samples, and 25–35 day mass production. Custom extrusion dies or injection tooling typically start at MOQ 200+ pcs withNDA exclusivity.',
+          'Trial orders on existing stocked models start from 10 pcs. Adapting an ODM platform requires 0 tooling cost, MOQ 50–100 pcs per SKU, 7–12 day samples, and 25–35 day mass production. Custom extrusion dies or injection tooling typically start at MOQ 200+ pcs with NDA exclusivity.',
       },
       {
         question: 'Can BOLEN support UL, CE, UKCA, and SAA private-label documentation?',
@@ -422,14 +422,14 @@ export const SEO_LANDING_PAGES: SeoLandingPage[] = [
     slug: 'led-mirror-wholesale-supplier',
     title: 'LED Mirror Wholesale Supplier | Mixed-SKU Container Bulk | BOLEN',
     description:
-      'Factory-direct LED mirror wholesale supplier: mix 4–8 SKUs per 20GP/40HQ container, MOQ 50 pcs, 5mm EN 1036 glass, CRI ≥ 90, IP44 UL/CE/SAA compliance & ISTA-3A cartons in 25–35 days.',
+      'Factory-direct LED mirror wholesale supplier: trial from 10 pcs on stocked SKUs or mix 4–8 models per 20GP/40HQ container (MOQ 50 pcs/SKU), 5mm EN 1036 glass, CRI ≥ 90, IP44 & ISTA-3A cartons.',
     eyebrow: 'Container consolidation & distributor assortment programs',
     h1: 'LED Mirror Wholesale Supplier for Distributors and Bulk Projects',
     intro:
-      'BOLEN supplies regional bathroom distributors, showroom chains, and e-commerce importers with factory-direct wholesale LED mirror assortments. Ship mixed-SKU 20GP (~350–550 pcs) or 40HQ (~850–1,300 pcs) containers from our 46,800 m² Jiaxing plant starting at MOQ 50 pcs per model—built with 5mm EN 1036 copper-free glass, CRI ≥ 90 2700K–6500K LEDs, IP44 protection, and ISTA-3A cartons in 25–35 days.',
+      'BOLEN supplies regional bathroom distributors, showroom chains, and e-commerce importers with factory-direct wholesale LED mirror assortments. Launch market tests from 10 pcs on stocked catalog models, or ship mixed-SKU 20GP (~350–550 pcs) and 40HQ (~850–1,300 pcs) containers from our 46,800 m² Jiaxing plant starting at 50 pcs per model—built with 5mm EN 1036 copper-free glass, CRI ≥ 90 2700K–6500K LEDs, IP44 protection, and ISTA-3A cartons in 25–35 days.',
     proofPoints: [
       { value: '20GP / 40HQ', label: '350–1,300 pcs mixed-SKU container consolidation (4–8 models)' },
-      { value: 'MOQ 50 pcs', label: 'Per stocked platform for fast distributor assortment launch' },
+      { value: '10 / 50 pcs', label: 'Stocked catalog trials from 10 pcs; mixed-container 50 pcs/SKU' },
       { value: 'ISTA-3A Pack', label: '5-ply mail-order or palletized cartons with UPC/EAN labels' },
       { value: '25–35 days', label: 'Factory-direct FCL/LCL dispatch near Shanghai & Ningbo ports' },
     ],
@@ -450,7 +450,7 @@ export const SEO_LANDING_PAGES: SeoLandingPage[] = [
       {
         heading: 'Transparent FOB / EXW volume tiers & cost drivers',
         paragraphs: [
-          'Wholesale quotations break down unit pricing by order tier (50 / 200 / 500+ pcs), carton specification, and destination compliance (CE/SAA vs UL/ETL) so importers calculate exact landed margin per CBM without hidden trading-company markups.',
+          'Wholesale quotations break down unit pricing by order tier (10-pc stocked trial / 50 / 200 / 500+ pcs), carton specification, and destination compliance (CE/SAA vs UL/ETL) so importers calculate exact landed margin per CBM without hidden trading-company markups.',
         ],
       },
       {
@@ -464,7 +464,7 @@ export const SEO_LANDING_PAGES: SeoLandingPage[] = [
       {
         question: 'How many LED mirrors fit in a 20GP or 40HQ container, and can we mix SKUs?',
         answer:
-          'Depending on mirror dimensions (e.g., 600×800 mm to 1200×800 mm), a 20GP holds roughly 350–550 pcs and a 40HQ holds 850–1,300 pcs. Buyers can typically mix 4–8 SKUs at MOQ 50 pcs per model.',
+          'Depending on mirror dimensions (e.g., 600×800 mm to 1200×800 mm), a 20GP holds roughly 350–550 pcs and a 40HQ holds 850–1,300 pcs. Stocked catalog SKUs can start from 10 pcs for LCL market trials, while full mixed containers typically combine 4–8 models at 50 pcs per SKU.',
       },
       {
         question: 'Are wholesale cartons drop-tested for parcel e-commerce fulfilment?',
@@ -493,7 +493,7 @@ export const SEO_LANDING_PAGES: SeoLandingPage[] = [
     proofPoints: [
       { value: '400–2000+ mm', label: 'Custom mm/inch sizing with ±1.0 mm CNC glass accuracy' },
       { value: '36W–96W Scaled', label: 'Driver wattage, CRI ≥ 90 lumens & demister scaled to area' },
-      { value: 'MOQ 50 pcs', label: 'Tooling-free resizing on frameless & aluminum platforms' },
+      { value: '10 / 50–100 pcs', label: 'Catalog sizes from 10 pcs; tooling-free custom cuts 50–100 pcs' },
       { value: '25–35 days', label: '7–12 day sample & size-engineered ISTA-3A crate/carton' },
     ],
     sections: [
@@ -513,7 +513,7 @@ export const SEO_LANDING_PAGES: SeoLandingPage[] = [
       {
         heading: 'No-mold resizing for fast 7–12 day sampling',
         paragraphs: [
-          'Frameless backlit/front-lit mirrors and mitered/welded 6063-T5 aluminum frames can be built to any custom size without new mold fees, keeping MOQ at 50–100 pcs per dimension and prototype lead time at 7–12 days.',
+          'Stocked standard sizes support trial orders from 10 pcs, while frameless backlit/front-lit mirrors and mitered/welded 6063-T5 aluminum frames can be built to any custom dimension without new mold fees at 50–100 pcs per size (prototype turnaround 7–12 days).',
         ],
       },
       {
@@ -532,7 +532,7 @@ export const SEO_LANDING_PAGES: SeoLandingPage[] = [
       {
         question: 'Does resizing an LED mirror require new tooling or affect brightness?',
         answer:
-          'Frameless and aluminum-framed platforms require zero mold cost (MOQ 50–100 pcs). We scale 24V LED strip length, driver wattage (e.g., 36W–96W), and anti-fog pad dimensions so illumination stays uniform.',
+          'Existing catalog dimensions can trial from 10 pcs, while custom-cut frameless and aluminum-framed platforms require zero mold cost (50–100 pcs per custom size). We scale 24V LED strip length, driver wattage (e.g., 36W–96W), and anti-fog pad dimensions so illumination stays uniform.',
       },
       {
         question: 'What are the sample and bulk lead times for made-to-measure mirrors?',
@@ -552,11 +552,11 @@ export const SEO_LANDING_PAGES: SeoLandingPage[] = [
     eyebrow: 'CNC organic, pebble & asymmetric mirror programs',
     h1: 'Irregular Shaped Mirror Manufacturer for Custom Collections',
     intro:
-      'BOLEN manufactures organic pebble, cloud, wavy, capsule, half-moon, and asymmetric designer mirrors for bathroom, furniture, and hospitality brands inside our 46,800 m² Jiaxing factory. Using CNC contour cutting and automated curve-edging on 5mm EN 1036 copper-free silver glass, we produce both non-LED decorative shapes and IP44 CRI ≥ 90 backlit/front-lit irregular LED mirrors at MOQ 50–100 pcs.',
+      'BOLEN manufactures organic pebble, cloud, wavy, capsule, half-moon, and asymmetric designer mirrors for bathroom, furniture, and hospitality brands inside our 46,800 m² Jiaxing factory. Using CNC contour cutting and automated curve-edging on 5mm EN 1036 copper-free silver glass, we offer 10-piece trial orders on existing organic templates and 50–100 piece custom OEM runs for bespoke non-LED or IP44 CRI ≥ 90 illuminated silhouettes.',
     proofPoints: [
       { value: 'CNC Contour', label: '±1.0 mm curve cutting & diamond edge polishing on 5mm glass' },
       { value: 'LED or Non-LED', label: 'Frameless halo, bent 6063-T5 aluminum or wood frames' },
-      { value: 'MOQ 50–100 pcs', label: '7–12 day sample from DXF/AI vector or dimensioned sketch' },
+      { value: '10 / 50–100 pcs', label: 'Catalog organic shapes from 10 pcs; bespoke DXF runs 50–100 pcs' },
       { value: '3-Yr / 2-Yr', label: '3-yr LED/electrical warranty; 2-yr non-LED mirror & frame warranty' },
     ],
     sections: [
@@ -600,7 +600,7 @@ export const SEO_LANDING_PAGES: SeoLandingPage[] = [
       {
         question: 'What are the MOQ and lead times for custom organic shapes?',
         answer:
-          'Standard MOQ is 50–100 pcs per shape/size, with 7–12 day samples and 25–35 day mass production packed in contour-cut EPE foam cartons.',
+          'Existing catalog pebble, arch, and wavy templates can trial from 10 pcs, while exclusive buyer-vector silhouettes start at 50–100 pcs per shape/size—with 7–12 day samples and 25–35 day mass production packed in contour-cut EPE foam cartons.',
       },
     ],
     productTerms: ['irregular', 'organic', 'pebble', 'half-round', 'half moon', 'geometric', 'diamond', 'arch'],
@@ -620,7 +620,7 @@ export const SEO_LANDING_PAGES: SeoLandingPage[] = [
       { value: 'BT 5.0/5.3 · 2×3W', label: 'Moisture-sealed stereo rear exciters/speakers & custom pairing ID' },
       { value: 'CRI ≥ 90 · IP44', label: '2700K–6500K dimming, anti-fog, LED clock & temperature readout' },
       { value: 'CE RED / FCC / UL', label: 'RF, EMC & electrical safety verified per model configuration' },
-      { value: 'MOQ 50–100 pcs', label: '7–12 day functional sample, 25–35 day build & 3-yr electrical warranty' },
+      { value: '10 / 50–100 pcs', label: 'Stocked smart SKUs from 10 pcs; OEM UI/pairing runs 50–100 pcs' },
     ],
     sections: [
       {
@@ -645,7 +645,7 @@ export const SEO_LANDING_PAGES: SeoLandingPage[] = [
       {
         heading: 'OEM UI customization, 25–35 day production & 3-year warranty',
         paragraphs: [
-          'Customize touch-icon silkscreens, standby backlight brightness, multi-language user manuals, and ISTA-3A retail packaging starting at MOQ 50–100 pcs (7–12 day samples, 25–35 day mass production). All smart modules, LEDs, drivers, and touch sensors are covered by our 3-year factory warranty.',
+          'Stocked smart mirror SKUs support 10-piece pilot evaluations, while custom touch-icon silkscreens, broadcast pairing IDs, multi-language manuals, and ISTA-3A retail boxes start at 50–100 pcs (7–12 day samples, 25–35 day mass production). All smart modules, LEDs, drivers, and touch sensors are covered by our 3-year factory warranty.',
         ],
       },
     ],
@@ -663,7 +663,7 @@ export const SEO_LANDING_PAGES: SeoLandingPage[] = [
       {
         question: 'What MOQ, lead time, and warranty cover smart mirrors?',
         answer:
-          'Standard MOQ is 50–100 pcs per model, with 7–12 day samples, 25–35 day mass production, and a 3-year warranty on Bluetooth, display, LED, driver, and touch electronics.',
+          'Existing catalog smart mirrors can trial from 10 pcs, whereas OEM customized pairing/UI runs start at 50–100 pcs per model—with 7–12 day samples, 25–35 day mass production, and a 3-year warranty on Bluetooth, display, LED, driver, and touch electronics.',
       },
     ],
     productTerms: ['bluetooth', 'speaker', 'time and temperature', 'time&temperature', 'digital clock', 'touch screen', 'motion sensor'],
@@ -683,7 +683,7 @@ export const SEO_LANDING_PAGES: SeoLandingPage[] = [
       { value: '150–250 W/m²', label: 'PET demister pad (+12°C to +18°C in 3–5 min, auto-off option)' },
       { value: '5mm EN 1036', label: 'Copper-free glass (>720h corrosion test) & CRI ≥ 90 LEDs' },
       { value: 'IP44 / IP54', label: 'UL 962, CE EN 60598, UKCA, SAA & RoHS electrical safety' },
-      { value: 'MOQ 50–100 pcs', label: '25–35 day production, ISTA-3A cartons & 3-yr electrical warranty' },
+      { value: '10 / 50–100 pcs', label: 'Catalog anti-fog trials from 10 pcs; OEM runs 50–100 pcs (3-yr warranty)' },
     ],
     sections: [
       {
@@ -708,7 +708,7 @@ export const SEO_LANDING_PAGES: SeoLandingPage[] = [
       {
         heading: 'Sampling in 7–12 days, container shipping & 3-year warranty',
         paragraphs: [
-          'Request demister pad layout drawings, sample verification (7–12 days), and FOB/CIF quotations at MOQ 50–100 pcs per size with 25–35 day mass production and ISTA-3A export cartons. Anti-fog heating pads, LEDs, drivers, and touch controls are covered by our 3-year factory warranty.',
+          'Request demister pad layout drawings and sample verification (7–12 days). Standard stocked anti-fog designs support 10-piece trial orders, while custom demister footprints and OEM builds start at 50–100 pcs per size with 25–35 day mass production and ISTA-3A export cartons. Anti-fog heating pads, LEDs, drivers, and touch controls are covered by our 3-year factory warranty.',
         ],
       },
     ],
@@ -745,7 +745,7 @@ export const SEO_LANDING_PAGES: SeoLandingPage[] = [
     proofPoints: [
       { value: '1500–1800+ mm', label: 'Distortion-free 4mm/5mm EN 1036 glass + CAT II shatter film' },
       { value: '3 Mount Styles', label: 'Fold-out easel stand, wall-hung Z-bar & leaning anti-tip hardware' },
-      { value: 'MOQ 50 pcs', label: 'Arched, rectangular, capsule & LED full-length formats' },
+      { value: '10 / 50 pcs', label: 'Existing floor-mirror models from 10 pcs; custom OEM runs from 50 pcs' },
       { value: 'ISTA-3A Pack', label: 'Honeycomb + 35mm EPE anti-flex cartons in 25–35 days' },
     ],
     sections: [
@@ -769,9 +769,9 @@ export const SEO_LANDING_PAGES: SeoLandingPage[] = [
         ],
       },
       {
-        heading: 'MOQ 50 pcs, 25–35 day delivery & clear warranty terms',
+        heading: 'Flexible trial & bulk MOQ, 25–35 day delivery & clear warranty terms',
         paragraphs: [
-          'Standard MOQ for full-length mirrors is 50 pcs per size/finish, with 7–12 day samples and 25–35 day mass production from Jiaxing (60 km to Shanghai port). Illuminated LED full-length models carry a 3-year electrical warranty, while non-LED full-length mirror glass, safety backing, stands, and frames carry a 2-year warranty.',
+          'Stocked catalog full-length models can be trialed from 10 pcs, while custom sizes, finishes, or LED builds start at 50 pcs per SKU—with 7–12 day samples and 25–35 day mass production from Jiaxing (60 km to Shanghai Port). Illuminated LED full-length models carry a 3-year electrical warranty, while non-LED full-length mirror glass, safety backing, stands, and frames carry a 2-year warranty.',
         ],
       },
     ],
@@ -789,7 +789,7 @@ export const SEO_LANDING_PAGES: SeoLandingPage[] = [
       {
         question: 'What MOQ, lead time, and warranty apply to full-length mirrors?',
         answer:
-          'MOQ starts at 50 pcs per size/finish with 7–12 day samples and 25–35 day bulk production. LED electronics carry a 3-year warranty; non-LED mirror glass, backing, stands, and frames carry a 2-year warranty.',
+          'Pilot orders on existing catalog full-length models start from 10 pcs; custom dimensions or finishes start at 50 pcs per SKU, with 7–12 day samples and 25–35 day bulk production. LED electronics carry a 3-year warranty; non-LED mirror glass, backing, stands, and frames carry a 2-year warranty.',
       },
     ],
     productTerms: ['full length', 'full-length', 'dressing', 'freestanding', 'with stand', 'floor standing', 'floor mirror', 'leaning'],

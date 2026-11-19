@@ -110,6 +110,7 @@ export async function handleMediaRequest(
   if (!upstreamUrl) return failure(404);
 
   const isVideo = isVideoMediaPath(url.pathname);
+  const isHead = request.method === 'HEAD';
   const fetchUpstream = deps.fetch ?? fetch;
   const cache = deps.cache === undefined ? edgeCache() : deps.cache;
 
@@ -136,7 +137,7 @@ export async function handleMediaRequest(
     let upstream: Response;
     try {
       upstream = await fetchUpstream(upstreamUrl, {
-        method: request.method === 'HEAD' && hasRange ? 'HEAD' : 'GET',
+        method: isHead ? 'HEAD' : 'GET',
         headers: upstreamReqHeaders,
       });
     } catch {
@@ -156,18 +157,30 @@ export async function handleMediaRequest(
       return failure(upstream.status >= 500 ? 502 : 404);
     }
 
+    if (isHead) {
+      await upstream.body?.cancel();
+    }
+
     // Stream upstream.body directly — never buffer video or image payloads in memory.
-    response = new Response(upstream.body, {
+    response = new Response(isHead ? null : upstream.body, {
       status: upstream.status,
       headers: mediaHeaders(upstream.headers, negotiated, isVideo),
     });
 
-    const contentLength = Number(upstream.headers.get('Content-Length') || '0');
+    // Only tee video streams into caches.default when Content-Length is explicitly
+    // known, positive, and within MAX_VIDEO_CACHE_BYTES. Never cache HEAD responses.
+    const rawContentLength = upstream.headers.get('Content-Length')?.trim() ?? '';
+    const parsedContentLength = /^\d+$/.test(rawContentLength) ? Number(rawContentLength) : null;
+    const withinVideoCacheLimit =
+      parsedContentLength !== null &&
+      parsedContentLength > 0 &&
+      parsedContentLength <= MAX_VIDEO_CACHE_BYTES;
     const canCache =
-      cache &&
+      Boolean(cache) &&
+      !isHead &&
       upstream.status === 200 &&
       !hasRange &&
-      (!isVideo || !(Number.isFinite(contentLength) && contentLength > MAX_VIDEO_CACHE_BYTES));
+      (!isVideo || withinVideoCacheLimit);
 
     if (canCache) {
       const stored = cache.put(cacheKey, response.clone()).catch(() => undefined);
@@ -178,11 +191,13 @@ export async function handleMediaRequest(
 
   const etag = response.headers.get('ETag');
   if (!hasRange && response.status === 200 && etag && request.headers.get('If-None-Match') === etag) {
-    await response.body?.cancel();
+    // Non-blocking cancel avoids WHATWG tee-cancel deadlock when cache.put()
+    // is concurrently reading the cloned branch in ctx.waitUntil().
+    void response.body?.cancel().catch(() => undefined);
     return new Response(null, { status: 304, headers: notModifiedHeaders(response.headers) });
   }
-  if (request.method === 'HEAD') {
-    await response.body?.cancel();
+  if (isHead) {
+    void response.body?.cancel().catch(() => undefined);
     return new Response(null, { status: response.status, headers: response.headers });
   }
   return response;

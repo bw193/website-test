@@ -7,7 +7,13 @@ import type { Env } from './index.ts';
 const ORIGIN = 'https://bolenmirror.com';
 const STORAGE = 'https://mxmmffwntosvwaviippd.supabase.co/storage/v1';
 
-type FetchCall = { url: string; accept: string | null; range: string | null; ifRange: string | null };
+type FetchCall = {
+  url: string;
+  method: string;
+  accept: string | null;
+  range: string | null;
+  ifRange: string | null;
+};
 
 function supabaseFetch(
   options: {
@@ -20,13 +26,16 @@ function supabaseFetch(
   const calls: FetchCall[] = [];
   const fetchImpl = (async (input: RequestInfo | URL, init?: RequestInit) => {
     const reqHeaders = new Headers(init?.headers);
+    const method = (init?.method || 'GET').toUpperCase();
     calls.push({
       url: String(input),
+      method,
       accept: reqHeaders.get('Accept'),
       range: reqHeaders.get('Range'),
       ifRange: reqHeaders.get('If-Range'),
     });
-    return new Response(options.body === undefined ? 'image-bytes' : options.body, {
+    const body = method === 'HEAD' ? null : (options.body === undefined ? 'image-bytes' : options.body);
+    return new Response(body, {
       status: options.status ?? 200,
       headers: {
         'Content-Type': options.contentType ?? 'image/webp',
@@ -43,15 +52,22 @@ function supabaseFetch(
 }
 
 function memoryCache() {
-  const store = new Map<string, Response>();
+  const store = new Map<string, { status: number; headers: [string, string][]; bytes: ArrayBuffer }>();
   return {
     store,
     cache: {
       async match(request: Request) {
-        return store.get(request.url)?.clone();
+        const entry = store.get(request.url);
+        if (!entry) return undefined;
+        return new Response(entry.bytes.slice(0), { status: entry.status, headers: entry.headers });
       },
       async put(request: Request, response: Response) {
-        store.set(request.url, response);
+        const bytes = await response.arrayBuffer();
+        store.set(request.url, {
+          status: response.status,
+          headers: [...response.headers.entries()],
+          bytes,
+        });
       },
     },
   };
@@ -81,6 +97,7 @@ test('serves Supabase images (including .jfif and escaped parentheses) without n
   assert.match(response.headers.get('Content-Security-Policy') || '', /sandbox/);
   assert.deepEqual(calls, [{
     url: `${STORAGE}/render/image/public/product-images/products/a.jfif?width=800&resize=contain`,
+    method: 'GET',
     accept: 'image/webp',
     range: null,
     ifRange: null,
@@ -107,6 +124,7 @@ test('original files come from the object endpoint and are not format-negotiated
   assert.equal(response.headers.get('Vary'), null);
   assert.deepEqual(calls, [{
     url: `${STORAGE}/object/public/comp%20image/logo.png`,
+    method: 'GET',
     accept: '*/*',
     range: null,
     ifRange: null,
@@ -153,6 +171,7 @@ test('streams .mp4 video Range requests (206 Partial Content), strips X-Robots-T
   assert.equal(store.size, 0, '206 Partial Content responses must not be written to caches.default');
   assert.deepEqual(calls, [{
     url: `${STORAGE}/object/public/product-videos/videos/1782526758014-t1n84v7.mp4`,
+    method: 'GET',
     accept: '*/*',
     range: 'bytes=0-12',
     ifRange: '"abc123"',
@@ -205,8 +224,9 @@ test('caches each negotiated format separately and serves repeats from the edge 
   ]);
 });
 
-test('answers conditional and HEAD requests without a body', async () => {
-  const { fetchImpl } = supabaseFetch();
+test('answers conditional and HEAD requests without a body and avoids upstream GET or cache poisoning on HEAD misses', async () => {
+  const { calls, fetchImpl } = supabaseFetch();
+  const { cache, store } = memoryCache();
   const path = '/media/product-images/products/a.jpg';
   const notModified = await handleMediaRequest(mediaRequest(path, { 'If-None-Match': '"abc123"' }), undefined, {
     fetch: fetchImpl,
@@ -216,10 +236,72 @@ test('answers conditional and HEAD requests without a body', async () => {
   assert.equal(notModified.headers.get('ETag'), '"abc123"');
   assert.equal(await notModified.text(), '');
 
-  const head = await handleMediaRequest(mediaRequest(path, {}, 'HEAD'), undefined, { fetch: fetchImpl, cache: null });
-  assert.equal(head.status, 200);
-  assert.equal(head.headers.get('Content-Type'), 'image/webp');
-  assert.equal(await head.text(), '');
+  const headMiss = await handleMediaRequest(mediaRequest(path, {}, 'HEAD'), undefined, { fetch: fetchImpl, cache });
+  assert.equal(headMiss.status, 200);
+  assert.equal(headMiss.headers.get('Content-Type'), 'image/webp');
+  assert.equal(await headMiss.text(), '');
+  assert.equal(calls[calls.length - 1].method, 'HEAD', 'HEAD cache miss forwards HEAD upstream');
+  assert.equal(store.size, 0, 'HEAD response must never be written to the GET edge cache');
+
+  const getAfterHead = await handleMediaRequest(mediaRequest(path), undefined, { fetch: fetchImpl, cache });
+  assert.equal(getAfterHead.status, 200);
+  assert.equal(await getAfterHead.text(), 'image-bytes');
+  assert.equal(calls[calls.length - 1].method, 'GET');
+  assert.equal(store.size, 1);
+
+  const callsBeforeWarmHead = calls.length;
+  const headHit = await handleMediaRequest(mediaRequest(path, {}, 'HEAD'), undefined, { fetch: fetchImpl, cache });
+  assert.equal(headHit.status, 200);
+  assert.equal(headHit.headers.get('Content-Type'), 'image/webp');
+  assert.equal(await headHit.text(), '');
+  assert.equal(calls.length, callsBeforeWarmHead, 'warm HEAD hit is answered from edge cache without upstream fetch');
+});
+
+test('skips edge caching for videos with missing, zero, or oversized Content-Length and passes through 416', async () => {
+  const path = '/media/product-videos/videos/stream.mp4';
+
+  const unknownLength = supabaseFetch({
+    status: 200,
+    contentType: 'video/mp4',
+    body: 'chunked-video',
+  });
+  const unknownCache = memoryCache();
+  const unknownRes = await handleMediaRequest(mediaRequest(path), undefined, {
+    fetch: unknownLength.fetchImpl,
+    cache: unknownCache.cache,
+  });
+  assert.equal(unknownRes.status, 200);
+  assert.equal(await unknownRes.text(), 'chunked-video');
+  assert.equal(unknownCache.store.size, 0, 'video with absent Content-Length must not be teed into cache.put');
+
+  const oversized = supabaseFetch({
+    status: 200,
+    contentType: 'video/mp4',
+    body: 'big-video',
+    extraHeaders: { 'Content-Length': String(30 * 1024 * 1024) },
+  });
+  const oversizedCache = memoryCache();
+  const oversizedRes = await handleMediaRequest(mediaRequest(path), undefined, {
+    fetch: oversized.fetchImpl,
+    cache: oversizedCache.cache,
+  });
+  assert.equal(oversizedRes.status, 200);
+  assert.equal(await oversizedRes.text(), 'big-video');
+  assert.equal(oversizedCache.store.size, 0, 'video larger than 25 MB must not be teed into cache.put');
+
+  const range416 = supabaseFetch({
+    status: 416,
+    contentType: 'text/plain',
+    body: null,
+    extraHeaders: { 'Content-Range': 'bytes */1024' },
+  });
+  const res416 = await handleMediaRequest(mediaRequest(path, { Range: 'bytes=5000-6000' }), undefined, {
+    fetch: range416.fetchImpl,
+    cache: null,
+  });
+  assert.equal(res416.status, 416);
+  assert.equal(res416.headers.get('Content-Range'), 'bytes */1024');
+  assert.equal(res416.headers.get('Accept-Ranges'), 'bytes');
 });
 
 test('refuses non-media paths, video resize params, mismatched content types and upstream failures', async () => {

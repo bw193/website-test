@@ -389,7 +389,7 @@ export const en = {
           "Glass · Lighting · Frame · Private-Label Packaging"
         ],
         paragraphs: [
-          "We have established deep partnerships across Europe (NL, RO, UK, ES, NO, DK), the Middle East, North America, Australia, and South America. Our products are fully compliant with international standards, holding CE, CB, RoHS, IP44, UKCA, UL, and SAA certifications.",
+          "We have established deep partnerships across Europe (NL, RO, UK, ES, NO, DK), the Middle East, North America, Australia, and South America. Our mirrors are engineered to international standards and available with CE, CB, RoHS, UKCA, UL, and SAA certifications (plus IP44/IP54 wet-zone ratings) by model and destination market.",
           "As a direct manufacturer, we offer highly competitive pricing. We are committed to delivering premium quality that perfectly aligns with your budget requirements.",
           "Our quality assurance system matches our after-sales commitment. Every product undergoes 100% pre-shipment inspection, backed by a comprehensive 3-year extended warranty on electronic components.",
           "From mirror glass to packaging, we provide end-to-end OEM/ODM customization services tailored to help you expand your market reach and build your brand."

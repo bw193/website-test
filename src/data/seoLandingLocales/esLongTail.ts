@@ -48,7 +48,7 @@ export const esLongTailSeoLandingTranslations = {
     ],
   },
   'irregular-shaped-mirror-manufacturer': {
-    title: 'Fabricante de espejos irregulares con 3 años de garantía',
+    title: 'Fabricante de espejos irregulares | Corte CNC orgánico OEM | BOLEN',
     description: 'Cree espejos orgánicos, asimétricos, ovales y personalizados con revisión técnica, LED, muestras y embalaje protector de BOLEN.',
     eyebrow: 'Programas de formas orgánicas y geométricas',
     h1: 'Fabricante de espejos irregulares para colecciones a medida',
@@ -97,7 +97,7 @@ export const esLongTailSeoLandingTranslations = {
     title: 'Fabricante de espejos LED antivaho | BOLEN',
     description: 'Compre espejos LED antivaho con cobertura térmica, controles, configuración eléctrica, pruebas y embalaje OEM revisados por BOLEN.',
     eyebrow: 'Reflejo claro en baños húmedos',
-    h1: 'Fabricante de espejos LED antivaho con cobertura del demister por modelo',
+    h1: 'Fabricante de espejos LED antivaho con cobertura térmica por modelo',
     intro: 'BOLEN fabrica espejos LED antivaho para distribuidores, marcas, hoteles y proyectos. Un desempañador fiable depende del tamaño y posición del calentador, dimensiones, control, componentes y condiciones del baño. Confirmamos estas variables por modelo, sin tratar “antivaho” como un distintivo genérico.',
     proofPoints: [
       { value: 'Revisión de cobertura', label: 'Zona térmica según espejo' },

@@ -57,7 +57,7 @@ export default function Footer() {
               <span className="font-bold text-xl text-white tracking-wide">BOLEN</span>
             </div>
             <p className="text-stone-400 text-sm">
-              Jiaxing Chengtai Mirror Co., Ltd.<br/>
+              {t('home.companyName', 'Jiaxing Chengtai Mirror Co., Ltd.')}<br/>
               {t(
                 'footer.description',
                 'Premium mirror manufacturer and exporter. Supplying high-quality, modern vanity mirrors to businesses worldwide.'
@@ -122,7 +122,7 @@ export default function Footer() {
         </div>
         <div className="mt-10 border-t border-stone-800/90 pt-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-stone-500 sm:pr-40">
           <p>
-            &copy; {new Date().getFullYear()} Jiaxing Chengtai Mirror Co., Ltd. (Brand: BOLEN). {t('footer.rights', 'All rights reserved.')}
+            &copy; {new Date().getFullYear()} {t('home.companyName', 'Jiaxing Chengtai Mirror Co., Ltd.')} (BOLEN). {t('footer.rights', 'All rights reserved.')}
           </p>
           {/* Moved out of the public header, where it sat beside the nav links
               and gave an internal staff entry point the same prominence as the

@@ -29,9 +29,9 @@ export const deSeoLandingTranslations = {
       },
     ],
     faq: [
-      { question: 'Kann BOLEN LED-Badezimmerspiegel nach Maß fertigen?', answer: 'Ja. Maße, Form, Beleuchtung, Rahmen, Schalter, Antibeschlagfläche, Funktionen, Logo und Verpackung können für OEM/ODM geprüft werden. Machbarkeit und MOQ hängen von der Konstruktion ab.' },
-      { question: 'Welche Zertifizierungen gibt es für LED-Spiegel?', answer: 'BOLEN arbeitet mit CE-, CB-, RoHS-, IP- und weiteren marktspezifischen Anforderungen. Der Umfang hängt von Modell und Bauteilsatz ab und wird vor Angebot und Bemusterung bestätigt.' },
-      { question: 'Beliefern Sie Großhändler und Hotelprojekte?', answer: 'Ja. Wir unterstützen Händler, Eigenmarken, Hotelausstatter, Wohnprojekte und weitere B2B-Kunden bei Spezifikation, Muster, Produktion und Exportverpackung.' },
+      { question: 'Welches Spiegelglas, welchen CRI und welche IP-Schutzart nutzen BOLEN LED-Badspiegel?', answer: 'Unsere OEM-Serien verwenden 5 mm kupferfreies Silberspiegelglas nach EN 1036, SMD-2835-LEDs mit CRI ≥ 90 (optional CRI ≥ 95) in 2700K–6500K sowie IP44- oder IP54-Feuchtraumschutz.' },
+      { question: 'Welche elektrischen Zertifizierungen und Garantien gelten für LED-Spiegel?', answer: 'Je nach Zielmarkt und Modell fertigen wir mit geprüften CE-EN-60598-, CB-, UKCA-, UL-962-/ETL-, SAA- und RoHS-Bauteilsätzen. LEDs, Treiber, Sensoren und Elektronik sind 3 Jahre garantiert (2 Jahre auf Nicht-LED-Spiegel und Rahmen).' },
+      { question: 'Wie hoch sind Mindestbestellmenge (MOQ) und Lieferzeiten?', answer: 'Testbestellungen bestehender Katalogmodelle starten ab 10 Stück; kundenspezifische OEM/ODM-Maße und Eigenmarkenserien ab 50–100 Stück je Ausführung. Muster entstehen in 7–12 Tagen, Serienaufträge in 25–35 Tagen.' },
     ],
   },
   'custom-mirror-manufacturer': {

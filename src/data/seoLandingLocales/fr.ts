@@ -32,9 +32,9 @@ export const frSeoLandingTranslations = {
       },
     ],
     faq: [
-      { question: 'BOLEN peut-il fabriquer des miroirs LED sur mesure ?', answer: 'Oui. Dimensions, forme, éclairage, cadre, commande, zone antibuée, fonctions, logo et emballage peuvent être étudiés en OEM/ODM. La faisabilité et le MOQ dépendent de la construction retenue.' },
-      { question: 'Quelles certifications sont disponibles pour les miroirs LED ?', answer: 'BOLEN travaille avec les exigences CE, CB, RoHS, indices IP et d’autres normes propres aux marchés. La couverture varie selon le modèle et les composants et doit être confirmée avant le devis.' },
-      { question: 'Fournissez-vous les grossistes et les projets hôteliers ?', answer: 'Oui. Nous accompagnons distributeurs, marques privées, fournisseurs hôteliers, programmes résidentiels et autres acheteurs B2B pour la spécification, l’échantillonnage, la production et l’emballage export.' },
+      { question: 'Quels verre, indice CRI et protection IP équipent les miroirs LED BOLEN ?', answer: 'Nos séries OEM reposent sur du verre argenté sans cuivre 5 mm EN 1036, des rubans LED SMD 2835 CRI ≥ 90 (option CRI ≥ 95) en 2700K–6500K et une étanchéité IP44 ou IP54 adaptée aux volumes de salle de bains.' },
+      { question: 'Quelles certifications électriques et garanties couvrent les miroirs LED ?', answer: 'Les configurations sont assemblées avec des composants certifiés CE EN 60598, CB, UKCA, UL 962 / ETL, SAA et RoHS vérifiés par modèle. Les LED, drivers, commandes et pièces électriques sont garantis 3 ans (2 ans sur le miroir non LED et le cadre).' },
+      { question: 'Quels sont les MOQ et délais standard de fabrication ?', answer: 'Les commandes d’essai sur les modèles catalogue existants démarrent à 10 pièces, tandis que les fabrications OEM/ODM sur mesure démarrent à 50–100 pièces par dimension. Les prototypes prennent 7–12 jours et la série 25–35 jours.' },
     ],
   },
   'custom-mirror-manufacturer': {

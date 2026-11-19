@@ -20,7 +20,7 @@ export const esSeoLandingTranslations = {
           'Un programa de espejos LED exige mucho más que elegir una forma. La iluminación, el vidrio, los componentes eléctricos, el marco, la posición del interruptor, el montaje y el embalaje deben funcionar juntos. BOLEN revisa estos requisitos antes del muestreo para asegurar una fabricación, certificación, instalación y logística viables.',
           'Las configuraciones pueden incluir luz frontal, retroiluminación o ambas, construcción con o sin marco, controles táctiles o por sensor, antivaho, regulación de brillo y temperatura de color, reloj, temperatura y otras funciones de proyecto. La disponibilidad final se confirma por modelo y mercado.',
         ],
-        bullets: ['Espejos LED para baño residencial y retail', 'Espejos para hoteles y apartamentos', 'Espejos inteligentes para catálogos mayoristas', 'Medidas y formas a partir de planos'],
+        bullets: ['Dimensiones, formas, colores y acabados de marco a medida', 'Vidrio espejo plateado sin cobre de 5 mm EN 1036 y opciones de seguridad', 'Iluminación CRI ≥ 90, controles, antivaho y funciones inteligentes', 'Logotipo, manual y embalaje ISTA-3A de marca propia o de proyecto'],
       },
       {
         heading: 'Control de calidad desde los componentes hasta la inspección final',
@@ -32,9 +32,9 @@ export const esSeoLandingTranslations = {
       },
     ],
     faq: [
-      { question: '¿Qué partes de un espejo LED de baño puede personalizar BOLEN?', answer: 'Se pueden revisar tamaño, forma, iluminación, marco, interruptor, zona antivaho, funciones, logotipo y embalaje. La viabilidad y el MOQ dependen de la construcción elegida.' },
-      { question: '¿Cuál es el MOQ de los espejos LED?', answer: 'Depende de tamaño, estructura, componentes, embalaje y nivel de personalización. Una plataforma existente suele ser más flexible que un molde nuevo; la cifra exacta se confirma tras revisar la especificación.' },
-      { question: '¿Pueden fabricar según especificaciones hoteleras o comerciales?', answer: 'Sí. Comparta planos, cuadros de habitaciones, montaje, mercado de destino y volumen estimado para revisarlos antes de la muestra y la cotización.' },
+      { question: '¿Qué vidrio, índice CRI y protección IP utilizan los espejos LED de baño BOLEN?', answer: 'Las series OEM emplean vidrio espejo sin cobre de 5 mm EN 1036, tiras LED SMD 2835 con CRI ≥ 90 (opción CRI ≥ 95) y CCT 2700K–6500K, junto con protección IP44 o IP54 para zonas húmedas.' },
+      { question: '¿Qué certificaciones eléctricas y garantías aplican a los espejos LED?', answer: 'Configuramos conjuntos con certificación UL 962 / ETL, CE EN 60598, CB, UKCA, SAA y RoHS confirmados por modelo. La iluminación LED, drivers, controles táctiles y electrónica incluyen 3 años de garantía (2 años en espejo sin LED y estructura).' },
+      { question: '¿Cuál es el MOQ y el plazo de fabricación estándar?', answer: 'Los pedidos de prueba en modelos existentes de catálogo comienzan desde 10 unidades, mientras que las medidas y especificaciones OEM/ODM a medida parten de 50–100 unidades por modelo. Las muestras tardan 7–12 días y la producción en serie 25–35 días.' },
     ],
   },
   'custom-mirror-manufacturer': {

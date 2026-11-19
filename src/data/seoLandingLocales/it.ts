@@ -5,7 +5,7 @@ export const itSeoLandingTranslations = {
     title: 'Produttore cinese di specchi LED da bagno | BOLEN',
     description: 'Acquista specchi LED da bagno su misura da BOLEN, produttore cinese con sviluppo OEM/ODM, specifiche flessibili e supporto all’esportazione.',
     eyebrow: 'Programmi di specchi LED direttamente dalla fabbrica',
-    h1: 'Produttore di specchi LED da bagno per collezioni vanity',
+    h1: 'Produttore di specchi LED da bagno per collezioni lavabo e arredo bagno',
     intro: 'BOLEN aiuta importatori, distributori, marchi bagno, fornitori alberghieri e buyer di progetto a sviluppare collezioni adatte alle esigenze reali del mercato. Il nostro stabilimento di Jiaxing coordina lavorazione del vetro, telai, integrazione LED, assemblaggio, controllo e imballaggio per l’esportazione.',
     proofPoints: [
       { value: 'Dal 2005', label: 'Esperienza nella produzione di specchi' },
@@ -23,9 +23,9 @@ export const itSeoLandingTranslations = {
       { heading: 'Dalla richiesta alla produzione pronta per la spedizione', paragraphs: ['Invia dimensioni, quantità stimata, mercato di destinazione, funzioni richieste e immagini o disegni. BOLEN confermerà la piattaforma più adatta, il livello di personalizzazione, il campione, il MOQ, i tempi e la base d’imballaggio. Il prezzo sarà calcolato sulla specifica reale.'] },
     ],
     faq: [
-      { question: 'BOLEN può produrre specchi LED da bagno su misura?', answer: 'Sì. Dimensioni, forma, illuminazione, telaio, comando, area antiappannante, funzioni, logo e imballaggio possono essere valutati per OEM/ODM. Fattibilità e MOQ dipendono dalla struttura scelta.' },
-      { question: 'Quali certificazioni sono disponibili per gli specchi LED?', answer: 'BOLEN opera con requisiti CE, CB, RoHS, classi IP e altre norme specifiche del mercato. La copertura varia per modello e componenti e va confermata prima del preventivo.' },
-      { question: 'Fornite grossisti e progetti alberghieri?', answer: 'Sì. Supportiamo distributori, private label, fornitori hospitality, progetti residenziali e altri clienti B2B con specifiche, campioni, produzione e imballaggio export.' },
+      { question: 'Che vetro, indice CRI e grado IP usano gli specchi LED da bagno BOLEN?', answer: 'Le configurazioni OEM utilizzano vetro argentato senza rame 5 mm EN 1036, strisce LED SMD 2835 con CRI ≥ 90 (opzione CRI ≥ 95) e temperatura 2700K–6500K, con protezione IP44 o IP54 per zona bagno.' },
+      { question: 'Quali certificazioni elettriche e garanzie coprono gli specchi LED?', answer: 'I modelli sono configurabili con componentistica certificata CE EN 60598, CB, UKCA, UL 962 / ETL, SAA e RoHS confermata per modello. LED, driver, sensori touch ed elettronica hanno 3 anni di garanzia (2 anni su specchio non LED e telaio).' },
+      { question: 'Quali sono il MOQ e i tempi di produzione standard?', answer: 'Gli ordini pilota sui modelli a catalogo partono da 10 pezzi, mentre le produzioni OEM/ODM su misura partono da 50–100 pezzi per formato. I campioni richiedono 7–12 giorni e la produzione in serie 25–35 giorni.' },
     ],
   },
   'custom-mirror-manufacturer': {

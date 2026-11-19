@@ -191,39 +191,41 @@ export default function Products() {
         path={catalogPath}
         noindex={unknownCategory}
         schema={
-          selectedCategory && categorySlug
-            ? buildCatalogCategorySchema({
-                lang,
-                slug: categorySlug,
-                name: categoryLabel,
-                pageName: pageHeading,
-                description: seoDescription,
-                homeLabel: t('navbar.home'),
-                catalogLabel: t('navbar.catalog'),
-                products: loading ? undefined : filteredProducts.map((product) => {
-                  const name = translateProduct(product).title || product.title;
-                  return {
-                    id: product.id,
-                    category: product.category,
-                    title: product.title,
-                    name: lang === 'en' ? polishEnglishProductTitle(name) : name,
-                    image: product.images?.[0],
-                  };
-                }),
-                totalProducts: filteredProducts.length,
-              })
-            : {
-                "@context": "https://schema.org",
-                "@type": "CollectionPage",
-                "name": pageHeading,
-                "description": seoDescription,
-                "url": `https://bolenmirror.com/${lang}/products/`,
-                "isPartOf": {
-                  "@type": "WebSite",
-                  "name": "BOLEN Mirror",
-                  "url": "https://bolenmirror.com"
+          unknownCategory || categoryUnresolved
+            ? undefined
+            : selectedCategory && categorySlug
+              ? buildCatalogCategorySchema({
+                  lang,
+                  slug: categorySlug,
+                  name: categoryLabel,
+                  pageName: pageHeading,
+                  description: seoDescription,
+                  homeLabel: t('navbar.home'),
+                  catalogLabel: t('navbar.catalog'),
+                  products: loading ? undefined : filteredProducts.map((product) => {
+                    const name = translateProduct(product).title || product.title;
+                    return {
+                      id: product.id,
+                      category: product.category,
+                      title: product.title,
+                      name: lang === 'en' ? polishEnglishProductTitle(name) : name,
+                      image: product.images?.[0],
+                    };
+                  }),
+                  totalProducts: filteredProducts.length,
+                })
+              : {
+                  "@context": "https://schema.org",
+                  "@type": "CollectionPage",
+                  "name": pageHeading,
+                  "description": seoDescription,
+                  "url": `https://bolenmirror.com/${lang}/products/`,
+                  "isPartOf": {
+                    "@type": "WebSite",
+                    "name": "BOLEN Mirror",
+                    "url": "https://bolenmirror.com"
+                  }
                 }
-              }
         }
       />
       {/* Hero Section */}

@@ -15,7 +15,11 @@ import {
   toListItem,
 } from '../utils/blog';
 import type { BlogPost as RawBlogPost, BlogListItem, LocalizedBlogPost } from '../types/blog';
-import { buildBlogBreadcrumbSchema, buildBlogPostingSchema } from '../utils/blogSchema';
+import {
+  buildBlogBreadcrumbSchema,
+  buildBlogPostingSchema,
+  isCompanyBlogAuthor,
+} from '../utils/blogSchema';
 import { optimizeImage } from '../utils/optimizeImage';
 import { runWhenIdle } from '../utils/idle';
 import { recommendSolutionsForProduct } from '../data/seoLandingPages';
@@ -280,7 +284,7 @@ export default function BlogPost() {
   const showCover = Boolean(cover && cover !== failedCover);
   const seoTitle = post.seo_title || `${post.title} | BOLEN Mirror Insights`;
   const seoDescription = post.seo_description || post.excerpt;
-  const isCompanyAuthor = !post.author || /^bolen(\s+mirror)?$/i.test(post.author.trim());
+  const isCompanyAuthor = isCompanyBlogAuthor(post.author);
   const authorCredential = isCompanyAuthor
     ? t(
         'blog.authorRoleTeam',

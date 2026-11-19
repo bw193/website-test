@@ -432,6 +432,60 @@ const COPY: Record<
   },
 };
 
+const ARIA_LABELS: Record<
+  Lang,
+  {
+    breadcrumb: string;
+    siteSections: string;
+    proofPoints: string;
+    products: string;
+    articles: string;
+  }
+> = {
+  en: {
+    breadcrumb: 'Breadcrumb',
+    siteSections: 'Site sections',
+    proofPoints: 'BOLEN manufacturing proof points',
+    products: 'Products',
+    articles: 'Articles',
+  },
+  zh: {
+    breadcrumb: '面包屑导航',
+    siteSections: '网站栏目',
+    proofPoints: 'BOLEN 制造实力指标',
+    products: '产品列表',
+    articles: '文章列表',
+  },
+  es: {
+    breadcrumb: 'Ruta de navegación',
+    siteSections: 'Secciones del sitio',
+    proofPoints: 'Indicadores de fabricación de BOLEN',
+    products: 'Productos',
+    articles: 'Artículos',
+  },
+  fr: {
+    breadcrumb: 'Fil d’Ariane',
+    siteSections: 'Sections du site',
+    proofPoints: 'Repères de fabrication BOLEN',
+    products: 'Produits',
+    articles: 'Articles',
+  },
+  de: {
+    breadcrumb: 'Brotkrumennavigation',
+    siteSections: 'Seitenbereiche',
+    proofPoints: 'BOLEN Fertigungskennzahlen',
+    products: 'Produkte',
+    articles: 'Artikel',
+  },
+  it: {
+    breadcrumb: 'Percorso di navigazione',
+    siteSections: 'Sezioni del sito',
+    proofPoints: 'Indicatori produttivi BOLEN',
+    products: 'Prodotti',
+    articles: 'Articoli',
+  },
+};
+
 function escapeHtml(s: string): string {
   return s
     .replace(/&/g, '&amp;')
@@ -1109,7 +1163,7 @@ function homeContent(
     <div data-prerender="home">
       ${heroBlock}<h1><span>${escapeHtml(h.heroKicker)}</span> ${escapeHtml(h.heroTitle1)} ${escapeHtml(h.heroTitle2)}</h1>
       <p>${escapeHtml(c.homeIntro)}</p>
-      <nav aria-label="Site sections">
+      <nav aria-label="${escapeAttr(ARIA_LABELS[lang].siteSections)}">
         <a href="/${lang}/products/">${escapeHtml(c.navCatalog)}</a>
         <a href="/${lang}/our-story/">${escapeHtml(c.navStory)}</a>
         <a href="/${lang}/rfq/">${escapeHtml(c.navRfq)}</a>
@@ -1124,7 +1178,7 @@ function homeContent(
       ${solutionLinks}
       ${factoryGalleryBlock(lang, gallery)}
       <footer>
-        <p><strong>Jiaxing Chengtai Mirror Co., Ltd. (BOLEN)</strong></p>
+        <p><strong>${escapeHtml(h.companyName)} (BOLEN)</strong></p>
         <address>${escapeHtml(addr.label)}: ${escapeHtml(addr.value)} &middot; <a href="mailto:sales@bolenmirror.com">sales@bolenmirror.com</a> &middot; <a href="tel:+8618058603602">+86 18058603602</a></address>
         <p><a href="/${lang}/privacy-policy/">${escapeHtml(legal.privacy)}</a> &middot; <a href="/${lang}/terms-and-conditions/">${escapeHtml(legal.terms)}</a></p>
       </footer>
@@ -1148,7 +1202,7 @@ function seoSolutionsContent(lang: Lang): string {
   }).join('\n      ');
   return `
     <div data-prerender="seo-solutions">
-      <nav aria-label="Breadcrumb"><a href="/${lang}/">${escapeHtml(ui.home)}</a> &raquo; <span>${escapeHtml(ui.footerLabel)}</span></nav>
+      <nav aria-label="${escapeAttr(ARIA_LABELS[lang].breadcrumb)}"><a href="/${lang}/">${escapeHtml(ui.home)}</a> &raquo; <span>${escapeHtml(ui.footerLabel)}</span></nav>
       <h1>${escapeHtml(ui.hubHeading)}</h1>
       <p>${escapeHtml(ui.hubIntro)}</p>
       <ol>
@@ -1199,7 +1253,7 @@ function seoLandingContent(
     })
     .join('\n        ');
   const faqs = page.faq
-    .map((item) => `<article><h2>${escapeHtml(item.question)}</h2><p>${escapeHtml(item.answer)}</p></article>`)
+    .map((item) => `<article><h3>${escapeHtml(item.question)}</h3><p>${escapeHtml(item.answer)}</p></article>`)
     .join('\n      ');
   const related = page.relatedSlugs
     .map((slug) => SEO_LANDING_BY_SLUG[slug])
@@ -1210,10 +1264,10 @@ function seoLandingContent(
 
   return `
     <div data-prerender="seo-landing">
-      <nav aria-label="Breadcrumb"><a href="/${lang}/">${escapeHtml(ui.home)}</a> &raquo; <a href="/${lang}/solutions/">${escapeHtml(ui.footerLabel)}</a> &raquo; <span>${escapeHtml(page.shortTitle || page.h1)}</span></nav>
+      <nav aria-label="${escapeAttr(ARIA_LABELS[lang].breadcrumb)}"><a href="/${lang}/">${escapeHtml(ui.home)}</a> &raquo; <a href="/${lang}/solutions/">${escapeHtml(ui.footerLabel)}</a> &raquo; <span>${escapeHtml(page.shortTitle || page.h1)}</span></nav>
       <h1>${escapeHtml(page.h1)}</h1>
       <p>${escapeHtml(page.intro)}</p>
-      <ul aria-label="BOLEN manufacturing proof points">${proof}</ul>
+      <ul aria-label="${escapeAttr(ARIA_LABELS[lang].proofPoints)}">${proof}</ul>
       ${productList ? `<section><h2>${escapeHtml(ui.modelsHeading)}</h2><ul>${productList}</ul></section>` : ''}
       ${sections}
       <section><h2>${escapeHtml(ui.faqHeading)}</h2>${faqs}</section>
@@ -1286,7 +1340,7 @@ function catalogContent(
     : '';
   return `
     <div data-prerender="catalog">
-      <nav aria-label="Breadcrumb">
+      <nav aria-label="${escapeAttr(ARIA_LABELS[lang].breadcrumb)}">
         <a href="/${lang}/">${escapeHtml(LOCALE_NAV[lang].home)}</a>
         &raquo;
         ${categoryName
@@ -1296,7 +1350,7 @@ function catalogContent(
       <h1>${escapeHtml(opts?.heading ?? (categoryName ? categoryLabel : c.catalogH1))}</h1>
       <p data-seo-description="">${escapeHtml(intro)}</p>
       ${categoryNav}
-      <ul aria-label="Products">
+      <ul aria-label="${escapeAttr(ARIA_LABELS[lang].products)}">
         ${items}
       </ul>${editorialBlock}
     </div>
@@ -1340,7 +1394,7 @@ function productDetailContent(lang: Lang, product: Product, tr: LangTranslations
 
   return `
     <div data-prerender="product">
-      <nav aria-label="Breadcrumb">
+      <nav aria-label="${escapeAttr(ARIA_LABELS[lang].breadcrumb)}">
         <a href="/${lang}/">${escapeHtml(LOCALE_NAV[lang].home)}</a>
         &raquo;
         <a href="/${lang}/products/">${escapeHtml(LOCALE_NAV[lang].catalog)}</a>
@@ -2094,7 +2148,7 @@ function blogIndexContent(lang: Lang, items: BlogListItem[]): string {
   return `
     <div data-prerender="blog">
       <h1>${escapeHtml(c.h1)}</h1>
-      <ul aria-label="Articles">
+      <ul aria-label="${escapeAttr(ARIA_LABELS[lang].articles)}">
         ${list}
       </ul>
     </div>
@@ -2149,7 +2203,7 @@ function blogPostContent(
     : '';
   return `
     <div data-prerender="blogPost">
-      <nav aria-label="Breadcrumb">
+      <nav aria-label="${escapeAttr(ARIA_LABELS[lang].breadcrumb)}">
         <a href="/${lang}/">${escapeHtml(hc.breadcrumbHome)}</a>
         &raquo;
         <a href="/${lang}${INSIGHTS_PATH}/">${escapeHtml(c.journal)}</a>
@@ -2376,7 +2430,7 @@ function videoIndexContent(lang: Lang, items: VideoListItem[]): string {
     .join('\n        ');
   return `
     <div data-prerender="videos">
-      <nav aria-label="Breadcrumb">
+      <nav aria-label="${escapeAttr(ARIA_LABELS[lang].breadcrumb)}">
         <a href="/${lang}/">${escapeHtml(LOCALE_NAV[lang].home)}</a>
         &raquo;
         <span>${escapeHtml(c.videos)}</span>
@@ -2460,7 +2514,7 @@ function videoPostContent(
       : '';
   return `
     <div data-prerender="videoPost">
-      <nav aria-label="Breadcrumb">
+      <nav aria-label="${escapeAttr(ARIA_LABELS[lang].breadcrumb)}">
         <a href="/${lang}/">${escapeHtml(LOCALE_NAV[lang].home)}</a>
         &raquo;
         <a href="/${lang}/videos/">${escapeHtml(c.videos)}</a>
