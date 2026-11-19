@@ -13,6 +13,7 @@ import {
   type AmbientClipPlan,
 } from '../utils/video';
 import { imageSrcSet, optimizeImage } from '../utils/optimizeImage';
+import { toMediaPath } from '../utils/media';
 import type { VideoListItem } from '../types/video';
 
 const POSTER_WIDTHS = [640, 1024, 1600];
@@ -65,6 +66,7 @@ export default function FeaturedVideo({ video }: { video: VideoListItem }) {
   // Only self-hosted files can be a backdrop. A YouTube/Vimeo embed would mean
   // loading a third-party player with its own chrome behind the copy.
   const canAmbient = playback.kind === 'video';
+  const ambientSrc = canAmbient ? toMediaPath(playback.src) : '';
 
   useEffect(() => {
     const el = sectionRef.current;
@@ -194,12 +196,13 @@ export default function FeaturedVideo({ video }: { video: VideoListItem }) {
             ref={videoRef}
             // The media fragment makes the browser range-request just this window
             // instead of streaming from byte zero.
-            src={clipEnd !== null ? `${playback.src}#t=${clip.start.toFixed(2)},${clipEnd.toFixed(2)}` : playback.src}
+            src={clipEnd !== null ? `${ambientSrc}#t=${clip.start.toFixed(2)},${clipEnd.toFixed(2)}` : ambientSrc}
+            poster={toMediaPath(poster) || undefined}
             autoPlay
             muted={muted}
             loop={clipEnd === null}
             playsInline
-            preload="auto"
+            preload="metadata"
             tabIndex={-1}
             onPlaying={() => setAmbientPlaying(true)}
             onPause={() => setAmbientPlaying(false)}

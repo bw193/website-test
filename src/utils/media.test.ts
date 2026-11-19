@@ -1,20 +1,49 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { mediaSourceUrl, mediaUpstreamUrl, toMediaPath, toMediaTransformPath, toMediaUrl } from './media';
+import {
+  isVideoMediaPath,
+  mediaSourceUrl,
+  mediaUpstreamUrl,
+  toMediaPath,
+  toMediaTransformPath,
+  toMediaUrl,
+} from './media';
 import { imageSrcSet, optimizeImage } from './optimizeImage';
 
 const STORAGE = 'https://mxmmffwntosvwaviippd.supabase.co/storage/v1';
 const PRODUCT = `${STORAGE}/object/public/product-images/products/1789869664636-ohqsx8j.jpg`;
+const JFIF_PRODUCT = `${STORAGE}/object/public/product-images/products/1793692653981-gd2dxkr.jfif`;
+const VIDEO_MP4 = `${STORAGE}/object/public/product-videos/videos/1789897842547-h6eyqac.mp4`;
 const LOGO = `${STORAGE}/object/public/comp%20image/logo.png`;
 
-test('Supabase images map to same-origin /media/ paths and absolute URLs', () => {
+test('Supabase images (.jpg, .jfif, .png) and videos (.mp4, .webm, .mov) map to same-origin /media/ URLs', () => {
   assert.equal(toMediaPath(PRODUCT), '/media/product-images/products/1789869664636-ohqsx8j.jpg');
   assert.equal(toMediaUrl(PRODUCT), 'https://bolenmirror.com/media/product-images/products/1789869664636-ohqsx8j.jpg');
+  assert.equal(toMediaPath(JFIF_PRODUCT), '/media/product-images/products/1793692653981-gd2dxkr.jfif');
+  assert.equal(toMediaUrl(JFIF_PRODUCT), 'https://bolenmirror.com/media/product-images/products/1793692653981-gd2dxkr.jfif');
+  assert.equal(toMediaPath(VIDEO_MP4), '/media/product-videos/videos/1789897842547-h6eyqac.mp4');
+  assert.equal(toMediaUrl(VIDEO_MP4), 'https://bolenmirror.com/media/product-videos/videos/1789897842547-h6eyqac.mp4');
+  assert.equal(toMediaPath(`${STORAGE}/object/public/videos/demo.webm`), '/media/videos/demo.webm');
+  assert.equal(toMediaPath(`${STORAGE}/object/public/video/clip.mov`), '/media/video/clip.mov');
+  assert.equal(isVideoMediaPath('/media/product-videos/videos/1789897842547-h6eyqac.mp4'), true);
+  assert.equal(isVideoMediaPath('/media/product-images/products/1793692653981-gd2dxkr.jfif'), false);
+
   assert.equal(toMediaPath(LOGO), '/media/comp%20image/logo.png');
-  // Raw and pre-encoded spellings of the same object agree.
+  // Raw and pre-encoded spellings of the same object agree, and parentheses are percent-escaped.
   assert.equal(toMediaPath(`${STORAGE}/object/public/comp image/logo.png`), '/media/comp%20image/logo.png');
-  assert.equal(toMediaPath(`${STORAGE}/object/public/comp%20image/CE(1)(1).jpg`), '/media/comp%20image/CE(1)(1).jpg');
+  assert.equal(
+    toMediaPath(`${STORAGE}/object/public/comp%20image/CE(1)(1).jpg`),
+    '/media/comp%20image/CE%281%29%281%29.jpg',
+  );
+  assert.equal(
+    toMediaPath(`${STORAGE}/object/public/comp%20image/CE%281%29%281%29.jpg`),
+    '/media/comp%20image/CE%281%29%281%29.jpg',
+  );
   assert.equal(toMediaUrl('/media/comp%20image/logo.png'), 'https://bolenmirror.com/media/comp%20image/logo.png');
+  assert.equal(
+    toMediaPath('https://bolenmirror.com/media/product-videos/videos/1789897842547-h6eyqac.mp4'),
+    '/media/product-videos/videos/1789897842547-h6eyqac.mp4',
+  );
 });
 
 test('everything the proxy does not serve is left untouched', () => {
@@ -22,7 +51,7 @@ test('everything the proxy does not serve is left untouched', () => {
     'https://i.ytimg.com/vi/yQKZzgU23Nk/maxresdefault.jpg',
     '/hero/lcp-1280.webp',
     `${STORAGE}/object/public/other-bucket/file.jpg`,
-    `${STORAGE}/object/public/product-videos/videos/1789897842547-h6eyqac.mp4`,
+    `${STORAGE}/object/public/other-bucket/file.mp4`,
     'data:image/svg+xml;base64,AAAA',
   ];
   for (const url of untouched) {
@@ -33,8 +62,18 @@ test('everything the proxy does not serve is left untouched', () => {
   assert.equal(toMediaUrl(undefined), undefined);
 });
 
-test('optimizeImage emits /media/ transform URLs with the same parameters as before', () => {
+test('optimizeImage emits /media/ transform URLs for raster images including .jfif, never for videos', () => {
   assert.equal(optimizeImage(PRODUCT, { width: 800 }), '/media/product-images/products/1789869664636-ohqsx8j.jpg?width=800&resize=contain');
+  assert.equal(
+    optimizeImage(JFIF_PRODUCT, { width: 640 }),
+    '/media/product-images/products/1793692653981-gd2dxkr.jfif?width=640&resize=contain',
+  );
+  assert.equal(
+    optimizeImage(`${STORAGE}/object/public/comp%20image/CE(1)(1).jpg`, { width: 400 }),
+    '/media/comp%20image/CE%281%29%281%29.jpg?width=400&resize=contain',
+  );
+  // Video files never receive image resize query parameters.
+  assert.equal(optimizeImage(VIDEO_MP4, { width: 800 }), '/media/product-videos/videos/1789897842547-h6eyqac.mp4');
   assert.equal(
     optimizeImage(PRODUCT, { width: 1200, height: 675, resize: 'cover', quality: 85 }),
     '/media/product-images/products/1789869664636-ohqsx8j.jpg?width=1200&height=675&quality=85&resize=cover',
@@ -58,6 +97,19 @@ test('/media/ requests resolve to the Supabase object or transform they stand fo
     return mediaUpstreamUrl(url.pathname, url.searchParams);
   };
   assert.equal(resolve('/media/product-images/products/a.jpg'), `${STORAGE}/object/public/product-images/products/a.jpg`);
+  assert.equal(resolve('/media/product-images/products/a.jfif'), `${STORAGE}/object/public/product-images/products/a.jfif`);
+  assert.equal(
+    resolve('/media/product-videos/videos/a.mp4?utm_source=x'),
+    `${STORAGE}/object/public/product-videos/videos/a.mp4`,
+  );
+  assert.equal(
+    resolve('/media/comp%20image/CE%281%29%281%29.jpg'),
+    `${STORAGE}/object/public/comp%20image/CE%281%29%281%29.jpg`,
+  );
+  assert.equal(
+    resolve('/media/comp%20image/CE(1)(1).jpg'),
+    `${STORAGE}/object/public/comp%20image/CE%281%29%281%29.jpg`,
+  );
   assert.equal(
     resolve('/media/comp%20image/logo.png?width=400&resize=contain&utm_source=x'),
     `${STORAGE}/render/image/public/comp%20image/logo.png?width=400&resize=contain`,
@@ -70,10 +122,12 @@ test('/media/ requests resolve to the Supabase object or transform they stand fo
   assert.equal(mediaSourceUrl('/hero/lcp-640.webp'), '/hero/lcp-640.webp');
 });
 
-test('the proxy refuses unknown buckets, non-images, traversal and bad parameters', () => {
+test('the proxy refuses unknown buckets, unsupported files, video transforms, traversal and bad parameters', () => {
   const refused = [
     '/media/private-bucket/a.jpg',
-    '/media/product-videos/videos/a.mp4',
+    '/media/private-bucket/a.mp4',
+    '/media/product-videos/videos/a.mp4?width=800',
+    '/media/product-images/products/icon.svg?width=800',
     '/media/product-images/products/page.html',
     '/media/product-images',
     '/media/product-images//a.jpg',

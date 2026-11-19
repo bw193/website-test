@@ -5,7 +5,13 @@
 
 import type { LocalizedVideoPost, VideoListItem } from '../types/video';
 import { toMediaUrl } from './media';
-import { FALLBACK_VIDEO_THUMB, getVideoPlayback, toIsoDuration } from './video';
+import {
+  FALLBACK_VIDEO_THUMB,
+  getVideoPlayback,
+  localizeVideoCategory,
+  resolveVideoDescription,
+  toIsoDuration,
+} from './video';
 
 const SITE_URL = 'https://bolenmirror.com';
 const PUBLISHER = {
@@ -72,16 +78,24 @@ export function videoDetailUrl(lang: string, slug: string): string {
 }
 
 /**
- * The VideoObject body shared by the detail page, the index ItemList and the
- * home page. `@context` is added by the callers that emit a standalone node.
+ * The VideoObject body shared by the detail page and the index ItemList.
+ * `@context` is added by callers that emit a standalone node.
  */
 function videoObjectCore(video: LocalizedVideoPost | VideoListItem, lang: string): Record<string, unknown> {
   const url = videoDetailUrl(lang, video.slug);
   const playback = getVideoPlayback(video);
+  const description = resolveVideoDescription(
+    {
+      title: video.title,
+      excerpt: video.excerpt,
+      body: 'body' in video ? video.body : undefined,
+    },
+    lang,
+  );
   const node: Record<string, unknown> = {
     '@type': 'VideoObject',
     name: video.title,
-    description: video.excerpt || video.title,
+    description,
     thumbnailUrl: [toMediaUrl(video.thumbnail_url || FALLBACK_VIDEO_THUMB)],
     uploadDate: video.published_at || ('updated_at' in video ? video.updated_at : undefined) || undefined,
     publisher: PUBLISHER,
@@ -90,9 +104,9 @@ function videoObjectCore(video: LocalizedVideoPost | VideoListItem, lang: string
   };
   if (video.duration_seconds) node.duration = toIsoDuration(video.duration_seconds);
   if (playback.kind === 'embed') node.embedUrl = playback.src;
-  if (playback.kind === 'video') node.contentUrl = playback.src;
-  if (video.category) node.genre = video.category;
-  if (video.tags?.length) node.keywords = video.tags.join(', ');
+  if (playback.kind === 'video') node.contentUrl = toMediaUrl(playback.src);
+  if (video.category) node.genre = localizeVideoCategory(video.category, lang);
+  if (lang === 'en' && video.tags?.length) node.keywords = video.tags.join(', ');
   return node;
 }
 
