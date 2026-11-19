@@ -4,12 +4,13 @@ import { ArrowRight, ArrowUpRight, CalendarDays, ChevronRight, Clock, Tag } from
 import { useTranslation } from 'react-i18next';
 import Markdown from '../components/Markdown';
 import SEO from '../components/SEO';
-import ProductCard from '../components/ProductCard';
+import ProductCard, { capImageAlt } from '../components/ProductCard';
 import VideoCard, { videoCategoryPath } from '../components/VideoCard';
 import VideoPlayer from '../components/VideoPlayer';
 import VideoShare from '../components/VideoShare';
 import { useLocalizedPath } from '../hooks/useLocalizedPath';
 import { readInitialVideoPost } from '../utils/prerenderData';
+import { optimizeImage } from '../utils/optimizeImage';
 import { formatBlogDate } from '../utils/blog';
 import {
   formatVideoDuration,
@@ -26,6 +27,75 @@ import { runWhenIdle } from '../utils/idle';
 import type { LocalizedVideoPost, ProductRecommendationInput, VideoListItem, VideoPost } from '../types/video';
 
 const UP_NEXT_COUNT = 4;
+
+type SeededVideoProduct = ProductRecommendationInput & { href?: string };
+
+function readRawPrerenderObject(): Record<string, any> | null {
+  if (typeof window !== 'undefined' && (window as any).__BOLEN_PRERENDER_DATA__) {
+    const winObj = (window as any).__BOLEN_PRERENDER_DATA__;
+    if (winObj && typeof winObj === 'object') return winObj as Record<string, any>;
+  }
+  if (typeof document !== 'undefined') {
+    const el = document.getElementById('__BOLEN_PRERENDER_DATA__');
+    if (el?.textContent) {
+      try {
+        return JSON.parse(el.textContent) as Record<string, any>;
+      } catch {
+        return null;
+      }
+    }
+  }
+  return null;
+}
+
+function normalizeVideoSeedProducts(items: unknown): SeededVideoProduct[] {
+  if (!Array.isArray(items)) return [];
+  return items
+    .map((raw: any): SeededVideoProduct | null => {
+      if (!raw || typeof raw !== 'object' || typeof raw.title !== 'string') return null;
+      const images = Array.isArray(raw.images)
+        ? raw.images.filter((u: unknown): u is string => typeof u === 'string')
+        : typeof raw.img === 'string' && raw.img
+          ? [raw.img]
+          : [];
+      return {
+        id: typeof raw.id === 'string' ? raw.id : '',
+        title: raw.title,
+        description: typeof raw.description === 'string' ? raw.description : '',
+        images,
+        category: typeof raw.category === 'string' ? raw.category : undefined,
+        price_range: typeof raw.price_range === 'string' ? raw.price_range : undefined,
+        msrp: typeof raw.msrp === 'string' ? raw.msrp : undefined,
+        href: typeof raw.href === 'string' ? raw.href : undefined,
+      };
+    })
+    .filter((item): item is SeededVideoProduct => Boolean(item && (item.id || item.href)));
+}
+
+function readVideoPrerenderSeed(slug: string, lang: string): {
+  video: LocalizedVideoPost | null;
+  relatedProducts: SeededVideoProduct[];
+  upNext: VideoListItem[];
+} {
+  const raw = readRawPrerenderObject();
+  if (raw && (raw.route === 'videoPost' || raw.route === 'videoDetail')) {
+    if (raw.lang && raw.lang !== lang) {
+      return { video: null, relatedProducts: [], upNext: [] };
+    }
+    if (raw.videoPost?.slug === slug) {
+      return {
+        video: raw.videoPost as LocalizedVideoPost,
+        relatedProducts: normalizeVideoSeedProducts(raw.relatedProducts ?? raw.products),
+        upNext: Array.isArray(raw.upNext) ? (raw.upNext as VideoListItem[]) : [],
+      };
+    }
+  }
+  const fallback = readInitialVideoPost(slug);
+  if (fallback && (!raw?.lang || raw.lang === lang)) {
+    return { video: fallback, relatedProducts: [], upNext: [] };
+  }
+  return { video: null, relatedProducts: [], upNext: [] };
+}
 
 /** Same-topic clips first, then the newest — what a buyer is likeliest to want next. */
 function pickUpNext(current: LocalizedVideoPost, all: VideoPost[], lang: string): VideoListItem[] {
@@ -45,19 +115,19 @@ export default function VideoDetail() {
   const { lp, lang } = useLocalizedPath();
   const { t } = useTranslation();
 
-  const initial = readInitialVideoPost(slug);
-  const [video, setVideo] = useState<LocalizedVideoPost | null>(initial);
-  const [loading, setLoading] = useState(initial === null);
-  const [relatedProducts, setRelatedProducts] = useState<ProductRecommendationInput[]>([]);
-  const [upNext, setUpNext] = useState<VideoListItem[]>([]);
+  const seed = readVideoPrerenderSeed(slug, lang);
+  const [video, setVideo] = useState<LocalizedVideoPost | null>(seed.video);
+  const [loading, setLoading] = useState(seed.video === null);
+  const [relatedProducts, setRelatedProducts] = useState<SeededVideoProduct[]>(seed.relatedProducts);
+  const [upNext, setUpNext] = useState<VideoListItem[]>(seed.upNext);
 
   useEffect(() => {
     let active = true;
-    const initialVideo = readInitialVideoPost(slug);
-    setVideo(initialVideo);
-    setRelatedProducts([]);
-    setUpNext([]);
-    setLoading(initialVideo === null);
+    const nextSeed = readVideoPrerenderSeed(slug, lang);
+    setVideo(nextSeed.video);
+    setRelatedProducts(nextSeed.relatedProducts);
+    setUpNext(nextSeed.upNext);
+    setLoading(nextSeed.video === null);
 
     const refreshVideo = async () => {
       try {
@@ -68,8 +138,8 @@ export default function VideoDetail() {
           .eq('slug', slug)
           .eq('status', 'published')
           .maybeSingle();
-        const current = data ? localizeVideo(data as VideoPost, lang) : initialVideo;
-        if (active) setVideo(current);
+        const current = data ? localizeVideo(data as VideoPost, lang) : nextSeed.video;
+        if (active && current) setVideo(current);
         if (!current) return;
 
         const [{ data: products }, { data: videoList }] = await Promise.all([
@@ -86,8 +156,14 @@ export default function VideoDetail() {
             .limit(24),
         ]);
         if (!active) return;
-        if (products) setRelatedProducts(recommendProductsForVideo(current, products as ProductRecommendationInput[], 4));
-        if (videoList) setUpNext(pickUpNext(current, videoList as VideoPost[], lang));
+        if (products && products.length > 0) {
+          const recommended = recommendProductsForVideo(current, products as ProductRecommendationInput[], 4);
+          if (recommended.length > 0) setRelatedProducts(recommended);
+        }
+        if (videoList && videoList.length > 0) {
+          const nextItems = pickUpNext(current, videoList as VideoPost[], lang);
+          if (nextItems.length > 0) setUpNext(nextItems);
+        }
       } catch (e) {
         console.error('Error fetching video', e);
       } finally {
@@ -95,7 +171,7 @@ export default function VideoDetail() {
       }
     };
 
-    if (initialVideo) {
+    if (nextSeed.video) {
       const cancel = runWhenIdle(refreshVideo, 1500);
       return () => {
         active = false;
@@ -148,6 +224,7 @@ export default function VideoDetail() {
   const duration = formatVideoDuration(video.duration_seconds);
   const date = video.published_at ? formatBlogDate(video.published_at, lang) : '';
   const categoryLabel = video.category ? t(`videos.categories.${video.category}`, video.category) : '';
+  const safeBody = video.body ? video.body.replace(/^#\s+/gm, '## ') : '';
 
   return (
     <article className="bg-[#FAF9F6] text-stone-800 selection:bg-amber-200/60 selection:text-stone-900">
@@ -230,7 +307,7 @@ export default function VideoDetail() {
               <VideoShare url={canonical} title={video.title} className="mt-7" />
             </header>
 
-            {video.body && (
+            {safeBody && (
               <Markdown
                 className="prose prose-stone prose-lg mt-12 max-w-none border-t border-stone-200 pt-10
                   prose-headings:font-serif prose-headings:tracking-tight prose-headings:text-stone-900
@@ -243,11 +320,11 @@ export default function VideoDetail() {
                   prose-img:rounded-2xl prose-img:shadow-sm
                   prose-li:text-stone-700 prose-li:marker:text-amber-600"
               >
-                {video.body}
+                {safeBody}
               </Markdown>
             )}
 
-            {video.tags.length > 0 && (
+            {lang === 'en' && video.tags.length > 0 && (
               <div className="mt-10 flex flex-wrap items-center gap-2 border-t border-stone-200 pt-6">
                 <span className="mr-1 inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
                   <Tag className="h-3.5 w-3.5" aria-hidden="true" />
@@ -336,18 +413,39 @@ export default function VideoDetail() {
               </Link>
             </div>
             <div className="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-              {relatedProducts.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  id={product.id}
-                  title={product.title}
-                  description={product.description || ''}
-                  image={product.images?.[0] || ''}
-                  category={product.category || undefined}
-                  priceRange={product.price_range || undefined}
-                  msrp={product.msrp || undefined}
-                />
-              ))}
+              {relatedProducts.map((product, idx) =>
+                product.id ? (
+                  <ProductCard
+                    key={product.id}
+                    id={product.id}
+                    title={product.title}
+                    description={product.description || ''}
+                    image={product.images?.[0] || ''}
+                    category={product.category || undefined}
+                    priceRange={product.price_range || undefined}
+                    msrp={product.msrp || undefined}
+                  />
+                ) : (
+                  <article key={product.href || idx} className="group flex flex-col">
+                    <Link to={product.href || lp('/products')} className="block aspect-square overflow-hidden rounded-2xl bg-stone-100">
+                      {product.images?.[0] && (
+                        <img
+                          src={optimizeImage(product.images[0], { width: 400 })}
+                          alt={capImageAlt(product.title, 100)}
+                          width="400"
+                          height="400"
+                          loading="lazy"
+                          decoding="async"
+                          className="h-full w-full object-contain object-center"
+                        />
+                      )}
+                    </Link>
+                    <h3 className="mt-4 font-serif text-lg leading-snug text-stone-900 group-hover:text-amber-800">
+                      <Link to={product.href || lp('/products')}>{product.title}</Link>
+                    </h3>
+                  </article>
+                )
+              )}
             </div>
           </div>
         </section>

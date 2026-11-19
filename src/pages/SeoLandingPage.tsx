@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState, type MouseEvent } from 'react';
 import { ArrowDown, ArrowRight, ArrowUpRight, Check, ChevronRight, Plus } from 'lucide-react';
 import { Link, Navigate, useParams } from 'react-router-dom';
 import SEO from '../components/SEO';
-import ProductCard from '../components/ProductCard';
+import ProductCard, { capImageAlt } from '../components/ProductCard';
 import ProductCardSkeleton from '../components/ProductCardSkeleton';
 import Reveal from '../components/Reveal';
 import SolutionGallery from '../components/SolutionGallery';
@@ -42,6 +42,42 @@ interface Product {
   msrp?: string;
 }
 
+const SERVICE_SCHEMA_COPY: Record<
+  string,
+  { areaServed: string; audienceType: string; catalogName: string }
+> = {
+  en: {
+    areaServed: 'Worldwide',
+    audienceType: 'Importers, distributors, brands, hotel and project buyers',
+    catalogName: 'BOLEN mirror catalog',
+  },
+  zh: {
+    areaServed: '全球市场',
+    audienceType: '进口商、经销商、卫浴品牌、酒店及工程项目采购商',
+    catalogName: 'BOLEN 产品目录',
+  },
+  es: {
+    areaServed: 'Mundial',
+    audienceType: 'Importadores, distribuidores, marcas, hoteles y compradores de proyectos',
+    catalogName: 'Catálogo de espejos BOLEN',
+  },
+  fr: {
+    areaServed: 'Monde entier',
+    audienceType: 'Importateurs, distributeurs, marques, hôtels et acheteurs projets',
+    catalogName: 'Catalogue de miroirs BOLEN',
+  },
+  de: {
+    areaServed: 'Weltweit',
+    audienceType: 'Importeure, Großhändler, Marken, Hotels und Projekteinkäufer',
+    catalogName: 'BOLEN Spiegelkatalog',
+  },
+  it: {
+    areaServed: 'Tutto il mondo',
+    audienceType: 'Importatori, distributori, marchi, hotel e buyer di progetto',
+    catalogName: 'Catalogo specchi BOLEN',
+  },
+};
+
 export default function SeoLandingPage() {
   const { slug } = useParams<{ slug: string }>();
   const { lang } = useLocalizedPath();
@@ -59,7 +95,9 @@ function SolutionDetail() {
   const detail = SOLUTION_DETAIL_COPY[lang];
   const rootRef = useRef<HTMLDivElement>(null);
   const [activeSection, setActiveSection] = useState('solution-overview');
-  const [openFaq, setOpenFaq] = useState<number | null>(0);
+  const [openFaqs, setOpenFaqs] = useState<Set<number>>(
+    () => new Set((sourcePage?.faq ?? []).map((_, idx) => idx))
+  );
   const heading = lang === 'zh' ? 'font-sans font-semibold tracking-tight' : 'font-serif';
   const initial = useMemo(() => readInitialSeoLandingData<Product>(slug), [slug]);
   const [products, setProducts] = useState<Product[]>(initial?.products ?? []);
@@ -181,6 +219,7 @@ function SolutionDetail() {
   if (!page) return <Navigate to={lp('/solutions')} replace />;
 
   const canonical = `${SITE_URL}/${lang}/solutions/${page.slug}/`;
+  const schemaCopy = SERVICE_SCHEMA_COPY[lang] || SERVICE_SCHEMA_COPY.en;
   const serviceSchema = {
     '@context': 'https://schema.org',
     '@type': 'Service',
@@ -189,13 +228,14 @@ function SolutionDetail() {
     serviceType: page.shortTitle || page.h1,
     description: page.description,
     url: canonical,
+    inLanguage: lang,
     areaServed: {
       '@type': 'Place',
-      name: 'Worldwide',
+      name: schemaCopy.areaServed,
     },
     audience: {
       '@type': 'BusinessAudience',
-      audienceType: 'Importers, distributors, brands, hotel and project buyers',
+      audienceType: schemaCopy.audienceType,
     },
     brand: {
       '@type': 'Brand',
@@ -208,7 +248,7 @@ function SolutionDetail() {
     },
     hasOfferCatalog: {
       '@type': 'OfferCatalog',
-      name: 'BOLEN mirror catalog',
+      name: schemaCopy.catalogName,
       url: `${SITE_URL}/${lang}/products/`,
     },
   };
@@ -328,8 +368,8 @@ function SolutionDetail() {
             </Reveal>
             <div className="solution-model-grid">
               {loading
-                ? Array.from({ length: 3 }).map((_, index) => <ProductCardSkeleton key={index} />)
-                : featuredProducts.slice(0, 3).map((product, index) => {
+                ? Array.from({ length: 6 }).map((_, index) => <ProductCardSkeleton key={index} />)
+                : featuredProducts.map((product, index) => {
                     const cardCopy = getSeoLandingProductCardCopy(product, lang);
                     const displayTitleOverride = prerenderCopyMatchesLanguage
                       ? product.display_title
@@ -340,11 +380,9 @@ function SolutionDetail() {
                       ? product.buyer_summary
                       : lang === 'en'
                         ? buildProductBuyerSummary(product)
-                        : lang === 'zh'
-                          ? cardCopy.summary
-                          : undefined;
+                        : cardCopy.summary;
                     return (
-                      <Reveal key={product.id} delay={index * 100}>
+                      <Reveal key={product.id} delay={index * 80}>
                         <ProductCard
                           id={product.id}
                           title={product.title}
@@ -376,7 +414,7 @@ function SolutionDetail() {
                     <Link to={isFactory ? lp('/our-story') : model.href} className="solution-chapter-photo">
                       <img
                         src={optimizeImage(isFactory ? FACTORY_IMAGE : model.image, { width: 800 })}
-                        alt={isFactory ? detail.factoryImageAlt : model.title}
+                        alt={capImageAlt(isFactory ? detail.factoryImageAlt : model.title, 100)}
                         width="800" height="960" loading="lazy" decoding="async"
                       />
                       <span className="solution-chapter-photo-link">{isFactory ? detail.factoryLink : detail.viewModel}<ArrowUpRight size={18} aria-hidden="true" /></span>
@@ -411,19 +449,30 @@ function SolutionDetail() {
             <Link to={lp('/rfq')} className="solution-text-link">{ui.discussProject}<ArrowUpRight size={18} aria-hidden="true" /></Link>
           </Reveal>
           <div className="solution-faq-list">
-            {page.faq.map((item, index) => (
-              <Reveal key={item.question} delay={index * 60} className={`solution-faq-item ${openFaq === index ? 'is-open' : ''}`}>
-                <h3>
-                  <button id={`solution-question-${index}`} type="button" aria-expanded={openFaq === index} aria-controls={`solution-answer-${index}`} onClick={() => setOpenFaq(openFaq === index ? null : index)}>
-                    <span className="solution-faq-index" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
-                    <span>{item.question}</span><span className="solution-faq-toggle"><Plus size={20} aria-hidden="true" /></span>
-                  </button>
-                </h3>
-                <div id={`solution-answer-${index}`} role="region" aria-labelledby={`solution-question-${index}`} aria-hidden={openFaq !== index} className="solution-faq-answer">
-                  <div><p>{item.answer}</p></div>
-                </div>
-              </Reveal>
-            ))}
+            {page.faq.map((item, index) => {
+              const isOpen = openFaqs.has(index);
+              const toggleFaq = () => {
+                setOpenFaqs((prev) => {
+                  const next = new Set(prev);
+                  if (next.has(index)) next.delete(index);
+                  else next.add(index);
+                  return next;
+                });
+              };
+              return (
+                <Reveal key={item.question} delay={index * 60} className={`solution-faq-item ${isOpen ? 'is-open' : ''}`}>
+                  <h3>
+                    <button id={`solution-question-${index}`} type="button" aria-expanded={isOpen} aria-controls={`solution-answer-${index}`} onClick={toggleFaq}>
+                      <span className="solution-faq-index" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+                      <span>{item.question}</span><span className="solution-faq-toggle"><Plus size={20} aria-hidden="true" /></span>
+                    </button>
+                  </h3>
+                  <div id={`solution-answer-${index}`} role="region" aria-labelledby={`solution-question-${index}`} className="solution-faq-answer">
+                    <div><p>{item.answer}</p></div>
+                  </div>
+                </Reveal>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -442,7 +491,7 @@ function SolutionDetail() {
                 <Reveal as="li" key={related.slug} delay={index * 80}>
                   <Link to={lp(`/solutions/${related.slug}`)} className="solution-related-card">
                     <span className="solution-related-number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
-                    <div className="solution-related-heading"><h3 className={heading}>{related.shortTitle || related.h1}</h3><ArrowUpRight size={22} aria-hidden="true" /></div>
+                    <div className="solution-related-heading"><h3 className={heading}>{related.relatedAnchor || related.shortTitle || related.h1}</h3><ArrowUpRight size={22} aria-hidden="true" /></div>
                     <p>{related.blurb || related.description}</p>
                     <span className="solution-related-action">{ui.homeExplore}<ArrowRight size={16} aria-hidden="true" /></span>
                   </Link>

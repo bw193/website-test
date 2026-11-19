@@ -56,7 +56,7 @@
    the same node keep working — unlayered author CSS would otherwise win the
    cascade over Tailwind's layered utilities. The `backwards` fill keeps the
    from-frame applied while a stagger animation-delay is pending. */
-.reveal { opacity: 0; }
+.reveal { opacity: 1; }
 .reveal-in {
   opacity: 1;
   animation: revealUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) backwards;
@@ -66,24 +66,24 @@
 .reveal-scale.reveal-in { animation-name: revealScale; }
 .reveal-blur.reveal-in  { animation-name: revealBlur; }
 @keyframes revealUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to   { opacity: 1; transform: none; }
+  from { transform: translateY(16px); }
+  to   { transform: none; }
 }
 @keyframes revealLeft {
-  from { opacity: 0; transform: translateX(-28px); }
-  to   { opacity: 1; transform: none; }
+  from { transform: translateX(-20px); }
+  to   { transform: none; }
 }
 @keyframes revealRight {
-  from { opacity: 0; transform: translateX(28px); }
-  to   { opacity: 1; transform: none; }
+  from { transform: translateX(20px); }
+  to   { transform: none; }
 }
 @keyframes revealScale {
-  from { opacity: 0; transform: scale(0.94); }
-  to   { opacity: 1; transform: none; }
+  from { transform: scale(0.97); }
+  to   { transform: none; }
 }
 @keyframes revealBlur {
-  from { opacity: 0; transform: translateY(16px) scale(0.985); filter: blur(6px); }
-  to   { opacity: 1; transform: none; filter: blur(0); }
+  from { transform: translateY(12px) scale(0.99); }
+  to   { transform: none; }
 }
 
 /* Hero carousel crossfade + settle-zoom — applied only to non-initial slides
@@ -160,18 +160,22 @@
   }
 }
 
-/* Certificate/logo marquee — soft edge fade so logos melt in and out of the
+/* Certificate/logo marquee — soft edge fade so cards melt in and out of the
    frame instead of hard-clipping at the viewport edge. */
 .marquee-mask {
-  -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
-  mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 7%, black 93%, transparent);
+  mask-image: linear-gradient(to right, transparent, black 7%, black 93%, transparent);
 }
 
-.certificate-marquee { width: 100%; overflow: hidden; }
+.certificate-marquee {
+  width: 100%;
+  overflow: hidden;
+  padding-block: 0.5rem;
+}
 .certificate-marquee-track {
   display: flex;
   width: max-content;
-  animation: certificateScroll 30s linear infinite;
+  animation: certificateScroll 36s linear infinite;
 }
 .certificate-marquee-set {
   display: flex;
@@ -179,23 +183,33 @@
   /* Each half must cover the viewport or wide screens expose an empty tail
      before the animation loops. Identical halves keep the seam aligned. */
   min-width: 100vw;
-  align-items: center;
+  align-items: stretch;
   justify-content: space-around;
+  gap: 1.25rem;
+  padding-inline: 0.625rem;
 }
 .certificate-marquee-item {
   display: flex;
   flex: none;
-  width: 12rem;
-  height: 8rem;
-  margin-inline: 2rem;
-  align-items: center;
-  justify-content: center;
+  width: 14.5rem;
 }
 @keyframes certificateScroll {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
 }
 .certificate-marquee:hover .certificate-marquee-track { animation-play-state: paused; }
+
+/* Global export map directional light pulse along curved corridors. */
+.global-map-flow {
+  stroke-dasharray: 0.14 0.86;
+  stroke-dashoffset: 0.14;
+  animation: globalMapFlow 4.2s linear var(--map-delay, 0s) infinite;
+}
+@keyframes globalMapFlow {
+  0% { stroke-dashoffset: 0.14; opacity: 0.95; }
+  75% { stroke-dashoffset: -0.86; opacity: 0.95; }
+  100% { stroke-dashoffset: -0.86; opacity: 0; }
+}
 
 /* CTA backdrop — an ultra-slow breathe so the closing band feels alive behind
    the copy without distracting from it. */
@@ -247,7 +261,7 @@
 .factory-gallery.reveal-in .factory-thumb {
   animation: factoryThumbIn 550ms cubic-bezier(0.22, 1, 0.36, 1) calc(280ms + var(--factory-thumb-order, 0) * 45ms) backwards;
 }
-.factory-photo-current { opacity: 0; }
+.factory-photo-current { opacity: 1; }
 .factory-photo-current.is-ready {
   opacity: 1;
   animation: factoryPhotoIn 1100ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
@@ -374,17 +388,18 @@
   .certificate-marquee-track { width: 100%; animation: none; }
   .certificate-marquee-set {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
-    gap: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(13.5rem, 1fr));
+    gap: 1.25rem;
     width: 100%;
     min-width: 0;
     max-width: 80rem;
     margin-inline: auto;
     padding-inline: 1rem;
-    justify-items: center;
+    justify-items: stretch;
   }
   .certificate-marquee-set[aria-hidden="true"] { display: none; }
-  .certificate-marquee-item { margin: 0; }
+  .certificate-marquee-item { width: 100%; margin: 0; }
+  .global-map-flow { animation: none; stroke-dasharray: none; opacity: 0.35; }
   /* Decorative blobs and the GlobalMap's dash / ping loops. */
   .animate-pulse,
   .animate-ping { animation: none !important; }

@@ -239,7 +239,7 @@ export default function AiReceptionist() {
   const copy = (key: string, defaultValue: string) =>
     t(`aiReceptionist.${key}`, { defaultValue });
 
-  const isProductDetail = /^\/(?:en|zh|es|fr|de|it)\/products\/(?!category(?:\/|$))[^/]+(?:\/[^/]+)?\/?$/.test(
+  const isProductDetail = /^\/(?:en|zh|es|fr|de|it)\/products\/(?!category(?:\/|$)).+/.test(
     location.pathname,
   );
 
@@ -607,11 +607,12 @@ export default function AiReceptionist() {
   if (location.pathname.startsWith('/admin')) return null;
 
   const mobileBottom = isProductDetail
-    ? 'bottom-[calc(6.5rem+env(safe-area-inset-bottom))]'
-    : 'bottom-[calc(1rem+env(safe-area-inset-bottom))]';
+    ? 'bottom-[calc(6.75rem+env(safe-area-inset-bottom))]'
+    : 'bottom-[calc(1.25rem+env(safe-area-inset-bottom))]';
+  const zLayer = isOpen ? 'z-[70]' : 'z-30 sm:z-50';
 
   return (
-    <div className={`fixed right-3 z-[70] sm:right-5 lg:bottom-6 lg:right-6 ${mobileBottom}`}>
+    <div className={`fixed right-3 sm:right-5 lg:bottom-6 lg:right-6 ${zLayer} ${mobileBottom}`}>
       {isOpen ? (
         <section
           id="ai-receptionist-dialog"
@@ -619,7 +620,7 @@ export default function AiReceptionist() {
           aria-modal="false"
           aria-labelledby="ai-receptionist-title"
           className={`flex h-[min(38rem,calc(100dvh-2rem))] w-[calc(100vw-1.5rem)] max-w-sm flex-col overflow-hidden rounded-3xl border border-stone-200 bg-[#FAF9F6] shadow-2xl shadow-stone-950/20 lg:max-h-[calc(100dvh-3rem)] ${
-            isProductDetail ? 'max-h-[calc(100dvh-8.5rem)]' : 'max-h-[calc(100dvh-2rem)]'
+            isProductDetail ? 'max-h-[calc(100dvh-9rem)]' : 'max-h-[calc(100dvh-2rem)]'
           }`}
         >
           <header className="relative shrink-0 overflow-hidden bg-stone-900 px-5 py-4 text-white">
@@ -860,7 +861,14 @@ export default function AiReceptionist() {
                       {copy(
                         'emailConsentCompact',
                         'I agree to email follow-up and linking this email to this chat for up to 90 days.',
-                      )}
+                      )}{' '}
+                      <Link
+                        to={lp('/privacy-policy')}
+                        onClick={() => closeChat(false)}
+                        className="font-medium text-amber-800 underline decoration-amber-400 underline-offset-2 hover:text-amber-950"
+                      >
+                        {copy('privacyPolicyLink', t('footer.privacy', 'Privacy Policy'))}
+                      </Link>
                     </span>
                   </label>
 
@@ -959,6 +967,14 @@ export default function AiReceptionist() {
                     'privacyNote',
                     'We store an automatically redacted copy of this AI chat for up to 90 days. Do not type contact, ID, payment, or account details into chat. An email submitted through the separate continuation form is stored with your consent and is visible only to authorized administrators and approved employees.',
                   )}{' '}
+              <Link
+                to={lp('/privacy-policy')}
+                onClick={() => closeChat(false)}
+                className="font-medium text-stone-500 underline decoration-stone-300 underline-offset-2 hover:text-stone-700"
+              >
+                {copy('privacyPolicyLink', t('footer.privacy', 'Privacy Policy'))}
+              </Link>
+              {' · '}
               <a
                 href="mailto:sales@bolenmirror.com?subject=AI%20chat%20privacy%20request"
                 className="font-medium text-stone-500 underline decoration-stone-300 underline-offset-2 hover:text-stone-700"
@@ -979,7 +995,7 @@ export default function AiReceptionist() {
             });
             setIsOpen(true);
           }}
-          className="group flex h-14 items-center gap-2 rounded-full bg-stone-900 px-4 text-white shadow-xl shadow-stone-950/25 transition-all hover:-translate-y-0.5 hover:bg-stone-800 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
+          className="group flex h-12 sm:h-14 items-center gap-2 rounded-full bg-stone-900 px-3.5 sm:px-4 text-white shadow-xl shadow-stone-950/25 transition-all hover:-translate-y-0.5 hover:bg-stone-800 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
           aria-label={copy('openLabel', 'Open BOLEN AI assistant')}
           aria-haspopup="dialog"
         >

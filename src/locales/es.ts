@@ -25,13 +25,21 @@ export const es = {
       videos: "Videos",
       adminDashboard: "Panel de Administración",
       logout: "Cerrar sesión",
-      employeeLogin: "Acceso Empleados"
+      employeeLogin: "Acceso Empleados",
+      changeLanguage: "Cambiar idioma",
+      openMenu: "Abrir menú principal",
+      languageSelection: "Selección de idioma",
+      mainNavigation: "Navegación principal"
     },
     footer: {
       description: "Fabricante y exportador de espejos premium. Suministramos espejos de tocador modernos y de alta calidad a empresas de todo el mundo.",
       contact: "Contacto",
       quickLinks: "Enlaces rápidos",
-      rights: "Todos los derechos reservados."
+      rights: "Todos los derechos reservados.",
+      address: "No. 1, Building 2, No. 1, Chuangye Road, Wangdian Town, Jiaxing, Zhejiang, China",
+      terms: "Términos y Condiciones",
+      privacy: "Política de Privacidad",
+      languagesLabel: "Idiomas"
     },
     accessibility: {
       skipToContent: "Saltar al contenido"
@@ -81,6 +89,7 @@ export const es = {
       privacyNote: "Guardamos una copia redactada automáticamente de este chat durante un máximo de 90 días. No escribas datos de contacto, identidad, pago o cuenta en el chat. El correo enviado mediante el formulario separado se guarda con tu consentimiento y solo es visible para administradores autorizados y empleados aprobados.",
       privacyNoteCompact: "El chat redactado se guarda hasta 90 días. No introduzcas datos sensibles.",
       privacyContact: "Solicitud de privacidad",
+      privacyPolicyLink: "Política de privacidad",
       openLabel: "Abrir el asistente de IA de BOLEN",
       buttonText: "Preguntar a la IA"
     },
@@ -225,7 +234,7 @@ export const es = {
       heroKicker: "Fabricante de espejos LED · Socio OEM/ODM",
       heroTitle1: "Espejos de alta gama,",
       heroTitle2: "hechos a medida para su marca.",
-      heroImageAlt: "Fábrica de espejos BOLEN: fabricante de espejos LED y de baño y proveedor OEM/ODM con más de 20 años de experiencia",
+      heroImageAlt: "Fábrica BOLEN: fabricante y proveedor OEM/ODM de espejos LED y de baño",
       heroDesc: "<1>BOLEN</1> ayuda a marcas de todo el mundo a llevar al mercado colecciones de espejos con identidad propia. Desde el diseño y la personalización hasta la producción con rigurosos controles de calidad y la entrega en todo el mundo, hacemos que la fabricación de alta gama sea sencilla, fiable y escalable.",
       heroPrimaryCta: "Solicitar precio y MOQ",
       heroSecondaryCta: "Explore nuestros productos",
@@ -253,7 +262,22 @@ export const es = {
         desc2: "Operamos dos sedes empresariales y dos plantas de producción de última generación. Nuestra dedicada fuerza laboral gestiona múltiples líneas de producción de espejos LED y de prueba, junto con talleres especializados personalizados, todo en estricto cumplimiento de las normas de gestión de calidad ISO 9001.",
         backedBy: "Respaldado por más de 200 profesionales",
         quote: "\"La Calidad Primero, Los Clientes Primero\"",
-        corePrinciple: "Nuestro Principio Fundamental"
+        corePrinciple: "Nuestro Principio Fundamental",
+        map: {
+          hub: "Jiaxing · Centro junto a Shanghái",
+          hubSub: "A 60 km del puerto de Shanghái · ISO 9001",
+          corridors: "8 corredores globales de exportación",
+          regions: {
+            northAmerica: "Norteamérica",
+            canada: "Canadá",
+            southAmerica: "Sudamérica",
+            europe: "Europa",
+            ukNordics: "Reino Unido y Nórdicos",
+            middleEast: "Oriente Medio",
+            southeastAsia: "Sudeste Asiático",
+            australia: "Australia"
+          }
+        }
       },
       collections: {
         subtitle: "Colecciones",
@@ -279,7 +303,17 @@ export const es = {
       },
       certificates: {
         subtitle: "Nuestras Cualificaciones",
-        title: "Certificaciones Globales"
+        title: "Certificaciones Globales",
+        desc: "Ensayos de seguridad, conformidad y protección verificados por modelo para mercados de Europa, Norteamérica, Reino Unido y Australia.",
+        scopeNote: "Las marcas y certificados aplicables se confirman por modelo y mercado de destino durante la cotización.",
+        items: {
+          saa: "Australia y NZ",
+          ce: "Conformidad Europea",
+          ip44: "Humedad y Polvo",
+          ukca: "Reino Unido",
+          ul: "Norteamérica",
+          ccc: "Seguridad Obligatoria"
+        }
       },
       factoryShowcase: {
         subtitle: "Dentro de la Fábrica",
@@ -308,10 +342,11 @@ export const es = {
         subtitle: "La Ventaja BOLEN",
         title: "Ventaja de Fabricación",
         desc: "Veintiún años de producción verticalmente integrada, una planta de 46.800 m² y una ubicación logísticamente privilegiada cerca de los puertos de Shanghái y Ningbo.",
+        facilityTag: "Planta de Jiaxing · Est. 2005",
         features: {
-          f1: { title: "Capacidad de Fabricación Demostrada", desc: "Con 21 años de trayectoria, nuestra planta de 46.800 m² cuenta con más de 200 trabajadores cualificados, garantizando una cadena de suministro estable y plazos de entrega fiables." },
-          f2: { title: "Ubicación Estratégica", desc: "Situados cerca de los puertos de Shanghái y Ningbo, disfrutamos de una ubicación privilegiada que asegura una logística cómoda y eficiente." },
-          f3: { title: "Fábrica Directa y Rentable", desc: "Como fábrica directa, eliminamos los costes de intermediarios para ofrecer precios altamente competitivos sin comprometer la calidad, asegurando el mejor valor para su negocio." }
+          f1: { metric: "46.800 m² · 200+ Especialistas", title: "Capacidad de Fabricación Demostrada", desc: "Con 21 años de trayectoria, nuestra planta de 46.800 m² cuenta con más de 200 trabajadores cualificados, garantizando una cadena de suministro estable y plazos de entrega fiables." },
+          f2: { metric: "Puertos de Shanghái y Ningbo", title: "Ubicación Estratégica", desc: "Situados cerca de los puertos de Shanghái y Ningbo, disfrutamos de una ubicación privilegiada que asegura una logística cómoda y eficiente." },
+          f3: { metric: "OEM / ODM · Directo de Fábrica", title: "Fábrica Directa y Rentable", desc: "Como fábrica directa, eliminamos los costes de intermediarios para ofrecer precios altamente competitivos sin comprometer la calidad, asegurando el mejor valor para su negocio." }
         }
       },
       manufacturingProcess: {
@@ -328,6 +363,7 @@ export const es = {
         }
       },
       whyUs: {
+        subtitle: "Estándares de Colaboración",
         title1: "¿Por qué Asociarse con",
         title2: "Bolen?",
         features: [
@@ -335,6 +371,12 @@ export const es = {
           { title: "Fábrica Directa y Rentable" },
           { title: "Control de Calidad Riguroso y Garantía" },
           { title: "Personalización Integral" }
+        ],
+        proofs: [
+          "CE · CB · RoHS · IP44 · UKCA · UL · SAA",
+          "Precio directo de fábrica · MOQ según especificación",
+          "Inspección 100% previa al envío · Garantía de 3 años",
+          "Cristal · Iluminación · Marco · Embalaje de marca"
         ],
         paragraphs: [
           "Hemos establecido alianzas profundas en Europa (NL, RO, UK, ES, NO, DK), Oriente Medio, Norteamérica, Australia y Sudamérica. Nuestros productos cumplen plenamente con los estándares internacionales, contando con certificaciones CE, CB, RoHS, IP44, SAA, entre otras.",
@@ -344,8 +386,10 @@ export const es = {
         ]
       },
       cta: {
+        kicker: "Inicie su Próximo Programa de Espejos",
         title: "¿Listo para Elevar su Espacio?",
         desc: "Contáctenos hoy para discutir sus requisitos personalizados o explore nuestro extenso catálogo de espejos premium.",
+        responseNote: "Revisión de especificaciones y cotización en 24 horas",
         viewCatalog: "Ver Catálogo",
         contactSales: "Contactar Ventas"
       }
@@ -476,6 +520,8 @@ export const es = {
       noMoreInTopic: "Aún no hay más perspectivas en esta vista.",
       nextStepTitle: "Convierta la información útil en una especificación lista para fábrica",
       nextStepDescription: "Compare rutas de fabricación y envíe medidas, cantidad, mercado y funciones requeridas para obtener una cotización precisa.",
+      authorRoleTeam: "Equipo de Ingeniería Óptica y Eléctrica BOLEN · Planta ISO 9001 (Desde 2005)",
+      authorRoleSpecialist: "Especialista en Exportación B2B y Especificaciones · Jiaxing Chengtai Mirror Co., Ltd.",
       categories: {
         "Buying Guide": "Guía de compra",
         "Bolen Story": "Historia de BOLEN",

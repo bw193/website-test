@@ -104,7 +104,7 @@ export default function Navbar() {
   ];
 
   const languageMenu = (
-    <div className="absolute right-0 mt-2 w-32 bg-white rounded-md shadow-lg py-1 z-50 ring-1 ring-black ring-opacity-5" role="menu" aria-label="Language selection">
+    <div className="absolute right-0 mt-2 w-32 bg-white rounded-md shadow-lg py-1 z-50 ring-1 ring-black ring-opacity-5" role="menu" aria-label={t('navbar.languageSelection', 'Language selection')}>
       {languages.map((l) => (
         <Link
           key={l.code}
@@ -123,7 +123,7 @@ export default function Navbar() {
   );
 
   return (
-    <nav ref={navRef} className="bg-white shadow-sm sticky top-0 z-50" aria-label="Main navigation">
+    <nav ref={navRef} className="bg-white shadow-sm sticky top-0 z-50" aria-label={t('navbar.mainNavigation', 'Main navigation')}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
@@ -166,7 +166,7 @@ export default function Navbar() {
               <button
                 onClick={() => setLangMenuOpen(!langMenuOpen)}
                 className="text-stone-500 hover:text-amber-600 flex items-center gap-1 text-sm font-medium transition-colors"
-                title="Change Language"
+                title={t('navbar.changeLanguage', 'Change language')}
                 aria-expanded={langMenuOpen}
                 aria-haspopup="true"
                 aria-label={t('navbar.changeLanguage', 'Change language')}

@@ -10,6 +10,14 @@ import { catalogCategoryPath } from '../utils/catalogCategory';
 import { useProductTranslator } from '../utils/productI18n';
 import { polishEnglishProductTitle } from '../utils/productCopy';
 
+export function capImageAlt(raw: string, maxLength = 100): string {
+  const cleaned = (raw || '').replace(/\bloding\b/gi, 'loading').replace(/\s+/g, ' ').trim();
+  if (cleaned.length <= maxLength) return cleaned;
+  const slice = cleaned.slice(0, maxLength - 1);
+  const lastSpace = slice.lastIndexOf(' ');
+  return `${(lastSpace > 48 ? slice.slice(0, lastSpace) : slice).replace(/[,;:\-–—\s]+$/, '')}`;
+}
+
 interface ProductCardProps {
   id: string;
   title: string;
@@ -20,6 +28,7 @@ interface ProductCardProps {
   msrp?: string;
   buyerSummary?: string;
   displayTitleOverride?: string;
+  ctaVariant?: 'primary' | 'secondary';
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({
@@ -30,7 +39,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
   category,
   priceRange,
   msrp,
+  buyerSummary,
   displayTitleOverride,
+  ctaVariant = 'secondary',
 }) => {
   const { t } = useTranslation();
   const { lp, lang } = useLocalizedPath();
@@ -43,7 +54,10 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const productUrl = lp(productDetailPath({ id, title, category }, lang));
   const d = translate({ id, title, description });
   const translatedTitle = d.title ?? title;
-  const displayTitle = displayTitleOverride || (lang === 'en' ? polishEnglishProductTitle(translatedTitle) : translatedTitle);
+  const displayTitle =
+    displayTitleOverride ||
+    (lang === 'en' ? polishEnglishProductTitle(translatedTitle) : translatedTitle);
+  const imageAlt = capImageAlt(displayTitle, 100);
   const sourceDescription = description?.trim() || '';
   // Most legacy rows store the model code in `description`. Keep that value
   // visible and pass it into the RFQ, but do not present it as if it were buyer
@@ -61,19 +75,23 @@ const ProductCard: React.FC<ProductCardProps> = ({
     model: modelNumber,
   });
   const quoteUrl = `${lp('/rfq')}?${quoteParams.toString()}`;
+  const ctaClassName =
+    ctaVariant === 'primary'
+      ? 'btn-primary w-full whitespace-nowrap'
+      : 'inline-flex w-full items-center justify-center gap-2 rounded-full border border-stone-300 bg-white px-5 py-2.5 text-sm font-semibold text-stone-800 whitespace-nowrap transition-colors hover:border-amber-500 hover:bg-amber-50/60 hover:text-stone-950 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2';
 
   return (
     <article className="group flex h-full flex-col">
       <Link
         to={productUrl}
-        aria-label={`${t('products.viewDetails')}: ${displayTitle}`}
+        aria-label={`${t('products.viewDetails')}: ${imageAlt}`}
         className="relative block aspect-square overflow-hidden rounded-2xl bg-stone-100"
       >
         <img
           src={optimizeImage(image, { width: 400 }) || PRODUCT_IMAGE_PLACEHOLDER}
           srcSet={imageSrcSet(image, [300, 400, 600])}
           onError={handleImageError}
-          alt={displayTitle}
+          alt={imageAlt}
           className="h-full w-full object-contain object-center transition-transform duration-700 group-hover:scale-105"
           width="400"
           height="400"
@@ -110,6 +128,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
           </Link>
         </h3>
 
+        {buyerSummary && (
+          <p className="mt-2.5 line-clamp-3 text-sm leading-6 text-stone-600">
+            {buyerSummary}
+          </p>
+        )}
+
         <div className="mt-auto pt-4">
           {(priceRange || msrp) && (
             <div className="mb-4" data-nosnippet="">
@@ -130,7 +154,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
               )}
             </div>
           )}
-          <Link to={quoteUrl} rel="nofollow" className="btn-primary w-full whitespace-nowrap">
+          <Link to={quoteUrl} rel="nofollow" className={ctaClassName}>
             {t('blog.ctaQuote', 'Contact Sales')}
             <ArrowUpRight className="h-3.5 w-3.5 shrink-0" />
           </Link>

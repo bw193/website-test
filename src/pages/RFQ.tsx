@@ -108,12 +108,15 @@ export default function RFQ() {
     }
   };
 
+  const rfqTitle = t('seo.rfqTitle');
+  const rfqDesc = t('seo.rfqDesc');
   const contactSchema = {
     "@context": "https://schema.org",
     "@type": "ContactPage",
-    "name": "Contact Sales | BOLEN Mirror",
-    "description": "Contact Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) for OEM/ODM inquiries, custom mirror manufacturing, and bulk orders.",
+    "name": rfqTitle,
+    "description": rfqDesc,
     "url": `https://bolenmirror.com/${lang}/rfq/`,
+    "inLanguage": lang,
     "mainEntity": {
       "@type": "Organization",
       "name": "Jiaxing Chengtai Mirror Co., Ltd. (BOLEN)",
@@ -121,9 +124,9 @@ export default function RFQ() {
         "@type": "ContactPoint",
         "telephone": "+86-18058603602",
         "email": "sales@bolenmirror.com",
-        "contactType": "customer service",
+        "contactType": "sales",
         "areaServed": "Worldwide",
-        "availableLanguage": ["en", "zh"]
+        "availableLanguage": ["en", "zh", "es", "fr", "de", "it"]
       },
       "address": {
         "@type": "PostalAddress",
@@ -138,22 +141,22 @@ export default function RFQ() {
   return (
     <div className="bg-stone-50 min-h-screen pt-10 sm:pt-14 lg:pt-16 pb-12">
       <SEO 
-        title={t('seo.rfqTitle')}
-        description={t('seo.rfqDesc')}
+        title={rfqTitle}
+        description={rfqDesc}
         path="/rfq"
         schema={contactSchema}
       />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-8 lg:mb-12">
           <m.h1 
-            initial={{ opacity: 0, y: 20 }}
+            initial={false}
             animate={{ opacity: 1, y: 0 }}
             className="text-4xl font-serif text-stone-900 sm:text-5xl mb-4"
           >
             {t('productDetail.requestQuote')}
           </m.h1>
           <m.p 
-            initial={{ opacity: 0, y: 20 }}
+            initial={false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
             className="text-lg text-stone-600 font-light"
@@ -168,7 +171,7 @@ export default function RFQ() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
           {/* Contact Information */}
           <m.div 
-            initial={{ opacity: 0, x: -20 }}
+            initial={false}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
             className="order-2 lg:order-1 lg:col-span-1"
@@ -202,7 +205,12 @@ export default function RFQ() {
                   </div>
                   <div>
                     <p className="text-sm font-medium text-stone-900">{t('rfq.visitUs', 'Visit us')}</p>
-                    <p className="text-stone-600">Jiaxing, Zhejiang, China</p>
+                    <address className="not-italic text-sm leading-6 text-stone-600">
+                      {t(
+                        'footer.address',
+                        'No. 1, Building 2, No. 1, Chuangye Road, Wangdian Town, Jiaxing, Zhejiang, China'
+                      )}
+                    </address>
                   </div>
                 </div>
               </div>
@@ -211,7 +219,7 @@ export default function RFQ() {
 
           {/* RFQ Form */}
           <m.div 
-            initial={{ opacity: 0, x: 20 }}
+            initial={false}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.3 }}
             className="order-1 lg:order-2 lg:col-span-2"

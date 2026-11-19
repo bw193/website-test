@@ -25,13 +25,21 @@ export const fr = {
       videos: "Vidéos",
       adminDashboard: "Tableau de Bord",
       logout: "Déconnexion",
-      employeeLogin: "Connexion Employé"
+      employeeLogin: "Connexion Employé",
+      changeLanguage: "Changer de langue",
+      openMenu: "Ouvrir le menu principal",
+      languageSelection: "Sélection de la langue",
+      mainNavigation: "Navigation principale"
     },
     footer: {
       description: "Fabricant et exportateur de miroirs haut de gamme. Nous fournissons des miroirs de toilette modernes et de qualité aux entreprises du monde entier.",
       contact: "Contact",
       quickLinks: "Liens rapides",
-      rights: "Tous droits réservés."
+      rights: "Tous droits réservés.",
+      address: "No. 1, Building 2, No. 1, Chuangye Road, Wangdian Town, Jiaxing, Zhejiang, Chine",
+      terms: "Conditions Générales",
+      privacy: "Politique de Confidentialité",
+      languagesLabel: "Langues"
     },
     accessibility: {
       skipToContent: "Aller au contenu"
@@ -81,6 +89,7 @@ export const fr = {
       privacyNote: "Nous conservons une copie automatiquement anonymisée de ce chat pendant 90 jours au maximum. Ne saisissez pas de coordonnées ni de données d’identité, de paiement ou de compte dans le chat. L’e-mail envoyé via le formulaire séparé est conservé avec votre consentement et visible uniquement par les administrateurs autorisés et les employés approuvés.",
       privacyNoteCompact: "Le chat anonymisé est conservé jusqu’à 90 jours. Ne saisissez aucune donnée sensible.",
       privacyContact: "Demande de confidentialité",
+      privacyPolicyLink: "Politique de confidentialité",
       openLabel: "Ouvrir l’assistant IA BOLEN",
       buttonText: "Demander à l’IA"
     },
@@ -225,7 +234,7 @@ export const fr = {
       heroKicker: "Fabricant de miroirs LED · Partenaire OEM/ODM",
       heroTitle1: "Des miroirs haut de gamme,",
       heroTitle2: "conçus sur mesure pour votre marque.",
-      heroImageAlt: "Usine de miroirs BOLEN : fabricant de miroirs LED et de salle de bain et fournisseur OEM/ODM depuis plus de 20 ans",
+      heroImageAlt: "Usine BOLEN : fabricant et fournisseur OEM/ODM de miroirs LED et de bain",
       heroDesc: "<1>BOLEN</1> accompagne des marques du monde entier dans la commercialisation de collections de miroirs distinctives. De la conception et de la personnalisation à la production soumise à un contrôle qualité rigoureux et à la livraison mondiale, nous rendons la fabrication haut de gamme simple, fiable et adaptée à tous les volumes.",
       heroPrimaryCta: "Demander prix et MOQ",
       heroSecondaryCta: "Découvrir nos produits",
@@ -253,7 +262,22 @@ export const fr = {
         desc2: "Nous exploitons deux sièges sociaux et deux usines de production de pointe. Notre main-d'œuvre dévouée gère plusieurs lignes de production de miroirs LED et d'essayage, ainsi que des ateliers spécialisés sur mesure, le tout en stricte conformité avec les normes de gestion de la qualité ISO 9001.",
         backedBy: "Soutenu par plus de 200 professionnels",
         quote: "\"La Qualité d'Abord, Les Clients d'Abord\"",
-        corePrinciple: "Notre Principe Fondamental"
+        corePrinciple: "Notre Principe Fondamental",
+        map: {
+          hub: "Jiaxing · Pôle près de Shanghai",
+          hubSub: "À 60 km du port de Shanghai · ISO 9001",
+          corridors: "8 corridors d'exportation mondiaux",
+          regions: {
+            northAmerica: "Amérique du Nord",
+            canada: "Canada",
+            southAmerica: "Amérique du Sud",
+            europe: "Europe",
+            ukNordics: "Royaume-Uni & Nordiques",
+            middleEast: "Moyen-Orient",
+            southeastAsia: "Asie du Sud-Est",
+            australia: "Australie"
+          }
+        }
       },
       collections: {
         subtitle: "Collections",
@@ -279,7 +303,17 @@ export const fr = {
       },
       certificates: {
         subtitle: "Nos Qualifications",
-        title: "Certifications Mondiales"
+        title: "Certifications Mondiales",
+        desc: "Essais de sécurité, de conformité et d'étanchéité vérifiés par modèle pour les marchés d'Europe, d'Amérique du Nord, du Royaume-Uni et d'Australie.",
+        scopeNote: "Les marquages et rapports d'essais disponibles sont confirmés par modèle et marché lors du devis.",
+        items: {
+          saa: "Australie & NZ",
+          ce: "Conformité Européenne",
+          ip44: "Humidité & Poussière",
+          ukca: "Royaume-Uni",
+          ul: "Amérique du Nord",
+          ccc: "Sécurité Obligatoire"
+        }
       },
       factoryShowcase: {
         subtitle: "À l'Intérieur de l'Usine",
@@ -308,10 +342,11 @@ export const fr = {
         subtitle: "L'Atout BOLEN",
         title: "Atout de Fabrication",
         desc: "Vingt et un ans de production verticalement intégrée, une usine de 46 800 m² et un emplacement logistique privilégié à proximité des ports de Shanghai et Ningbo.",
+        facilityTag: "Site de Jiaxing · Fondé en 2005",
         features: {
-          f1: { title: "Capacité de Fabrication Éprouvée", desc: "Établie il y a 21 ans, notre installation de 46 800 m² emploie plus de 200 ouvriers qualifiés, garantissant une chaîne d'approvisionnement stable et des délais de livraison fiables." },
-          f2: { title: "Emplacement Stratégique", desc: "Situés à proximité des ports de Shanghai et Ningbo, nous bénéficions d'un emplacement de choix qui assure une logistique pratique et efficace." },
-          f3: { title: "Usine Directe et Rentable", desc: "En tant qu'usine directe, nous éliminons les coûts d'intermédiaires pour offrir des prix très compétitifs sans compromettre la qualité, garantissant la meilleure valeur pour votre entreprise." }
+          f1: { metric: "46 800 m² · 200+ Spécialistes", title: "Capacité de Fabrication Éprouvée", desc: "Établie il y a 21 ans, notre installation de 46 800 m² emploie plus de 200 ouvriers qualifiés, garantissant une chaîne d'approvisionnement stable et des délais de livraison fiables." },
+          f2: { metric: "Ports de Shanghai & Ningbo", title: "Emplacement Stratégique", desc: "Situés à proximité des ports de Shanghai et Ningbo, nous bénéficions d'un emplacement de choix qui assure une logistique pratique et efficace." },
+          f3: { metric: "OEM / ODM · Direct Usine", title: "Usine Directe et Rentable", desc: "En tant qu'usine directe, nous éliminons les coûts d'intermédiaires pour offrir des prix très compétitifs sans compromettre la qualité, garantissant la meilleure valeur pour votre entreprise." }
         }
       },
       manufacturingProcess: {
@@ -328,6 +363,7 @@ export const fr = {
         }
       },
       whyUs: {
+        subtitle: "Standards de Partenariat",
         title1: "Pourquoi Choisir",
         title2: "Bolen ?",
         features: [
@@ -335,6 +371,12 @@ export const fr = {
           { title: "Usine Directe et Rentable" },
           { title: "Contrôle Qualité Rigoureux et Garantie" },
           { title: "Personnalisation Complète" }
+        ],
+        proofs: [
+          "CE · CB · RoHS · IP44 · UKCA · UL · SAA",
+          "Prix direct usine · MOQ selon cahier des charges",
+          "Inspection 100 % avant expédition · Garantie 3 ans",
+          "Verre · Éclairage · Cadre · Emballage à votre marque"
         ],
         paragraphs: [
           "Nous avons établi des partenariats solides en Europe (NL, RO, UK, ES, NO, DK), au Moyen-Orient, en Amérique du Nord, en Australie et en Amérique du Sud. Nos produits sont entièrement conformes aux normes internationales et possèdent les certifications CE, CB, RoHS, IP44, SAA, entre autres.",
@@ -344,8 +386,10 @@ export const fr = {
         ]
       },
       cta: {
+        kicker: "Lancez Votre Prochain Programme de Miroirs",
         title: "Prêt à Sublimer Votre Espace ?",
         desc: "Contactez-nous dès aujourd'hui pour discuter de vos besoins personnalisés ou parcourez notre vaste catalogue de miroirs haut de gamme.",
+        responseNote: "Étude du cahier des charges et devis usine sous 24 heures",
         viewCatalog: "Voir le Catalogue",
         contactSales: "Contacter les Ventes"
       }
@@ -476,6 +520,8 @@ export const fr = {
       noMoreInTopic: "Aucun autre conseil dans cette vue pour le moment.",
       nextStepTitle: "Transformez ces conseils en spécification prête pour l'usine",
       nextStepDescription: "Comparez les options de fabrication, puis envoyez dimensions, quantité, marché et fonctions requises pour un devis précis.",
+      authorRoleTeam: "Équipe d’ingénierie optique et électrique BOLEN · Usine ISO 9001 (Depuis 2005)",
+      authorRoleSpecialist: "Spécialiste export B2B & cahiers des charges · Jiaxing Chengtai Mirror Co., Ltd.",
       categories: {
         "Buying Guide": "Guide d'achat",
         "Bolen Story": "Histoire de BOLEN",
