@@ -133,7 +133,15 @@ function readBlogPrerenderSeed(slug: string, lang: string): {
 
 function demoteMarkdownH1(markdown: string): string {
   if (!markdown) return '';
-  return markdown.replace(/^#\s+/gm, '## ');
+  return markdown
+    .replace(/^#\s+/gm, '## ')
+    .replace(/\*\*([^*\n]+?)\*\*/g, (full, inner, offset, str) => {
+      const prev = offset > 0 ? str[offset - 1] : '';
+      const next = offset + full.length < str.length ? str[offset + full.length] : '';
+      const lead = /[\p{L}\p{N}]/u.test(prev) && /^[^\s\p{L}\p{N}]/u.test(inner) ? ' ' : '';
+      const trail = /[^\s\p{L}\p{N}]$/u.test(inner) && /[\p{L}\p{N}]/u.test(next) ? ' ' : '';
+      return `${lead}${full}${trail}`;
+    });
 }
 
 export default function BlogPost() {

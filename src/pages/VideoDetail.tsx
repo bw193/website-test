@@ -224,7 +224,17 @@ export default function VideoDetail() {
   const duration = formatVideoDuration(video.duration_seconds);
   const date = video.published_at ? formatBlogDate(video.published_at, lang) : '';
   const categoryLabel = video.category ? t(`videos.categories.${video.category}`, video.category) : '';
-  const safeBody = video.body ? video.body.replace(/^#\s+/gm, '## ') : '';
+  const safeBody = video.body
+    ? video.body
+        .replace(/^#\s+/gm, '## ')
+        .replace(/\*\*([^*\n]+?)\*\*/g, (full, inner, offset, str) => {
+          const prev = offset > 0 ? str[offset - 1] : '';
+          const next = offset + full.length < str.length ? str[offset + full.length] : '';
+          const lead = /[\p{L}\p{N}]/u.test(prev) && /^[^\s\p{L}\p{N}]/u.test(inner) ? ' ' : '';
+          const trail = /[^\s\p{L}\p{N}]$/u.test(inner) && /[\p{L}\p{N}]/u.test(next) ? ' ' : '';
+          return `${lead}${full}${trail}`;
+        })
+    : '';
 
   return (
     <article className="bg-[#FAF9F6] text-stone-800 selection:bg-amber-200/60 selection:text-stone-900">
