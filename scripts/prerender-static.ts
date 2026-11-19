@@ -79,9 +79,12 @@ import {
 } from '../src/data/seoLandingI18n';
 import {
   buildCatalogCategorySchema,
+  buildProductBreadcrumbSchema,
+  canonicalCategoryName,
   CATALOG_CATEGORY_PREFIX,
   catalogCategoryPath,
   DEFAULT_PRODUCT_CATEGORIES,
+  getCatalogCategoryEditorial,
   getCatalogCategoryPageCopy,
   getCatalogCategorySeoTitle,
   interpolateTemplate,
@@ -142,6 +145,33 @@ const LOCALE_PRODUCTS = {
   fr: frLocale.translation.products,
   de: deLocale.translation.products,
   it: itLocale.translation.products,
+} as const;
+
+const LOCALE_PRODUCT_DETAIL = {
+  en: enLocale.translation.productDetail,
+  zh: zhLocale.translation.productDetail,
+  es: esLocale.translation.productDetail,
+  fr: frLocale.translation.productDetail,
+  de: deLocale.translation.productDetail,
+  it: itLocale.translation.productDetail,
+} as const;
+
+const LOCALE_RFQ = {
+  en: enLocale.translation.rfq,
+  zh: zhLocale.translation.rfq,
+  es: esLocale.translation.rfq,
+  fr: frLocale.translation.rfq,
+  de: deLocale.translation.rfq,
+  it: itLocale.translation.rfq,
+} as const;
+
+const LOCALE_VIDEOS = {
+  en: enLocale.translation.videos,
+  zh: zhLocale.translation.videos,
+  es: esLocale.translation.videos,
+  fr: frLocale.translation.videos,
+  de: deLocale.translation.videos,
+  it: itLocale.translation.videos,
 } as const;
 
 // Hero kicker/heading/alt, so the static home <h1> and hero <img> match what
@@ -475,29 +505,102 @@ async function loadProductTranslations(): Promise<Record<Lang, LangTranslations>
   const out = {} as Record<Lang, LangTranslations>;
   for (const lang of LANGUAGES) {
     out[lang] = {};
-    if (lang === 'en' || lang === 'zh') continue; // en is source; zh stays English
+    if (lang === 'en') continue; // en is source; zh/es/fr/de/it load public/i18n/products.<lang>.json
     try {
       const raw = await readFile(resolve(PROJECT_ROOT, 'public', 'i18n', `products.${lang}.json`), 'utf-8');
       out[lang] = JSON.parse(raw) as LangTranslations;
     } catch {
-      // no translation file for this language yet
+      // no translation file for this language yet — graceful fallback
     }
   }
   return out;
 }
 
-// Overlay localized copy onto an (English) product. Never touches the title
-// used for slugs/URLs — callers always derive those from the original product.
-function localizeProduct(product: Product, tr: LangTranslations | undefined): Product {
+// Overlay localized copy onto an (English) product and apply English title
+// typo/polish cleanup. Never touches the title used for slugs/URLs — callers
+// always derive routes from `productDetailPath(product, lang)`.
+function localizeProduct(product: Product, tr: LangTranslations | undefined, lang: Lang = 'en'): Product {
+  const polishedEnTitle = polishEnglishProductTitle(product.title);
   const fields = tr?.[product.id];
-  if (!fields) return product;
+  if (!fields) {
+    return lang === 'en' ? { ...product, title: polishedEnTitle } : { ...product, title: polishedEnTitle };
+  }
+  const rawTitle = fields.title?.trim() ? fields.title : polishedEnTitle;
   return {
     ...product,
-    title: fields.title || product.title,
+    title: lang === 'en' ? polishEnglishProductTitle(rawTitle) : rawTitle,
     description: (fields.description as string) || product.description,
     details: (fields.details as string) || product.details,
     specifications: fields.specifications ?? product.specifications,
   };
+}
+
+/**
+ * Extracts ONLY `{ title, description }` for the products actually listed on a
+ * catalog, landing, blog, or video page — never embedding all 117 full
+ * `details`/`specifications` (~550 KB) into `__BOLEN_PRERENDER_DATA__`.
+ */
+function pickCardTranslations(
+  tr: LangTranslations | undefined,
+  listed: ReadonlyArray<{ id?: string }>
+): LangTranslations | undefined {
+  if (!tr) return undefined;
+  const subset: LangTranslations = {};
+  let count = 0;
+  for (const item of listed) {
+    if (!item.id) continue;
+    const entry = tr[item.id];
+    if (!entry) continue;
+    const compact: ProductFields = {};
+    if (entry.title) compact.title = entry.title;
+    if (typeof entry.description === 'string' && entry.description) compact.description = entry.description;
+    if (compact.title || compact.description) {
+      subset[item.id] = compact;
+      count++;
+    }
+  }
+  return count > 0 ? subset : undefined;
+}
+
+/**
+ * Cleans image `alt` text (`<= 100` chars, fixes typos like "loding", strips
+ * Alibaba-style certification/wholesale keyword-stuffing tails, and truncates
+ * cleanly at a word or CJK boundary).
+ */
+function cleanImageAlt(raw: string | undefined | null, maxLen = 100): string {
+  if (!raw) return '';
+  let text = raw
+    .replace(/\bloding\b/gi, (m) => (m[0] === 'L' ? 'Loading' : 'loading'))
+    .replace(/\bReactanglar\b/gi, 'Rectangular')
+    .replace(/\bFree\s+Standings\b/gi, 'Free-Standing')
+    .replace(/\bNatual\b/gi, 'Natural')
+    .replace(/\bCertificated\b/gi, 'Certified')
+    .replace(/\bDiemension\b/gi, 'Dimension')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (!text) return '';
+  // Strip repeated certification / wholesale keyword-stuffing suffixes
+  text = text
+    .replace(/[,;·|\-–—\s]*(?:\b(?:CE|RoHS|BSCI|UL|ETL|SAA|UKCA|CB|ISO\s*9001)\b[\s,;/·|\-–—]*){2,}$/i, '')
+    .trim();
+  if (text.length <= maxLen) return text;
+  const sliced = text.slice(0, maxLen);
+  const lastSpace = sliced.lastIndexOf(' ');
+  const trimmed = lastSpace >= Math.floor(maxLen * 0.6) ? sliced.slice(0, lastSpace) : sliced;
+  return trimmed.replace(/[,;:.·|\-–—/+\s]+$/u, '').trim();
+}
+
+/** Ensures any `<img>` produced by Markdown rendering also respects `alt <= 100` chars. */
+function sanitizeHtmlImageAlts(html: string): string {
+  return html.replace(/(<img\b[^>]*?\balt=")([^"]*)(")/gi, (_full, prefix: string, altVal: string, suffix: string) => {
+    const decoded = altVal
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&amp;/g, '&');
+    return `${prefix}${escapeAttr(cleanImageAlt(decoded, 100))}${suffix}`;
+  });
 }
 
 // react-helmet-async uses `data-rh="true"` to identify the tags it manages.
@@ -521,12 +624,13 @@ function hreflangBlock(routePath: string, languages: readonly string[] = LANGUAG
   ].join('\n    ');
 }
 
-// Injected as a non-executing JSON island that Products / ProductDetail
-// pick up on first render. Lets the rendered DOM contain product cards /
-// detail content immediately, before the Supabase refresh fetch completes.
+// Injected right before </body> as a compact JSON island + window sync so both
+// `src/utils/prerenderData.ts` (`getElementById`) and components reading
+// `window.__BOLEN_PRERENDER_DATA__` directly hydrate synchronously without
+// bloating <head>.
 function prerenderDataScript(payload: unknown): string {
   const json = JSON.stringify(payload).replace(/</g, '\\u003c');
-  return `<script id="__BOLEN_PRERENDER_DATA__" type="application/json">${json}</script>`;
+  return `<script id="__BOLEN_PRERENDER_DATA__" type="application/json">${json}</script>\n    <script>try{window.__BOLEN_PRERENDER_DATA__=JSON.parse(document.getElementById("__BOLEN_PRERENDER_DATA__").textContent)}catch(e){}</script>`;
 }
 
 function ogTwitterBlock(
@@ -589,7 +693,6 @@ function buildHead(opts: {
   alternatePaths?: Record<string, string>;
 }): string {
   const {
-    lang,
     title,
     description,
     canonical,
@@ -617,7 +720,7 @@ function buildHead(opts: {
 
 function injectIntoTemplate(
   template: string,
-  opts: { lang: Lang; headExtras: string; bodyContent: string }
+  opts: { lang: Lang; headExtras: string; bodyContent: string; dataScript?: string }
 ): string {
   let html = template;
 
@@ -625,18 +728,14 @@ function injectIntoTemplate(
   html = html.replace(/<html\s+lang="[^"]*"/, `<html lang="${opts.lang}"`);
 
   // Remove the template's default <title> so the per-route title is the only one.
-  // `[^<]*` keeps the match on one tag — index.html has a block comment that
-  // *mentions* `<title>` in prose; a [\s\S]*? lazy match would otherwise jump
-  // from that prose into the real `</title>` 18 lines later, wiping the head.
   html = html.replace(/<title>[^<]*<\/title>/, '');
 
-  // Inject head extras immediately before </head>.
+  // Inject lean SEO head extras immediately before </head>.
   html = html.replace('</head>', `    ${opts.headExtras}\n  </head>`);
 
-  // Put the SEO fallback content directly inside #root. React replaces this
-  // on mount, while crawlers, no-JS users, and slow-network visitors see real
-  // route content immediately instead of a full-screen loader.
-  const rootBlock = `<div id="root">\n      ${opts.bodyContent}\n    </div>`;
+  // Put the SEO fallback content directly inside #root (with all img alts capped <= 100 chars).
+  const safeBody = sanitizeHtmlImageAlts(opts.bodyContent);
+  const rootBlock = `<div id="root">\n      ${safeBody}\n    </div>`;
   let replaced = false;
   html = html.replace(
     /<div id="root">\s*<div id="root-loader">[\s\S]*?<\/div>\s*<\/div>\s*<\/div>/,
@@ -649,11 +748,12 @@ function injectIntoTemplate(
     html = html.replace(/<div id="root">\s*<\/div>/, rootBlock);
   }
 
-  // The loader element is gone from prerendered routes (only dist/index.html,
-  // the SPA fallback shell, still has it), so its CSS is dead weight here.
-  // Swap it for styling that makes the fallback readable: React clears #root on
-  // mount via createRoot, but until the entry chunk lands this markup IS the
-  // page, and it carries no Tailwind classes.
+  // Inject __BOLEN_PRERENDER_DATA__ right before </body> instead of inside <head>.
+  if (opts.dataScript) {
+    html = html.replace('</body>', `    ${opts.dataScript}\n  </body>`);
+  }
+
+  // Swap loader CSS for lightweight fallback layout CSS.
   html = html.replace(
     /<style>\s*#root-loader\{[\s\S]*?<\/style>/,
     `<style>${PRERENDER_FALLBACK_CSS}</style>`
@@ -769,17 +869,137 @@ function toFeaturedVideoPayload(video: VideoPost, lang: Lang): VideoListItem {
   return rest;
 }
 
+const PHYSICAL_ADDRESS: Record<Lang, { label: string; value: string }> = {
+  en: {
+    label: 'Factory Address',
+    value: 'No. 1, Building 2, No. 1, Chuangye Road, Wangdian Town, Jiaxing, Zhejiang, China',
+  },
+  zh: {
+    label: '工厂地址',
+    value: '中国浙江省嘉兴市秀洲区王店镇创业路1号2幢1号（No. 1, Building 2, No. 1, Chuangye Road, Wangdian Town, Jiaxing, Zhejiang, China）',
+  },
+  es: {
+    label: 'Dirección de fábrica',
+    value: 'No. 1, Building 2, No. 1, Chuangye Road, Wangdian Town, Jiaxing, Zhejiang, China',
+  },
+  fr: {
+    label: 'Adresse de l’usine',
+    value: 'No. 1, Building 2, No. 1, Chuangye Road, Wangdian Town, Jiaxing, Zhejiang, China',
+  },
+  de: {
+    label: 'Werksadresse',
+    value: 'No. 1, Building 2, No. 1, Chuangye Road, Wangdian Town, Jiaxing, Zhejiang, China',
+  },
+  it: {
+    label: 'Indirizzo dello stabilimento',
+    value: 'No. 1, Building 2, No. 1, Chuangye Road, Wangdian Town, Jiaxing, Zhejiang, China',
+  },
+};
+
+const FACTORY_GALLERY_I18N: Record<
+  string,
+  Record<Lang, { caption: string; alt: string }>
+> = {
+  factory: {
+    en: { caption: 'Factory', alt: 'BOLEN LED mirror manufacturing plant exterior' },
+    zh: { caption: '生产基地', alt: 'BOLEN LED 浴室镜自有生产基地外观' },
+    es: { caption: 'Fábrica', alt: 'Planta de fabricación de espejos LED BOLEN' },
+    fr: { caption: 'Usine', alt: 'Usine de fabrication de miroirs LED BOLEN' },
+    de: { caption: 'Werk', alt: 'BOLEN Produktionswerk für LED-Badspiegel' },
+    it: { caption: 'Stabilimento', alt: 'Stabilimento di produzione specchi LED BOLEN' },
+  },
+  'sample room': {
+    en: { caption: 'Sample room', alt: 'BOLEN mirror showroom with custom OEM/ODM samples' },
+    zh: { caption: '样品展厅', alt: 'BOLEN 镜业 OEM/ODM 定制样品展示厅' },
+    es: { caption: 'Sala de muestras', alt: 'Sala de exposición de muestras OEM/ODM de espejos BOLEN' },
+    fr: { caption: 'Salle d’échantillons', alt: 'Showroom d’échantillons de miroirs sur mesure BOLEN' },
+    de: { caption: 'Musterraum', alt: 'BOLEN Ausstellungsraum mit OEM/ODM-Spiegelmustern' },
+    it: { caption: 'Sala campioni', alt: 'Showroom campioni specchi personalizzati OEM/ODM BOLEN' },
+  },
+  'r&d office building': {
+    en: { caption: 'R&D Office Building', alt: 'BOLEN mirror R&D and engineering office building' },
+    zh: { caption: '研发办公楼', alt: 'BOLEN 镜业光学与结构研发办公大楼' },
+    es: { caption: 'Edificio de I+D y oficinas', alt: 'Edificio de oficinas e ingeniería de I+D de BOLEN' },
+    fr: { caption: 'Bâtiment R&D et bureaux', alt: 'Bâtiment de recherche, développement et ingénierie BOLEN' },
+    de: { caption: 'F&E- und Verwaltungsgebäude', alt: 'BOLEN Forschungs-, Entwicklungs- und Bürogebäude' },
+    it: { caption: 'Edificio uffici e R&S', alt: 'Edificio uffici progettazione e ricerca BOLEN' },
+  },
+  'company machinery': {
+    en: { caption: 'Company machinery', alt: 'Automated CNC glass cutting and edging equipment' },
+    zh: { caption: '自动化生产设备', alt: '全自动 CNC 玻璃切割与精磨边加工设备' },
+    es: { caption: 'Maquinaria industrial', alt: 'Maquinaria CNC automatizada de corte y canteado de vidrio' },
+    fr: { caption: 'Parc machines', alt: 'Équipement CNC automatisé de découpe et façonnage du verre' },
+    de: { caption: 'Maschinenpark', alt: 'Automatisierte CNC-Glaszuschnitt- und Kantenbearbeitungsanlage' },
+    it: { caption: 'Macchinari di produzione', alt: 'Impianto CNC automatizzato per taglio e molatura del vetro' },
+  },
+  workshop: {
+    en: { caption: 'Workshop', alt: 'BOLEN mirror fabrication and frame workshop' },
+    zh: { caption: '生产车间', alt: 'BOLEN 镜面深加工与金属边框制造车间' },
+    es: { caption: 'Taller de producción', alt: 'Taller de fabricación y ensamblaje de espejos BOLEN' },
+    fr: { caption: 'Atelier de production', alt: 'Atelier de fabrication et d’usinage de miroirs BOLEN' },
+    de: { caption: 'Fertigungshalle', alt: 'BOLEN Werkhalle für Spiegel- und Rahmenfertigung' },
+    it: { caption: 'Reparto produttivo', alt: 'Reparto di lavorazione specchi e telai BOLEN' },
+  },
+  'mirror inventory': {
+    en: { caption: 'Mirror inventory', alt: 'Raw copper-free silver mirror glass sheet inventory' },
+    zh: { caption: '原片与半成品储备', alt: '无铜环保银镜原片与半成品仓储区' },
+    es: { caption: 'Inventario de espejos', alt: 'Stock de láminas de vidrio plateado sin cobre' },
+    fr: { caption: 'Stock de miroiterie', alt: 'Stock de volumes de verre argenté sans cuivre' },
+    de: { caption: 'Spiegellager', alt: 'Lagerbestand an kupferfreiem Silberspiegel-Rohglas' },
+    it: { caption: 'Magazzino lastre', alt: 'Stoccaggio lastre di vetro argentato senza rame' },
+  },
+  'production&assembly line': {
+    en: { caption: 'Production & assembly line', alt: 'BOLEN LED bathroom mirror assembly and QC line' },
+    zh: { caption: '总装与检测流水线', alt: 'BOLEN LED 浴室镜电气总装与在线老化检测线' },
+    es: { caption: 'Línea de producción y montaje', alt: 'Línea de ensamblaje y prueba de espejos de baño LED BOLEN' },
+    fr: { caption: 'Ligne de production et d’assemblage', alt: 'Ligne d’assemblage et de contrôle qualité des miroirs LED BOLEN' },
+    de: { caption: 'Produktions- und Montagelinie', alt: 'BOLEN Fertigungs- und Prüflinie für LED-Badspiegel' },
+    it: { caption: 'Linea di produzione e assemblaggio', alt: 'Linea di montaggio e collaudo specchi da bagno LED BOLEN' },
+  },
+  warehouse: {
+    en: { caption: 'Warehouse', alt: 'Finished mirror export carton warehouse' },
+    zh: { caption: '成品仓库', alt: '待发运出口包装成品镜立体仓库' },
+    es: { caption: 'Almacén', alt: 'Almacén de espejos terminados listos para exportación' },
+    fr: { caption: 'Entrepôt', alt: 'Entrepôt de miroirs emballés prêts pour l’exportation' },
+    de: { caption: 'Fertigwarenlager', alt: 'Lagerhalle für versandfertig verpackte Exportspiegel' },
+    it: { caption: 'Magazzino prodotti finiti', alt: 'Magazzino specchi imballati pronti per la spedizione' },
+  },
+  'loading and shipping': {
+    en: { caption: 'Loading and shipping', alt: 'Mirror container loading and export dispatch' },
+    zh: { caption: '装柜与发运', alt: '出口集装箱现场装柜加固与物流发运' },
+    es: { caption: 'Carga y expedición', alt: 'Carga de contenedores de espejos y despacho marítimo' },
+    fr: { caption: 'Chargement et expédition', alt: 'Chargement de conteneurs de miroirs pour expédition maritime' },
+    de: { caption: 'Verladung und Versand', alt: 'Containerverladung und Exportversand von Spiegellieferungen' },
+    it: { caption: 'Carico e spedizione', alt: 'Carico container di specchi per spedizioni internazionali' },
+  },
+};
+
+function localizeFactoryGallery(gallery: FactoryGalleryItem[], lang: Lang): FactoryGalleryItem[] {
+  return gallery.map((item) => {
+    const key = (item.caption || '').trim().toLowerCase();
+    const mapped = FACTORY_GALLERY_I18N[key]?.[lang];
+    if (mapped) {
+      return {
+        url: item.url,
+        alt: cleanImageAlt(mapped.alt),
+        caption: mapped.caption,
+      };
+    }
+    return {
+      url: item.url,
+      alt: cleanImageAlt(lang === 'en' ? item.alt : `${FACTORY_COPY[lang].heading} — BOLEN`),
+      caption: lang === 'en' ? item.caption : undefined,
+    };
+  });
+}
+
 function featuredVideoBlock(lang: Lang, video?: VideoListItem): string {
   if (!video) return '';
   const c = FEATURED_VIDEO_COPY[lang];
   const href = `/${lang}/videos/${video.slug}/`;
-  // Same transform URL FeaturedVideo.tsx requests, so React's <img> on mount
-  // hits the already-downloaded image instead of fetching a second derivative.
-  // No width/height: the poster's real shape isn't known at build time, and the
-  // React frame reserves the box via aspect-ratio.
   const poster = video.thumbnail_url
     ? `<img src="${escapeAttr(optimizeImage(video.thumbnail_url, { width: 960 }))}" alt="${escapeAttr(
-        video.title
+        cleanImageAlt(video.title)
       )}" loading="lazy" decoding="async" referrerpolicy="no-referrer" />`
     : '';
   const excerpt = video.excerpt ? `<p>${escapeHtml(video.excerpt)}</p>` : '';
@@ -806,7 +1026,7 @@ function factoryGalleryBlock(lang: Lang, gallery: FactoryGalleryItem[]): string 
       const figcaption = it.caption
         ? `<figcaption>${escapeHtml(it.caption)}</figcaption>`
         : '';
-      return `<li><figure><img src="${escapeAttr(optimizeImage(it.url, { width: 800 }))}" srcset="${escapeAttr(srcset)}" sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" width="800" height="600" alt="${escapeAttr(it.alt)}" loading="lazy" decoding="async" referrerpolicy="no-referrer" />${figcaption}</figure></li>`;
+      return `<li><figure><img src="${escapeAttr(optimizeImage(it.url, { width: 800 }))}" srcset="${escapeAttr(srcset)}" sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" width="800" height="600" alt="${escapeAttr(cleanImageAlt(it.alt))}" loading="lazy" decoding="async" referrerpolicy="no-referrer" />${figcaption}</figure></li>`;
     })
     .join('\n        ');
   return `
@@ -830,12 +1050,10 @@ function homeContent(
 ): string {
   const c = COPY[lang];
   const h = LOCALE_HOME[lang];
-  // Bake the LCP hero straight into the static HTML so the browser discovers
-  // and fetches it during HTML parse — before any JS runs. React renders a
-  // byte-identical <img> on mount, so the painted pixels never change.
+  const addr = PHYSICAL_ADDRESS[lang];
   const heroBlock = hero
     ? `<div class="relative bg-stone-900 overflow-hidden">
-        <img src="${escapeAttr(hero.src)}" srcset="${escapeAttr(hero.srcset)}" sizes="100vw" width="${hero.width}" height="${hero.height}" alt="${escapeAttr(h.heroImageAlt)}" class="w-full h-auto block" fetchpriority="high" decoding="async" referrerpolicy="no-referrer" />
+        <img src="${escapeAttr(hero.src)}" srcset="${escapeAttr(hero.srcset)}" sizes="100vw" width="${hero.width}" height="${hero.height}" alt="${escapeAttr(cleanImageAlt(h.heroImageAlt))}" class="w-full h-auto block" fetchpriority="high" decoding="async" referrerpolicy="no-referrer" />
       </div>
       `
     : '';
@@ -871,6 +1089,10 @@ function homeContent(
       ${featuredVideoBlock(lang, featuredVideo)}
       ${solutionLinks}
       ${factoryGalleryBlock(lang, gallery)}
+      <footer>
+        <p><strong>Jiaxing Chengtai Mirror Co., Ltd. (BOLEN)</strong></p>
+        <address>${escapeHtml(addr.label)}: ${escapeHtml(addr.value)} &middot; <a href="mailto:sales@bolenmirror.com">sales@bolenmirror.com</a> &middot; <a href="tel:+8618058603602">+86 18058603602</a></address>
+      </footer>
     </div>
   `.trim();
 }
@@ -929,13 +1151,13 @@ function seoLandingContent(
     .join('\n      ');
   const productList = matchedProducts
     .map((product) => {
-      const display = localizeProduct(product, tr);
+      const display = localizeProduct(product, tr, lang);
       const fallbackCopy = getSeoLandingProductCardCopy(product, lang);
       const hasTranslation = Boolean(tr[product.id]?.title);
       const displayTitle = lang === 'en' ? display.title : hasTranslation ? display.title : fallbackCopy.title;
       const href = `/${lang}${productDetailPath(product, lang)}/`;
       const image = product.images?.[0]
-        ? `<img src="${escapeAttr(toMediaPath(product.images[0]))}" alt="${escapeAttr(displayTitle)}" width="400" height="400" loading="lazy" />`
+        ? `<img src="${escapeAttr(toMediaPath(product.images[0]))}" alt="${escapeAttr(cleanImageAlt(displayTitle))}" width="400" height="400" loading="lazy" />`
         : '';
       const summary = lang === 'en' || hasTranslation ? buildProductBuyerSummary(display) : fallbackCopy.summary;
       return `<li><a href="${escapeAttr(href)}">${image}<strong>${escapeHtml(displayTitle)}</strong></a>${summary ? `<p>${escapeHtml(summary)}</p>` : ''}</li>`;
@@ -967,8 +1189,9 @@ function seoLandingContent(
 }
 
 function categoryDisplayName(lang: Lang, name: string): string {
+  const canonical = canonicalCategoryName(name) || name;
   const map = LOCALE_PRODUCTS[lang].categories as Record<string, string>;
-  return map[name] || name;
+  return map[canonical] || map[name] || canonical;
 }
 
 function catalogContent(
@@ -979,6 +1202,7 @@ function catalogContent(
 ): string {
   const c = COPY[lang];
   const categoryName = opts?.categoryName;
+  const categorySlug = categoryName ? toCategorySlug(categoryName) : '';
   const categoryLabel = categoryName ? categoryDisplayName(lang, categoryName) : '';
   const listed = categoryName
     ? products.filter((p) => productMatchesCategory(p.category, categoryName))
@@ -986,10 +1210,11 @@ function catalogContent(
   const items = listed
     .map((p) => {
       const href = `/${lang}${productDetailPath(p, lang)}/`;
-      const title = tr[p.id]?.title || p.title;
+      const display = localizeProduct(p, tr, lang);
+      const title = display.title;
       const img = p.images?.[0];
       const imgTag = img
-        ? `<img src="${escapeAttr(toMediaPath(img))}" alt="${escapeAttr(title)}" width="400" height="400" loading="lazy" />`
+        ? `<img src="${escapeAttr(toMediaPath(img))}" alt="${escapeAttr(cleanImageAlt(title))}" width="400" height="400" loading="lazy" />`
         : '';
       return `<li><a href="${escapeAttr(href)}">${imgTag}<span>${escapeHtml(title)}</span></a></li>`;
     })
@@ -1013,35 +1238,43 @@ function catalogContent(
   const intro = opts?.description ?? (categoryName
     ? interpolateTemplate(LOCALE_PRODUCTS[lang].categoryIntro, { category: categoryLabel })
     : c.catalogIntro);
+  const editorial = categorySlug ? getCatalogCategoryEditorial(lang, categorySlug) : null;
+  const editorialBlock = editorial
+    ? `
+      <section aria-labelledby="category-editorial-heading">
+        <h2 id="category-editorial-heading">${escapeHtml(editorial.heading)}</h2>
+        ${editorial.paragraphs.map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join('\n        ')}
+        <ul>
+          ${editorial.highlights.map((item) => `<li>${escapeHtml(item)}</li>`).join('\n          ')}
+        </ul>
+      </section>`
+    : '';
   return `
     <div data-prerender="catalog">
       <nav aria-label="Breadcrumb">
-        <a href="/${lang}/">${escapeHtml(c.breadcrumbHome)}</a>
+        <a href="/${lang}/">${escapeHtml(LOCALE_NAV[lang].home)}</a>
         &raquo;
         ${categoryName
-          ? `<a href="/${lang}/products/">${escapeHtml(c.breadcrumbCatalog)}</a> &raquo; <span>${escapeHtml(categoryLabel)}</span>`
-          : `<span>${escapeHtml(c.breadcrumbCatalog)}</span>`}
+          ? `<a href="/${lang}/products/">${escapeHtml(LOCALE_NAV[lang].catalog)}</a> &raquo; <span>${escapeHtml(categoryLabel)}</span>`
+          : `<span>${escapeHtml(LOCALE_NAV[lang].catalog)}</span>`}
       </nav>
       <h1>${escapeHtml(opts?.heading ?? (categoryName ? categoryLabel : c.catalogH1))}</h1>
       <p data-seo-description="">${escapeHtml(intro)}</p>
       ${categoryNav}
       <ul aria-label="Products">
         ${items}
-      </ul>
+      </ul>${editorialBlock}
     </div>
   `.trim();
 }
 
 function productDetailContent(lang: Lang, product: Product, tr: LangTranslations, seo: ResolvedProductSeo): string {
   const c = COPY[lang];
-  const localized = localizeProduct(product, tr);
+  const localized = localizeProduct(product, tr, lang);
   const img = product.images?.[0];
   const imgTag = img
-    ? `<img src="${escapeAttr(toMediaPath(img))}" alt="${escapeAttr(localized.title)}" width="600" height="600" />`
+    ? `<img src="${escapeAttr(toMediaPath(img))}" alt="${escapeAttr(cleanImageAlt(localized.title))}" width="600" height="600" />`
     : '';
-  // The `description` column holds model codes ("CTL609"), not prose. Render it
-  // as a model number when it is short, and as an actual description only when
-  // it is long enough to be one.
   const descText = localized.description?.trim() || '';
   const desc = descText.length >= 30 && descText !== seo.description
     ? `<p>${escapeHtml(descText.slice(0, 600))}</p>`
@@ -1051,10 +1284,6 @@ function productDetailContent(lang: Lang, product: Product, tr: LangTranslations
     ? `<p><strong>${escapeHtml(product.price_range.startsWith('$') ? product.price_range : `$${product.price_range}`)}</strong></p>`
     : '';
 
-  // `details` is the real marketing copy (and is translated per-language by
-  // scripts/translate-products.ts). It was fetched but never rendered, which
-  // left every product page under 40 words of crawlable content.
-  // Same renderer as the product page, so photos come out as captioned figures.
   const details = localized.details?.trim()
     ? `<h2>${escapeHtml(c.detailsHeading)}</h2>\n      ${renderMarkdownToHtml(normalizeProductDetails(localized.details), { descriptionImages: true })}`
     : '';
@@ -1072,15 +1301,16 @@ function productDetailContent(lang: Lang, product: Product, tr: LangTranslations
       </dl>`
     : '';
   const solutions = relatedSolutionsBlock(lang, product);
+  const resolvedCategory = canonicalCategoryName(product.category);
 
   return `
     <div data-prerender="product">
       <nav aria-label="Breadcrumb">
-        <a href="/${lang}/">${escapeHtml(c.breadcrumbHome)}</a>
+        <a href="/${lang}/">${escapeHtml(LOCALE_NAV[lang].home)}</a>
         &raquo;
-        <a href="/${lang}/products/">${escapeHtml(c.breadcrumbCatalog)}</a>
-        ${product.category
-          ? `&raquo; <a href="/${lang}${catalogCategoryPath(product.category)}/">${escapeHtml(categoryDisplayName(lang, product.category))}</a>`
+        <a href="/${lang}/products/">${escapeHtml(LOCALE_NAV[lang].catalog)}</a>
+        ${resolvedCategory && product.category
+          ? `&raquo; <a href="/${lang}${catalogCategoryPath(product.category)}/">${escapeHtml(categoryDisplayName(lang, resolvedCategory))}</a>`
           : ''}
         &raquo;
         <span>${escapeHtml(localized.title)}</span>
@@ -1117,6 +1347,7 @@ function relatedSolutionsBlock(
 
 function storyContent(lang: Lang): string {
   const story = LOCALE_STORY[lang];
+  const addr = PHYSICAL_ADDRESS[lang];
   const stages = [
     story.process.steps.brief,
     story.process.steps.specification,
@@ -1136,6 +1367,7 @@ function storyContent(lang: Lang): string {
           <dt>${escapeHtml(story.company.foundedLabel)}</dt><dd>2005</dd>
           <dt>${escapeHtml(story.company.facilityLabel)}</dt><dd>46,800 m²</dd>
           <dt>${escapeHtml(story.company.teamLabel)}</dt><dd>200+</dd>
+          <dt>${escapeHtml(addr.label)}</dt><dd>${escapeHtml(addr.value)}</dd>
         </dl>
       </section>
       <section>
@@ -1147,16 +1379,43 @@ function storyContent(lang: Lang): string {
         <h2>${escapeHtml(story.quality.titleLine1)} ${escapeHtml(story.quality.titleLine2)}</h2>
         <p>${escapeHtml(story.quality.scopeNote)}</p>
       </section>
+      <section>
+        <h2>${escapeHtml(story.partnership.titleLine1)} ${escapeHtml(story.partnership.titleLine2)}</h2>
+        <p>${escapeHtml(story.partnership.description)}</p>
+        <address>${escapeHtml(addr.value)} &middot; <a href="mailto:sales@bolenmirror.com">sales@bolenmirror.com</a> &middot; <a href="tel:+8618058603602">+86 18058603602</a></address>
+      </section>
     </div>
   `.trim();
 }
 
 function rfqContent(lang: Lang): string {
-  const c = COPY[lang];
+  const rfq = LOCALE_RFQ[lang];
+  const pd = LOCALE_PRODUCT_DETAIL[lang];
+  const addr = PHYSICAL_ADDRESS[lang];
   return `
     <div data-prerender="rfq">
-      <h1>${escapeHtml(c.rfqH1)}</h1>
-      <p>${escapeHtml(c.rfqIntro)}</p>
+      <h1>${escapeHtml(pd.requestQuote)}</h1>
+      <p>${escapeHtml(rfq.intro)}</p>
+      <section>
+        <h2>${escapeHtml(rfq.quoteIncludesTitle)}</h2>
+        <ul>
+          <li>${escapeHtml(rfq.quoteIncludesMoq)}</li>
+          <li>${escapeHtml(rfq.quoteIncludesLeadTime)}</li>
+          <li>${escapeHtml(rfq.quoteIncludesOptions)}</li>
+        </ul>
+      </section>
+      <section>
+        <h2>${escapeHtml(rfq.contactInformation)}</h2>
+        <dl>
+          <dt>${escapeHtml(rfq.emailUs)}</dt>
+          <dd><a href="mailto:sales@bolenmirror.com">sales@bolenmirror.com</a></dd>
+          <dt>${escapeHtml(rfq.callUs)}</dt>
+          <dd><a href="tel:+8618058603602">+86 18058603602</a></dd>
+          <dt>${escapeHtml(rfq.visitUs)}</dt>
+          <dd><address>${escapeHtml(addr.value)}</address></dd>
+        </dl>
+        <p>${escapeHtml(rfq.messagePlaceholder)}</p>
+      </section>
     </div>
   `.trim();
 }
@@ -1179,24 +1438,59 @@ function termsContent(lang: Lang): string {
   `.trim();
 }
 
+function privacyContent(
+  lang: Lang,
+  copy: {
+    kicker: string;
+    heading: string;
+    lastUpdated: string;
+    intro: string;
+    sections: ReadonlyArray<{ title: string; body: string }>;
+    contactHeading: string;
+    contactLead: string;
+  }
+): string {
+  const addr = PHYSICAL_ADDRESS[lang];
+  const sections = copy.sections
+    .map((section) => `<section><h2>${escapeHtml(section.title)}</h2><p>${escapeHtml(section.body)}</p></section>`)
+    .join('\n      ');
+  return `
+    <div data-prerender="privacy">
+      <p>${escapeHtml(copy.kicker)}</p>
+      <h1>${escapeHtml(copy.heading)}</h1>
+      <p>${escapeHtml(copy.lastUpdated)}</p>
+      <p>${escapeHtml(copy.intro)}</p>
+      ${sections}
+      <section>
+        <h2>${escapeHtml(copy.contactHeading)}</h2>
+        <p>${escapeHtml(copy.contactLead)} <a href="mailto:${escapeAttr(TERMS_CONTACT_EMAIL)}">${escapeHtml(TERMS_CONTACT_EMAIL)}</a>.</p>
+        <address>${escapeHtml(addr.value)}</address>
+      </section>
+    </div>
+  `.trim();
+}
+
 // Copy mirrors src/pages/NotFound.tsx, which React renders on hydration. The
 // robots meta carries data-rh so Helmet adopts it instead of adding a second.
 const NOT_FOUND_TITLE = 'Page Not Found | BOLEN Mirror';
+const NOT_FOUND_DESC = "The page you're looking for doesn't exist or has been moved.";
 const NOINDEX_META = `<meta ${RH} name="robots" content="noindex, nofollow" />`;
 
 /**
- * dist/404.html: the SPA shell with a noindex head and a static not-found
- * body. Cloudflare serves it with HTTP 404 for every path that has no asset
- * (see wrangler.jsonc), so missing pages are real 404s for crawlers while the
- * React app still boots and renders the styled, localized NotFound view.
+ * dist/404.html: the SPA shell with a noindex head (zero canonical/hreflang!)
+ * and a static not-found body.
  */
 function notFoundHtml(template: string): string {
-  const headExtras = [`<title>${escapeHtml(NOT_FOUND_TITLE)}</title>`, NOINDEX_META].join('\n    ');
+  const headExtras = [
+    `<title>${escapeHtml(NOT_FOUND_TITLE)}</title>`,
+    `<meta ${RH} name="description" content="${escapeAttr(NOT_FOUND_DESC)}" />`,
+    NOINDEX_META,
+  ].join('\n    ');
   const bodyContent = `
     <div data-prerender="not-found">
       <p>404</p>
       <h1>Page Not Found</h1>
-      <p>The page you're looking for doesn't exist or has been moved.</p>
+      <p>${escapeHtml(NOT_FOUND_DESC)}</p>
       <p><a href="/en/">Go Home</a> &middot; <a href="/en/products/">Browse Products</a></p>
     </div>
   `.trim();
@@ -1277,8 +1571,45 @@ function seoSolutionsSchema(lang: Lang): any[] {
   ];
 }
 
+const SERVICE_SCHEMA_I18N: Record<
+  Lang,
+  { areaServed: string; audienceType: string; catalogName: string }
+> = {
+  en: {
+    areaServed: 'Worldwide',
+    audienceType: 'Importers, distributors, brands, hotel and project buyers',
+    catalogName: 'BOLEN mirror catalog',
+  },
+  zh: {
+    areaServed: '全球市场',
+    audienceType: '进口商、经销商、卫浴品牌、酒店及工程项目采购商',
+    catalogName: 'BOLEN 产品目录',
+  },
+  es: {
+    areaServed: 'Mundial',
+    audienceType: 'Importadores, distribuidores, marcas, hoteles y compradores de proyectos',
+    catalogName: 'Catálogo de espejos BOLEN',
+  },
+  fr: {
+    areaServed: 'Monde entier',
+    audienceType: 'Importateurs, distributeurs, marques, hôtels et acheteurs projets',
+    catalogName: 'Catalogue de miroirs BOLEN',
+  },
+  de: {
+    areaServed: 'Weltweit',
+    audienceType: 'Importeure, Großhändler, Marken, Hotels und Projekteinkäufer',
+    catalogName: 'BOLEN Spiegelkatalog',
+  },
+  it: {
+    areaServed: 'Tutto il mondo',
+    audienceType: 'Importatori, distributori, marchi, hotel e buyer di progetto',
+    catalogName: 'Catalogo specchi BOLEN',
+  },
+};
+
 function seoLandingSchema(lang: Lang, page: SeoLandingPage): any[] {
   const ui = getSeoSolutionsUi(lang);
+  const svc = SERVICE_SCHEMA_I18N[lang];
   const url = `${SITE_URL}/${lang}/solutions/${page.slug}/`;
   return [
     {
@@ -1289,13 +1620,14 @@ function seoLandingSchema(lang: Lang, page: SeoLandingPage): any[] {
       serviceType: page.shortTitle || page.h1,
       description: page.description,
       url,
+      inLanguage: lang,
       areaServed: {
         '@type': 'Place',
-        name: 'Worldwide',
+        name: svc.areaServed,
       },
       audience: {
         '@type': 'BusinessAudience',
-        audienceType: 'Importers, distributors, brands, hotel and project buyers',
+        audienceType: svc.audienceType,
       },
       brand: {
         '@type': 'Brand',
@@ -1308,7 +1640,7 @@ function seoLandingSchema(lang: Lang, page: SeoLandingPage): any[] {
       },
       hasOfferCatalog: {
         '@type': 'OfferCatalog',
-        name: 'BOLEN mirror catalog',
+        name: svc.catalogName,
         url: `${SITE_URL}/${lang}/products/`,
       },
     },
@@ -1348,14 +1680,16 @@ function parsePriceRange(range?: string): { low: number; high: number } {
 function productPageSeo(product: Product, lang: Lang): ResolvedProductSeo {
   const display = { ...product, title: lang === 'en' ? polishEnglishProductTitle(product.title) : product.title };
   return resolveProductSeo(display, lang, {
-    titleSuffix: COPY[lang].productSuffix,
-    descriptionTemplate: COPY[lang].productDescTemplate,
+    titleSuffix: LOCALE_PRODUCT_DETAIL[lang].brandSuffix,
+    descriptionTemplate: LOCALE_PRODUCT_DETAIL[lang].descTemplate,
   });
 }
 
 function productDetailSchema(lang: Lang, product: Product, display: Product, seo: ResolvedProductSeo): any[] {
   const productFullUrl = `https://bolenmirror.com/${lang}${productDetailPath(product, lang)}/`;
   const { low: lowPrice, high: highPrice } = parsePriceRange(product.price_range);
+  const resolvedCategory = canonicalCategoryName(product.category);
+  const categoryLabel = resolvedCategory ? categoryDisplayName(lang, resolvedCategory) : undefined;
   return [
     {
       '@context': 'https://schema.org/',
@@ -1368,9 +1702,6 @@ function productDetailSchema(lang: Lang, product: Product, display: Product, seo
         '@type': 'Brand',
         name: 'BOLEN',
       },
-      // Surfaces the same spec table Google sees in the body as structured
-      // data. Omitted entirely when a product has no specs — an empty
-      // additionalProperty array is worse than none.
       ...(normalizeSpecs(display.specifications).length
         ? {
             additionalProperty: normalizeSpecs(display.specifications).map((s) => ({
@@ -1380,32 +1711,35 @@ function productDetailSchema(lang: Lang, product: Product, display: Product, seo
             })),
           }
         : {}),
-      offers:
-        lowPrice > 0
-          ? {
-              '@type': 'AggregateOffer',
-              url: productFullUrl,
-              priceCurrency: 'USD',
-              lowPrice,
-              highPrice,
-              offerCount: 1,
-              availability: 'https://schema.org/InStock',
-            }
-          : {
+      ...(lowPrice > 0
+        ? {
+            offers: {
               '@type': 'Offer',
               url: productFullUrl,
-              availability: 'https://schema.org/InStock',
+              priceCurrency: 'USD',
+              ...(lowPrice === highPrice
+                ? { price: lowPrice }
+                : {
+                    priceSpecification: {
+                      '@type': 'UnitPriceSpecification',
+                      priceCurrency: 'USD',
+                      minPrice: lowPrice,
+                      maxPrice: highPrice,
+                    },
+                  }),
             },
+          }
+        : {}),
     },
-    {
-      '@context': 'https://schema.org',
-      '@type': 'BreadcrumbList',
-      itemListElement: [
-        { '@type': 'ListItem', position: 1, name: 'Home', item: `https://bolenmirror.com/${lang}/` },
-        { '@type': 'ListItem', position: 2, name: 'Products', item: `https://bolenmirror.com/${lang}/products/` },
-        { '@type': 'ListItem', position: 3, name: display.title, item: productFullUrl },
-      ],
-    },
+    buildProductBreadcrumbSchema({
+      lang,
+      homeLabel: LOCALE_NAV[lang].home,
+      catalogLabel: LOCALE_NAV[lang].catalog,
+      categoryName: product.category,
+      categoryLabel,
+      productTitle: display.title,
+      productUrl: productFullUrl,
+    }),
   ];
 }
 
@@ -1418,10 +1752,10 @@ function rfqSchema(lang: Lang): any[] {
     {
       '@context': 'https://schema.org',
       '@type': 'ContactPage',
-      name: 'Contact Sales | BOLEN Mirror',
-      description:
-        'Contact Jiaxing Chengtai Mirror Co., Ltd. (BOLEN) for OEM/ODM inquiries, custom mirror manufacturing, and bulk orders.',
+      name: LOCALE_SEO[lang].rfqTitle,
+      description: LOCALE_SEO[lang].rfqDesc,
       url: `https://bolenmirror.com/${lang}/rfq/`,
+      inLanguage: lang,
       mainEntity: {
         '@type': 'Organization',
         name: 'Jiaxing Chengtai Mirror Co., Ltd. (BOLEN)',
@@ -1429,9 +1763,9 @@ function rfqSchema(lang: Lang): any[] {
           '@type': 'ContactPoint',
           telephone: '+86-18058603602',
           email: 'sales@bolenmirror.com',
-          contactType: 'customer service',
+          contactType: 'sales',
           areaServed: 'Worldwide',
-          availableLanguage: ['en', 'zh'],
+          availableLanguage: [...LANGUAGES],
         },
         address: {
           '@type': 'PostalAddress',
@@ -1913,9 +2247,31 @@ const VIDEO_COPY: Record<
   },
 };
 
+function videoCategoryDisplayName(lang: Lang, category: string): string {
+  const map = LOCALE_VIDEOS[lang].categories as Record<string, string>;
+  return map[category] || category;
+}
+
+function getVideoAvailableLanguages(
+  video: Pick<VideoPost, 'title' | 'body' | 'excerpt'>
+): Lang[] {
+  return LANGUAGES.filter((lang) => {
+    const title = video.title?.[lang]?.trim();
+    const content = video.body?.[lang]?.trim() || video.excerpt?.[lang]?.trim();
+    return Boolean(title && content);
+  });
+}
+
+function hasVideoTranslation(
+  video: Pick<VideoPost, 'title' | 'body' | 'excerpt'>,
+  lang: Lang
+): boolean {
+  return getVideoAvailableLanguages(video).includes(lang);
+}
+
 function videoMetaLine(video: VideoListItem | LocalizedVideoPost, lang: Lang): string {
   const parts: string[] = [];
-  if (video.category) parts.push(`<span>${escapeHtml(video.category)}</span>`);
+  if (video.category) parts.push(`<span>${escapeHtml(videoCategoryDisplayName(lang, video.category))}</span>`);
   if (video.published_at) {
     parts.push(
       `<time datetime="${escapeAttr(video.published_at)}">${escapeHtml(formatBlogDate(video.published_at, lang))}</time>`
@@ -1939,16 +2295,24 @@ async function fetchVideos(): Promise<VideoPost[]> {
     return [];
   }
   const supabase = createClient(supabaseUrl, supabaseKey);
-  const { data, error } = await supabase
-    .from('videos')
-    .select('*')
-    .eq('status', 'published')
-    .order('published_at', { ascending: false });
-  if (error) {
-    console.warn(`[prerender-static] Could not fetch videos: ${error.message}`);
-    return [];
+  const PAGE = 500;
+  const all: VideoPost[] = [];
+  for (let from = 0; ; from += PAGE) {
+    const { data, error } = await supabase
+      .from('videos')
+      .select('*')
+      .eq('status', 'published')
+      .order('published_at', { ascending: false })
+      .range(from, from + PAGE - 1);
+    if (error) {
+      console.warn(`[prerender-static] Could not fetch videos: ${error.message}`);
+      return from === 0 ? [] : all;
+    }
+    const batch = (data || []) as VideoPost[];
+    all.push(...batch);
+    if (batch.length < PAGE) break;
   }
-  return (data || []) as VideoPost[];
+  return all;
 }
 
 function videoIndexContent(lang: Lang, items: VideoListItem[]): string {
@@ -1958,7 +2322,7 @@ function videoIndexContent(lang: Lang, items: VideoListItem[]): string {
     .map((video, index) => {
       const href = `/${lang}/videos/${video.slug}/`;
       const img = video.thumbnail_url
-        ? `<img src="${escapeAttr(toMediaPath(video.thumbnail_url))}" alt="${escapeAttr(video.title)}" width="640" height="360" loading="${
+        ? `<img src="${escapeAttr(toMediaPath(video.thumbnail_url))}" alt="${escapeAttr(cleanImageAlt(video.title))}" width="640" height="360" loading="${
             index < 3 ? 'eager' : 'lazy'
           }" />`
         : '';
@@ -1971,7 +2335,7 @@ function videoIndexContent(lang: Lang, items: VideoListItem[]): string {
   return `
     <div data-prerender="videos">
       <nav aria-label="Breadcrumb">
-        <a href="/${lang}/">${escapeHtml(hc.breadcrumbHome)}</a>
+        <a href="/${lang}/">${escapeHtml(LOCALE_NAV[lang].home)}</a>
         &raquo;
         <span>${escapeHtml(c.videos)}</span>
       </nav>
@@ -1998,9 +2362,20 @@ function videoPostContent(
 ): string {
   const c = VIDEO_COPY[lang];
   const hc = COPY[lang];
-  const media = video.thumbnail_url
-    ? `<img src="${escapeAttr(toMediaPath(video.thumbnail_url))}" alt="${escapeAttr(video.title)}" width="1200" height="675" />`
-    : '';
+  const playback = getVideoPlayback(video);
+  const posterPath = video.thumbnail_url ? toMediaPath(video.thumbnail_url) : '';
+  const media =
+    playback.kind === 'video'
+      ? `<video controls preload="metadata" playsinline${
+          posterPath ? ` poster="${escapeAttr(posterPath)}"` : ''
+        } src="${escapeAttr(toMediaPath(playback.src))}" width="1280" height="720"></video>`
+      : playback.kind === 'embed'
+        ? `<iframe loading="lazy" src="${escapeAttr(playback.src)}" title="${escapeAttr(
+            cleanImageAlt(video.title)
+          )}" width="1280" height="720" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`
+        : posterPath
+          ? `<img src="${escapeAttr(posterPath)}" alt="${escapeAttr(cleanImageAlt(video.title))}" width="1200" height="675" />`
+          : '';
   const relatedBlock = related.length
     ? `<section aria-label="${escapeAttr(c.relatedProducts)}">
         <h2>${escapeHtml(c.relatedProducts)}</h2>
@@ -2010,7 +2385,7 @@ function videoPostContent(
               (r) =>
                 `<li><a href="${escapeAttr(r.href)}">${
                   r.img
-                    ? `<img src="${escapeAttr(toMediaPath(r.img))}" alt="${escapeAttr(r.title)}" width="200" height="200" loading="lazy" />`
+                    ? `<img src="${escapeAttr(toMediaPath(r.img))}" alt="${escapeAttr(cleanImageAlt(r.title))}" width="200" height="200" loading="lazy" />`
                     : ''
                 }${escapeHtml(r.title)}</a></li>`
             )
@@ -2027,7 +2402,7 @@ function videoPostContent(
               (item) =>
                 `<li><a href="/${lang}/videos/${escapeAttr(item.slug)}/">${
                   item.thumbnail_url
-                    ? `<img src="${escapeAttr(toMediaPath(item.thumbnail_url))}" alt="${escapeAttr(item.title)}" width="320" height="180" loading="lazy" />`
+                    ? `<img src="${escapeAttr(toMediaPath(item.thumbnail_url))}" alt="${escapeAttr(cleanImageAlt(item.title))}" width="320" height="180" loading="lazy" />`
                     : ''
                 }${escapeHtml(item.title)}</a>${videoMetaLine(item, lang)}</li>`
             )
@@ -2036,11 +2411,15 @@ function videoPostContent(
         <p><a href="/${lang}/videos/">${escapeHtml(c.allVideos)}</a></p>
       </section>`
     : '';
-  const tags = video.tags.length ? `<p>${video.tags.map((tag) => escapeHtml(tag)).join(' &middot; ')}</p>` : '';
+  // Raw DB tags are English-only; render them only on English pages so non-English locales stay clean.
+  const tags =
+    lang === 'en' && video.tags.length
+      ? `<p>${video.tags.map((tag) => escapeHtml(tag)).join(' &middot; ')}</p>`
+      : '';
   return `
     <div data-prerender="videoPost">
       <nav aria-label="Breadcrumb">
-        <a href="/${lang}/">${escapeHtml(hc.breadcrumbHome)}</a>
+        <a href="/${lang}/">${escapeHtml(LOCALE_NAV[lang].home)}</a>
         &raquo;
         <a href="/${lang}/videos/">${escapeHtml(c.videos)}</a>
         &raquo;
@@ -2063,61 +2442,50 @@ function videoPostContent(
   `.trim();
 }
 
-/** og:video for a watch page — the MP4 for self-hosted clips, the player URL for embeds. */
+/** og:video for a watch page — the /media/-proxied MP4 for self-hosted clips, the player URL for embeds. */
 function videoOgVideo(video: LocalizedVideoPost): { url: string; type: string } | undefined {
   const playback = getVideoPlayback(video);
-  if (playback.kind === 'video') return { url: playback.src, type: videoMimeType(playback.src) || 'video/mp4' };
+  if (playback.kind === 'video') {
+    return { url: toMediaUrl(playback.src), type: videoMimeType(playback.src) || 'video/mp4' };
+  }
   if (playback.kind === 'embed') return { url: playback.src, type: 'text/html' };
   return undefined;
 }
 
-async function writeUuidRedirects(products: Product[]): Promise<void> {
+async function cleanLegacyAutoRedirects(): Promise<void> {
   const redirectsPath = resolve(DIST, '_redirects');
-  let existing = '';
   try {
-    existing = await readFile(redirectsPath, 'utf-8');
+    const existing = await readFile(redirectsPath, 'utf-8');
+    if (existing.includes('# BEGIN auto-uuid-redirects')) {
+      const cleaned = existing
+        .replace(/# BEGIN auto-uuid-redirects[\s\S]*?# END auto-uuid-redirects\n*/g, '')
+        .replace(/^\n+/, '');
+      await writeFile(redirectsPath, cleaned, 'utf-8');
+    }
   } catch {
-    // No existing _redirects (public/_redirects deleted?) — start clean.
+    // dist/_redirects may not exist yet
   }
-
-  const BEGIN = '# BEGIN auto-uuid-redirects';
-  const END = '# END auto-uuid-redirects';
-  const staticBody = existing
-    .replace(new RegExp(`${BEGIN}[\\s\\S]*?${END}\\n?`, 'g'), '')
-    .replace(/^\n+/, '');
-
-  const lines: string[] = [
-    BEGIN,
-    '# Generated by scripts/prerender-static.ts — 301s for legacy /<slug>-<uuid> product URLs.',
-  ];
-  let ruleCount = 0;
-  for (const product of products) {
-    if (!product.id || !product.title) continue;
-    const slug = toSlug(product.title);
-    if (!slug) continue;
-
-    const pairs: Array<[string, string]> = [];
-    pairs.push([`/products/${slug}-${product.id}`, `/en${productDetailPath(product, 'en')}/`]);
-    pairs.push([`/products/${slug}-${product.id}/`, `/en${productDetailPath(product, 'en')}/`]);
-    for (const lang of LANGUAGES) {
-      const dest = `/${lang}${productDetailPath(product, lang)}/`;
-      pairs.push([`/${lang}/products/${slug}-${product.id}`, dest]);
-      pairs.push([`/${lang}/products/${slug}-${product.id}/`, dest]);
-    }
-    for (const [src, dst] of pairs) {
-      lines.push(`${src}  ${dst}  301`);
-      ruleCount++;
-    }
-  }
-  lines.push(END);
-
-  await writeFile(redirectsPath, `${lines.join('\n')}\n\n${staticBody}`, 'utf-8');
-  console.log(`[prerender-static] Wrote ${ruleCount} UUID redirect rules to dist/_redirects.`);
 }
 
 async function main(): Promise<void> {
   console.log('[prerender-static] Reading dist/index.html...');
   const template = await readFile(resolve(DIST, 'index.html'), 'utf-8');
+
+  const privacyModuleSpec = '../src/data/' + 'privacyCopy';
+  const privacyMod = (await import(privacyModuleSpec).catch(() => null)) as null | {
+    PRIVACY_PATH?: string;
+    getPrivacyCopy?: (lang: string) => {
+      kicker: string;
+      heading: string;
+      lastUpdated: string;
+      intro: string;
+      sections: ReadonlyArray<{ title: string; body: string }>;
+      contactHeading: string;
+      contactLead: string;
+      seo: { title: string; description: string };
+    };
+    buildPrivacySchema?: (lang: string) => Record<string, unknown>;
+  };
 
   console.log('[prerender-static] Fetching products from Supabase...');
   const products = await fetchAllProducts();
@@ -2127,43 +2495,22 @@ async function main(): Promise<void> {
   const { heroBgs, categories, factoryGallery, featuredVideoSlug } = await fetchSiteSettings();
   console.log(`[prerender-static] Factory gallery: ${factoryGallery.length} photo(s).`);
 
-  // Probe the primary (LCP) hero's intrinsic size once, then derive the
-  // responsive src/srcset baked into the home HTML, the <head> preload, and the
-  // data island consumed by Home.tsx.
   const heroPrimary = heroBgs[0];
   const heroSize = heroPrimary ? await probeImageSize(heroPrimary) : HERO_DEFAULT_SIZE;
   const supabaseHero: HeroImage | undefined = heroPrimary
     ? { src: optimizeImage(heroPrimary, { width: 1280 }), srcset: buildHeroSrcSet(heroPrimary), width: heroSize.w, height: heroSize.h }
     : undefined;
 
-  // Self-host EVERY hero slide: download each responsive width from Supabase's
-  // transform endpoint at build time and write them into dist/hero/. Cloudflare
-  // then serves them from its CDN with fast TTFB, instead of the live Supabase
-  // /render/image/ endpoint which can take ~1-2s on a cold transform.
-  //
-  // This used to cover only slide 1 (the preloaded LCP candidate). Slides 2..n
-  // were still fetched from Supabase at 1920px when the carousel advanced, and
-  // because the carousel auto-rotated before any user input, every one of
-  // those late paints became a new LCP candidate — the homepage measured 6.2s
-  // LCP with a 100ms first slide. Home.tsx now also waits for an interaction
-  // before rotating; self-hosting the remaining slides makes the eventual
-  // swap fast and keeps Supabase off the home page entirely.
-  //
-  // Each slide falls back to its Supabase transform URLs independently, so one
-  // failed download never breaks the build or degrades the other slides.
   const heroSlides: HeroSlide[] = [];
   if (heroBgs.length > 0) {
     const heroDir = resolve(DIST, 'hero');
     await mkdir(heroDir, { recursive: true });
     const results = await Promise.all(
       heroBgs.map(async (url, index): Promise<{ slide: HeroSlide; selfHosted: boolean }> => {
-        // Slide 1 keeps the historical `lcp-*` file names.
         const base = index === 0 ? 'lcp' : `slide${index + 1}`;
         try {
           const srcsetParts = await Promise.all(
             HERO_WIDTHS.map(async (w) => {
-              // optimizeImage returns a same-origin /media/ path; download
-              // straight from Supabase, since the Worker is not running here.
               const res = await fetch(mediaSourceUrl(optimizeImage(url, { width: w })), {
                 headers: { Accept: 'image/webp' },
               });
@@ -2183,27 +2530,22 @@ async function main(): Promise<void> {
     const hosted = results.filter((r) => r.selfHosted).length;
     console.log(`[prerender-static] Self-hosted ${hosted}/${heroBgs.length} hero slide(s) in dist/hero/.`);
   }
-  // The preloaded first slide. Only meaningful when it is actually self-hosted;
-  // otherwise Home.tsx and the baked <img> fall back to the Supabase set below.
   const heroLcp: HeroSlide | undefined = heroSlides[0]?.src.startsWith('/hero/') ? heroSlides[0] : undefined;
 
-  // Prefer the self-hosted set for the baked <img>, the <head> preload, and the
-  // data island; fall back to the Supabase transform set.
   const hero: HeroImage | undefined = heroLcp
     ? { ...heroLcp, width: heroSize.w, height: heroSize.h }
     : supabaseHero;
-  // `href` is the fallback candidate for browsers that don't support
-  // imagesrcset on a preload link — without it they parse the tag, find no URL,
-  // and silently drop the LCP preload entirely. Supporting browsers ignore
-  // `href` and pick from imagesrcset as normal.
   const heroPreload = hero
     ? `<link rel="preload" as="image" href="${escapeAttr(hero.src)}" imagesrcset="${escapeAttr(hero.srcset)}" imagesizes="100vw" fetchpriority="high" referrerpolicy="no-referrer" />`
     : '';
   console.log(`[prerender-static] Hero ${heroPrimary ? `${heroSize.w}x${heroSize.h}` : '(none)'} baked into home.`);
 
-  // ProductCard only reads id/title/description/images/category/price_range/msrp;
-  // strip the heavy details/specifications fields out of the shared product payload.
-  const lightProducts = products.map(({ details, specifications, ...rest }) => rest);
+  // ProductCard only reads id/title/description/images[0]/category/price_range/msrp;
+  // strip details, specifications, seo, and extra gallery URLs from card payloads.
+  const lightProducts = products.map(({ details, specifications, seo, images, ...rest }) => ({
+    ...rest,
+    images: images?.length ? [images[0]] : [],
+  }));
 
   console.log('[prerender-static] Loading product translations (public/i18n)...');
   const translations = await loadProductTranslations();
@@ -2215,8 +2557,6 @@ async function main(): Promise<void> {
   const videos = await fetchVideos();
   console.log(`[prerender-static] ${videos.length} videos loaded.`);
 
-  // Home featured video: resolved from the published set, so unpublishing the
-  // chosen video simply drops the section from the next build.
   const featuredVideoPost = featuredVideoSlug ? videos.find((v) => v.slug === featuredVideoSlug) : undefined;
   if (featuredVideoSlug && !featuredVideoPost) {
     console.warn(
@@ -2226,50 +2566,60 @@ async function main(): Promise<void> {
     console.log(`[prerender-static] Home featured video: ${featuredVideoPost.slug}`);
   }
   const productById = new Map(products.map((p) => [p.id, p]));
+  const lightProductById = new Map(lightProducts.map((p) => [p.id, p]));
   for (const lang of LANGUAGES) {
     const n = Object.keys(translations[lang]).length;
     if (n > 0) console.log(`[prerender-static]   ${lang}: ${n} translated products`);
   }
 
   let routeCount = 0;
-  // Slugs no longer carry the row UUID, so two products with the same title
-  // would map to the same file. Guard against silently overwriting one.
   const seenProductSlugs = new Set<string>();
   for (const lang of LANGUAGES) {
-    const c = COPY[lang];
+    const localizedGallery = localizeFactoryGallery(factoryGallery, lang);
+    const localizedVideosForLang = videos.filter((video) => hasVideoTranslation(video, lang));
 
     // Home
     {
       const canonical = `${SITE_URL}/${lang}/`;
-      const featuredVideo = featuredVideoPost ? toFeaturedVideoPayload(featuredVideoPost, lang) : undefined;
+      const featuredVideo =
+        featuredVideoPost && hasVideoTranslation(featuredVideoPost, lang)
+          ? toFeaturedVideoPayload(featuredVideoPost, lang)
+          : undefined;
+      const homeProducts = lightProducts.slice(0, 6);
       const dataScript = prerenderDataScript({
         route: 'home',
         lang,
-        products: lightProducts,
+        products: homeProducts,
         heroBgs,
         heroW: heroSize.w,
         heroH: heroSize.h,
         heroLcp,
         heroSlides,
         categories,
-        factoryGallery,
+        factoryGallery: localizedGallery,
         featuredVideo,
-        productTranslations: translations[lang],
+        productTranslations: pickCardTranslations(translations[lang], homeProducts),
       });
-      const headExtras = `${buildHead({
-        lang,
-        title: LOCALE_SEO[lang].homeTitle,
-        description: LOCALE_SEO[lang].homeDesc,
-        canonical,
-        ogImage: DEFAULT_OG_IMAGE,
-        ogType: 'website',
-        routePath: '/',
-        schema: homeSchema(lang, factoryGallery, featuredVideo),
-      })}\n    ${heroPreload}\n    ${dataScript}`;
+      const headExtras = [
+        buildHead({
+          lang,
+          title: LOCALE_SEO[lang].homeTitle,
+          description: LOCALE_SEO[lang].homeDesc,
+          canonical,
+          ogImage: DEFAULT_OG_IMAGE,
+          ogType: 'website',
+          routePath: '/',
+          schema: homeSchema(lang, localizedGallery, featuredVideo),
+        }),
+        heroPreload,
+      ]
+        .filter(Boolean)
+        .join('\n    ');
       const html = injectIntoTemplate(template, {
         lang,
         headExtras,
-        bodyContent: homeContent(lang, hero, factoryGallery, featuredVideo, categories),
+        bodyContent: homeContent(lang, hero, localizedGallery, featuredVideo, categories),
+        dataScript,
       });
       await writeRoute(`${lang}`, html);
       routeCount++;
@@ -2284,9 +2634,9 @@ async function main(): Promise<void> {
         lang,
         products: catalogProducts,
         categories,
-        productTranslations: translations[lang],
+        productTranslations: pickCardTranslations(translations[lang], catalogProducts),
       });
-      const headExtras = `${buildHead({
+      const headExtras = buildHead({
         lang,
         title: LOCALE_SEO[lang].catalogTitle,
         description: LOCALE_SEO[lang].catalogDesc,
@@ -2295,7 +2645,7 @@ async function main(): Promise<void> {
         ogType: 'website',
         routePath: '/products',
         schema: catalogSchema(lang),
-      })}\n    ${dataScript}`;
+      });
       const html = injectIntoTemplate(template, {
         lang,
         headExtras,
@@ -2303,6 +2653,7 @@ async function main(): Promise<void> {
           categories,
           description: LOCALE_SEO[lang].catalogDesc,
         }),
+        dataScript,
       });
       await writeRoute(`${lang}/products`, html);
       routeCount++;
@@ -2323,16 +2674,19 @@ async function main(): Promise<void> {
       });
       const description = categoryCopy.description;
       const categoryProducts = products.filter((product) => productMatchesCategory(product.category, categoryName));
+      const lightCategoryProducts = lightProducts.filter((product) =>
+        productMatchesCategory(product.category, categoryName)
+      );
       const ogImage = categoryProducts[0]?.images?.[0] || DEFAULT_OG_IMAGE;
       const dataScript = prerenderDataScript({
         route: 'catalog',
         lang,
-        products: lightProducts,
+        products: lightCategoryProducts,
         categories,
         categorySlug,
-        productTranslations: translations[lang],
+        productTranslations: pickCardTranslations(translations[lang], categoryProducts),
       });
-      const headExtras = `${buildHead({
+      const headExtras = buildHead({
         lang,
         title,
         description,
@@ -2348,15 +2702,18 @@ async function main(): Promise<void> {
           description,
           homeLabel: LOCALE_NAV[lang].home,
           catalogLabel: LOCALE_NAV[lang].catalog,
-          products: categoryProducts.map((product) => ({
-            id: product.id,
-            category: product.category,
-            title: product.title,
-            name: translations[lang][product.id]?.title || product.title,
-            image: product.images?.[0],
-          })),
+          products: categoryProducts.map((product) => {
+            const disp = localizeProduct(product, translations[lang], lang);
+            return {
+              id: product.id,
+              category: product.category,
+              title: product.title,
+              name: disp.title,
+              image: product.images?.[0],
+            };
+          }),
         }),
-      })}\n    ${dataScript}`;
+      });
       const html = injectIntoTemplate(template, {
         lang,
         headExtras,
@@ -2366,6 +2723,7 @@ async function main(): Promise<void> {
           heading: categoryCopy.h1,
           description,
         }),
+        dataScript,
       });
       await writeRoute(`${lang}${routePath}`, html);
       routeCount++;
@@ -2405,14 +2763,15 @@ async function main(): Promise<void> {
           .sort((a, b) => scoreSeoLandingProduct(sourcePage, b) - scoreSeoLandingProduct(sourcePage, a))
           .slice(0, 6)
           .map((product) => {
-            const localized = localizeProduct(product, translations[lang]);
+            const localized = localizeProduct(product, translations[lang], lang);
             const fallbackCopy = getSeoLandingProductCardCopy(product, lang);
             const hasTranslation = Boolean(translations[lang][product.id]?.title);
-            const { details, specifications, ...rest } = product;
+            const { details, specifications, seo, images, ...rest } = product;
             return {
               ...rest,
+              images: images?.length ? [images[0]] : [],
               display_title:
-                lang === 'en' ? undefined : hasTranslation ? localized.title : fallbackCopy.title,
+                lang === 'en' ? localized.title : hasTranslation ? localized.title : fallbackCopy.title,
               buyer_summary:
                 lang === 'en' || hasTranslation
                   ? buildProductBuyerSummary(localized)
@@ -2424,9 +2783,9 @@ async function main(): Promise<void> {
           lang,
           landingSlug: page.slug,
           products: landingProducts,
-          productTranslations: translations[lang],
+          productTranslations: pickCardTranslations(translations[lang], landingProducts),
         });
-        const headExtras = `${buildHead({
+        const headExtras = buildHead({
           lang,
           title: page.title,
           description: page.description,
@@ -2434,11 +2793,12 @@ async function main(): Promise<void> {
           ogImage: landingProducts[0]?.images?.[0] || DEFAULT_OG_IMAGE,
           routePath,
           schema: seoLandingSchema(lang, page),
-        })}\n    ${dataScript}`;
+        });
         const html = injectIntoTemplate(template, {
           lang,
           headExtras,
           bodyContent: seoLandingContent(lang, page, sourcePage, products, translations[lang]),
+          dataScript,
         });
         await writeRoute(`${lang}${routePath}`, html);
         routeCount++;
@@ -2448,6 +2808,13 @@ async function main(): Promise<void> {
     // Our Story
     {
       const canonical = `${SITE_URL}/${lang}/our-story/`;
+      const dataScript = prerenderDataScript({
+        route: 'ourStory',
+        lang,
+        productCount: products.length,
+        videoCount: localizedVideosForLang.length,
+        factoryGallery: localizedGallery,
+      });
       const headExtras = buildHead({
         lang,
         title: LOCALE_SEO[lang].storyTitle,
@@ -2462,6 +2829,7 @@ async function main(): Promise<void> {
         lang,
         headExtras,
         bodyContent: storyContent(lang),
+        dataScript,
       });
       await writeRoute(`${lang}/our-story`, html);
       routeCount++;
@@ -2489,9 +2857,7 @@ async function main(): Promise<void> {
       routeCount++;
     }
 
-    // Terms and Conditions. Linked from every footer but previously never
-    // prerendered, so with not_found_handling = "404-page" it would have been
-    // served as the 404 page. Head mirrors <SEO> in TermsAndConditions.tsx.
+    // Terms and Conditions
     {
       const canonical = `${SITE_URL}/${lang}${TERMS_PATH}/`;
       const termsCopy = getTermsCopy(lang);
@@ -2514,6 +2880,34 @@ async function main(): Promise<void> {
       routeCount++;
     }
 
+    // Optional Privacy Policy (prerenders all 6 locales automatically once src/data/privacyCopy.ts exists)
+    if (
+      typeof privacyMod?.PRIVACY_PATH === 'string' &&
+      typeof privacyMod.getPrivacyCopy === 'function' &&
+      typeof privacyMod.buildPrivacySchema === 'function'
+    ) {
+      const privacyPath = privacyMod.PRIVACY_PATH;
+      const canonical = `${SITE_URL}/${lang}${privacyPath}/`;
+      const copy = privacyMod.getPrivacyCopy(lang);
+      const headExtras = buildHead({
+        lang,
+        title: copy.seo.title,
+        description: copy.seo.description,
+        canonical,
+        ogImage: DEFAULT_OG_IMAGE,
+        ogType: 'website',
+        routePath: privacyPath,
+        schema: [privacyMod.buildPrivacySchema(lang)],
+      });
+      const html = injectIntoTemplate(template, {
+        lang,
+        headExtras,
+        bodyContent: privacyContent(lang, copy),
+      });
+      await writeRoute(`${lang}${privacyPath}`, html);
+      routeCount++;
+    }
+
     // Insights index
     {
       const canonical = `${SITE_URL}/${lang}${INSIGHTS_PATH}/`;
@@ -2522,7 +2916,7 @@ async function main(): Promise<void> {
         .map((post) => toListItem(post, lang));
       const bc = BLOG_COPY[lang];
       const dataScript = prerenderDataScript({ route: 'blog', lang, blogPosts: items });
-      const headExtras = `${buildHead({
+      const headExtras = buildHead({
         lang,
         title: bc.metaTitle,
         description: bc.metaDesc,
@@ -2536,23 +2930,27 @@ async function main(): Promise<void> {
           breadcrumbLabel: bc.journal,
           posts: items,
         }) as any[],
-      })}\n    ${dataScript}`;
+      });
       const html = injectIntoTemplate(template, {
         lang,
         headExtras,
         bodyContent: blogIndexContent(lang, items),
+        dataScript,
       });
       await writeRoute(`${lang}${INSIGHTS_PATH}`, html);
       routeCount++;
     }
 
-    // Videos index
+    // Videos index (only localized videos)
     {
       const canonical = `${SITE_URL}/${lang}/videos/`;
-      const items = videos.map((video) => toVideoListItem(video, lang));
+      const items = localizedVideosForLang.map((video) => {
+        const { search_text, ...rest } = toVideoListItem(video, lang);
+        return rest;
+      });
       const vc = VIDEO_COPY[lang];
       const dataScript = prerenderDataScript({ route: 'videos', lang, videoPosts: items });
-      const headExtras = `${buildHead({
+      const headExtras = buildHead({
         lang,
         title: vc.metaTitle,
         description: vc.metaDesc,
@@ -2561,11 +2959,12 @@ async function main(): Promise<void> {
         ogType: 'website',
         routePath: '/videos',
         schema: buildVideoIndexSchema(lang, items) as any[],
-      })}\n    ${dataScript}`;
+      });
       const html = injectIntoTemplate(template, {
         lang,
         headExtras,
         bodyContent: videoIndexContent(lang, items),
+        dataScript,
       });
       await writeRoute(`${lang}/videos`, html);
       routeCount++;
@@ -2576,14 +2975,17 @@ async function main(): Promise<void> {
       if (!rawPost.slug || !hasBlogTranslation(rawPost, lang)) continue;
       const localized = localizePost(rawPost, lang);
       const bc = BLOG_COPY[lang];
-      const related = localized.product_ids
+      const relatedProductModels = localized.product_ids
         .map((pid) => productById.get(pid))
-        .filter((p): p is Product => !!p)
-        .map((p) => {
-          const disp = localizeProduct(p, translations[lang]);
-          return { href: `/${lang}${productDetailPath(p, lang)}/`, title: disp.title || p.title, img: p.images?.[0] };
-        });
-      const relatedArticles = blogPosts
+        .filter((p): p is Product => !!p);
+      const related = relatedProductModels.map((p) => {
+        const disp = localizeProduct(p, translations[lang], lang);
+        return { href: `/${lang}${productDetailPath(p, lang)}/`, title: disp.title || p.title, img: p.images?.[0] };
+      });
+      const relatedProductCards = localized.product_ids
+        .map((pid) => lightProductById.get(pid))
+        .filter((p): p is NonNullable<typeof p> => Boolean(p));
+      const relatedArticleCandidates = blogPosts
         .filter(
           (candidate) =>
             candidate.slug !== rawPost.slug &&
@@ -2595,20 +2997,25 @@ async function main(): Promise<void> {
             Number(Boolean(a.category && a.category === rawPost.category))
         )
         .slice(0, 3)
-        .map((candidate) => {
-          const item = toListItem(candidate, lang);
-          return {
-            href: `/${lang}${insightDetailPath(item.slug)}/`,
-            title: item.title,
-            img: item.cover_image,
-          };
-        });
+        .map((candidate) => toListItem(candidate, lang));
+      const relatedArticles = relatedArticleCandidates.map((item) => ({
+        href: `/${lang}${insightDetailPath(item.slug)}/`,
+        title: item.title,
+        img: item.cover_image,
+      }));
       const path = insightDetailPath(localized.slug);
       const canonical = `${SITE_URL}/${lang}${path}/`;
       const title = localized.seo_title || `${localized.title} | BOLEN Mirror Insights`;
       const description = localized.seo_description || localized.excerpt;
-      const dataScript = prerenderDataScript({ route: 'blogPost', lang, blogPost: localized });
-      const headExtras = `${buildHead({
+      const dataScript = prerenderDataScript({
+        route: 'blogPost',
+        lang,
+        blogPost: localized,
+        relatedProducts: relatedProductCards,
+        relatedArticles: relatedArticleCandidates,
+        productTranslations: pickCardTranslations(translations[lang], relatedProductModels),
+      });
+      const headExtras = buildHead({
         lang,
         title,
         description,
@@ -2621,42 +3028,57 @@ async function main(): Promise<void> {
           buildBlogPostingSchema(localized, lang),
           buildBlogBreadcrumbSchema(localized, lang, bc.journal),
         ],
-      })}\n    ${dataScript}`;
+      });
       const html = injectIntoTemplate(template, {
         lang,
         headExtras,
         bodyContent: blogPostContent(lang, localized, related, relatedArticles),
+        dataScript,
       });
       await writeRoute(`${lang}${path}`, html);
       routeCount++;
     }
 
-    // Product detail pages — title/description shape mirrors ProductDetail.tsx
-    // exactly so Helmet's isEqualNode adoption works on mount.
-    // Video details
+    // Video details (guarded by hasVideoTranslation)
     for (const rawVideo of videos) {
-      if (!rawVideo.slug) continue;
+      if (!rawVideo.slug || !hasVideoTranslation(rawVideo, lang)) continue;
       const localized = localizeVideo(rawVideo, lang);
-      const related = recommendProductsForVideo(localized, products, 4).map((p) => {
-        const disp = localizeProduct(p, translations[lang]);
+      const relatedProductModels = recommendProductsForVideo(localized, products, 4);
+      const related = relatedProductModels.map((p) => {
+        const disp = localizeProduct(p, translations[lang], lang);
         return { href: `/${lang}${productDetailPath(p, lang)}/`, title: disp.title || p.title, img: p.images?.[0] };
       });
-      // Same ordering as VideoDetail.tsx's "Up next": same-topic clips first, then newest.
-      const upNext = videos
+      const relatedProductCards = relatedProductModels.map(({ details, specifications, seo, images, ...rest }) => ({
+        ...rest,
+        images: images?.length ? [images[0]] : [],
+      }));
+      const upNext = localizedVideosForLang
         .filter((item) => item.slug && item.slug !== rawVideo.slug)
-        .map((item) => toVideoListItem(item, lang))
+        .map((item) => {
+          const { search_text, ...rest } = toVideoListItem(item, lang);
+          return rest;
+        })
         .sort(
           (a, b) =>
             Number(Boolean(b.category && b.category === localized.category)) -
             Number(Boolean(a.category && a.category === localized.category))
         )
         .slice(0, 4);
+      const { search_text: _omittedSearch, ...slimVideoPost } = localized;
       const path = `/videos/${localized.slug}`;
       const canonical = `${SITE_URL}/${lang}${path}/`;
       const title = localized.seo_title || `${localized.title} | BOLEN Mirror Videos`;
-      const description = localized.seo_description || localized.excerpt;
-      const dataScript = prerenderDataScript({ route: 'videoPost', lang, videoPost: localized });
-      const headExtras = `${buildHead({
+      const rawVideoDesc = (localized.seo_description || localized.excerpt || '').trim();
+      const description = rawVideoDesc.length >= 15 ? rawVideoDesc : localized.title;
+      const dataScript = prerenderDataScript({
+        route: 'videoPost',
+        lang,
+        videoPost: slimVideoPost,
+        relatedProducts: relatedProductCards,
+        upNext,
+        productTranslations: pickCardTranslations(translations[lang], relatedProductModels),
+      });
+      const headExtras = buildHead({
         lang,
         title,
         description,
@@ -2665,17 +3087,21 @@ async function main(): Promise<void> {
         ogType: 'video.other',
         ogVideo: videoOgVideo(localized),
         routePath: path,
+        alternateLanguages: getVideoAvailableLanguages(rawVideo),
         schema: [buildVideoObjectSchema(localized, lang), buildVideoBreadcrumbSchema(localized, lang)],
-      })}\n    ${dataScript}`;
+      });
       const html = injectIntoTemplate(template, {
         lang,
         headExtras,
         bodyContent: videoPostContent(lang, localized, related, upNext),
+        dataScript,
       });
       await writeRoute(`${lang}${path}`, html);
       routeCount++;
     }
 
+    // Product detail pages — title/description/schema shape mirrors ProductDetail.tsx
+    // byte-for-byte so Helmet's isEqualNode adoption works on mount.
     for (const product of products) {
       if (!product.id || !product.title) continue;
       const path = productDetailPath(product, lang);
@@ -2688,7 +3114,7 @@ async function main(): Promise<void> {
       }
       seenProductSlugs.add(slugKey);
       const canonical = `${SITE_URL}/${lang}${path}/`;
-      const display = localizeProduct(product, translations[lang]);
+      const display = localizeProduct(product, translations[lang], lang);
       const seo = productPageSeo(display, lang);
       const { title, description } = seo;
       const productFields = translations[lang][product.id];
@@ -2698,7 +3124,7 @@ async function main(): Promise<void> {
         product,
         productTranslations: productFields ? { [product.id]: productFields } : undefined,
       });
-      const headExtras = `${buildHead({
+      const headExtras = buildHead({
         lang,
         title,
         description,
@@ -2708,11 +3134,12 @@ async function main(): Promise<void> {
         routePath: path,
         schema: productDetailSchema(lang, product, display, seo),
         alternatePaths: productAlternatePaths(product),
-      })}\n    ${dataScript}`;
+      });
       const html = injectIntoTemplate(template, {
         lang,
         headExtras,
         bodyContent: productDetailContent(lang, product, translations[lang], seo),
+        dataScript,
       });
       await writeRoute(decodeURI(`${lang}${path}`), html);
       routeCount++;
@@ -2725,9 +3152,17 @@ async function main(): Promise<void> {
   // dist/admin/index.html — the client-only employee portal shell, served with
   // 200 for every /admin path by worker/reliable-entry.ts.
   await writeRoute('admin', adminShellHtml(template));
-  console.log('[prerender-static] Wrote dist/404.html and dist/admin/index.html.');
+  // Ensure bare root SPA shell dist/index.html carries noindex, follow if ever hit directly.
+  if (!/<meta\b[^>]*name=["']robots["']/i.test(template)) {
+    const rootNoindexHtml = template.replace(
+      '</head>',
+      '    <meta name="robots" content="noindex, follow" />\n  </head>'
+    );
+    await writeFile(resolve(DIST, 'index.html'), rootNoindexHtml, 'utf-8');
+  }
+  console.log('[prerender-static] Wrote dist/404.html, dist/admin/index.html, and noindex guard on dist/index.html.');
 
-  await writeUuidRedirects(products);
+  await cleanLegacyAutoRedirects();
 
   console.log(`[prerender-static] Wrote ${routeCount} route files into dist/.`);
 }

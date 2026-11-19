@@ -15,6 +15,7 @@ import {
   LEGACY_BLOG_PATH,
   insightDetailPath,
 } from '../src/data/insights';
+import { TERMS_PATH } from '../src/data/termsCopy';
 import {
   categoryPublicPages,
   DEFAULT_PRODUCT_CATEGORIES,
@@ -34,8 +35,9 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 const DOMAIN = 'https://bolenmirror.com';
-const LANGUAGES = ['en', 'zh', 'es', 'fr', 'de', 'it'];
+const LANGUAGES = ['en', 'zh', 'es', 'fr', 'de', 'it'] as const;
 const today = new Date().toISOString().split('T')[0];
+const PAGE_SIZE = 500;
 
 type SitemapPage = {
   loc: string;
@@ -108,6 +110,23 @@ function toW3cDate(value: string | null | undefined): string {
   return Number.isNaN(date.getTime()) ? '' : date.toISOString();
 }
 
+export function getVideoAvailableLanguages(
+  video: Pick<SitemapVideoPost, 'title' | 'body' | 'excerpt'>
+): string[] {
+  return LANGUAGES.filter((lang) => {
+    const title = video.title?.[lang]?.trim();
+    const content = video.body?.[lang]?.trim() || video.excerpt?.[lang]?.trim();
+    return Boolean(title && content);
+  });
+}
+
+export function hasVideoTranslation(
+  video: Pick<SitemapVideoPost, 'title' | 'body' | 'excerpt'>,
+  lang: string
+): boolean {
+  return getVideoAvailableLanguages(video).includes(lang);
+}
+
 function buildVideoBlock(video: SitemapVideoPost, lang: string): string | null {
   const playback = getVideoPlayback({
     source_type: normalizeVideoSourceType(video.source_type),
@@ -117,9 +136,10 @@ function buildVideoBlock(video: SitemapVideoPost, lang: string): string | null {
   const thumbnail = deriveVideoThumbnailUrl(video);
   // The site's own /media/ copy: Supabase serves the original as noindex.
   const thumbnailLoc = isHttpUrl(thumbnail) ? toMediaUrl(thumbnail) : '';
+  const contentLoc = playback.kind === 'video' && isHttpUrl(playback.src) ? toMediaUrl(playback.src) : '';
   const playbackTag =
-    playback.kind === 'video' && isHttpUrl(playback.src)
-      ? `      <video:content_loc>${escapeXml(playback.src)}</video:content_loc>`
+    playback.kind === 'video' && isHttpUrl(contentLoc)
+      ? `      <video:content_loc>${escapeXml(contentLoc)}</video:content_loc>`
       : playback.kind === 'embed' && isHttpUrl(playback.src)
         ? `      <video:player_loc>${escapeXml(playback.src)}</video:player_loc>`
         : '';
@@ -133,12 +153,13 @@ function buildVideoBlock(video: SitemapVideoPost, lang: string): string | null {
 
   const fallbackTitle = normalizeText(video.slug.replace(/-/g, ' '));
   const title = normalizeText(pickLocalized(video.seo_title, lang) || pickLocalized(video.title, lang) || fallbackTitle);
-  const description = truncateDescription(
+  const rawDesc = normalizeText(
     pickLocalized(video.seo_description, lang) ||
       pickLocalized(video.excerpt, lang) ||
       pickLocalized(video.body, lang) ||
-      title
+      ''
   );
+  const description = truncateDescription(rawDesc.length >= 15 ? rawDesc : title);
   const duration =
     typeof video.duration_seconds === 'number' && video.duration_seconds >= 1 && video.duration_seconds <= 28800
       ? `      <video:duration>${Math.round(video.duration_seconds)}</video:duration>`
@@ -148,7 +169,7 @@ function buildVideoBlock(video: SitemapVideoPost, lang: string): string | null {
   // since the dedicated <video:category> element was retired.
   const tags = Array.from(
     new Set([video.category || '', ...(video.tags || [])].map((tag) => normalizeText(tag)).filter(Boolean))
-  ).slice(0, 32);
+  ).slice(0, MAX_VIDEO_TAGS);
 
   return [
     '    <video:video>',
@@ -197,8 +218,36 @@ ${xDefault}
   </url>`;
 }
 
+async function fetchPaginated<T>(
+  queryPage: (from: number, to: number) => PromiseLike<{ data: T[] | null; error: { message: string } | null }>,
+  label: string,
+  fatalOnFirstPage = false
+): Promise<T[]> {
+  const rows: T[] = [];
+  for (let from = 0; ; from += PAGE_SIZE) {
+    const { data, error } = await queryPage(from, from + PAGE_SIZE - 1);
+    if (error) {
+      if (fatalOnFirstPage && from === 0) {
+        console.error(`Error fetching ${label}:`, error.message);
+        process.exit(1);
+      }
+      console.warn(`Could not fetch ${label} for sitemap:`, error.message);
+      return rows;
+    }
+    const batch = data || [];
+    rows.push(...batch);
+    if (batch.length < PAGE_SIZE) break;
+  }
+  return rows;
+}
+
 async function generateSitemap() {
-  // Static pages
+  const privacyModuleSpec = '../src/data/' + 'privacyCopy';
+  const privacyMod = (await import(privacyModuleSpec).catch(() => null)) as null | {
+    PRIVACY_PATH?: string;
+  };
+
+  // Static pages (including Terms and optional Privacy Policy)
   const staticPages = [
     { loc: '/', changefreq: 'weekly', priority: '1.0' },
     { loc: '/products', changefreq: 'weekly', priority: '0.9' },
@@ -206,21 +255,32 @@ async function generateSitemap() {
     { loc: '/our-story', changefreq: 'monthly', priority: '0.7' },
     { loc: INSIGHTS_PATH, changefreq: 'weekly', priority: '0.7' },
     { loc: '/videos', changefreq: 'weekly', priority: '0.7' },
+    { loc: TERMS_PATH, changefreq: 'yearly', priority: '0.4' },
+    ...(typeof privacyMod?.PRIVACY_PATH === 'string'
+      ? [{ loc: privacyMod.PRIVACY_PATH, changefreq: 'yearly', priority: '0.4' }]
+      : []),
   ];
 
-  // Fetch products for dynamic pages
-  const { data: products, error } = await supabase
-    .from('products')
-    .select('id, title, category, updated_at, created_at')
-    .eq('is_active', true)
-    .order('created_at', { ascending: false });
+  // Fetch products with pagination so growth past 1,000 rows never truncates silently
+  const products = await fetchPaginated<{
+    id: string;
+    title: string;
+    category?: string | null;
+    updated_at?: string | null;
+    created_at?: string | null;
+  }>(
+    (from, to) =>
+      supabase
+        .from('products')
+        .select('id, title, category, updated_at, created_at')
+        .eq('is_active', true)
+        .order('created_at', { ascending: false })
+        .range(from, to),
+    'products',
+    true
+  );
 
-  if (error) {
-    console.error('Error fetching products:', error.message);
-    process.exit(1);
-  }
-
-  const productPages = (products || []).map((p) => {
+  const productPages = products.map((p) => {
     const lastmod = (p.updated_at || p.created_at || today).split('T')[0];
     return {
       loc: productDetailPath(p, 'en'),
@@ -252,55 +312,63 @@ async function generateSitemap() {
     lastmod: page.lastmod,
   }));
 
-  // Published Journal (blog) posts. The table may not exist yet (SQL not run),
-  // so a failure here just omits blog URLs instead of breaking the sitemap.
-  const { data: blogPosts, error: blogError } = await supabase
-    .from('blog_posts')
-    .select('slug, title, body, updated_at, published_at, created_at')
-    .eq('status', 'published')
-    .order('published_at', { ascending: false });
+  // Published Journal (blog) posts (paginated)
+  type SitemapBlogPost = Pick<BlogPost, 'slug' | 'title' | 'body' | 'updated_at' | 'published_at' | 'created_at'>;
+  const typedBlogPosts = await fetchPaginated<SitemapBlogPost>(
+    (from, to) =>
+      supabase
+        .from('blog_posts')
+        .select('slug, title, body, updated_at, published_at, created_at')
+        .eq('status', 'published')
+        .order('published_at', { ascending: false })
+        .range(from, to),
+    'blog posts'
+  );
 
-  if (blogError) {
-    console.warn('Could not fetch blog posts for sitemap:', blogError.message);
-  }
+  const blogPostPages: SitemapPage[] = typedBlogPosts
+    .map((p) => {
+      const lastmod = (p.updated_at || p.published_at || p.created_at || today).split('T')[0];
+      return {
+        loc: insightDetailPath(p.slug),
+        changefreq: 'monthly',
+        priority: '0.7',
+        lastmod,
+        availableLanguages: getBlogAvailableLanguages(p),
+      };
+    })
+    .filter((page) => (page.availableLanguages?.length ?? 0) > 0);
 
-  const typedBlogPosts = (blogPosts || []) as BlogPost[];
-  const blogPostPages: SitemapPage[] = typedBlogPosts.map((p) => {
-    const lastmod = (p.updated_at || p.published_at || p.created_at || today).split('T')[0];
-    return {
-      loc: insightDetailPath(p.slug),
-      changefreq: 'monthly',
-      priority: '0.7',
-      lastmod,
-      availableLanguages: getBlogAvailableLanguages(p),
-    };
-  });
+  // Published videos (paginated), guarded by hasVideoTranslation per locale
+  const typedVideoPosts = await fetchPaginated<SitemapVideoPost>(
+    (from, to) =>
+      supabase
+        .from('videos')
+        .select(
+          'slug, source_type, video_url, embed_url, thumbnail_url, category, tags, duration_seconds, title, excerpt, body, seo_title, seo_description, updated_at, published_at, created_at'
+        )
+        .eq('status', 'published')
+        .order('published_at', { ascending: false })
+        .range(from, to),
+    'videos'
+  );
 
-  // Published videos. The table may not exist yet, so a failure omits video
-  // URLs instead of breaking the sitemap before scripts/videos.sql is run.
-  const { data: videoPosts, error: videoError } = await supabase
-    .from('videos')
-    .select(
-      'slug, source_type, video_url, embed_url, thumbnail_url, category, tags, duration_seconds, title, excerpt, body, seo_title, seo_description, updated_at, published_at, created_at'
-    )
-    .eq('status', 'published')
-    .order('published_at', { ascending: false });
-
-  if (videoError) {
-    console.warn('Could not fetch videos for sitemap:', videoError.message);
-  }
-
-  const videoPostPages = ((videoPosts || []) as SitemapVideoPost[]).map((p) => {
-    const lastmod = (p.updated_at || p.published_at || p.created_at || today).split('T')[0];
-    const videoByLang = Object.fromEntries(LANGUAGES.map((lang) => [lang, buildVideoBlock(p, lang)]));
-    return {
-      loc: `/videos/${p.slug}`,
-      changefreq: 'monthly',
-      priority: '0.7',
-      lastmod,
-      videoByLang,
-    };
-  });
+  const videoPostPages: SitemapPage[] = typedVideoPosts
+    .map((p) => {
+      const availableLanguages = getVideoAvailableLanguages(p);
+      const lastmod = (p.updated_at || p.published_at || p.created_at || today).split('T')[0];
+      const videoByLang = Object.fromEntries(
+        availableLanguages.map((lang) => [lang, buildVideoBlock(p, lang)])
+      );
+      return {
+        loc: `/videos/${p.slug}`,
+        changefreq: 'monthly',
+        priority: '0.7',
+        lastmod,
+        videoByLang,
+        availableLanguages,
+      };
+    })
+    .filter((page) => (page.availableLanguages?.length ?? 0) > 0);
 
   const solutionPages: SitemapPage[] = [
     { loc: '/solutions', changefreq: 'monthly', priority: '0.9', lastmod: today },
@@ -321,8 +389,8 @@ async function generateSitemap() {
     ...videoPostPages,
   ];
 
-  // Most routes exist in every locale. Insight articles only emit URLs and
-  // reciprocal hreflang entries for languages that contain a real translation.
+  // Most routes exist in every locale. Insight articles and videos only emit
+  // URLs and reciprocal hreflang entries for languages with real translations.
   const urls = allPages.flatMap((page) => {
     const availableLanguages = page.availableLanguages || LANGUAGES;
     return availableLanguages.map((lang) =>
@@ -358,15 +426,10 @@ ${urls.join('\n')}
     // dist/ may not exist yet during pre-build
   }
 
-  // Direct untranslated article locales to a real localized version. This is
-  // written to dist after Vite copies public/_redirects, so production serves
-  // an HTTP 301 instead of an English fallback with a false locale canonical.
+  // Direct untranslated article/video locales to a real localized version.
   try {
     const baseRedirectsPath = resolve(__dirname, '..', 'public', '_redirects');
     const distRedirectsPath = resolve(__dirname, '..', 'dist', '_redirects');
-    // prerender-static adds legacy product UUID redirects to dist/_redirects.
-    // Preserve that generated map and only fall back to public/_redirects when
-    // this script is run before a production build has created dist/.
     const existingRedirects = (() => {
       try {
         return readFileSync(distRedirectsPath, 'utf-8');
@@ -375,13 +438,14 @@ ${urls.join('\n')}
       }
     })();
     const baseRedirects = existingRedirects
+      .replace(/# BEGIN auto-uuid-redirects[\s\S]*?# END auto-uuid-redirects\s*/gu, '')
       .replace(
         /^# BEGIN generated untranslated Insight redirects[\s\S]*?# END generated untranslated Insight redirects\s*/u,
         ''
       )
       .replace(/\n# Generated fallbacks for untranslated Insight articles\.[\s\S]*$/u, '')
       .trimEnd();
-    const translationRedirects = typedBlogPosts.flatMap((post) => {
+    const articleRedirects = typedBlogPosts.flatMap((post) => {
       const available = getBlogAvailableLanguages(post);
       const fallbackLanguage = available.includes('en') ? 'en' : available[0];
       if (!fallbackLanguage) return [];
@@ -399,6 +463,18 @@ ${urls.join('\n')}
         }
       );
     });
+    const videoRedirects = typedVideoPosts.flatMap((video) => {
+      if (!video.slug) return [];
+      const available = getVideoAvailableLanguages(video);
+      const fallbackLanguage = available.includes('en') ? 'en' : available[0];
+      if (!fallbackLanguage) return [];
+      return LANGUAGES.filter((lang) => !available.includes(lang)).flatMap((lang) => {
+        const source = `/${lang}/videos/${video.slug}`;
+        const target = `/${fallbackLanguage}/videos/${video.slug}/`;
+        return [`${source} ${target} 301`, `${source}/ ${target} 301`];
+      });
+    });
+    const translationRedirects = [...articleRedirects, ...videoRedirects];
     const redirectOutput = translationRedirects.length
       ? `# BEGIN generated untranslated Insight redirects\n${translationRedirects.join('\n')}\n# END generated untranslated Insight redirects\n\n${baseRedirects}\n`
       : `${baseRedirects}\n`;

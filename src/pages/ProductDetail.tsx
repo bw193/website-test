@@ -17,7 +17,7 @@ import { useLocalizedPath } from '../hooks/useLocalizedPath';
 import { readInitialProduct } from '../utils/prerenderData';
 import { parseProductParam } from '../utils/slug';
 import { findProductRoute, productDetailPath, productAlternatePaths, productMatchesDetailPath } from '../utils/productRoutes';
-import { catalogCategoryPath } from '../utils/catalogCategory';
+import { buildProductBreadcrumbSchema, canonicalCategoryName, catalogCategoryPath } from '../utils/catalogCategory';
 import { useProductTranslator } from '../utils/productI18n';
 import { recommendVideosForProduct, toVideoListItem } from '../utils/video';
 import type { VideoListItem, VideoPost } from '../types/video';
@@ -348,15 +348,15 @@ export default function ProductDetail() {
   };
 
   const fadeInUp = {
-    hidden: { opacity: reduceMotion ? 1 : 0, y: reduceMotion ? 0 : 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: reduceMotion ? 0 : 0.65 } }
+    hidden: { opacity: 1, y: 0 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0 } }
   };
 
   const staggerContainer = {
-    hidden: { opacity: reduceMotion ? 1 : 0 },
+    hidden: { opacity: 1 },
     visible: {
       opacity: 1,
-      transition: { staggerChildren: reduceMotion ? 0 : 0.08 }
+      transition: { staggerChildren: 0 }
     }
   };
 
@@ -380,12 +380,20 @@ export default function ProductDetail() {
     titleSuffix: t('productDetail.brandSuffix', '| BOLEN Mirror'),
   });
 
+  const resolvedCategory = canonicalCategoryName(product?.category);
+  const categoryLabel = resolvedCategory
+    ? t(`products.categories.${resolvedCategory}`, resolvedCategory)
+    : undefined;
+  const galleryTitle = display.title.length > 84
+    ? display.title.slice(0, 84).replace(/\s+\S*$/, '').replace(/[,;:\-–|/]+$/, '').trim()
+    : display.title;
+
   const productSchema = product ? [
     {
       "@context": "https://schema.org/",
       "@type": "Product",
       "name": pageHeading,
-      "image": product.images?.map((image: string) => toMediaUrl(image)),
+      "image": (product.images || []).map((image: string) => toMediaUrl(image)),
       "description": richDescription,
       "sku": product.id,
       "brand": {
@@ -401,32 +409,35 @@ export default function ProductDetail() {
             }))
           }
         : {}),
-      "offers":
-        lowPrice > 0
-          ? {
-              "@type": "AggregateOffer",
-              "url": productFullUrl,
-              "priceCurrency": "USD",
-              "lowPrice": lowPrice,
-              "highPrice": highPrice,
-              "offerCount": 1,
-              "availability": "https://schema.org/InStock"
-            }
-          : {
+      ...(lowPrice > 0
+        ? {
+            "offers": {
               "@type": "Offer",
               "url": productFullUrl,
-              "availability": "https://schema.org/InStock"
+              "priceCurrency": "USD",
+              ...(lowPrice === highPrice
+                ? { "price": lowPrice }
+                : {
+                    "priceSpecification": {
+                      "@type": "UnitPriceSpecification",
+                      "priceCurrency": "USD",
+                      "minPrice": lowPrice,
+                      "maxPrice": highPrice
+                    }
+                  })
             }
+          }
+        : {})
     },
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": t('navbar.home'), "item": `https://bolenmirror.com/${lang}/` },
-        { "@type": "ListItem", "position": 2, "name": t('navbar.catalog'), "item": `https://bolenmirror.com/${lang}/products/` },
-        { "@type": "ListItem", "position": 3, "name": display.title, "item": productFullUrl }
-      ]
-    }
+    buildProductBreadcrumbSchema({
+      lang,
+      homeLabel: t('navbar.home'),
+      catalogLabel: t('navbar.catalog'),
+      categoryName: product.category,
+      categoryLabel,
+      productTitle: display.title,
+      productUrl: productFullUrl,
+    })
   ] : undefined;
 
   return (
@@ -447,47 +458,45 @@ export default function ProductDetail() {
           stacked inside this column. */}
       <section className="pdp-hero">
         <div className="pdp-container">
-        <m.nav
+        <nav
           aria-label="Breadcrumb"
-          initial={{ opacity: reduceMotion ? 1 : 0, x: reduceMotion ? 0 : -12 }}
-          animate={{ opacity: 1, x: 0 }}
           className="pdp-breadcrumb"
         >
           <Link to={lp('/')} className="hover:text-amber-600 transition-colors">{t('navbar.home')}</Link>
           <ChevronRight className="mx-1.5 h-3.5 w-3.5 shrink-0 text-stone-300 sm:mx-2 sm:h-4 sm:w-4" />
           <Link to={lp('/products')} className="hover:text-amber-600 transition-colors">{t('productDetail.backToCatalog')}</Link>
-          {product.category && (
+          {resolvedCategory && categoryLabel && (
             <>
               <ChevronRight className="mx-1.5 h-3.5 w-3.5 shrink-0 text-stone-300 sm:mx-2 sm:h-4 sm:w-4" />
               <Link
-                to={lp(catalogCategoryPath(product.category))}
+                to={lp(catalogCategoryPath(product.category!))}
                 className="hover:text-amber-600 transition-colors"
               >
-                {t(`products.categories.${product.category}`, product.category)}
+                {categoryLabel}
               </Link>
             </>
           )}
           <ChevronRight className="mx-1.5 h-3.5 w-3.5 shrink-0 text-stone-300 sm:mx-2 sm:h-4 sm:w-4" />
           <span aria-current="page">{display.title}</span>
-        </m.nav>
+        </nav>
 
         <div className="pdp-hero-grid">
-          <ProductGallery key={product.id + ':' + lang} images={product.images} title={display.title} />
+          <ProductGallery key={product.id + ':' + lang} images={product.images} title={galleryTitle} />
 
           {/* Right Column: identity, price basis and the quote action */}
           <m.div 
             variants={staggerContainer}
-            initial="hidden"
+            initial={false}
             animate="visible"
             className="pdp-hero-copy"
           >
             <m.div variants={fadeInUp} className="pdp-product-meta">
-              {product.category && (
+              {resolvedCategory && categoryLabel && (
                 <Link
-                  to={lp(catalogCategoryPath(product.category))}
+                  to={lp(catalogCategoryPath(product.category!))}
                   className="pdp-category"
                 >
-                  {t(`products.categories.${product.category}`, product.category)}
+                  {categoryLabel}
                 </Link>
               )}
               {productReference && (
@@ -559,9 +568,9 @@ export default function ProductDetail() {
           </m.div>
 
         </div>
-        <m.ul variants={fadeInUp} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} className="pdp-trust-row">
+        <ul className="pdp-trust-row">
           {trustPoints.map(({ Icon, label }) => <li key={label}><span className="pdp-trust-icon"><Icon size={21} aria-hidden="true" /></span><span>{label}</span></li>)}
-        </m.ul>
+        </ul>
         </div>
       </section>
 
@@ -584,11 +593,7 @@ export default function ProductDetail() {
                 key/value list or a paragraph across the full container. */}
             <div className={`pdp-info-grid ${splitInfoBand ? 'is-split' : ''}`}>
               {specs.length > 0 && (
-                <m.div
-                  variants={fadeInUp}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true, amount: 0.1 }}
+                <div
                   id="product-specs" tabIndex={-1} className="pdp-spec-sheet pdp-anchor"
                   ref={specSheetRef}
                 >
@@ -604,15 +609,11 @@ export default function ProductDetail() {
                       </div>
                     ))}
                   </dl>
-                </m.div>
+                </div>
               )}
 
               {hasDetails && (
-                <m.div
-                  variants={fadeInUp}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true, amount: 0.1 }}
+                <div
                   id="product-description" tabIndex={-1} className="pdp-details pdp-anchor"
                 >
                   <SectionHeading>{t('productDetail.productDetails')}</SectionHeading>
@@ -620,7 +621,7 @@ export default function ProductDetail() {
                   <Markdown className="pdp-prose prose prose-amber prose-stone max-w-none" descriptionImages>
                     {normalizeProductDetails(display.details)}
                   </Markdown>
-                </m.div>
+                </div>
               )}
             </div>
           </div>
@@ -808,12 +809,7 @@ export default function ProductDetail() {
       {(relatedSolutions.length > 0 || relatedVideos.length > 0) && (
         <div className="pdp-related pdp-container">
           {relatedSolutions.length > 0 && (
-            <m.section
-              variants={fadeInUp}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.1 }}
-            >
+            <section>
               <SectionHeading>{solutionsUi.relatedSolutions}</SectionHeading>
               <ul className="pdp-related-grid">
                 {relatedSolutions.map((solution, index) => (
@@ -835,16 +831,11 @@ export default function ProductDetail() {
                   </li>
                 ))}
               </ul>
-            </m.section>
+            </section>
           )}
 
           {relatedVideos.length > 0 && (
-            <m.section id="product-videos" tabIndex={-1} className="pdp-videos pdp-anchor"
-              variants={fadeInUp}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.1 }}
-            >
+            <section id="product-videos" tabIndex={-1} className="pdp-videos pdp-anchor">
               <div className="flex flex-wrap items-end justify-between gap-4">
                 <SectionHeading>{t('productDetail.relatedVideos', 'Related videos')}</SectionHeading>
                 <Link to={lp('/videos')} className="text-sm font-semibold text-amber-700 hover:text-amber-800">
@@ -856,7 +847,7 @@ export default function ProductDetail() {
                   <VideoCard key={video.id} video={video} index={index + 4} />
                 ))}
               </div>
-            </m.section>
+            </section>
           )}
         </div>
       )}

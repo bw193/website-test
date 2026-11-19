@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Link, NavLink, useParams, useSearchParams } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import ProductCardSkeleton from '../components/ProductCardSkeleton';
-import { Search, PackageX } from 'lucide-react';
+import { Search, PackageX, CheckCircle2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import SEO from '../components/SEO';
 import { useCurrentLang, useLocalizedPath } from '../hooks/useLocalizedPath';
@@ -17,6 +17,7 @@ import {
   catalogCategoryPath,
   DEFAULT_PRODUCT_CATEGORIES,
   findCategoryBySlug,
+  getCatalogCategoryEditorial,
   getCatalogCategoryPageCopy,
   getCatalogCategorySeoTitle,
   productMatchesCategory,
@@ -162,6 +163,9 @@ export default function Products() {
     : null;
   const pageHeading = categoryCopy?.h1 ?? t('products.catalog');
   const seoDescription = categoryCopy?.description ?? t('seo.catalogDesc');
+  const categoryEditorial = selectedCategory
+    ? getCatalogCategoryEditorial(lang, toCategorySlug(selectedCategory))
+    : null;
 
   const filteredProducts = products.filter(p => {
     const matchesCategory = categoryUnresolved
@@ -234,26 +238,23 @@ export default function Products() {
         
         <div className="relative max-w-4xl mx-auto text-center">
           <m.p
-            initial={{ opacity: 0, y: 12 }}
+            initial={false}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
             className="mb-5 text-xs font-semibold uppercase tracking-[0.32em] text-amber-400"
           >
             {t('products.kicker', 'OEM · ODM · Factory direct')}
           </m.p>
           <m.h1 
-            initial={{ opacity: 0, y: 20 }}
+            initial={false}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.08 }}
             className="font-serif text-5xl leading-[0.95] tracking-tight sm:text-6xl md:text-7xl"
           >
             {pageHeading}
           </m.h1>
           <div className="mx-auto mt-8 h-px w-24 bg-gradient-to-r from-transparent via-amber-500 to-transparent" />
           <m.p 
-            initial={{ opacity: 0, y: 20 }}
+            initial={false}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.18 }}
             data-seo-description=""
             className="mx-auto mt-8 max-w-2xl text-lg font-light leading-relaxed text-stone-300"
           >
@@ -346,7 +347,7 @@ export default function Products() {
             {filteredProducts.length === 0 ? (
               <m.div 
                 key="empty"
-                initial={{ opacity: 0, y: 20 }}
+                initial={false}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 className="flex min-h-[420px] w-full items-center justify-center rounded-3xl bg-white"
@@ -377,9 +378,8 @@ export default function Products() {
               <m.div 
                 key="grid"
                 className={GRID_CLASS}
-                initial={{ opacity: 0 }}
+                initial={false}
                 animate={{ opacity: 1 }}
-                transition={{ duration: 0.25 }}
               >
                 {filteredProducts.map((product, index) => (
                   <div
@@ -404,6 +404,33 @@ export default function Products() {
               </m.div>
             )}
           </AnimatePresence>
+        )}
+
+        {categoryEditorial && (
+          <section
+            aria-labelledby="category-editorial-heading"
+            className="mt-20 rounded-3xl border border-stone-200 bg-white p-8 sm:p-10 lg:p-12 shadow-sm"
+          >
+            <h2
+              id="category-editorial-heading"
+              className="font-serif text-2xl sm:text-3xl text-stone-900 mb-5"
+            >
+              {categoryEditorial.heading}
+            </h2>
+            <div className="space-y-4 text-stone-600 leading-relaxed max-w-4xl">
+              {categoryEditorial.paragraphs.map((paragraph, idx) => (
+                <p key={idx}>{paragraph}</p>
+              ))}
+            </div>
+            <ul className="mt-8 grid gap-3 sm:grid-cols-2 border-t border-stone-100 pt-6">
+              {categoryEditorial.highlights.map((item, idx) => (
+                <li key={idx} className="flex items-start gap-2.5 text-sm text-stone-700">
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" aria-hidden="true" />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
         )}
       </div>
     </div>

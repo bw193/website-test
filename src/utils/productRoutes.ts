@@ -1,6 +1,7 @@
 import legacyAliases from '../data/legacyProductAliases.json';
 import routeData from '../data/productRoutes.json';
 import type { SupportedLanguage } from '../hooks/useLocalizedPath';
+import { catalogCategoryPath } from './catalogCategory';
 import { parseProductParam, toSlug } from './slug';
 
 export interface ProductRoute {
@@ -112,6 +113,9 @@ export function productRedirectLocation(url: URL): string | null {
   if (!parsed) return null;
   const target = localizedProductPathname(url.pathname, parsed.lang);
   if (target) return target !== url.pathname ? `${target}${url.search}` : null;
+  if (!parsed.category && KNOWN_PRODUCT_CATEGORIES.has(parsed.param)) {
+    return `/${parsed.lang}${catalogCategoryPath(parsed.param)}/${url.search}`;
+  }
   if (parsed.category && !KNOWN_PRODUCT_CATEGORIES.has(parsed.category)) return null;
   const { slug, legacyId } = parseProductParam(parsed.param);
   const discontinuedCategory =

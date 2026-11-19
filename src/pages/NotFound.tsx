@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Home, ArrowLeft } from 'lucide-react';
+import { Home } from 'lucide-react';
 import SEO from '../components/SEO';
 import { useLocalizedPath } from '../hooks/useLocalizedPath';
 
@@ -8,7 +8,12 @@ export default function NotFound() {
   const { lp } = useLocalizedPath();
   return (
     <div className="min-h-screen bg-stone-50 flex items-center justify-center px-4">
-      <SEO title="Page Not Found | BOLEN Mirror" noindex={true} />
+      <SEO
+        title="Page Not Found | BOLEN Mirror"
+        description="The page you're looking for doesn't exist or has been moved."
+        noindex={true}
+        alternateLanguages={[]}
+      />
       <div className="text-center max-w-md">
         <p className="text-8xl font-serif font-bold text-stone-200 mb-4">404</p>
         <h1 className="text-2xl font-bold text-stone-900 mb-3">Page Not Found</h1>

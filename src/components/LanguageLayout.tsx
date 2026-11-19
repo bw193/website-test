@@ -1,7 +1,9 @@
-import { useEffect } from 'react';
-import { Outlet, useParams, Navigate } from 'react-router-dom';
+import { lazy, useEffect } from 'react';
+import { Outlet, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { SUPPORTED_LANGUAGES, DEFAULT_LANGUAGE } from '../hooks/useLocalizedPath';
+import { SUPPORTED_LANGUAGES } from '../hooks/useLocalizedPath';
+
+const NotFound = lazy(() => import('../pages/NotFound'));
 
 export default function LanguageLayout() {
   const { lang } = useParams<{ lang: string }>();
@@ -15,7 +17,7 @@ export default function LanguageLayout() {
   }, [lang, i18n, isValidLang]);
 
   if (!isValidLang) {
-    return <Navigate to={`/${DEFAULT_LANGUAGE}/`} replace />;
+    return <NotFound />;
   }
 
   return <Outlet />;

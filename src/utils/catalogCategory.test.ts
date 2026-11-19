@@ -2,8 +2,13 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
   buildCatalogCategorySchema,
+  buildProductBreadcrumbSchema,
+  canonicalCategoryName,
+  catalogCategoryPath,
+  getCatalogCategoryEditorial,
   getCatalogCategoryPageCopy,
   getCatalogCategorySeoTitle,
+  productMatchesCategory,
   type CatalogCategorySchemaProduct,
 } from './catalogCategory';
 
@@ -14,189 +19,215 @@ const approvedTitles = [
   ['full-length-dressing-mirror', 'Full-Length Mirror Manufacturer | Dressing Mirror Supplier'],
   ['irregular-mirror', 'Custom Irregular Mirrors | Professional Irregular Mirror Manufacturer'],
   ['mirror-cabinet', 'LED Mirror Cabinet Manufacturer | Mirror Cabinet Manufacturing'],
+  ['bathroom-vanity', 'Bathroom Vanity Manufacturer | Custom Bathroom Vanity Cabinets'],
 ] as const;
 
 const translatedSeo = {
-  "zh": {
-    "titles": {
-      "hot-sale": "镜子批发供应商 | 热销镜子制造商",
-      "led-lighted-mirror": "LED 浴室镜制造商 | LED 发光镜供应商",
-      "bathroom-mirror-without-led": "无 LED 浴室镜 | 浴室镜制造商",
-      "full-length-dressing-mirror": "全身镜制造商 | 穿衣镜供应商",
-      "irregular-mirror": "定制异形镜 | 专业异形镜制造商",
-      "mirror-cabinet": "LED 镜柜制造商 | 镜柜制造"
+  zh: {
+    titles: {
+      'hot-sale': '镜子批发供应商 | 热销镜子制造商',
+      'led-lighted-mirror': 'LED 浴室镜制造商 | LED 发光镜供应商',
+      'bathroom-mirror-without-led': '无 LED 浴室镜 | 浴室镜制造商',
+      'full-length-dressing-mirror': '全身镜制造商 | 穿衣镜供应商',
+      'irregular-mirror': '定制异形镜 | 专业异形镜制造商',
+      'mirror-cabinet': 'LED 镜柜制造商 | 镜柜制造',
+      'bathroom-vanity': '浴室柜制造商 | 定制浴室柜批发供应商',
     },
-    "copy": {
-      "hot-sale": {
-        "h1": "热销镜子批发",
-        "description": "选购镜子批发供应商与制造商提供的热销镜子。支持定制尺寸、镜框及表面处理，适用于品牌商、零售商和酒店项目。"
+    copy: {
+      'hot-sale': {
+        h1: '热销镜子批发',
+        description: '选购镜子批发供应商与制造商提供的热销镜子。支持定制尺寸、镜框及表面处理，适用于品牌商、零售商和酒店项目。',
       },
-      "led-lighted-mirror": {
-        "h1": "LED 浴室镜制造商",
-        "description": "采购 LED 发光浴室镜，支持定制尺寸，并提供调光和防雾选项。为品牌商和酒店提供 OEM/ODM 镜子制造及批发供应。"
+      'led-lighted-mirror': {
+        h1: 'LED 浴室镜制造商',
+        description: '采购 LED 发光浴室镜，支持定制尺寸，并提供调光和防雾选项。为品牌商和酒店提供 OEM/ODM 镜子制造及批发供应。',
       },
-      "bathroom-mirror-without-led": {
-        "h1": "浴室镜制造商",
-        "description": "采购有框及无框设计的无 LED 浴室镜。支持定制尺寸、材料和表面处理，为品牌商和酒店提供 OEM/ODM 镜子制造服务。"
+      'bathroom-mirror-without-led': {
+        h1: '浴室镜制造商',
+        description: '采购有框及无框设计的无 LED 浴室镜。支持定制尺寸、材料和表面处理，为品牌商和酒店提供 OEM/ODM 镜子制造服务。',
       },
-      "full-length-dressing-mirror": {
-        "h1": "全身穿衣镜制造商",
-        "description": "从制造商和批发供应商处采购全身穿衣镜。支持定制尺寸、镜框和表面处理，适用于酒店、零售商及家居品牌。"
+      'full-length-dressing-mirror': {
+        h1: '全身穿衣镜制造商',
+        description: '从制造商和批发供应商处采购全身穿衣镜。支持定制尺寸、镜框和表面处理，适用于酒店、零售商及家居品牌。',
       },
-      "irregular-mirror": {
-        "h1": "定制异形镜制造商",
-        "description": "向专业镜子制造商采购定制异形镜。支持定制形状、尺寸和表面处理，为品牌商及酒店项目提供 OEM/ODM 供应服务。"
+      'irregular-mirror': {
+        h1: '定制异形镜制造商',
+        description: '向专业镜子制造商采购定制异形镜。支持定制形状、尺寸和表面处理，为品牌商及酒店项目提供 OEM/ODM 供应服务。',
       },
-      "mirror-cabinet": {
-        "h1": "LED 镜柜制造商",
-        "description": "采购兼具实用储物空间的 LED 镜柜，支持定制尺寸与表面处理。为品牌商和酒店提供 OEM/ODM 镜柜制造及批发供应。"
-      }
-    }
+      'mirror-cabinet': {
+        h1: 'LED 镜柜制造商',
+        description: '采购兼具实用储物空间的 LED 镜柜，支持定制尺寸与表面处理。为品牌商和酒店提供 OEM/ODM 镜柜制造及批发供应。',
+      },
+      'bathroom-vanity': {
+        h1: '定制浴室柜制造商',
+        description: '采购壁挂式与落地式浴室柜，配备岩板或陶瓷一体盆及多层防水柜体。为品牌商和酒店项目提供 OEM/ODM 浴室柜制造与批发供应。',
+      },
+    },
   },
-  "es": {
-    "titles": {
-      "hot-sale": "Proveedor mayorista de espejos | Fabricante de los espejos más vendidos",
-      "led-lighted-mirror": "Fabricante de espejos de baño LED | Proveedor de espejos con luz LED",
-      "bathroom-mirror-without-led": "Espejos de baño sin LED | Fabricante de espejos de baño",
-      "full-length-dressing-mirror": "Fabricante de espejos de cuerpo entero | Proveedor de espejos de vestidor",
-      "irregular-mirror": "Espejos irregulares a medida | Fabricante profesional de espejos irregulares",
-      "mirror-cabinet": "Fabricante de armarios con espejo LED | Fabricación de armarios con espejo"
+  es: {
+    titles: {
+      'hot-sale': 'Proveedor mayorista de espejos | Fabricante de los espejos más vendidos',
+      'led-lighted-mirror': 'Fabricante de espejos de baño LED | Proveedor de espejos con luz LED',
+      'bathroom-mirror-without-led': 'Espejos de baño sin LED | Fabricante de espejos de baño',
+      'full-length-dressing-mirror': 'Fabricante de espejos de cuerpo entero | Proveedor de espejos de vestidor',
+      'irregular-mirror': 'Espejos irregulares a medida | Fabricante profesional de espejos irregulares',
+      'mirror-cabinet': 'Fabricante de armarios con espejo LED | Fabricación de armarios con espejo',
+      'bathroom-vanity': 'Fabricante de muebles de baño | Proveedor mayorista de muebles de lavabo',
     },
-    "copy": {
-      "hot-sale": {
-        "h1": "Espejos más vendidos al por mayor",
-        "description": "Descubra los espejos más vendidos de un proveedor mayorista y fabricante de espejos. Tamaños, marcos y acabados personalizados para marcas, minoristas y proyectos hoteleros."
+    copy: {
+      'hot-sale': {
+        h1: 'Espejos más vendidos al por mayor',
+        description: 'Descubra los espejos más vendidos de un proveedor mayorista y fabricante de espejos. Tamaños, marcos y acabados personalizados para marcas, minoristas y proyectos hoteleros.',
       },
-      "led-lighted-mirror": {
-        "h1": "Fabricante de espejos de baño LED",
-        "description": "Adquiera espejos de baño con luz LED, tamaños personalizados y opciones de regulación de brillo y antivaho. Fabricación de espejos OEM/ODM y suministro al por mayor para marcas y hoteles."
+      'led-lighted-mirror': {
+        h1: 'Fabricante de espejos de baño LED',
+        description: 'Adquiera espejos de baño con luz LED, tamaños personalizados y opciones de regulación de brillo y antivaho. Fabricación de espejos OEM/ODM y suministro al por mayor para marcas y hoteles.',
       },
-      "bathroom-mirror-without-led": {
-        "h1": "Fabricante de espejos de baño",
-        "description": "Adquiera espejos de baño sin LED, con o sin marco. Tamaños, materiales y acabados personalizados, con fabricación de espejos OEM/ODM para marcas y hoteles."
+      'bathroom-mirror-without-led': {
+        h1: 'Fabricante de espejos de baño',
+        description: 'Adquiera espejos de baño sin LED, con o sin marco. Tamaños, materiales y acabados personalizados, con fabricación de espejos OEM/ODM para marcas y hoteles.',
       },
-      "full-length-dressing-mirror": {
-        "h1": "Fabricante de espejos de vestidor de cuerpo entero",
-        "description": "Adquiera espejos de vestidor de cuerpo entero de un fabricante y proveedor mayorista. Tamaños, marcos y acabados personalizados para hoteles, minoristas y marcas de artículos para el hogar."
+      'full-length-dressing-mirror': {
+        h1: 'Fabricante de espejos de vestidor de cuerpo entero',
+        description: 'Adquiera espejos de vestidor de cuerpo entero de un fabricante y proveedor mayorista. Tamaños, marcos y acabados personalizados para hoteles, minoristas y marcas de artículos para el hogar.',
       },
-      "irregular-mirror": {
-        "h1": "Fabricante de espejos irregulares a medida",
-        "description": "Adquiera espejos irregulares a medida de un fabricante profesional. Formas, tamaños y acabados personalizados, con suministro OEM/ODM para marcas y proyectos hoteleros."
+      'irregular-mirror': {
+        h1: 'Fabricante de espejos irregulares a medida',
+        description: 'Adquiera espejos irregulares a medida de un fabricante profesional. Formas, tamaños y acabados personalizados, con suministro OEM/ODM para marcas y proyectos hoteleros.',
       },
-      "mirror-cabinet": {
-        "h1": "Fabricante de armarios con espejo LED",
-        "description": "Adquiera armarios con espejo LED y espacio de almacenamiento práctico, con tamaños y acabados personalizados. Fabricación OEM/ODM y suministro al por mayor para marcas y hoteles."
-      }
-    }
+      'mirror-cabinet': {
+        h1: 'Fabricante de armarios con espejo LED',
+        description: 'Adquiera armarios con espejo LED y espacio de almacenamiento práctico, con tamaños y acabados personalizados. Fabricación OEM/ODM y suministro al por mayor para marcas y hoteles.',
+      },
+      'bathroom-vanity': {
+        h1: 'Fabricante de muebles de baño a medida',
+        description: 'Adquiera muebles de baño suspendidos y de pie con lavabos cerámicos o de piedra sinterizada. Fabricación OEM/ODM y suministro mayorista para marcas y proyectos hoteleros.',
+      },
+    },
   },
-  "fr": {
-    "titles": {
-      "hot-sale": "Fournisseur de miroirs en gros | Fabricant de miroirs à succès",
-      "led-lighted-mirror": "Fabricant de miroirs de salle de bain LED | Fournisseur de miroirs lumineux LED",
-      "bathroom-mirror-without-led": "Miroirs de salle de bain sans LED | Fabricant de miroirs de salle de bain",
-      "full-length-dressing-mirror": "Fabricant de miroirs en pied | Fournisseur de miroirs de dressing",
-      "irregular-mirror": "Miroirs irréguliers sur mesure | Fabricant professionnel de miroirs irréguliers",
-      "mirror-cabinet": "Fabricant d'armoires à miroir LED | Fabrication d'armoires à miroir"
+  fr: {
+    titles: {
+      'hot-sale': 'Fournisseur de miroirs en gros | Fabricant de miroirs à succès',
+      'led-lighted-mirror': 'Fabricant de miroirs de salle de bain LED | Fournisseur de miroirs lumineux LED',
+      'bathroom-mirror-without-led': 'Miroirs de salle de bain sans LED | Fabricant de miroirs de salle de bain',
+      'full-length-dressing-mirror': 'Fabricant de miroirs en pied | Fournisseur de miroirs de dressing',
+      'irregular-mirror': 'Miroirs irréguliers sur mesure | Fabricant professionnel de miroirs irréguliers',
+      'mirror-cabinet': "Fabricant d'armoires à miroir LED | Fabrication d'armoires à miroir",
+      'bathroom-vanity': 'Fabricant de meubles de salle de bain | Fournisseur de meubles vasques sur mesure',
     },
-    "copy": {
-      "hot-sale": {
-        "h1": "Miroirs à succès en gros",
-        "description": "Découvrez des miroirs à succès auprès d'un fournisseur et fabricant de miroirs en gros. Dimensions, cadres et finitions sur mesure pour les marques, les détaillants et les projets hôteliers."
+    copy: {
+      'hot-sale': {
+        h1: 'Miroirs à succès en gros',
+        description: "Découvrez des miroirs à succès auprès d'un fournisseur et fabricant de miroirs en gros. Dimensions, cadres et finitions sur mesure pour les marques, les détaillants et les projets hôteliers.",
       },
-      "led-lighted-mirror": {
-        "h1": "Fabricant de miroirs de salle de bain LED",
-        "description": "Commandez des miroirs de salle de bain à éclairage LED aux dimensions personnalisées, avec réglage de luminosité et fonction antibuée en option. Fabrication de miroirs OEM/ODM et fourniture en gros pour les marques et les hôtels."
+      'led-lighted-mirror': {
+        h1: 'Fabricant de miroirs de salle de bain LED',
+        description: 'Commandez des miroirs de salle de bain à éclairage LED aux dimensions personnalisées, avec réglage de luminosité et fonction antibuée en option. Fabrication de miroirs OEM/ODM et fourniture en gros pour les marques et les hôtels.',
       },
-      "bathroom-mirror-without-led": {
-        "h1": "Fabricant de miroirs de salle de bain",
-        "description": "Commandez des miroirs de salle de bain sans LED, avec ou sans cadre. Dimensions, matériaux et finitions sur mesure, avec fabrication de miroirs OEM/ODM pour les marques et les hôtels."
+      'bathroom-mirror-without-led': {
+        h1: 'Fabricant de miroirs de salle de bain',
+        description: 'Commandez des miroirs de salle de bain sans LED, avec ou sans cadre. Dimensions, matériaux et finitions sur mesure, avec fabrication de miroirs OEM/ODM pour les marques et les hôtels.',
       },
-      "full-length-dressing-mirror": {
-        "h1": "Fabricant de miroirs de dressing en pied",
-        "description": "Commandez des miroirs de dressing en pied auprès d'un fabricant et fournisseur en gros. Dimensions, cadres et finitions sur mesure pour les hôtels, les détaillants et les marques d'articles pour la maison."
+      'full-length-dressing-mirror': {
+        h1: 'Fabricant de miroirs de dressing en pied',
+        description: "Commandez des miroirs de dressing en pied auprès d'un fabricant et fournisseur en gros. Dimensions, cadres et finitions sur mesure pour les hôtels, les détaillants et les marques d'articles pour la maison.",
       },
-      "irregular-mirror": {
-        "h1": "Fabricant de miroirs irréguliers sur mesure",
-        "description": "Commandez des miroirs irréguliers sur mesure auprès d'un fabricant professionnel. Formes, dimensions et finitions personnalisées, avec fourniture OEM/ODM pour les marques et les projets hôteliers."
+      'irregular-mirror': {
+        h1: 'Fabricant de miroirs irréguliers sur mesure',
+        description: "Commandez des miroirs irréguliers sur mesure auprès d'un fabricant professionnel. Formes, dimensions et finitions personnalisées, avec fourniture OEM/ODM pour les marques et les projets hôteliers.",
       },
-      "mirror-cabinet": {
-        "h1": "Fabricant d'armoires à miroir LED",
-        "description": "Commandez des armoires à miroir LED avec des rangements pratiques, des dimensions et des finitions sur mesure. Fabrication OEM/ODM et fourniture en gros pour les marques et les hôtels."
-      }
-    }
+      'mirror-cabinet': {
+        h1: "Fabricant d'armoires à miroir LED",
+        description: 'Commandez des armoires à miroir LED avec des rangements pratiques, des dimensions et des finitions sur mesure. Fabrication OEM/ODM et fourniture en gros pour les marques et les hôtels.',
+      },
+      'bathroom-vanity': {
+        h1: 'Fabricant de meubles de salle de bain sur mesure',
+        description: 'Commandez des meubles vasques suspendus ou sur pied avec plans en céramique ou pierre frittée. Fabrication OEM/ODM et fourniture en gros pour les marques et les projets hôteliers.',
+      },
+    },
   },
-  "de": {
-    "titles": {
-      "hot-sale": "Spiegel-Großhändler | Hersteller gefragter Spiegel",
-      "led-lighted-mirror": "Hersteller von LED-Badspiegeln | Lieferant für LED-Leuchtspiegel",
-      "bathroom-mirror-without-led": "Badspiegel ohne LED | Hersteller von Badspiegeln",
-      "full-length-dressing-mirror": "Hersteller von Ganzkörperspiegeln | Lieferant für Ankleidespiegel",
-      "irregular-mirror": "Unregelmäßige Spiegel nach Maß | Professioneller Hersteller unregelmäßiger Spiegel",
-      "mirror-cabinet": "Hersteller von LED-Spiegelschränken | Fertigung von Spiegelschränken"
+  de: {
+    titles: {
+      'hot-sale': 'Spiegel-Großhändler | Hersteller gefragter Spiegel',
+      'led-lighted-mirror': 'Hersteller von LED-Badspiegeln | Lieferant für LED-Leuchtspiegel',
+      'bathroom-mirror-without-led': 'Badspiegel ohne LED | Hersteller von Badspiegeln',
+      'full-length-dressing-mirror': 'Hersteller von Ganzkörperspiegeln | Lieferant für Ankleidespiegel',
+      'irregular-mirror': 'Unregelmäßige Spiegel nach Maß | Professioneller Hersteller unregelmäßiger Spiegel',
+      'mirror-cabinet': 'Hersteller von LED-Spiegelschränken | Fertigung von Spiegelschränken',
+      'bathroom-vanity': 'Hersteller von Badmöbeln | Waschtischunterschränke nach Maß',
     },
-    "copy": {
-      "hot-sale": {
-        "h1": "Gefragte Spiegel im Großhandel",
-        "description": "Entdecken Sie gefragte Spiegel von einem Spiegel-Großhändler und Hersteller. Individuelle Größen, Rahmen und Oberflächen für Marken, Einzelhändler und Hotelprojekte."
+    copy: {
+      'hot-sale': {
+        h1: 'Gefragte Spiegel im Großhandel',
+        description: 'Entdecken Sie gefragte Spiegel von einem Spiegel-Großhändler und Hersteller. Individuelle Größen, Rahmen und Oberflächen für Marken, Einzelhändler und Hotelprojekte.',
       },
-      "led-lighted-mirror": {
-        "h1": "Hersteller von LED-Badspiegeln",
-        "description": "Beziehen Sie LED-beleuchtete Badspiegel in individuellen Größen mit optionaler Dimm- und Antibeschlagfunktion. OEM/ODM-Spiegelfertigung und Großhandelslieferungen für Marken und Hotels."
+      'led-lighted-mirror': {
+        h1: 'Hersteller von LED-Badspiegeln',
+        description: 'Beziehen Sie LED-beleuchtete Badspiegel in individuellen Größen mit optionaler Dimm- und Antibeschlagfunktion. OEM/ODM-Spiegelfertigung und Großhandelslieferungen für Marken und Hotels.',
       },
-      "bathroom-mirror-without-led": {
-        "h1": "Hersteller von Badspiegeln",
-        "description": "Beziehen Sie Badspiegel ohne LED in gerahmten und rahmenlosen Ausführungen. Individuelle Größen, Materialien und Oberflächen mit OEM/ODM-Spiegelfertigung für Marken und Hotels."
+      'bathroom-mirror-without-led': {
+        h1: 'Hersteller von Badspiegeln',
+        description: 'Beziehen Sie Badspiegel ohne LED in gerahmten und rahmenlosen Ausführungen. Individuelle Größen, Materialien und Oberflächen mit OEM/ODM-Spiegelfertigung für Marken und Hotels.',
       },
-      "full-length-dressing-mirror": {
-        "h1": "Hersteller von Ganzkörper-Ankleidespiegeln",
-        "description": "Beziehen Sie Ganzkörper-Ankleidespiegel von einem Hersteller und Großhändler. Individuelle Größen, Rahmen und Oberflächen für Hotels, Einzelhändler und Einrichtungsmarken."
+      'full-length-dressing-mirror': {
+        h1: 'Hersteller von Ganzkörper-Ankleidespiegeln',
+        description: 'Beziehen Sie Ganzkörper-Ankleidespiegel von einem Hersteller und Großhändler. Individuelle Größen, Rahmen und Oberflächen für Hotels, Einzelhändler und Einrichtungsmarken.',
       },
-      "irregular-mirror": {
-        "h1": "Hersteller unregelmäßiger Spiegel nach Maß",
-        "description": "Beziehen Sie unregelmäßige Spiegel nach Maß von einem professionellen Hersteller. Individuelle Formen, Größen und Oberflächen mit OEM/ODM-Lieferungen für Marken und Hotelprojekte."
+      'irregular-mirror': {
+        h1: 'Hersteller unregelmäßiger Spiegel nach Maß',
+        description: 'Beziehen Sie unregelmäßige Spiegel nach Maß von einem professionellen Hersteller. Individuelle Formen, Größen und Oberflächen mit OEM/ODM-Lieferungen für Marken und Hotelprojekte.',
       },
-      "mirror-cabinet": {
-        "h1": "Hersteller von LED-Spiegelschränken",
-        "description": "Beziehen Sie LED-Spiegelschränke mit praktischem Stauraum sowie individuellen Größen und Oberflächen. OEM/ODM-Fertigung und Großhandelslieferungen für Marken und Hotels."
-      }
-    }
+      'mirror-cabinet': {
+        h1: 'Hersteller von LED-Spiegelschränken',
+        description: 'Beziehen Sie LED-Spiegelschränke mit praktischem Stauraum sowie individuellen Größen und Oberflächen. OEM/ODM-Fertigung und Großhandelslieferungen für Marken und Hotels.',
+      },
+      'bathroom-vanity': {
+        h1: 'Hersteller von Badmöbeln nach Maß',
+        description: 'Beziehen Sie wandhängende und bodenstehende Waschtischunterschränke mit Keramik- oder Sintersteinbecken. OEM/ODM-Fertigung und Großhandelslieferungen für Marken und Hotelprojekte.',
+      },
+    },
   },
-  "it": {
-    "titles": {
-      "hot-sale": "Fornitore di specchi all'ingrosso | Produttore degli specchi più venduti",
-      "led-lighted-mirror": "Produttore di specchi da bagno LED | Fornitore di specchi illuminati a LED",
-      "bathroom-mirror-without-led": "Specchi da bagno senza LED | Produttore di specchi da bagno",
-      "full-length-dressing-mirror": "Produttore di specchi a figura intera | Fornitore di specchi da guardaroba",
-      "irregular-mirror": "Specchi irregolari su misura | Produttore professionale di specchi irregolari",
-      "mirror-cabinet": "Produttore di armadietti con specchio LED | Produzione di armadietti con specchio"
+  it: {
+    titles: {
+      'hot-sale': "Fornitore di specchi all'ingrosso | Produttore degli specchi più venduti",
+      'led-lighted-mirror': 'Produttore di specchi da bagno LED | Fornitore di specchi illuminati a LED',
+      'bathroom-mirror-without-led': 'Specchi da bagno senza LED | Produttore di specchi da bagno',
+      'full-length-dressing-mirror': 'Produttore di specchi a figura intera | Fornitore di specchi da guardaroba',
+      'irregular-mirror': 'Specchi irregolari su misura | Produttore professionale di specchi irregolari',
+      'mirror-cabinet': 'Produttore di armadietti con specchio LED | Produzione di armadietti con specchio',
+      'bathroom-vanity': 'Produttore di mobili da bagno | Fornitore di mobili lavabo su misura',
     },
-    "copy": {
-      "hot-sale": {
-        "h1": "Specchi più venduti all'ingrosso",
-        "description": "Scopri gli specchi più venduti di un fornitore all'ingrosso e produttore di specchi. Dimensioni, cornici e finiture personalizzate per marchi, rivenditori e progetti alberghieri."
+    copy: {
+      'hot-sale': {
+        h1: "Specchi più venduti all'ingrosso",
+        description: "Scopri gli specchi più venduti di un fornitore all'ingrosso e produttore di specchi. Dimensioni, cornici e finiture personalizzate per marchi, rivenditori e progetti alberghieri.",
       },
-      "led-lighted-mirror": {
-        "h1": "Produttore di specchi da bagno LED",
-        "description": "Acquista specchi da bagno illuminati a LED con dimensioni personalizzate, regolazione della luminosità e funzione antiappannamento opzionali. Produzione di specchi OEM/ODM e fornitura all'ingrosso per marchi e hotel."
+      'led-lighted-mirror': {
+        h1: 'Produttore di specchi da bagno LED',
+        description: "Acquista specchi da bagno illuminati a LED con dimensioni personalizzate, regolazione della luminosità e funzione antiappannamento opzionali. Produzione di specchi OEM/ODM e fornitura all'ingrosso per marchi e hotel.",
       },
-      "bathroom-mirror-without-led": {
-        "h1": "Produttore di specchi da bagno",
-        "description": "Acquista specchi da bagno senza LED, con o senza cornice. Dimensioni, materiali e finiture personalizzati, con produzione di specchi OEM/ODM per marchi e hotel."
+      'bathroom-mirror-without-led': {
+        h1: 'Produttore di specchi da bagno',
+        description: "Acquista specchi da bagno senza LED, con o senza cornice. Dimensioni, materiali e finiture personalizzati, con produzione di specchi OEM/ODM per marchi e hotel.",
       },
-      "full-length-dressing-mirror": {
-        "h1": "Produttore di specchi da guardaroba a figura intera",
-        "description": "Acquista specchi da guardaroba a figura intera da un produttore e fornitore all'ingrosso. Dimensioni, cornici e finiture personalizzate per hotel, rivenditori e marchi per la casa."
+      'full-length-dressing-mirror': {
+        h1: 'Produttore di specchi da guardaroba a figura intera',
+        description: "Acquista specchi da guardaroba a figura intera da un produttore e fornitore all'ingrosso. Dimensioni, cornici e finiture personalizzate per hotel, rivenditori e marchi per la casa.",
       },
-      "irregular-mirror": {
-        "h1": "Produttore di specchi irregolari su misura",
-        "description": "Acquista specchi irregolari su misura da un produttore professionale. Forme, dimensioni e finiture personalizzate, con fornitura OEM/ODM per marchi e progetti alberghieri."
+      'irregular-mirror': {
+        h1: 'Produttore di specchi irregolari su misura',
+        description: "Acquista specchi irregolari su misura da un produttore professionale. Forme, dimensioni e finiture personalizzate, con fornitura OEM/ODM per marchi e progetti alberghieri.",
       },
-      "mirror-cabinet": {
-        "h1": "Produttore di armadietti con specchio LED",
-        "description": "Acquista armadietti con specchio LED e pratici vani portaoggetti, con dimensioni e finiture personalizzate. Produzione OEM/ODM e fornitura all'ingrosso per marchi e hotel."
-      }
-    }
-  }
+      'mirror-cabinet': {
+        h1: 'Produttore di armadietti con specchio LED',
+        description: "Acquista armadietti con specchio LED e pratici vani portaoggetti, con dimensioni e finiture personalizzate. Produzione OEM/ODM e fornitura all'ingrosso per marchi e hotel.",
+      },
+      'bathroom-vanity': {
+        h1: 'Produttore di mobili da bagno su misura',
+        description: "Acquista mobili da bagno sospesi e a terra con lavabi in ceramica o pietra sinterizzata. Produzione OEM/ODM e fornitura all'ingrosso per marchi e progetti alberghieri.",
+      },
+    },
+  },
 } as const;
 
 const supportedLanguages = ['en', ...Object.keys(translatedSeo)];
@@ -265,6 +296,11 @@ const approvedPageCopy = [
     h1: 'LED Mirror Cabinet Manufacturer',
     description: 'Source LED mirror cabinets with practical storage, custom sizes and finishes. OEM/ODM mirror cabinet manufacturing and wholesale supply for brands and hotels.',
   },
+  {
+    slug: 'bathroom-vanity',
+    h1: 'Custom Bathroom Vanity Manufacturer',
+    description: 'Source wall-hung and freestanding bathroom vanity cabinets with sintered stone or ceramic basins. OEM/ODM vanity manufacturing and wholesale supply for brands and hotels.',
+  },
 ] as const;
 
 test('every category with a custom title has dedicated H1 and description copy in all languages', () => {
@@ -281,6 +317,32 @@ test('every category with a custom title has dedicated H1 and description copy i
     }
     assert.equal(descriptions.size, approvedTitles.length, `${lang}: category descriptions must be distinct`);
   }
+});
+
+test('every active category has substantive 180+ word (or 300+ CJK char) B2B editorial copy in all 6 languages', () => {
+  for (const lang of supportedLanguages) {
+    const headings = new Set<string>();
+    for (const [slug] of approvedTitles) {
+      const editorial = getCatalogCategoryEditorial(lang, slug);
+      assert.ok(editorial, `${lang}/${slug}: missing B2B category editorial copy`);
+      const combined = [editorial.heading, ...editorial.paragraphs, ...editorial.highlights].join(' ');
+      assert.doesNotMatch(combined, /\bde plain-pied\b/i, `${lang}/${slug}: contains mistranslation de plain-pied`);
+      assert.doesNotMatch(combined, /\bvanidad\b/i, `${lang}/${slug}: contains mistranslation vanidad`);
+      assert.doesNotMatch(combined, /\bantiniebla\b/i, `${lang}/${slug}: contains mistranslation antiniebla`);
+      assert.doesNotMatch(combined, /\bEntnebler\b/i, `${lang}/${slug}: contains mistranslation Entnebler`);
+      if (lang === 'zh') {
+        const cjkCount = (combined.match(/[\u4e00-\u9fff]/g) || []).length;
+        assert.ok(cjkCount >= 350, `${lang}/${slug}: expected >= 350 CJK chars, got ${cjkCount}`);
+      } else {
+        const wordCount = combined.trim().split(/\s+/).length;
+        assert.ok(wordCount >= 180, `${lang}/${slug}: expected >= 180 words, got ${wordCount}`);
+      }
+      headings.add(editorial.heading);
+    }
+    assert.equal(headings.size, approvedTitles.length, `${lang}: editorial headings must be distinct`);
+  }
+  assert.equal(getCatalogCategoryEditorial('en', 'unknown'), null);
+  assert.equal(getCatalogCategoryEditorial('pt', 'led-lighted-mirror'), null);
 });
 
 for (const { slug, h1, description } of approvedPageCopy) {
@@ -319,6 +381,55 @@ test('preserves fallback H1 and description for additional or unknown categories
       assert.deepEqual(getCatalogCategoryPageCopy(lang, slug, fallback), fallback);
     }
   }
+});
+
+test('retired categories map cleanly to active hubs without orphaning products', () => {
+  for (const retired of [
+    'Framed LED Mirror',
+    'Frameless LED Mirror',
+    'Rectangle LED Mirror',
+    'Magnifying Makeup Mirror',
+  ]) {
+    assert.equal(catalogCategoryPath(retired), '/products/category/led-lighted-mirror');
+    assert.equal(productMatchesCategory(retired, 'Led Lighted Mirror'), true);
+    assert.equal(productMatchesCategory(retired, 'Bathroom Vanity'), false);
+    assert.equal(canonicalCategoryName(retired), 'Led Lighted Mirror');
+  }
+  assert.equal(productMatchesCategory('New Arrival', 'Hot Sale'), true);
+  assert.equal(canonicalCategoryName('Uncategorized'), null);
+});
+
+test('product BreadcrumbList schema includes localized Home, Catalog, and Category when present', () => {
+  const withCat = buildProductBreadcrumbSchema({
+    lang: 'zh',
+    homeLabel: '首页',
+    catalogLabel: '产品目录',
+    categoryName: 'Framed LED Mirror',
+    categoryLabel: 'LED发光镜',
+    productTitle: '椭圆形智能防雾浴室镜',
+    productUrl: 'https://bolenmirror.com/zh/products/led-lighted-mirror/oval-mirror/',
+  });
+  assert.deepEqual(withCat, {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: '首页', item: 'https://bolenmirror.com/zh/' },
+      { '@type': 'ListItem', position: 2, name: '产品目录', item: 'https://bolenmirror.com/zh/products/' },
+      { '@type': 'ListItem', position: 3, name: 'LED发光镜', item: 'https://bolenmirror.com/zh/products/category/led-lighted-mirror/' },
+      { '@type': 'ListItem', position: 4, name: '椭圆形智能防雾浴室镜', item: 'https://bolenmirror.com/zh/products/led-lighted-mirror/oval-mirror/' },
+    ],
+  });
+
+  const uncategorized = buildProductBreadcrumbSchema({
+    lang: 'de',
+    homeLabel: 'Startseite',
+    catalogLabel: 'Katalog',
+    categoryName: 'Uncategorized',
+    categoryLabel: 'Uncategorized',
+    productTitle: 'Runder Badspiegel',
+    productUrl: 'https://bolenmirror.com/de/products/uncategorized/runder-badspiegel/',
+  });
+  assert.equal((uncategorized.itemListElement as unknown[]).length, 3);
 });
 
 const options = {

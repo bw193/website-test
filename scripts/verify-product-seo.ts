@@ -111,7 +111,7 @@ async function main(): Promise<void> {
         const islandMatch = html.match(/<script\b[^>]*id="__BOLEN_PRERENDER_DATA__"[^>]*>([\s\S]*?)<\/script>/);
         assert.ok(islandMatch, `${route}: product data island missing`);
         const payload = JSON.parse(islandMatch[1]) as {
-          product: ProductSeoFields & { id: string; category?: string };
+          product: ProductSeoFields & { id: string; category?: string; price_range?: string };
           productTranslations?: Record<string, Partial<ProductSeoFields>>;
         };
         routeSet.add(`product:${payload.product.id}`);
@@ -120,8 +120,22 @@ async function main(): Promise<void> {
           const href = readOne(html, new RegExp(`<link\\b[^>]*hreflang="${alternateLang}"[^>]*href="([^"]*)"[^>]*>`, 'g'), route, `${alternateLang} alternate`);
           assert.equal(href, `${ORIGIN}/${alternateLang}${alternatePath}/`, `${route}: incorrect translated alternate URL`);
         }
-        const offer = pageSchemas[0].offers as { url: string };
-        assert.equal(offer.url, canonical, `${route}: Product offer uses an old URL`);
+        const priceNums = payload.product.price_range?.match(/\d+(?:\.\d+)?/g)?.map(Number) ?? [];
+        const hasPriceRange = priceNums.some((n) => n > 0);
+        if (pageSchemas[0].offers !== undefined) {
+          assert.equal(hasPriceRange, true, `${route}: Product without price_range must omit offers`);
+          const offer = pageSchemas[0].offers as Record<string, unknown>;
+          assert.equal(offer['@type'], 'Offer', `${route}: Product offer must use @type "Offer"`);
+          assert.equal(offer.url, canonical, `${route}: Product offer uses an old URL`);
+          assert.equal('availability' in offer, false, `${route}: Product offer must not hardcode availability`);
+          assert.equal(offer.priceCurrency, 'USD', `${route}: Product offer missing priceCurrency`);
+          assert.ok(
+            'price' in offer || 'priceSpecification' in offer,
+            `${route}: Product offer must include price or priceSpecification`
+          );
+        } else {
+          assert.equal(hasPriceRange, false, `${route}: Product with price_range is missing offers`);
+        }
         const translated = payload.productTranslations?.[payload.product.id];
         const product: ProductSeoFields = {
           ...payload.product,

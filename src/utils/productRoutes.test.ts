@@ -195,5 +195,31 @@ test('category-changed active products redirect across known categories and disc
   assert.equal(catalogCategoryPath('Framed LED Mirror'), '/products/category/led-lighted-mirror');
   assert.equal(catalogCategoryPath('Frameless LED Mirror'), '/products/category/led-lighted-mirror');
   assert.equal(catalogCategoryPath('Rectangle LED Mirror'), '/products/category/led-lighted-mirror');
+  assert.equal(catalogCategoryPath('Magnifying Makeup Mirror'), '/products/category/led-lighted-mirror');
   assert.equal(catalogCategoryPath('Uncategorized'), '/products');
+});
+
+test('bare category slugs under /products/<category-slug> 301-redirect to canonical category hubs', () => {
+  const expectations: Array<[string, string]> = [
+    ['led-lighted-mirror', '/products/category/led-lighted-mirror/'],
+    ['bathroom-vanity', '/products/category/bathroom-vanity/'],
+    ['framed-led-mirror', '/products/category/led-lighted-mirror/'],
+    ['frameless-led-mirror', '/products/category/led-lighted-mirror/'],
+    ['rectangle-led-mirror', '/products/category/led-lighted-mirror/'],
+    ['magnifying-makeup-mirror', '/products/category/led-lighted-mirror/'],
+    ['new-arrival', '/products/category/hot-sale/'],
+    ['uncategorized', '/products/'],
+  ];
+
+  for (const [slug, expectedSuffix] of expectations) {
+    for (const prefix of ['', ...LANGUAGES.map((lang) => `/${lang}`)]) {
+      const lang = prefix.slice(1) || 'en';
+      for (const slash of ['', '/']) {
+        assert.equal(
+          productRedirectLocation(new URL(`${prefix}/products/${slug}${slash}?utm_source=gsc`, ORIGIN)),
+          `/${lang}${expectedSuffix}?utm_source=gsc`,
+        );
+      }
+    }
+  }
 });
