@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
 
 export type RevealVariant = 'up' | 'left' | 'right' | 'scale' | 'blur';
 
@@ -14,43 +14,30 @@ type RevealProps = {
 } & React.HTMLAttributes<HTMLElement>;
 
 /**
- * Reveals its content on scroll into view — a tiny, dependency-free stand-in
- * for motion's `whileInView` fade/slide used across the homepage. Keeping this
- * out of `motion` lets the home route ship without the ~30KB motion runtime on
- * its critical path. Animates once, then disconnects the observer.
+ * Renders content visibly on initial mount (`opacity: 1`, `reveal-in` active)
+ * so Googlebot WRS and below-the-fold snapshots never encounter `opacity: 0`
+ * scroll-gated sections.
  */
-export default function Reveal({ as: Tag = 'div', delay = 0, variant = 'up', className = '', children, style, ...rest }: RevealProps) {
-  const ref = useRef<HTMLElement | null>(null);
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    // SSR/old browsers without IO: just show the content.
-    if (typeof IntersectionObserver === 'undefined') {
-      setVisible(true);
-      return;
-    }
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisible(true);
-          io.disconnect();
-        }
-      },
-      { rootMargin: '0px 0px -50px 0px' }
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
-
+export default function Reveal({
+  as: Tag = 'div',
+  delay = 0,
+  variant = 'up',
+  className = '',
+  children,
+  style,
+  ...rest
+}: RevealProps) {
   const variantClass = variant === 'up' ? '' : ` reveal-${variant}`;
+  const mergedStyle: React.CSSProperties = {
+    opacity: 1,
+    ...(delay ? { animationDelay: `${delay}ms` } : {}),
+    ...style,
+  };
 
   return (
     <Tag
-      ref={ref as any}
-      className={`reveal${variantClass} ${visible ? 'reveal-in' : ''} ${className}`.trim()}
-      style={delay ? { ...style, animationDelay: `${delay}ms` } : style}
+      className={`reveal${variantClass} reveal-in ${className}`.trim()}
+      style={mergedStyle}
       {...rest}
     >
       {children}

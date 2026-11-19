@@ -1,10 +1,15 @@
 User-agent: *
 Allow: /
+Allow: /media/
 Disallow: /admin
 Disallow: /admin/
 Disallow: /*/rfq/?*
 Disallow: /*/rfq?*
 Disallow: /*?lng=*
 Disallow: /*&lng=*
+Disallow: /*?q=
+Disallow: /*&q=
+Disallow: /*?category=
+Disallow: /*&category=
 
 Sitemap: https://bolenmirror.com/sitemap.xml

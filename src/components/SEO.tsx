@@ -64,18 +64,18 @@ export default function SEO({
       <title>{title}</title>
       <meta name="description" content={description} />
       {noindex && <meta name="robots" content="noindex, nofollow" />}
-      <link rel="canonical" href={canonicalUrl} />
+      {!noindex && <link rel="canonical" href={canonicalUrl} />}
 
-      {hasAlternate('en') && <link rel="alternate" hrefLang="en" href={alternateUrl('en')} />}
-      {hasAlternate('zh') && <link rel="alternate" hrefLang="zh" href={alternateUrl('zh')} />}
-      {hasAlternate('es') && <link rel="alternate" hrefLang="es" href={alternateUrl('es')} />}
-      {hasAlternate('fr') && <link rel="alternate" hrefLang="fr" href={alternateUrl('fr')} />}
-      {hasAlternate('de') && <link rel="alternate" hrefLang="de" href={alternateUrl('de')} />}
-      {hasAlternate('it') && <link rel="alternate" hrefLang="it" href={alternateUrl('it')} />}
-      {hasAlternate('en') && <link rel="alternate" hrefLang="x-default" href={alternateUrl('en')} />}
+      {!noindex && hasAlternate('en') && <link rel="alternate" hrefLang="en" href={alternateUrl('en')} />}
+      {!noindex && hasAlternate('zh') && <link rel="alternate" hrefLang="zh" href={alternateUrl('zh')} />}
+      {!noindex && hasAlternate('es') && <link rel="alternate" hrefLang="es" href={alternateUrl('es')} />}
+      {!noindex && hasAlternate('fr') && <link rel="alternate" hrefLang="fr" href={alternateUrl('fr')} />}
+      {!noindex && hasAlternate('de') && <link rel="alternate" hrefLang="de" href={alternateUrl('de')} />}
+      {!noindex && hasAlternate('it') && <link rel="alternate" hrefLang="it" href={alternateUrl('it')} />}
+      {!noindex && hasAlternate('en') && <link rel="alternate" hrefLang="x-default" href={alternateUrl('en')} />}
 
       <meta property="og:type" content={ogType} />
-      <meta property="og:url" content={canonicalUrl} />
+      {!noindex && <meta property="og:url" content={canonicalUrl} />}
       <meta property="og:title" content={title} />
       <meta property="og:description" content={description} />
       <meta property="og:image" content={ogImageUrl} />
@@ -85,7 +85,7 @@ export default function SEO({
       {ogVideo && <meta property="og:video:type" content={ogVideo.type} />}
 
       <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:url" content={canonicalUrl} />
+      {!noindex && <meta name="twitter:url" content={canonicalUrl} />}
       <meta name="twitter:title" content={title} />
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={ogImageUrl} />

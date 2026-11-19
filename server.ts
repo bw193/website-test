@@ -10,8 +10,9 @@ import {
   parseCategoriesSetting,
 } from './src/utils/catalogCategory';
 import { INSIGHTS_PATH, insightDetailPath } from './src/data/insights';
+import { TERMS_PATH } from './src/data/termsCopy';
 import { getBlogAvailableLanguages } from './src/utils/blog';
-import type { BlogPost } from './src/types/blog';
+import type { BlogPost, LocalizedMap } from './src/types/blog';
 import { productDetailPath, productAlternatePaths, productRedirectLocation } from './src/utils/productRoutes';
 import { handleMediaRequest } from './worker/media';
 
@@ -20,6 +21,26 @@ dotenv.config();
 const supabaseUrl = process.env.VITE_SUPABASE_URL || '';
 const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY || '';
 const supabase = createClient(supabaseUrl, supabaseKey);
+
+const PAGE_SIZE = 500;
+
+async function fetchPaginated<T>(
+  queryPage: (from: number, to: number) => PromiseLike<{ data: T[] | null; error: { message: string } | null }>,
+  label: string
+): Promise<T[]> {
+  const rows: T[] = [];
+  for (let from = 0; ; from += PAGE_SIZE) {
+    const { data, error } = await queryPage(from, from + PAGE_SIZE - 1);
+    if (error) {
+      console.warn(`Could not fetch ${label} for sitemap:`, error.message);
+      return rows;
+    }
+    const batch = data || [];
+    rows.push(...batch);
+    if (batch.length < PAGE_SIZE) break;
+  }
+  return rows;
+}
 
 async function startServer() {
   const app = express();
@@ -37,7 +58,7 @@ async function startServer() {
     next();
   });
 
-  const LANGUAGES = ['en', 'zh', 'es', 'fr', 'de', 'it'];
+  const LANGUAGES = ['en', 'zh', 'es', 'fr', 'de', 'it'] as const;
   const DOMAIN = 'https://bolenmirror.com';
   type SitemapPage = {
     loc: string;
@@ -47,6 +68,18 @@ async function startServer() {
     availableLanguages?: readonly string[];
     pathsByLang?: Record<string, string>;
   };
+
+  function getVideoAvailableLanguages(video: {
+    title?: LocalizedMap | null;
+    excerpt?: LocalizedMap | null;
+    body?: LocalizedMap | null;
+  }): string[] {
+    return LANGUAGES.filter((lang) => {
+      const title = video.title?.[lang]?.trim();
+      const content = video.body?.[lang]?.trim() || video.excerpt?.[lang]?.trim();
+      return Boolean(title && content);
+    });
+  }
 
   function buildUrlEntry(
     pagePath: string,
@@ -74,14 +107,30 @@ ${xDefault}
   </url>`;
   }
 
-  // Generate sitemap XML from live Supabase data
+  // Generate sitemap XML from live Supabase data (paginated)
   async function generateSitemapXml(): Promise<string> {
     const today = new Date().toISOString().split('T')[0];
-    const { data: products } = await supabase
-      .from('products')
-      .select('id, title, category, updated_at, created_at')
-      .eq('is_active', true)
-      .order('created_at', { ascending: false });
+    const privacyModuleSpec = './src/data/' + 'privacyCopy';
+    const privacyMod = (await import(privacyModuleSpec).catch(() => null)) as null | {
+      PRIVACY_PATH?: string;
+    };
+
+    const products = await fetchPaginated<{
+      id: string;
+      title: string;
+      category?: string | null;
+      updated_at?: string | null;
+      created_at?: string | null;
+    }>(
+      (from, to) =>
+        supabase
+          .from('products')
+          .select('id, title, category, updated_at, created_at')
+          .eq('is_active', true)
+          .order('created_at', { ascending: false })
+          .range(from, to),
+      'products'
+    );
 
     const staticPages: SitemapPage[] = [
       { loc: '/', changefreq: 'weekly', priority: '1.0', lastmod: today },
@@ -90,11 +139,21 @@ ${xDefault}
       { loc: '/our-story', changefreq: 'monthly', priority: '0.7', lastmod: today },
       { loc: INSIGHTS_PATH, changefreq: 'weekly', priority: '0.7', lastmod: today },
       { loc: '/videos', changefreq: 'weekly', priority: '0.7', lastmod: today },
+      { loc: TERMS_PATH, changefreq: 'yearly', priority: '0.4', lastmod: today },
+      ...(typeof privacyMod?.PRIVACY_PATH === 'string'
+        ? [{ loc: privacyMod.PRIVACY_PATH, changefreq: 'yearly', priority: '0.4', lastmod: today }]
+        : []),
     ];
 
-    const productPages = (products || []).map(product => {
+    const productPages = products.map((product) => {
       const lastmod = (product.updated_at || product.created_at || today).split('T')[0];
-      return { loc: productDetailPath(product, 'en'), pathsByLang: productAlternatePaths(product), changefreq: 'weekly', priority: '0.8', lastmod };
+      return {
+        loc: productDetailPath(product, 'en'),
+        pathsByLang: productAlternatePaths(product),
+        changefreq: 'weekly',
+        priority: '0.8',
+        lastmod,
+      };
     });
 
     const { data: categorySetting } = await supabase
@@ -113,37 +172,62 @@ ${xDefault}
       lastmod: page.lastmod,
     }));
 
-    const { data: blogPosts } = await supabase
-      .from('blog_posts')
-      .select('slug, title, body, updated_at, published_at, created_at')
-      .eq('status', 'published')
-      .order('published_at', { ascending: false });
+    type SitemapBlogPost = Pick<BlogPost, 'slug' | 'title' | 'body' | 'updated_at' | 'published_at' | 'created_at'>;
+    const blogPosts = await fetchPaginated<SitemapBlogPost>(
+      (from, to) =>
+        supabase
+          .from('blog_posts')
+          .select('slug, title, body, updated_at, published_at, created_at')
+          .eq('status', 'published')
+          .order('published_at', { ascending: false })
+          .range(from, to),
+      'blog posts'
+    );
 
-    const blogPostPages: SitemapPage[] = ((blogPosts || []) as BlogPost[]).map((post) => {
-      const lastmod = (post.updated_at || post.published_at || post.created_at || today).split('T')[0];
-      return {
-        loc: insightDetailPath(post.slug),
-        changefreq: 'monthly',
-        priority: '0.7',
-        lastmod,
-        availableLanguages: getBlogAvailableLanguages(post),
-      };
-    });
+    const blogPostPages: SitemapPage[] = blogPosts
+      .map((post) => {
+        const lastmod = (post.updated_at || post.published_at || post.created_at || today).split('T')[0];
+        return {
+          loc: insightDetailPath(post.slug),
+          changefreq: 'monthly',
+          priority: '0.7',
+          lastmod,
+          availableLanguages: getBlogAvailableLanguages(post),
+        };
+      })
+      .filter((page) => (page.availableLanguages?.length ?? 0) > 0);
 
-    const { data: videoPosts, error: videoError } = await supabase
-      .from('videos')
-      .select('slug, updated_at, published_at, created_at')
-      .eq('status', 'published')
-      .order('published_at', { ascending: false });
+    const videoPosts = await fetchPaginated<{
+      slug: string;
+      title?: LocalizedMap | null;
+      excerpt?: LocalizedMap | null;
+      body?: LocalizedMap | null;
+      updated_at?: string | null;
+      published_at?: string | null;
+      created_at?: string | null;
+    }>(
+      (from, to) =>
+        supabase
+          .from('videos')
+          .select('slug, title, excerpt, body, updated_at, published_at, created_at')
+          .eq('status', 'published')
+          .order('published_at', { ascending: false })
+          .range(from, to),
+      'videos'
+    );
 
-    if (videoError) {
-      console.warn('Could not fetch videos for sitemap:', videoError.message);
-    }
-
-    const videoPostPages = (videoPosts || []).map((post) => {
-      const lastmod = (post.updated_at || post.published_at || post.created_at || today).split('T')[0];
-      return { loc: `/videos/${post.slug}`, changefreq: 'monthly', priority: '0.7', lastmod };
-    });
+    const videoPostPages: SitemapPage[] = videoPosts
+      .map((post) => {
+        const lastmod = (post.updated_at || post.published_at || post.created_at || today).split('T')[0];
+        return {
+          loc: `/videos/${post.slug}`,
+          changefreq: 'monthly',
+          priority: '0.7',
+          lastmod,
+          availableLanguages: getVideoAvailableLanguages(post),
+        };
+      })
+      .filter((page) => (page.availableLanguages?.length ?? 0) > 0);
 
     const solutionPages = [
       { loc: '/solutions', changefreq: 'monthly', priority: '0.9', lastmod: today },
@@ -195,13 +279,18 @@ ${urls.join('\n')}
     }
   });
 
-  // Same-origin copies of the Supabase-hosted images, answered by the same
+  // Same-origin copies of the Supabase-hosted media, answered by the same
   // handler production uses (worker/media.ts), minus the edge cache.
   app.get('/media/*', async (req, res) => {
+    const headers: Record<string, string> = { Accept: req.get('Accept') || '*/*' };
+    const range = req.get('Range');
+    if (range) headers.Range = range;
+    const ifRange = req.get('If-Range');
+    if (ifRange) headers['If-Range'] = ifRange;
     const response = await handleMediaRequest(
       new Request(new URL(req.originalUrl, DOMAIN), {
         method: req.method,
-        headers: { Accept: req.get('Accept') || '*/*' },
+        headers,
       }),
       undefined,
       { cache: null },
@@ -268,11 +357,12 @@ ${urls.join('\n')}
       }
     }));
     // Redirect bare root to /en
-    app.get('/', (req, res) => res.redirect(302, '/en/'));
+    app.get('/', (req, res) => res.redirect(301, '/en/'));
     // Same contract as the Cloudflare deployment: the client-only employee
     // portal shell for /admin*, a real 404 (dist/404.html) for anything else
     // that has no prerendered file.
     app.get(['/admin', '/admin/*'], (req, res) => {
+      res.setHeader('X-Robots-Tag', 'noindex, nofollow');
       res.sendFile(path.join(distPath, 'admin', 'index.html'));
     });
     app.get('*', (req, res) => {

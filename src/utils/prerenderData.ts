@@ -17,8 +17,17 @@ export interface FactoryGalleryItem {
   caption?: string;
 }
 
-interface PrerenderPayload {
-  route?: 'home' | 'catalog' | 'productDetail' | 'blog' | 'blogPost' | 'videos' | 'videoPost' | 'seoLanding';
+export interface PrerenderPayload {
+  route?:
+    | 'home'
+    | 'catalog'
+    | 'productDetail'
+    | 'blog'
+    | 'blogPost'
+    | 'videos'
+    | 'videoPost'
+    | 'seoLanding'
+    | 'ourStory';
   lang?: string;
   products?: unknown[];
   product?: { id?: string; title?: string } & Record<string, unknown>;
@@ -43,16 +52,22 @@ interface PrerenderPayload {
   // for `lang` so the home section renders without a Supabase round-trip.
   featuredVideo?: VideoListItem | null;
   // Localized product copy embedded per page so the SPA can overlay
-  // translations synchronously on first render. Home/catalog carry the full
-  // map for the language; product pages carry just that product's entry.
+  // translations synchronously on first render. List/landing islands carry
+  // lightweight `{ title, description }` entries; productDetail carries the
+  // single product's full entry.
   productTranslations?: Record<string, ProductFields>;
   // Journal (blog) payloads. The index carries a light list of cards; an
-  // article page carries one post, both pre-localized for `lang` so the SPA
-  // renders synchronously with no Supabase fetch on the critical path.
+  // article page carries one post plus related products/articles, pre-localized
+  // for `lang` so the SPA renders synchronously with no Supabase fetch.
   blogPosts?: BlogListItem[];
   blogPost?: LocalizedBlogPost;
+  relatedProducts?: unknown[];
+  relatedArticles?: BlogListItem[];
   videoPosts?: VideoListItem[];
   videoPost?: LocalizedVideoPost;
+  upNext?: VideoListItem[];
+  productCount?: number;
+  videoCount?: number;
   landingSlug?: string;
   categorySlug?: string;
 }
@@ -72,9 +87,15 @@ function getPrerenderData(): PrerenderPayload | null {
   }
   try {
     cache = JSON.parse(el.textContent) as PrerenderPayload;
-    // A home/catalog island holds every product's translation for the lang;
-    // a product island holds only one, so don't mark the lang fully loaded.
-    primeProductTranslations(cache.lang, cache.productTranslations, cache.route !== 'productDetail');
+    if (typeof window !== 'undefined') {
+      (window as unknown as { __BOLEN_PRERENDER_DATA__?: PrerenderPayload }).__BOLEN_PRERENDER_DATA__ = cache;
+    }
+    // Catalog/home/landing islands embed only `{ title, description }` per
+    // listed product (never all 117 full details/specs), and productDetail
+    // embeds only `[product.id]`, so never mark the whole language dictionary
+    // fully loaded — client-side navigation to another product will still fetch
+    // `/i18n/products.<lang>.json` for full details and specifications.
+    primeProductTranslations(cache.lang, cache.productTranslations, false);
   } catch {
     cache = null;
   }
@@ -163,18 +184,76 @@ export function readInitialBlogPost(slug: string, lang?: string): LocalizedBlogP
   return data.blogPost.slug === slug ? data.blogPost : null;
 }
 
-export function readInitialVideoList(): VideoListItem[] | null {
+export function readInitialBlogPostExtras<T>(slug: string, lang?: string): {
+  relatedProducts: T[];
+  relatedArticles: BlogListItem[];
+} | null {
   const data = getPrerenderData();
-  if (data?.route === 'videos' && Array.isArray(data.videoPosts)) {
+  if (
+    data?.route !== 'blogPost' ||
+    (lang && data.lang !== lang) ||
+    data.blogPost?.slug !== slug
+  ) {
+    return null;
+  }
+  return {
+    relatedProducts: Array.isArray(data.relatedProducts) ? (data.relatedProducts as T[]) : [],
+    relatedArticles: Array.isArray(data.relatedArticles) ? data.relatedArticles : [],
+  };
+}
+
+export function readInitialVideoList(lang?: string): VideoListItem[] | null {
+  const data = getPrerenderData();
+  if (
+    data?.route === 'videos' &&
+    (!lang || data.lang === lang) &&
+    Array.isArray(data.videoPosts)
+  ) {
     return data.videoPosts as VideoListItem[];
   }
   return null;
 }
 
-export function readInitialVideoPost(slug: string): LocalizedVideoPost | null {
+export function readInitialVideoPost(slug: string, lang?: string): LocalizedVideoPost | null {
   const data = getPrerenderData();
-  if (data?.route !== 'videoPost' || !data.videoPost) return null;
+  if (
+    data?.route !== 'videoPost' ||
+    (lang && data.lang !== lang) ||
+    !data.videoPost
+  ) {
+    return null;
+  }
   return data.videoPost.slug === slug ? data.videoPost : null;
+}
+
+export function readInitialVideoPostExtras<T>(slug: string, lang?: string): {
+  relatedProducts: T[];
+  upNext: VideoListItem[];
+} | null {
+  const data = getPrerenderData();
+  if (
+    data?.route !== 'videoPost' ||
+    (lang && data.lang !== lang) ||
+    data.videoPost?.slug !== slug
+  ) {
+    return null;
+  }
+  return {
+    relatedProducts: Array.isArray(data.relatedProducts) ? (data.relatedProducts as T[]) : [],
+    upNext: Array.isArray(data.upNext) ? data.upNext : [],
+  };
+}
+
+export function readInitialStoryData(lang?: string): {
+  productCount?: number;
+  videoCount?: number;
+} | null {
+  const data = getPrerenderData();
+  if (data?.route !== 'ourStory' || (lang && data.lang !== lang)) return null;
+  return {
+    productCount: typeof data.productCount === 'number' ? data.productCount : undefined,
+    videoCount: typeof data.videoCount === 'number' ? data.videoCount : undefined,
+  };
 }
 
 export function readInitialSeoLandingData<T>(slug: string): { products: T[]; lang?: string } | null {
