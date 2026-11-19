@@ -186,7 +186,17 @@ function isAdminPath(pathname: string): boolean {
 // catalog client-side, which a crawler would otherwise see as a 404 page.
 const CATEGORY_INDEX_PATTERN = /^\/(en|zh|es|fr|de|it)\/products\/category\/?$/;
 const RETIRED_CATEGORY_PATTERN =
-  /^\/(en|zh|es|fr|de|it)\/products\/category\/(framed-led-mirror|frameless-led-mirror|rectangle-led-mirror|new-arrival|uncategorized)\/?$/;
+  /^\/(en|zh|es|fr|de|it)\/products\/category\/(framed-led-mirror|frameless-led-mirror|rectangle-led-mirror|magnifying-makeup-mirror|new-arrival|uncategorized)\/?$/;
+
+function withAdminNoindex(response: Response): Response {
+  const headers = new Headers(response.headers);
+  headers.set('X-Robots-Tag', 'noindex, nofollow');
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+}
 
 const worker = {
   async fetch(request: Request, env: Env, ctx?: WaitUntil): Promise<Response> {
@@ -201,12 +211,16 @@ const worker = {
         headers: { Location: canonicalUrl.toString() },
       });
     }
-    // Indexable copies of the Supabase-hosted images; see worker/media.ts.
+    // Indexable copies of the Supabase-hosted images and videos; see worker/media.ts.
     if (isRead && isMediaPath(url.pathname)) return handleMediaRequest(request, ctx);
-    if (isRead && isAdminPath(url.pathname)) {
-      return env.ASSETS.fetch(
-        new Request(new URL(ADMIN_SHELL_PATH, url), { method: request.method, headers: request.headers }),
-      );
+    if (isAdminPath(url.pathname)) {
+      if (isRead) {
+        const shellResponse = await env.ASSETS.fetch(
+          new Request(new URL(ADMIN_SHELL_PATH, url), { method: request.method, headers: request.headers }),
+        );
+        return withAdminNoindex(shellResponse);
+      }
+      return withAdminNoindex(await baseWorker.fetch(request, env));
     }
     const categoryIndex = isRead ? url.pathname.match(CATEGORY_INDEX_PATTERN) : null;
     if (categoryIndex) {

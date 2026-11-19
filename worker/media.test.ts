@@ -7,13 +7,26 @@ import type { Env } from './index.ts';
 const ORIGIN = 'https://bolenmirror.com';
 const STORAGE = 'https://mxmmffwntosvwaviippd.supabase.co/storage/v1';
 
-type FetchCall = { url: string; accept: string | null };
+type FetchCall = { url: string; accept: string | null; range: string | null; ifRange: string | null };
 
-function supabaseFetch(options: { status?: number; contentType?: string; body?: string } = {}) {
+function supabaseFetch(
+  options: {
+    status?: number;
+    contentType?: string;
+    body?: BodyInit | null;
+    extraHeaders?: Record<string, string>;
+  } = {},
+) {
   const calls: FetchCall[] = [];
   const fetchImpl = (async (input: RequestInfo | URL, init?: RequestInit) => {
-    calls.push({ url: String(input), accept: new Headers(init?.headers).get('Accept') });
-    return new Response(options.body ?? 'image-bytes', {
+    const reqHeaders = new Headers(init?.headers);
+    calls.push({
+      url: String(input),
+      accept: reqHeaders.get('Accept'),
+      range: reqHeaders.get('Range'),
+      ifRange: reqHeaders.get('If-Range'),
+    });
+    return new Response(options.body === undefined ? 'image-bytes' : options.body, {
       status: options.status ?? 200,
       headers: {
         'Content-Type': options.contentType ?? 'image/webp',
@@ -22,6 +35,7 @@ function supabaseFetch(options: { status?: number; contentType?: string; body?: 
         'X-Robots-Tag': 'none',
         'Set-Cookie': '__cf_bm=tracking; Domain=supabase.co',
         'sb-project-ref': 'mxmmffwntosvwaviippd',
+        ...(options.extraHeaders || {}),
       },
     });
   }) as typeof fetch;
@@ -47,10 +61,10 @@ function mediaRequest(path: string, headers: Record<string, string> = {}, method
   return new Request(`${ORIGIN}${path}`, { method, headers });
 }
 
-test('serves Supabase images without the noindex header or Supabase cookies', async () => {
+test('serves Supabase images (including .jfif and escaped parentheses) without noindex or Supabase cookies', async () => {
   const { calls, fetchImpl } = supabaseFetch();
   const response = await handleMediaRequest(
-    mediaRequest('/media/product-images/products/a.jpg?width=800&resize=contain', { Accept: 'image/avif,image/webp,*/*' }),
+    mediaRequest('/media/product-images/products/a.jfif?width=800&resize=contain', { Accept: 'image/avif,image/webp,*/*' }),
     undefined,
     { fetch: fetchImpl, cache: null },
   );
@@ -66,9 +80,21 @@ test('serves Supabase images without the noindex header or Supabase cookies', as
   assert.equal(response.headers.get('X-Content-Type-Options'), 'nosniff');
   assert.match(response.headers.get('Content-Security-Policy') || '', /sandbox/);
   assert.deepEqual(calls, [{
-    url: `${STORAGE}/render/image/public/product-images/products/a.jpg?width=800&resize=contain`,
+    url: `${STORAGE}/render/image/public/product-images/products/a.jfif?width=800&resize=contain`,
     accept: 'image/webp',
+    range: null,
+    ifRange: null,
   }]);
+
+  const parens = supabaseFetch({ contentType: 'image/jpeg' });
+  const parensRes = await handleMediaRequest(
+    mediaRequest('/media/comp%20image/CE%281%29%281%29.jpg'),
+    undefined,
+    { fetch: parens.fetchImpl, cache: null },
+  );
+  assert.equal(parensRes.status, 200);
+  assert.equal(parensRes.headers.get('X-Robots-Tag'), null);
+  assert.equal(parens.calls[0].url, `${STORAGE}/object/public/comp%20image/CE%281%29%281%29.jpg`);
 });
 
 test('original files come from the object endpoint and are not format-negotiated', async () => {
@@ -79,7 +105,84 @@ test('original files come from the object endpoint and are not format-negotiated
   });
   assert.equal(response.status, 200);
   assert.equal(response.headers.get('Vary'), null);
-  assert.deepEqual(calls, [{ url: `${STORAGE}/object/public/comp%20image/logo.png`, accept: '*/*' }]);
+  assert.deepEqual(calls, [{
+    url: `${STORAGE}/object/public/comp%20image/logo.png`,
+    accept: '*/*',
+    range: null,
+    ifRange: null,
+  }]);
+});
+
+test('streams .mp4 video Range requests (206 Partial Content), strips X-Robots-Tag, and skips cache.put on 206', async () => {
+  const chunks = [new TextEncoder().encode('ftyp'), new TextEncoder().encode('moov-data')];
+  const stream = new ReadableStream<Uint8Array>({
+    start(controller) {
+      for (const chunk of chunks) controller.enqueue(chunk);
+      controller.close();
+    },
+  });
+
+  const { calls, fetchImpl } = supabaseFetch({
+    status: 206,
+    contentType: 'video/mp4',
+    body: stream,
+    extraHeaders: {
+      'Content-Length': '13',
+      'Content-Range': 'bytes 0-12/3512867',
+    },
+  });
+  const { cache, store } = memoryCache();
+
+  const response = await handleMediaRequest(
+    mediaRequest('/media/product-videos/videos/1782526758014-t1n84v7.mp4', {
+      Range: 'bytes=0-12',
+      'If-Range': '"abc123"',
+    }),
+    undefined,
+    { fetch: fetchImpl, cache },
+  );
+
+  assert.equal(response.status, 206);
+  assert.equal(response.headers.get('Content-Type'), 'video/mp4');
+  assert.equal(response.headers.get('Content-Range'), 'bytes 0-12/3512867');
+  assert.equal(response.headers.get('Content-Length'), '13');
+  assert.equal(response.headers.get('Accept-Ranges'), 'bytes');
+  assert.equal(response.headers.get('X-Robots-Tag'), null);
+  assert.equal(response.headers.get('Set-Cookie'), null);
+  assert.equal(await response.text(), 'ftypmoov-data');
+  assert.equal(store.size, 0, '206 Partial Content responses must not be written to caches.default');
+  assert.deepEqual(calls, [{
+    url: `${STORAGE}/object/public/product-videos/videos/1782526758014-t1n84v7.mp4`,
+    accept: '*/*',
+    range: 'bytes=0-12',
+    ifRange: '"abc123"',
+  }]);
+});
+
+test('caches full 200 video responses cleanly while still serving subsequent Range requests from upstream', async () => {
+  const { calls, fetchImpl } = supabaseFetch({
+    status: 200,
+    contentType: 'video/mp4',
+    body: 'full-video-bytes',
+    extraHeaders: {
+      'Content-Length': '16',
+      'Accept-Ranges': 'bytes',
+    },
+  });
+  const { cache, store } = memoryCache();
+  const path = '/media/product-videos/videos/clip.mp4';
+
+  const fullRes = await handleMediaRequest(mediaRequest(path), undefined, { fetch: fetchImpl, cache });
+  assert.equal(fullRes.status, 200);
+  assert.equal(fullRes.headers.get('X-Robots-Tag'), null);
+  assert.equal(fullRes.headers.get('Accept-Ranges'), 'bytes');
+  assert.equal(await fullRes.text(), 'full-video-bytes');
+  assert.equal(store.size, 1);
+
+  const cachedRes = await handleMediaRequest(mediaRequest(path), undefined, { fetch: fetchImpl, cache });
+  assert.equal(cachedRes.status, 200);
+  assert.equal(await cachedRes.text(), 'full-video-bytes');
+  assert.equal(calls.length, 1, 'repeat full 200 request is served from cache');
 });
 
 test('caches each negotiated format separately and serves repeats from the edge cache', async () => {
@@ -119,9 +222,14 @@ test('answers conditional and HEAD requests without a body', async () => {
   assert.equal(await head.text(), '');
 });
 
-test('refuses non-media paths, non-image content and upstream failures', async () => {
+test('refuses non-media paths, video resize params, mismatched content types and upstream failures', async () => {
   const { calls, fetchImpl } = supabaseFetch();
-  for (const path of ['/media/private/a.jpg', '/media/product-videos/videos/a.mp4', '/media/product-images/a.jpg?width=99999']) {
+  for (const path of [
+    '/media/private/a.jpg',
+    '/media/private/a.mp4',
+    '/media/product-videos/videos/a.mp4?width=800',
+    '/media/product-images/a.jpg?width=99999',
+  ]) {
     const response = await handleMediaRequest(mediaRequest(path), undefined, { fetch: fetchImpl, cache: null });
     assert.equal(response.status, 404, path);
     assert.equal(response.headers.get('X-Robots-Tag'), 'noindex');
@@ -131,6 +239,10 @@ test('refuses non-media paths, non-image content and upstream failures', async (
   const html = supabaseFetch({ contentType: 'text/html' });
   assert.equal(
     (await handleMediaRequest(mediaRequest('/media/product-images/a.jpg'), undefined, { fetch: html.fetchImpl, cache: null })).status,
+    404,
+  );
+  assert.equal(
+    (await handleMediaRequest(mediaRequest('/media/product-videos/videos/a.mp4'), undefined, { fetch: html.fetchImpl, cache: null })).status,
     404,
   );
   const missing = supabaseFetch({ status: 400, contentType: 'application/json' });

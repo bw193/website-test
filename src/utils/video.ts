@@ -7,6 +7,7 @@ import type {
   VideoSourceType,
 } from '../types/video';
 import { pickLocalized } from './blog';
+import { toMediaUrl } from './media';
 
 const DIRECT_VIDEO_RE = /\.(mp4|webm|ogg|mov)(\?.*)?$/i;
 
@@ -18,26 +19,130 @@ export const FALLBACK_VIDEO_THUMB =
 export const VIDEO_LIST_COLUMNS =
   'id, slug, source_type, video_url, embed_url, thumbnail_url, category, tags, duration_seconds, published_at, title, excerpt';
 
+const VIDEO_CATEGORY_LABELS: Record<string, Record<string, string>> = {
+  'Factory Tour': {
+    en: 'Factory Tour',
+    zh: '工厂实拍',
+    es: 'Recorrido de fábrica',
+    fr: "Visite d'usine",
+    de: 'Werksrundgang',
+    it: 'Tour della fabbrica',
+  },
+  Factory: {
+    en: 'Factory',
+    zh: '工厂实拍',
+    es: 'Recorrido de fábrica',
+    fr: "Visite d'usine",
+    de: 'Werksrundgang',
+    it: 'Tour della fabbrica',
+  },
+  'Product Demo': {
+    en: 'Product Demo',
+    zh: '产品演示',
+    es: 'Demostración de producto',
+    fr: 'Démonstration produit',
+    de: 'Produktdemo',
+    it: 'Demo prodotto',
+  },
+  Installation: {
+    en: 'Installation',
+    zh: '安装演示',
+    es: 'Instalación',
+    fr: 'Installation',
+    de: 'Installation',
+    it: 'Installazione',
+  },
+  'Smart Features': {
+    en: 'Smart Features',
+    zh: '智能功能',
+    es: 'Funciones inteligentes',
+    fr: 'Fonctions intelligentes',
+    de: 'Smart-Funktionen',
+    it: 'Funzioni smart',
+  },
+  Technology: {
+    en: 'Technology',
+    zh: '技术解析',
+    es: 'Tecnología',
+    fr: 'Technologie',
+    de: 'Technologie',
+    it: 'Tecnologia',
+  },
+  'Quality Control': {
+    en: 'Quality Control',
+    zh: '质量控制',
+    es: 'Control de calidad',
+    fr: 'Contrôle qualité',
+    de: 'Qualitätskontrolle',
+    it: 'Controllo qualità',
+  },
+};
+
+const VIDEO_SUMMARY_TEMPLATES: Record<string, (title: string) => string> = {
+  en: (title) => `${title} — product demonstration and factory video from BOLEN Mirror.`,
+  zh: (title) => `${title} — BOLEN 镜业工厂实拍与产品功能演示视频。`,
+  es: (title) => `${title} — demostración de producto y video de fábrica de BOLEN Mirror.`,
+  fr: (title) => `${title} — démonstration produit et vidéo d'usine par BOLEN Mirror.`,
+  de: (title) => `${title} — Produktvorführung und Werksvideo von BOLEN Mirror.`,
+  it: (title) => `${title} — dimostrazione prodotto e video di fabbrica di BOLEN Mirror.`,
+};
+
+/** Localizes known English video category names for `VideoObject.genre` and UI fallbacks. */
+export function localizeVideoCategory(category: string | null | undefined, lang: string): string {
+  const trimmed = (category || '').trim();
+  if (!trimmed) return '';
+  const entry = VIDEO_CATEGORY_LABELS[trimmed];
+  if (!entry) return trimmed;
+  return entry[lang] || entry.en || trimmed;
+}
+
+function stripMarkdownText(value: string): string {
+  return value
+    .replace(/!\[[^\]]*]\([^)]*\)/g, ' ')
+    .replace(/\[([^\]]+)]\([^)]*\)/g, '$1')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/[`*_>#|~]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/** True when a text string is empty or looks like a bare SKU/model code (< 15 chars). */
+export function isBareModelCodeDescription(value: string | null | undefined): boolean {
+  const trimmed = (value || '').trim();
+  if (!trimmed) return true;
+  if (trimmed.length < 15) return true;
+  return /^[A-Z0-9_-]{2,24}$/i.test(trimmed);
+}
+
+/**
+ * Ensures video descriptions / excerpts never emit bare model codes like `"1016"`
+ * or `"CTL0075B"`, falling back to clean body prose or a localized title summary.
+ */
+export function resolveVideoDescription(
+  video: { title: string; excerpt?: string | null; body?: string | null },
+  lang: string
+): string {
+  const excerpt = (video.excerpt || '').trim();
+  if (!isBareModelCodeDescription(excerpt)) return excerpt;
+
+  const cleanBody = video.body ? stripMarkdownText(video.body) : '';
+  if (cleanBody.length >= 15) {
+    return cleanBody.length > 180 ? `${cleanBody.slice(0, 177).trimEnd()}...` : cleanBody;
+  }
+
+  const cleanTitle = (video.title || '').trim();
+  const buildFallback = VIDEO_SUMMARY_TEMPLATES[lang] || VIDEO_SUMMARY_TEMPLATES.en;
+  return cleanTitle ? buildFallback(cleanTitle) : 'BOLEN Mirror product and factory video.';
+}
+
 /**
  * Ceiling on what the homepage's background video may stream, deliberately set
  * high enough to admit the ~30MB factory film the site owner wants as the
- * backdrop. That is a lot of data for a section a visitor merely scrolled past,
- * so the cost is contained elsewhere instead: nothing loads until the band is
- * in view, metered and slow connections fall back to the poster, playback pauses
- * off-screen, and repeat visits revalidate to a 304. Lower this to ~6MB to make
- * the guard strict again — every product clip is under 5MB and still qualifies.
+ * backdrop.
  */
 export const AMBIENT_CLIP_BUDGET_BYTES = 32 * 1024 * 1024;
 /** Loop length when an excerpt is worth taking. */
 export const AMBIENT_CLIP_PREFERRED_SECONDS = 12;
-/**
- * How much media a browser pulls regardless of the window we ask for. A media
- * fragment bounds *playback*, not buffering: measured in Chrome, a 12s window of
- * a 130s/26MB upload still transferred ~11MB, and a 5s window of a 45s/53MB one
- * transferred ~47MB. So an excerpt is a byte *reducer*, never a byte guarantee,
- * and the affordability check has to price in the readahead. Calibrated
- * conservatively against those two measurements.
- */
 export const AMBIENT_READAHEAD_SECONDS = 55;
 
 export interface AmbientClipPlan {
@@ -51,26 +156,15 @@ export interface AmbientClipPlan {
   bytes: number | null;
 }
 
-/**
- * Decides whether the homepage can afford a video as its backdrop, and whether
- * to loop an excerpt instead of the whole thing.
- *
- * Excerpting helps exactly one shape of file: long and low-bitrate, where the
- * browser's readahead covers less than the full duration (a 3-minute 0.1 MB/s
- * upload transfers ~5MB instead of 18MB). It cannot rescue a high-bitrate file —
- * the readahead alone busts the budget — so those get the poster instead.
- */
 export function planAmbientClip(
   totalBytes: number | null,
   durationSeconds: number | null | undefined
 ): AmbientClipPlan | null {
-  // No duration means no way to size a window, so only pass files already small.
   if (!durationSeconds || durationSeconds <= 0) {
     if (totalBytes !== null && totalBytes > AMBIENT_CLIP_BUDGET_BYTES) return null;
     return { start: 0, seconds: 0, full: true, bytes: totalBytes };
   }
 
-  // No size means no bitrate to reason about; excerpt long sources on principle.
   if (totalBytes === null) {
     const excerpt = durationSeconds > AMBIENT_READAHEAD_SECONDS;
     return {
@@ -82,28 +176,17 @@ export function planAmbientClip(
   }
 
   const bytesPerSecond = totalBytes / durationSeconds;
-  // What the browser will really transfer, whatever window we ask it to play.
   const estimatedBytes = Math.min(totalBytes, bytesPerSecond * AMBIENT_READAHEAD_SECONDS);
   if (estimatedBytes > AMBIENT_CLIP_BUDGET_BYTES) return null;
 
-  // Only excerpt when it actually saves bytes — otherwise the browser fetches the
-  // whole file anyway and a short loop would just cost variety for nothing.
   if (durationSeconds <= AMBIENT_READAHEAD_SECONDS) {
     return { start: 0, seconds: durationSeconds, full: true, bytes: totalBytes };
   }
-  // Start a fifth of the way in: the opening seconds of these uploads are
-  // usually a title card or a dark pan.
   const seconds = AMBIENT_CLIP_PREFERRED_SECONDS;
   const start = Math.max(0, Math.min(durationSeconds * 0.2, durationSeconds - seconds));
   return { start, seconds, full: false, bytes: estimatedBytes };
 }
 
-/**
- * Byte size of a media URL via HEAD. `null` when it can't be determined —
- * callers should treat that as "no objection" rather than blocking playback.
- * Supabase storage serves `access-control-allow-origin: *`, and Content-Length
- * is CORS-safelisted, so this is readable from the browser.
- */
 export async function fetchMediaSize(url: string): Promise<number | null> {
   try {
     const res = await fetch(url, { method: 'HEAD' });
@@ -158,10 +241,9 @@ export function videoMimeType(url: string | null | undefined): string {
 }
 
 /**
- * Turns a stored embed URL into the one the player iframe should load once the
- * visitor has pressed play. YouTube is moved to the privacy-enhanced
- * youtube-nocookie host, and both providers get `autoplay=1` so the click on
- * the facade starts playback without a second click inside the iframe.
+ * Turns a stored embed URL into the one the player iframe should load. YouTube
+ * is moved to the privacy-enhanced youtube-nocookie host, and both providers get
+ * `autoplay=1` when requested.
  */
 export function buildPlaybackEmbedSrc(src: string, options: { autoplay?: boolean } = {}): string {
   const parsed = parseAbsoluteUrl(src);
@@ -249,7 +331,7 @@ export function deriveVideoThumbnailUrl(video: {
   embed_url?: string | null;
 }): string {
   const stored = (video.thumbnail_url || '').trim();
-  if (stored) return stored;
+  if (stored) return toMediaUrl(stored);
   return youtubePosterUrl(video.video_url) || youtubePosterUrl(video.embed_url);
 }
 
@@ -282,10 +364,10 @@ export function getVideoPlayback(video: {
     if (src) return { kind: 'embed', src };
   }
   if ((video.source_type === 'upload' || video.source_type === 'direct') && video.video_url) {
-    return { kind: 'video', src: video.video_url };
+    return { kind: 'video', src: toMediaUrl(video.video_url) };
   }
   if (isDirectVideoUrl(video.video_url)) {
-    return { kind: 'video', src: video.video_url || '' };
+    return { kind: 'video', src: toMediaUrl(video.video_url || '') };
   }
   const embedSrc = video.embed_url || buildEmbedUrl(video.embed_url);
   return embedSrc ? { kind: 'embed', src: embedSrc } : { kind: 'missing', src: '' };
@@ -311,42 +393,51 @@ export function parseFeaturedVideoSlug(raw: string | null | undefined): string {
 }
 
 export function localizeVideo(post: VideoPost, lang: string): LocalizedVideoPost {
+  const title = pickLocalized(post.title, lang);
+  const rawExcerpt = pickLocalized(post.excerpt, lang);
+  const body = pickLocalized(post.body, lang);
+  const rawSeoDesc = pickLocalized(post.seo_description, lang);
+  const thumb = deriveVideoThumbnailUrl(post);
   return {
     id: post.id,
     slug: post.slug,
     status: post.status,
     source_type: normalizeVideoSourceType(post.source_type),
-    video_url: post.video_url ?? null,
+    video_url: post.video_url ? toMediaUrl(post.video_url) : null,
     embed_url: post.embed_url ?? null,
-    thumbnail_url: deriveVideoThumbnailUrl(post) || null,
+    thumbnail_url: thumb || null,
     category: post.category ?? null,
     tags: Array.isArray(post.tags) ? post.tags.filter(Boolean) : [],
     duration_seconds: post.duration_seconds ?? null,
     published_at: post.published_at ?? null,
     updated_at: post.updated_at ?? null,
-    title: pickLocalized(post.title, lang),
-    excerpt: pickLocalized(post.excerpt, lang),
-    body: pickLocalized(post.body, lang),
+    title,
+    excerpt: resolveVideoDescription({ title, excerpt: rawExcerpt, body }, lang),
+    body,
     seo_title: pickLocalized(post.seo_title, lang) || undefined,
-    seo_description: pickLocalized(post.seo_description, lang) || undefined,
+    seo_description: !isBareModelCodeDescription(rawSeoDesc) ? rawSeoDesc : undefined,
     search_text: rawVideoSearchText(post),
   };
 }
 
 export function toVideoListItem(post: VideoPost, lang: string): VideoListItem {
+  const title = pickLocalized(post.title, lang);
+  const rawExcerpt = pickLocalized(post.excerpt, lang);
+  const body = pickLocalized(post.body, lang);
+  const thumb = deriveVideoThumbnailUrl(post);
   return {
     id: post.id,
     slug: post.slug,
     source_type: normalizeVideoSourceType(post.source_type),
-    video_url: post.video_url ?? null,
+    video_url: post.video_url ? toMediaUrl(post.video_url) : null,
     embed_url: post.embed_url ?? null,
-    thumbnail_url: deriveVideoThumbnailUrl(post) || null,
+    thumbnail_url: thumb || null,
     category: post.category ?? null,
     tags: Array.isArray(post.tags) ? post.tags.filter(Boolean) : [],
     duration_seconds: post.duration_seconds ?? null,
     published_at: post.published_at ?? null,
-    title: pickLocalized(post.title, lang),
-    excerpt: pickLocalized(post.excerpt, lang),
+    title,
+    excerpt: resolveVideoDescription({ title, excerpt: rawExcerpt, body }, lang),
     search_text: rawVideoSearchText(post),
   };
 }

@@ -1187,11 +1187,12 @@ function notFoundAwareAssets(): { env: Env; requested: string[] } {
   return { env, requested };
 }
 
-test('deployed Worker serves the employee-portal shell with 200 for every /admin path', async () => {
+test('deployed Worker serves the employee-portal shell with 200 and X-Robots-Tag: noindex, nofollow for every /admin path', async () => {
   for (const pathname of ['/admin', '/admin/', '/admin/login', '/admin/products/new', '/admin/products/5e8e0cf4-f9ed-4486-9aa3-d0a75ebfbb93']) {
     const { env, requested } = notFoundAwareAssets();
     const response = await reliableWorker.fetch(new Request(`https://bolenmirror.com${pathname}`), env);
     assert.equal(response.status, 200, pathname);
+    assert.equal(response.headers.get('X-Robots-Tag'), 'noindex, nofollow', pathname);
     assert.equal(await response.text(), 'admin shell');
     assert.deepEqual(requested, ['/admin/']);
   }
@@ -1244,6 +1245,13 @@ test('deployed Worker redirects retired category paths, Oct 14 localized slugs, 
   );
   assert.equal(framedCategory.status, 301);
   assert.equal(framedCategory.headers.get('Location'), '/en/products/category/led-lighted-mirror/');
+
+  const magnifyingCategory = await reliableWorker.fetch(
+    new Request('https://bolenmirror.com/en/products/category/magnifying-makeup-mirror/'),
+    environment(),
+  );
+  assert.equal(magnifyingCategory.status, 301);
+  assert.equal(magnifyingCategory.headers.get('Location'), '/en/products/category/led-lighted-mirror/');
 
   const uncategorizedIndex = await reliableWorker.fetch(
     new Request('https://bolenmirror.com/zh/products/category/uncategorized/'),

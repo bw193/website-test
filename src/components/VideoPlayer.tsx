@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import { Play, VideoOff } from 'lucide-react';
+import React from 'react';
+import { VideoOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import VideoPoster from './VideoPoster';
 import { optimizeImage } from '../utils/optimizeImage';
 import { toMediaPath } from '../utils/media';
-import { buildPlaybackEmbedSrc, formatVideoDuration, getVideoPlayback } from '../utils/video';
+import { buildPlaybackEmbedSrc, getVideoPlayback, videoMimeType } from '../utils/video';
 import type { LocalizedVideoPost, VideoListItem } from '../types/video';
 
 type PlayerVideo = Pick<
@@ -16,9 +16,8 @@ interface VideoPlayerProps {
   video: PlayerVideo;
   className?: string;
   /**
-   * Mount the real player straight away instead of the poster facade. Only for
-   * callers that already received a click (e.g. a "Play film" button) — the
-   * user gesture is what lets unmuted autoplay through.
+   * Autoplay immediately when mounted from an explicit user gesture (e.g. a
+   * "Play film" button).
    */
   autoPlay?: boolean;
   /** The poster is the LCP candidate on watch pages; raise its fetch priority. */
@@ -28,8 +27,6 @@ interface VideoPlayerProps {
 
 const POSTER_WIDTHS = [640, 1024, 1600];
 
-// Origins the YouTube / Vimeo players hit on load. Warmed on hover/focus of the
-// facade so the connection cost is paid before the click, not after it.
 const EMBED_ORIGINS: Record<string, string[]> = {
   youtube: ['https://www.youtube-nocookie.com', 'https://www.google.com'],
   vimeo: ['https://player.vimeo.com', 'https://i.vimeocdn.com', 'https://f.vimeocdn.com'],
@@ -50,28 +47,32 @@ function warmConnections(src: string) {
 }
 
 /**
- * Watch-page player. Renders a poster facade first — a YouTube iframe alone is
- * ~500 KB of script, so nothing third-party loads until the visitor presses
- * play. The click swaps in the iframe (privacy-enhanced host, autoplay=1) or a
- * native <video> for self-hosted files. Structured data on the page carries
- * the VideoObject, so crawlers don't depend on the player being mounted.
+ * Watch-page player. Always renders a crawlable `<video>` or `<iframe>` in the
+ * DOM so Googlebot Video can verify and index playback on every watch page:
+ * - Self-hosted MP4/WebM/MOV clips mount `<video controls preload="metadata">`
+ *   addressed through same-origin `/media/...` (no X-Robots-Tag: none).
+ * - YouTube/Vimeo embeds paint the local responsive poster immediately for LCP
+ *   while mounting `<iframe loading="lazy" src="...">` directly in the DOM.
  */
-export default function VideoPlayer({ video, className = '', autoPlay = false, priority = false, onPlay }: VideoPlayerProps) {
+export default function VideoPlayer({
+  video,
+  className = '',
+  autoPlay = false,
+  priority = false,
+  onPlay,
+}: VideoPlayerProps) {
   const { t } = useTranslation();
   const playback = getVideoPlayback(video);
-  const [activated, setActivated] = useState(autoPlay);
-  const duration = formatVideoDuration(video.duration_seconds);
-
-  const activate = () => {
-    if (activated) return;
-    setActivated(true);
-    onPlay?.();
-  };
-
-  const playLabel = t('videos.playLabel', { title: video.title, defaultValue: 'Play video: {{title}}' }) as string;
+  const mediaSrc = playback.kind === 'video' ? toMediaPath(playback.src) : '';
+  const posterPath = toMediaPath(video.thumbnail_url) || undefined;
+  const mimeType = playback.kind === 'video' ? videoMimeType(playback.src) : '';
 
   return (
-    <div className={`relative aspect-video overflow-hidden bg-stone-950 ${className}`.trim()}>
+    <div
+      className={`relative aspect-video overflow-hidden bg-stone-950 ${className}`.trim()}
+      onPointerEnter={() => playback.kind === 'embed' && warmConnections(playback.src)}
+      onFocus={() => playback.kind === 'embed' && warmConnections(playback.src)}
+    >
       {playback.kind === 'missing' ? (
         <VideoPoster fill aspect="video" src={video.thumbnail_url} alt="" loading="eager" imgClassName="opacity-40">
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-6 text-center text-white">
@@ -81,57 +82,7 @@ export default function VideoPlayer({ video, className = '', autoPlay = false, p
             </p>
           </div>
         </VideoPoster>
-      ) : !activated ? (
-        <VideoPoster
-          fill
-          aspect="video"
-          src={video.thumbnail_url}
-          alt=""
-          loading="eager"
-          fetchPriority={priority ? 'high' : undefined}
-          widths={POSTER_WIDTHS}
-          sizes="(max-width: 1280px) 100vw, 1152px"
-          className="group"
-          imgClassName="transition-transform duration-700 ease-out group-hover:scale-[1.02]"
-        >
-          <div
-            aria-hidden="true"
-            className="absolute inset-0 bg-gradient-to-t from-stone-950/70 via-stone-950/5 to-stone-950/25 transition-opacity duration-500 group-hover:opacity-80"
-          />
-          <button
-            type="button"
-            onClick={activate}
-            onPointerEnter={() => playback.kind === 'embed' && warmConnections(playback.src)}
-            onFocus={() => playback.kind === 'embed' && warmConnections(playback.src)}
-            aria-label={playLabel}
-            className="absolute inset-0 flex items-center justify-center focus:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-amber-400/80"
-          >
-            <span
-              aria-hidden="true"
-              className="flex h-16 w-16 items-center justify-center rounded-full bg-white/95 text-stone-950 shadow-[0_12px_40px_rgba(0,0,0,0.45)] transition-all duration-300 group-hover:scale-110 group-hover:bg-amber-400 sm:h-20 sm:w-20"
-            >
-              <Play className="ml-1 h-7 w-7 fill-current sm:h-8 sm:w-8" />
-            </span>
-          </button>
-          {duration && (
-            <span
-              aria-hidden="true"
-              className="pointer-events-none absolute bottom-4 right-4 rounded-md bg-stone-950/80 px-2.5 py-1 text-xs font-semibold tabular-nums text-white backdrop-blur"
-            >
-              {duration}
-            </span>
-          )}
-        </VideoPoster>
-      ) : playback.kind === 'embed' ? (
-        <iframe
-          src={buildPlaybackEmbedSrc(playback.src, { autoplay: true })}
-          title={video.title}
-          className="absolute inset-0 h-full w-full"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowFullScreen
-          referrerPolicy="strict-origin-when-cross-origin"
-        />
-      ) : (
+      ) : playback.kind === 'video' ? (
         <>
           {/* Product clips are often shot vertically; a blurred still fills the
               pillarbox instead of flat black bars. */}
@@ -140,18 +91,44 @@ export default function VideoPlayer({ video, className = '', autoPlay = false, p
               src={optimizeImage(video.thumbnail_url, { width: 96, quality: 40 })}
               alt=""
               aria-hidden="true"
+              loading={priority ? 'eager' : 'lazy'}
               className="absolute inset-0 h-full w-full scale-110 object-cover opacity-60 blur-2xl"
               referrerPolicy="no-referrer"
             />
           )}
           <video
-            className="absolute inset-0 h-full w-full object-contain"
-            src={playback.src}
-            poster={toMediaPath(video.thumbnail_url) || undefined}
+            className="relative z-10 h-full w-full object-contain"
+            src={mediaSrc}
+            poster={posterPath}
             controls
-            autoPlay
+            autoPlay={autoPlay}
             playsInline
-            preload="auto"
+            preload={autoPlay ? 'auto' : 'metadata'}
+            onPlay={onPlay}
+          >
+            {mimeType && <source src={mediaSrc} type={mimeType} />}
+          </video>
+        </>
+      ) : (
+        <>
+          <VideoPoster
+            fill
+            aspect="video"
+            src={video.thumbnail_url}
+            alt=""
+            loading="eager"
+            fetchPriority={priority ? 'high' : undefined}
+            widths={POSTER_WIDTHS}
+            sizes="(max-width: 1280px) 100vw, 1152px"
+          />
+          <iframe
+            src={buildPlaybackEmbedSrc(playback.src, { autoplay: autoPlay })}
+            title={video.title}
+            loading={autoPlay ? undefined : 'lazy'}
+            className="absolute inset-0 z-10 h-full w-full border-0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+            referrerPolicy="strict-origin-when-cross-origin"
           />
         </>
       )}
