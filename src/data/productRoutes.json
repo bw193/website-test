@@ -17,7 +17,7 @@
       "zh": "无框led浴室化妆镜-三色照明无级调光及内置除雾器",
       "es": "espejo-de-tocador-led-sin-marco-con-iluminacion-de-3-colores-regulacion-continua-y-desempanador-integrado",
       "fr": "miroir-de-courtoisie-led-sans-cadre-avec-eclairage-3-couleurs-variation-continue-et-desembueur-integre",
-      "de": "rahmenloser-led-badezimmer-schminkspiegel-mit-3-farben-beleuchtung-stufenloser-dimmung-und-integriertem-entnebler",
+      "de": "rahmenloser-led-badspiegel-mit-3-farben-beleuchtung-stufenloser-dimmung-integrierter-antibeschlagfunktion",
       "it": "specchio-da-trucco-led-senza-cornice-con-illuminazione-a-3-colori-regolazione-continua-e-disappannatore-integrato"
     }
   },
@@ -48,7 +48,7 @@
     "slugs": {
       "en": "factory-price-smart-illuminated-dimmable-anti-fog-mirror-cabinet-with-touch-sensor-switch",
       "zh": "工厂价智能发光可调光防雾镜柜-触摸感应开关",
-      "es": "armario-con-espejo-inteligente-iluminado-regulable-antiniebla-a-precio-de-fabrica-con-interruptor-de-sensor-tactil",
+      "es": "armario-con-espejo-inteligente-iluminado-regulable-y-antivaho-a-precio-de-fabrica-con-interruptor-tactil",
       "fr": "armoire-a-miroir-intelligente-lumineuse-dimmable-antibuee-a-prix-d-usine-avec-interrupteur-a-capteur-tactile",
       "de": "smarter-beleuchteter-dimmbarer-anti-beschlag-spiegelschrank-zum-fabrikpreis-mit-touch-sensor-schalter",
       "it": "armadietto-con-specchio-smart-illuminato-dimmerabile-anti-appannamento-a-prezzo-di-fabbrica-con-interruttore-a-sensore-tattile"
@@ -88,7 +88,7 @@
     }
   },
   "136cc962-0215-44f3-9890-78a61ae23cd7": {
-    "category": "rectangle-led-mirror",
+    "category": "led-lighted-mirror",
     "slugs": {
       "en": "ip44-rounded-corner-wall-mounted-backlit-led-bathroom-mirror",
       "zh": "ip44圆角壁挂背光led浴室镜",
@@ -114,7 +114,7 @@
     "slugs": {
       "en": "frameless-rectangular-led-bathroom-mirror-with-lights-anti-fog-wall-mounted-vanity-mirror",
       "zh": "无框长方形led浴室镜-防雾壁挂发光化妆镜",
-      "es": "espejo-de-bano-led-rectangular-sin-marco-con-luces-espejo-de-tocador-antiniebla-montado-en-pared",
+      "es": "espejo-de-bano-led-rectangular-sin-marco-con-iluminacion-y-sistema-antivaho-de-pared",
       "fr": "miroir-de-salle-de-bain-led-rectangulaire-sans-cadre-avec-lumieres-miroir-de-toilette-antibuee-montage-mural",
       "de": "rahmenloser-rechteckiger-led-badspiegel-mit-lichtern-anti-beschlag-wand-schminkspiegel",
       "it": "specchio-da-bagno-led-rettangolare-senza-cornice-con-luci-specchio-cosmetico-anti-appannamento-montato-a-parete"
@@ -143,7 +143,7 @@
     }
   },
   "1f78bed6-e501-4a5c-be36-fc0c4d75d613": {
-    "category": "framed-led-mirror",
+    "category": "led-lighted-mirror",
     "slugs": {
       "en": "oval-aluminum-framed-led-cosmetic-mirror-for-bathroom-and-hotel",
       "zh": "椭圆铝框led化妆镜-浴室及酒店",
@@ -154,7 +154,7 @@
     }
   },
   "20ad8706-9d80-45b5-b1e0-5a3de92f155b": {
-    "category": "rectangle-led-mirror",
+    "category": "led-lighted-mirror",
     "slugs": {
       "en": "modern-minimalist-frosted-edge-led-bathroom-mirror",
       "zh": "现代简约磨砂边led浴室镜",
@@ -165,7 +165,7 @@
     }
   },
   "20c3c9ee-3a91-4f9c-bb2b-d1cd9e9f12e5": {
-    "category": "frameless-led-mirror",
+    "category": "led-lighted-mirror",
     "slugs": {
       "en": "oval-dimmable-led-light-vanity-mirror-for-bathroom",
       "zh": "椭圆可调光led浴室化妆镜",
@@ -176,7 +176,7 @@
     }
   },
   "261834c8-b7dd-47dd-b924-7d1c3ef6c830": {
-    "category": "mirror-cabinet",
+    "category": "bathroom-vanity",
     "slugs": {
       "en": "high-quality-wood-grain-floating-bathroom-sink-cabinet-ce-certified-wall-hung-vanity-cabinet-for-bulk-order",
       "zh": "高品质木纹悬空浴室洗手柜-ce认证壁挂浴室柜-工程批量采购",
@@ -321,12 +321,12 @@
   "3e16cce8-674c-4cb5-9844-6e7ee93af53a": {
     "category": "led-lighted-mirror",
     "slugs": {
-      "en": "bolen-natual-wood-frame-rectangle-led-bathroom-mirror-with-dimmable-touch-sensor-and-anti-fog",
+      "en": "bolen-natural-wood-frame-rectangle-led-bathroom-mirror-with-dimmable-touch-sensor-and-anti-fog",
       "zh": "bolen-原木框矩形led浴室镜-带调光触摸开关及防雾功能",
       "es": "espejo-de-bano-led-rectangular-bolen-con-marco-de-madera-natural-sensor-tactil-regulable-y-antivaho",
-      "fr": "miroir-de-salle-de-bains-led-rectangulaire-bolen-a-cadre-en-bois-naturel-avec-capteur-tactile-dimmable-et-antibuee",
-      "de": "bolen-rechteckiger-led-badspiegel-mit-naturholzrahmen-dimmbarem-touch-sensor-und-antibeschlagfunktion",
-      "it": "specchio-da-bagno-led-rettangolare-bolen-con-cornice-in-legno-naturale-sensore-tattile-dimmerabile-e-antiappannamento"
+      "fr": "miroir-de-salle-de-bains-led-rectangulaire-bolen-a-cadre-en-bois-naturel-avec-variateur-tactile-et-antibuee",
+      "de": "bolen-rechteckiger-led-badezimmerspiegel-mit-naturholzrahmen-dimmbarem-touch-sensor-und-antibeschlagfunktion",
+      "it": "specchio-da-bagno-led-rettangolare-bolen-con-cornice-in-legno-naturale-sensore-touch-dimmerabile-e-antiappannamento"
     }
   },
   "43198e9f-e9af-48b8-871a-d5f996a7a280": {
@@ -398,12 +398,12 @@
   "5ae9709c-458b-479e-87ab-53deb22246ea": {
     "category": "led-lighted-mirror",
     "slugs": {
-      "en": "ce-certificated-arch-shape-aluminum-dimmable-led-lighted-hotel-bathroom-mirror-with-front-light",
+      "en": "ce-certified-arch-shape-aluminum-dimmable-led-lighted-hotel-bathroom-mirror-with-front-light",
       "zh": "ce认证拱形铝框可调光led酒店浴室镜-正面发光",
-      "es": "espejo-de-bano-de-hotel-led-regulable-de-aluminio-en-forma-de-arco-con-luz-frontal-y-certificacion-ce",
-      "fr": "miroir-de-salle-de-bain-d-hotel-led-dimmable-en-aluminium-en-forme-d-arche-avec-eclairage-frontal-et-certification-ce",
-      "de": "ce-zertifizierter-bogenfoermiger-dimmbarer-led-hotelbadspiegel-aus-aluminium-mit-frontlicht",
-      "it": "specchio-da-bagno-per-hotel-led-dimmerabile-in-alluminio-a-forma-di-arco-con-luce-frontale-e-certificazione-ce"
+      "es": "espejo-de-bano-led-en-arco-con-luz-frontal-y-marco-de-aluminio-regulable-certificado-ce-para-hoteles",
+      "fr": "miroir-de-salle-de-bains-d-hotel-led-en-arche-a-eclairage-frontal-et-cadre-en-aluminium-variable-certifie-ce",
+      "de": "ce-zertifizierter-bogenfoermiger-dimmbarer-led-hotelbadspiegel-mit-aluminiumrahmen-und-frontbeleuchtung",
+      "it": "specchio-da-bagno-led-per-hotel-ad-arco-con-cornice-in-alluminio-luce-frontale-dimmerabile-e-certificazione-ce"
     }
   },
   "5bfe496e-801d-40fd-b937-22771473c856": {
@@ -642,7 +642,7 @@
     "slugs": {
       "en": "frameless-geometric-backlit-led-smart-bathroom-mirror-with-digital-clock-touch-control-anti-fog-wall-mount-vanity-mirror",
       "zh": "无框几何形背光智能led浴室镜-数字时钟及触摸防雾",
-      "es": "espejo-de-bano-led-inteligente-sin-marco-geometrico-retroiluminado-con-reloj-digital-control-tactil-y-antiniebla-montaje-en-pared",
+      "es": "espejo-de-bano-inteligente-led-retroiluminado-geometrico-sin-marco-con-reloj-digital-espejo-de-tocador-mural-con-control-tactil-y-antivaho",
       "fr": "miroir-de-salle-de-bain-led-intelligent-sans-cadre-geometrique-retroeclaire-avec-horloge-numerique-controle-tactile-et-antibuee-montage-mural",
       "de": "rahmenloser-geometrischer-hinterleuchteter-led-smart-badspiegel-mit-digitaluhr-touch-steuerung-und-anti-beschlag-funktion-wandmontage",
       "it": "specchio-da-bagno-led-smart-senza-cornice-geometrico-retroilluminato-con-orologio-digitale-controllo-a-sfioramento-e-anti-appannamento-montaggio-a-parete"
@@ -662,12 +662,12 @@
   "86e7d18b-bcf8-4c71-aa48-e185da0c7796": {
     "category": "full-length-dressing-mirror",
     "slugs": {
-      "en": "wooden-frame-reactanglar-full-length-dressing-mirror-with-free-standings",
+      "en": "wooden-frame-rectangular-full-length-dressing-mirror-with-free-standing-stand",
       "zh": "木框长方形全身穿衣镜-独立落地支架",
-      "es": "espejo-de-vestidor-de-cuerpo-entero-rectangular-con-marco-de-madera-y-moq-bajo-con-soporte-independiente",
-      "fr": "miroir-sur-pied-rectangulaire-a-cadre-en-bois-avec-moq-reduit-et-support-autoportant",
-      "de": "rechteckiger-standspiegel-mit-holzrahmen-niedriger-moq-und-freistehendem-sockel",
-      "it": "specchio-da-toeletta-rettangolare-a-tutta-lunghezza-con-cornice-in-legno-moq-basso-e-supporto-autoportante"
+      "es": "espejo-vestidor-rectangular-de-cuerpo-entero-con-marco-de-madera-y-soporte-independiente",
+      "fr": "miroir-en-pied-rectangulaire-a-cadre-en-bois-avec-chevalet-autoportant",
+      "de": "rechteckiger-ganzkoerper-ankleidespiegel-mit-holzrahmen-und-freistehendem-standfuss",
+      "it": "specchio-rettangolare-a-figura-intera-con-cornice-in-legno-e-supporto-autoportante"
     }
   },
   "8848998b-ea91-4e0e-bb11-b03329617335": {
@@ -708,7 +708,7 @@
     "slugs": {
       "en": "oem-odm-led-bathroom-mirror-with-aluminum-frame-anti-fog-smart-features-for-hotels",
       "zh": "oem及odm铝框led酒店浴室镜-防雾及智能功能",
-      "es": "espejo-led-oem-y-odm-con-puerta-y-marco-de-aluminio-antiniebla-para-hoteles",
+      "es": "espejo-de-bano-led-oem-y-odm-con-marco-de-aluminio-antivaho-y-funciones-inteligentes-para-hoteles",
       "fr": "miroir-led-oem-odm-avec-porte-cadre-en-aluminium-et-antibuee-pour-hotels",
       "de": "oem-odm-led-spiegel-mit-tuer-aluminiumrahmen-und-anti-beschlag-funktion-fuer-hotels",
       "it": "specchio-led-oem-odm-con-anta-e-cornice-in-alluminio-anti-appannamento-per-hotel"
@@ -836,7 +836,7 @@
     }
   },
   "a4a8bf22-584f-455d-a46f-60b191b07c10": {
-    "category": "frameless-led-mirror",
+    "category": "led-lighted-mirror",
     "slugs": {
       "en": "modern-frameless-oval-front-lit-led-bathroom-mirror-for-wholesale",
       "zh": "现代无框椭圆前光led浴室镜-批发供应",
@@ -902,7 +902,7 @@
     }
   },
   "b546b976-b4b6-4a3d-8df0-9ceafba31c57": {
-    "category": "rectangle-led-mirror",
+    "category": "led-lighted-mirror",
     "slugs": {
       "en": "satin-edge-smart-led-bathroom-mirror-with-anti-fog-and-dimmable-light",
       "zh": "磨砂边智能led浴室镜-防雾及可调光照明",
@@ -937,12 +937,12 @@
   "ba773ee4-c38e-46f5-a4c1-6fb3a3d0596e": {
     "category": "led-lighted-mirror",
     "slugs": {
-      "en": "ce-certificated-irregular-organic-pebble-shape-bolen-led-backlit-bathroom-mirror-with-anti-fog",
+      "en": "ce-certified-irregular-organic-pebble-shape-bolen-led-backlit-bathroom-mirror-with-anti-fog",
       "zh": "bolen-ce认证不规则鹅卵石造型防雾led背光浴室镜",
-      "es": "espejo-de-bano-led-retroiluminado-bolen-con-forma-organica-irregular-de-guijarro-antivaho-y-certificado-ce",
-      "fr": "miroir-de-salle-de-bain-led-retroeclaire-bolen-forme-galet-organique-irreguliere-avec-antibuee-certifie-ce",
-      "de": "bolen-ce-zertifizierter-asymmetrischer-led-badspiegel-mit-hintergrundbeleuchtung-in-organischer-kieselform-und-antibeschlag",
-      "it": "specchio-da-bagno-led-retroilluminato-bolen-a-forma-organica-irregolare-a-ciottolo-con-antiappannamento-certificato-ce"
+      "es": "espejo-de-bano-led-retroiluminado-bolen-de-forma-organica-irregular-tipo-guijarro-con-antivaho-y-certificacion-ce",
+      "fr": "miroir-de-salle-de-bains-led-retroeclaire-bolen-forme-galet-organique-irreguliere-certifie-ce-avec-antibuee",
+      "de": "ce-zertifizierter-unregelmaessiger-organischer-kieselstein-led-badspiegel-von-bolen-mit-hintergrundbeleuchtung-und-antibeschlagfunktion",
+      "it": "specchio-bagno-led-retroilluminato-bolen-forma-organica-irregolare-a-ciottolo-certificato-ce-con-antiappannamento"
     }
   },
   "c3dcf397-004d-4468-8bff-1578a5861158": {
@@ -1014,12 +1014,12 @@
   "c760cc83-b3fb-4f8c-99e0-a388e99582a2": {
     "category": "led-lighted-mirror",
     "slugs": {
-      "en": "pool-shape-wall-mounted-bathroom-decoration-black-aluminum-frame-mirror",
-      "zh": "泳池形黑色铝框壁挂浴室装饰镜",
-      "es": "espejo-decorativo-de-bano-con-forma-de-piscina-marco-de-aluminio-negro-y-montaje-en-pared",
-      "fr": "miroir-decoratif-mural-pour-salle-de-bains-en-forme-de-bassin-avec-cadre-en-aluminium-noir",
-      "de": "beckenfoermiger-wandmontierter-dekorationsspiegel-fuers-badezimmer-mit-schwarzem-aluminiumrahmen",
-      "it": "specchio-decorativo-da-parete-per-bagno-a-forma-di-piscina-con-cornice-in-alluminio-nero"
+      "en": "capsule-oval-wall-mounted-bathroom-decoration-black-aluminum-frame-mirror",
+      "zh": "跑道椭圆形黑色铝框壁挂浴室装饰镜",
+      "es": "espejo-decorativo-de-bano-mural-ovalado-tipo-capsula-con-marco-de-aluminio-negro",
+      "fr": "miroir-decoratif-mural-de-salle-de-bains-ovale-capsule-avec-cadre-en-aluminium-noir",
+      "de": "kapselfoermiger-ovaler-wandspiegel-mit-schwarzem-aluminiumrahmen-zur-badezimmerdekoration",
+      "it": "specchio-decorativo-da-parete-per-bagno-ovale-a-capsula-con-cornice-in-alluminio-nero"
     }
   },
   "c8c28e07-559c-4189-81c8-e4f4f4dbf4cf": {
@@ -1177,7 +1177,7 @@
     }
   },
   "e518e8b6-0eba-49ea-82b1-832ae08bd846": {
-    "category": "mirror-cabinet",
+    "category": "bathroom-vanity",
     "slugs": {
       "en": "floating-wood-grain-bathroom-vanity-cabinet-ce-certified-for-hotel-villa-projects",
       "zh": "悬空木纹浴室柜-ce认证-酒店别墅工程定制",
@@ -1199,14 +1199,14 @@
     }
   },
   "e5628be8-2e36-4731-865c-a96b2b20f157": {
-    "category": "mirror-cabinet",
+    "category": "bathroom-vanity",
     "slugs": {
       "en": "custom-electric-bathroom-vanity-sink-cabinet-with-led-lighting-ip44-waterproof-multi-country-plug-optional-for-global-contractors",
       "zh": "工程定制ip44防水多国插头可选led照明电动浴室洗手盆柜",
-      "es": "mueble-de-bano-electrico-personalizado-con-lavabo-e-iluminacion-led-impermeable-ip44-y-enchufe-multipais-opcional-para-contratistas-internacionales",
-      "fr": "meuble-lavabo-de-salle-de-bain-electrique-sur-mesure-avec-eclairage-led-etanche-ip44-prise-multi-pays-en-option-pour-maitres-d-oeuvre-internationaux",
-      "de": "kundenspezifischer-elektrischer-badezimmer-waschtischunterschrank-mit-led-beleuchtung-wasserschutz-ip44-und-optionalem-mehrlaender-stecker-fuer-internationale-projektkunden",
-      "it": "mobile-bagno-elettrico-con-lavabo-e-illuminazione-led-su-misura-impermeabile-ip44-spina-multi-paese-opzionale-per-appaltatori-globali"
+      "es": "mueble-de-bano-electrico-a-medida-con-lavabo-e-iluminacion-led-impermeable-ip44-y-enchufe-multipais-opcional-para-contratistas-globales",
+      "fr": "meuble-lavabo-electrique-sur-mesure-avec-eclairage-led-etanche-ip44-et-prises-internationales-en-option-pour-entrepreneurs-globaux",
+      "de": "massgefertigter-elektrischer-badezimmer-waschtischunterschrank-mit-led-beleuchtung-ip44-spritzwassergeschuetzt-laenderstecker-optionen-fuer-globale-projektkunden",
+      "it": "mobile-lavabo-da-bagno-elettrico-su-misura-con-illuminazione-led-impermeabile-ip44-e-spina-multipaese-opzionale-per-appaltatori-globali"
     }
   },
   "e7518716-08ba-441d-b82a-a6610c48bb16": {
