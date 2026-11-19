@@ -24,6 +24,9 @@ export type SeoLandingPage = {
   relatedSlugs: string[];
   shortTitle?: string;
   blurb?: string;
+  footerAnchor?: string;
+  homeAnchor?: string;
+  relatedAnchor?: string;
 };
 
 export type SeoLandingPageTranslation = Pick<
@@ -36,751 +39,761 @@ export const SEO_SOLUTIONS_PATH = '/solutions';
 export const SEO_LANDING_PAGES: SeoLandingPage[] = [
   {
     slug: 'led-bathroom-mirror-manufacturer',
-    title: 'LED Bathroom Mirror Manufacturer in China | BOLEN',
+    title: 'LED Bathroom Mirror Manufacturer | EN 1036 & IP44 OEM | BOLEN',
     description:
-      'Source custom LED bathroom mirrors from BOLEN, a China manufacturer with OEM/ODM development, flexible specifications and export support.',
-    eyebrow: 'Factory-direct LED mirror programs',
+      'OEM LED bathroom mirror manufacturer with 5mm copper-free EN 1036 glass, CRI ≥ 90, 2700K–6500K dimming, IP44/IP54 protection, UL 962 / CE EN 60598 compliance and 25–35 day lead times.',
+    eyebrow: 'OEM optical & electrical vanity mirror engineering',
     h1: 'LED Bathroom Mirror Manufacturer for Vanity Collections',
     intro:
-      'BOLEN helps importers, distributors, bathroom brands, hotel suppliers and project buyers develop LED bathroom mirror collections around real market requirements. Our Jiaxing manufacturing base brings glass processing, frame preparation, LED integration, assembly, inspection and export packaging into one coordinated production workflow.',
+      'BOLEN engineers and manufactures custom LED bathroom mirror collections inside our 46,800 m² Jiaxing facility (established 2005, 6 production lines, 200+ specialists). Built around 5mm copper-free silver glass (EN 1036), CRI ≥ 90 high-density 2835 SMD LEDs, 2700K–6500K stepless CCT, and IP44/IP54 sealed electrical housings, every model is engineered for regional compliance (UL 962, CE EN 60598, SAA, RoHS) before sampling.',
     proofPoints: [
-      { value: 'Since 2005', label: 'Mirror manufacturing experience' },
-      { value: '46,800 m²', label: 'Integrated production complex' },
-      { value: '200+', label: 'Skilled production specialists' },
-      { value: 'OEM / ODM', label: 'Size, lighting, functions and packaging' },
+      { value: '5mm EN 1036', label: 'Copper-free silver glass (>720h salt-spray tested)' },
+      { value: 'CRI ≥ 90 · IP44/54', label: '2700K–6500K stepless CCT & sealed bathroom drivers' },
+      { value: 'MOQ 50–100 pcs', label: 'Per size/SKU with 7–12 day engineering samples' },
+      { value: '25–35 days', label: 'Mass production & ISTA-3A drop-tested cartons' },
     ],
     sections: [
       {
-        heading: 'Build the right LED mirror range for your market',
+        heading: 'Optical, LED, and ingress engineering for bathroom zones',
         paragraphs: [
-          'A successful LED mirror program starts with more than choosing a shape. Buyers need the lighting layout, glass, electrical components, frame construction, switch position, mounting system and packaging method to work together. BOLEN reviews these requirements before sampling so the product is practical to manufacture, certify, install and ship.',
-          'Available configurations include front-lit, backlit and combined lighting, framed or frameless construction, touch and sensor controls, anti-fog systems, adjustable brightness and color temperature, clock or temperature displays, and other project-specific functions. Final availability is confirmed against the selected model and destination market.',
+          'Engineering a commercial-grade LED vanity mirror requires matching optical diffusion, thermal dissipation, and moisture sealing as one integrated assembly. BOLEN specifies 5mm automotive-grade copper-free silver mirror glass (<0.1% copper, lead-free epoxy backing compliant with EN 1036) paired with 120–240 LEDs/m high-efficacy strips delivering CRI ≥ 90 (optional CRI ≥ 95 for makeup/hospitality) and 50,000+ hours rated lifespan.',
+          'Depending on destination market, electrical architectures are configured for 110–120V AC (UL 962 / ETL / FCC for North America) or 220–240V AC (CE EN 60598, CB, UKCA, SAA, RoHS for Europe, UK, and Australia/NZ), using IP44 or IP54 sealed constant-voltage driver enclosures and IP65 silicone-sleeved LED channels.',
         ],
         bullets: [
-          'Custom dimensions, shapes, frame colors and finishes',
-          'Copper-free silver mirror and project-specific glass options',
-          'Lighting, switch, anti-fog and smart-function configuration',
-          'Private-label logo, instruction manual and retail or project packaging',
+          '5mm copper-free silver mirror (EN 1036) with 18–35mm precision sandblasted light windows',
+          'CRI ≥ 90 illumination with 2700K–6500K stepless or 3-preset CCT and 10%–100% PWM dimming',
+          'IP44 / IP54 bathroom ingress protection with UL 962, CE EN 60598, CB, UKCA, SAA & RoHS options',
+          'Capacitive touch, IR wave sensor, PET anti-fog pad (150–250 W/m²) and memory-state wall-switch control',
         ],
       },
       {
-        heading: 'Quality control designed for repeat orders',
+        heading: 'In-line hi-pot, burn-in aging, and batch quality control',
         paragraphs: [
-          'Wholesale and project buyers need consistency across every production batch. Our process includes incoming-material review, component matching, assembly checks, lighting and function testing, appearance inspection and packaging confirmation before shipment. Product-specific certification and test documentation can be reviewed during quotation rather than assumed from a generic claim.',
-          'For hotel, apartment and commercial programs, we can also review installation method, replacement-part planning, carton labeling and pallet requirements. This reduces avoidable changes after a sample has been approved and makes repeat purchasing easier for procurement teams.',
+          'Brand collections require identical color binning (SDCM ≤ 3) and zero electrical drift across repeat orders. Every production run passes incoming glass flatness and silvering checks, automated CNC edging, 100% high-voltage dielectric (hi-pot) and earth-continuity testing, and a minimum 2-hour full-load illumination and demister burn-in inspection prior to packing.',
+          'Electronic components—including LED strips, constant-voltage drivers, touch sensors, and demister pads—are backed by our unified 3-year factory warranty, while mirror silvering, backing, and structural frames carry a 2-year warranty.',
         ],
       },
       {
-        heading: 'From inquiry to container-ready production',
+        heading: 'Specification review, 7–12 day sampling, and export packing',
         paragraphs: [
-          'Send your target dimensions, estimated quantity, destination market, required functions and reference images or drawings. BOLEN will confirm the closest platform, customization scope, sample route, MOQ, lead time and packaging basis. Pricing is prepared against the actual specification so buyers can compare like for like.',
+          'Send your target vanity widths (e.g., 600×800 mm, 900×800 mm, 1200×800 mm, or inch equivalents), lighting style, destination voltage, and estimated volume. Standard OEM vanity mirror MOQ is 50–100 pcs per size, with engineering samples ready in 7–12 days, mass production completed in 25–35 days, and ISTA-3A drop-tested 5-ply cartons engineered for retail or project transit.',
         ],
       },
     ],
     faq: [
       {
-        question: 'Can BOLEN manufacture custom-size LED bathroom mirrors?',
+        question: 'What glass, CRI, and IP ratings do BOLEN LED bathroom mirrors use?',
         answer:
-          'Yes. Size, shape, lighting layout, frame, switch, anti-fog area, functions, logo and packaging can be reviewed for OEM/ODM production. Feasibility and MOQ depend on the selected construction.',
+          'Standard OEM builds use 5mm copper-free silver glass (EN 1036), CRI ≥ 90 (optional CRI ≥ 95) 2835 SMD LEDs with 2700K–6500K CCT, and IP44 or IP54 bathroom moisture protection.',
       },
       {
-        question: 'Which certifications are available for LED mirrors?',
+        question: 'Which electrical certifications and warranties apply to LED mirrors?',
         answer:
-          'BOLEN works with CE, CB, RoHS, IP-rated and other market-specific requirements. Certification coverage varies by model and component set, so the required documents should be confirmed before quotation and sampling.',
+          'Configurations can be built with UL 962 / ETL, CE EN 60598, CB, UKCA, SAA, and RoHS certified component sets confirmed per model. LED lighting, drivers, touch sensors, and electrical parts carry a 3-year warranty (2 years on non-LED mirror silvering and frames).',
       },
       {
-        question: 'Do you supply wholesalers and hotel projects?',
+        question: 'What are your standard MOQ and production lead times?',
         answer:
-          'Yes. We support distributors, private-label brands, hospitality suppliers, apartment projects and other B2B buyers with specification review, sampling, production and export packaging.',
+          'Standard MOQ is 50–100 pcs per model/dimension depending on frame construction. Engineering samples take 7–12 days and mass production takes 25–35 days after sample approval.',
       },
     ],
-    productTerms: ['led', 'lighted', 'illuminated', 'backlit'],
-    productExcludeTerms: ['without led'],
+    productTerms: ['copper-free', '5mm', 'stepless dimming', 'frosted', 'halo', '3000–6000k', 'demister'],
+    productExcludeTerms: ['without led', 'full length', 'full-length', 'mirror cabinet', 'wholesale'],
     relatedSlugs: ['led-mirror-wholesale-supplier', 'smart-bluetooth-mirror-manufacturer', 'anti-fog-led-mirror-manufacturer'],
   },
   {
     slug: 'custom-mirror-manufacturer',
-    title: 'Custom Mirror Manufacturer from Drawing to Production | BOLEN',
+    title: 'Custom Mirror Manufacturer | CAD Drawing to Production | BOLEN',
     description:
-      'Develop custom LED, framed, frameless and decorative mirrors with OEM/ODM support, specification review, sampling and export packaging from BOLEN.',
-    eyebrow: 'From buyer brief to production-ready mirror',
+      'Bespoke mirror manufacturer translating CAD drawings into CNC-cut 5mm EN 1036 glass, 6063-T5 aluminum or wood frames, CRI ≥ 90 LED lighting, and ISTA-3A export packaging.',
+    eyebrow: 'CAD drawing & bespoke material fabrication',
     h1: 'Custom Mirror Manufacturer for Brands, Hotels and Distributors',
     intro:
-      'BOLEN turns drawings, reference products and sourcing briefs into manufacturable mirror programs. We support custom LED mirrors, framed and frameless bathroom mirrors, full-length mirrors, decorative mirrors and mirror cabinets for private-label, wholesale and project customers.',
+      'BOLEN converts architectural elevations, CAD drawings, and physical reference samples into engineered mirror constructions across our 46,800 m² facility. Combining ±1.0 mm CNC glass profiling on 5mm EN 1036 copper-free glass with custom 6063-T5 anodized aluminum, stainless steel, or solid wood frames, we build bespoke LED and non-LED mirrors with 7–12 day prototyping and MOQ 50–100 pcs.',
     proofPoints: [
-      { value: 'OEM / ODM', label: 'Development around your specification' },
-      { value: '200+', label: 'Skilled production team' },
-      { value: '2 factories', label: 'Coordinated production capacity' },
-      { value: 'Global', label: 'Export packaging and delivery support' },
+      { value: '±1.0 mm CNC', label: 'Precision cutting on 4mm/5mm EN 1036 silver glass' },
+      { value: '6063-T5 & Wood', label: 'Anodized, brushed brass, matte black & wood frames' },
+      { value: '7–12 days', label: 'Custom CAD drawing & physical prototype turnaround' },
+      { value: 'MOQ 50–100 pcs', label: '25–35 day mass production & ISTA-3A packaging' },
     ],
     sections: [
       {
-        heading: 'What can be customized?',
+        heading: 'Custom glass, frame extrusions, and optical detailing',
         paragraphs: [
-          'Customization can cover the visible design and the engineering behind it. Our team reviews the intended application, target price position and destination-market requirements before confirming materials and functions. This helps prevent an attractive concept from becoming difficult to certify, package or install.',
+          'Unlike catalog resellers limited to fixed housings, BOLEN fabricates glass, metal frames, laser-frosted light channels, and backplates in-house. Buyers can specify 4mm or 5mm EN 1036 copper-free silver glass with flat-polished, pencil, or 10–25 mm beveled edges, paired with 1.2–1.5 mm wall-thickness 6063-T5 aluminum extrusions, 304 stainless steel, iron powder-coated profiles, or moisture-sealed wood frames.',
+          'When illumination is specified, we engineer 2700K–6500K stepless CCT strips (CRI ≥ 90), PMMA optical diffusers to eliminate LED hot-spotting, IP44/IP54 driver enclosures, and UL 962 / CE EN 60598 / SAA compliant wiring harnesses tailored to the exact frame cavity.',
         ],
         bullets: [
-          'Mirror dimensions, organic or geometric shapes and edge treatment',
-          'Aluminum, steel, wood and other frame options with selected finishes',
-          'Front light, backlight, color temperature, dimming and anti-fog functions',
-          'Touch, motion-sensor, clock, temperature and selected smart functions',
-          'Logo, control icons, manuals, cartons, inserts, labels and pallet plans',
+          'Custom dimensions from 400×600 mm vanities up to 1800×900 mm architectural formats (±1.0 mm tolerance)',
+          '6063-T5 brushed gold, champagne bronze, matte black, gunmetal, white, and natural wood finishes',
+          '5mm EN 1036 copper-free glass with CAT II shatter-protection film and French-cleat or Z-bar hardware',
+          'CRI ≥ 90 front-lit/backlit LEDs, 2700K–6500K dimming, anti-fog pads, and laser-etched brand marks',
+          'ISTA-3A drop-tested mail-order cartons (25–35 mm EPE/EPS foam) or palletized project crating',
         ],
       },
       {
-        heading: 'A practical OEM/ODM development process',
+        heading: 'Engineering feasibility from CAD drawings before tooling',
         paragraphs: [
-          'The process begins with your drawing, target sample, product link or design brief. We identify a suitable construction, confirm critical dimensions and functions, and prepare a quotation based on expected volume. After the sample is reviewed, approved details are translated into production and inspection requirements.',
-          'When a completely new tool, frame section or electrical layout is required, the team will explain the development scope and any minimum order implications before work starts. Existing platforms can often reduce time and cost while still allowing a distinct market-facing design.',
+          'Send a DWG/DXF/PDF elevation, Pantone/RAL finish target, or physical benchmark sample. Within 24–48 hours our engineering team reviews structural rigidity, hanging load distribution, LED lumen output, and UL 962 / CE EN 60598 clearance rules, returning a production shop drawing for sign-off prior to cutting the 7–12 day prototype.',
+          'Adapting our existing 200+ extrusion profiles keeps MOQ at 50–100 pcs without tooling fees, while custom aluminum extrusion dies or molded backplates are transparently costed with typical MOQ of 200+ pcs.',
         ],
       },
       {
-        heading: 'Custom packaging for the actual sales channel',
+        heading: 'Channel-specific drop-test packaging & unified warranty',
         paragraphs: [
-          'A mirror sold through e-commerce needs different protection and labeling from a hotel-project pallet. BOLEN can review inner protection, carton construction, drop-test expectations, retail graphics, instruction packs and shipment consolidation so packaging is treated as part of the product rather than an afterthought.',
+          'E-commerce SKUs receive individual 5-ply BC-flute cartons with 30 mm high-density corner blocks engineered to pass ISTA-3A drop sequences, whereas hospitality orders ship in room-labeled bulk pallets. Every custom build is covered by a 3-year warranty on LED/electrical modules and a 2-year warranty on non-LED mirror silvering, backing, and frames.',
         ],
       },
     ],
     faq: [
       {
-        question: 'What information is needed for a custom mirror quote?',
+        question: 'What tolerances, materials, and drawings do you support for custom mirrors?',
         answer:
-          'Provide dimensions, quantity, application, destination market, glass and frame preference, required functions, packaging expectations and any drawing or reference image. Missing details can be confirmed during review.',
+          'We accept DWG, DXF, PDF, or dimensioned sketches, holding ±1.0 mm CNC glass tolerances on 4mm/5mm EN 1036 copper-free glass with 6063-T5 aluminum, stainless steel, or wood frames.',
       },
       {
-        question: 'Can BOLEN add our logo and packaging?',
+        question: 'What are the sampling time, MOQ, and mass-production lead time?',
         answer:
-          'Yes. Logo placement, touch icons, labels, manuals, color cartons and other private-label elements can be reviewed as part of the OEM/ODM specification.',
+          'Custom prototypes take 7–12 days after shop-drawing sign-off. Standard MOQ is 50–100 pcs per custom size using existing frame profiles (200+ pcs for new extrusion dies), with 25–35 days mass-production lead time.',
       },
       {
-        question: 'Is a custom mold always required?',
+        question: 'What warranty applies to custom LED vs non-LED decorative mirrors?',
         answer:
-          'No. Many projects can use or adapt an existing construction. A new mold or tooling route is only proposed when the requested shape, frame or component cannot be achieved reliably with an existing platform.',
+          'LED lighting, drivers, touch sensors, and electrical components carry a 3-year warranty; non-LED mirror silvering, safety backing, and frames carry a 2-year warranty.',
       },
     ],
-    productTerms: ['custom', 'oem', 'odm', 'irregular', 'organic', 'shape'],
+    productTerms: ['decorative', 'wood frame', 'gold framed', 'black aluminium', 'black aluminum', 'metal frame', 'retractable'],
     relatedSlugs: ['custom-size-led-mirrors', 'irregular-shaped-mirror-manufacturer', 'oem-odm-mirror-manufacturing'],
   },
   {
     slug: 'hotel-bathroom-mirrors',
-    title: 'Hotel Bathroom Mirror Manufacturer | BOLEN',
+    title: 'Hotel Bathroom Mirror Manufacturer | Hospitality FF&E Specs | BOLEN',
     description:
-      'Source hotel bathroom and vanity mirrors with project-focused specification, installation, packaging and repeat-order support from BOLEN.',
-    eyebrow: 'Hospitality mirror supply',
+      'Hospitality bathroom and guest-room mirror manufacturer: 5mm EN 1036 copper-free glass, CRI ≥ 90–95 vanity lighting, IP44/IP54 hardwired UL 962 / CE builds, room-schedule labeling & 25–35 day delivery.',
+    eyebrow: 'Hospitality FF&E mirror manufacturing',
     h1: 'Hotel Bathroom Mirrors Built for Project Specifications',
     intro:
-      'BOLEN supplies bathroom and vanity mirrors for hotels, serviced apartments and hospitality procurement programs. We help project teams align appearance, lighting, electrical requirements, mounting, room schedules, packaging and replacement planning before production.',
+      'BOLEN manufactures hospitality vanity, guest-room, and corridor mirrors for hotel FF&E contractors, serviced apartments, and resort developments from our 46,800 m² Jiaxing plant. Engineered with 5mm EN 1036 copper-free glass, CRI ≥ 90–95 flattering vanity illumination (2700K–4000K warm/neutral hospitality CCT), IP44/IP54 moisture protection, and hardwired wall-switch compatibility under UL 962 / CE EN 60598 / SAA.',
     proofPoints: [
-      { value: 'Project review', label: 'Room schedule and specification support' },
-      { value: 'Custom sizes', label: 'Vanity and wall dimensions' },
-      { value: 'Pre-shipment', label: 'Appearance and function checks' },
-      { value: 'Export ready', label: 'Carton labeling and pallet planning' },
+      { value: 'CRI ≥ 90–95', label: '2700K–4000K hospitality vanity lighting & 5mm EN 1036 glass' },
+      { value: 'IP44 / IP54', label: 'UL 962, CE EN 60598 & SAA hardwired electrical options' },
+      { value: 'MOQ 50 pcs', label: 'Per room-type schedule with 7–12 day mock-up room samples' },
+      { value: '25–35 days', label: 'Phased floor-by-floor palletization & 1–2% spare parts' },
     ],
     sections: [
       {
-        heading: 'Mirror choices for hotel bathrooms and guest rooms',
+        heading: 'Guest-room vanity, suite, and ADA mirror specifications',
         paragraphs: [
-          'Hospitality projects may require illuminated vanity mirrors, framed decorative mirrors, full-length guest-room mirrors or mirror cabinets. Each application has different priorities: flattering light at the vanity, safe mounting, easy cleaning, consistent finish, electrical access and replacement compatibility across many rooms.',
-          'BOLEN can review standard-room, suite and accessible-room requirements as separate line items while keeping finishes and control behavior consistent across the project. Drawings and room schedules are checked before sampling to reduce site-stage surprises.',
+          'Hospitality rooms demand glare-free facial rendering, tamper-resistant mounting, and zero edge blackening in humid bathrooms. BOLEN pairs 5mm copper-free silver glass (EN 1036, >720h salt-spray tested) and CAT II shatter-safe backing film with high-CRI (Ra ≥ 90, optional Ra ≥ 95) LED strips tuned to 2700K, 3000K, or 4000K—or 2700K–6500K selectable CCT—for consistent color across standard kings, double queens, suites, and accessible ADA rooms.',
+          'Electrical assemblies support direct hardwiring to guest-room master keycard or wall switches (with power-off memory) as well as capacitive touch and independent PET anti-fog heating pads (150–250 W/m²), compliant with UL 962 / ETL (120V) or CE EN 60598 / UKCA / SAA (220–240V).',
         ],
         bullets: [
-          'Front-lit and backlit vanity mirrors',
-          'Framed, frameless and decorative wall mirrors',
-          'Full-length mirrors for guest rooms and dressing areas',
-          'Mirror cabinets for selected room programs',
+          '5mm EN 1036 copper-free mirror with CAT II safety film and concealed anti-theft Z-bar / keyhole brackets',
+          'CRI ≥ 90 / 95 LED lighting (2700K–6500K), 0–10V / TRIAC wall-dimmer or touch-dimming options',
+          'IP44 / IP54 sealed junction & driver housings with replaceable service-access mounting plates',
+          'Coordinated guest-room full-length dressing mirrors and illuminated mirror cabinets on one PO',
         ],
       },
       {
-        heading: 'Installation and maintenance considerations',
+        heading: 'Mock-up room approval, spare-parts planning, and warranty',
         paragraphs: [
-          'Mounting position, cable exit, driver access and anti-fog pad coverage should be coordinated with the room design. For repeatable installation, we can confirm hanging hardware, orientation, templates and labeling. Product-specific spare-part needs and warranty arrangements can also be discussed before the order is finalized.',
+          'Before mass production begins, BOLEN builds model-room samples in 7–12 days from architectural FF&E drawings to verify cable exit coordinates, French-cleat alignment, and light output on site. Bulk hospitality shipments include 1%–2% agreed spare drivers/sensors for rapid engineering maintenance, backed by a 3-year warranty on LED and electrical components and a 2-year warranty on non-LED mirror silvering and frames.',
         ],
       },
       {
-        heading: 'Packaging organized by room or project phase',
+        heading: 'Floor-by-floor carton labeling and export crate protection',
         paragraphs: [
-          'Project mirrors can be labeled by model, room type, floor or delivery batch. Carton and pallet planning is reviewed against the mirror size and shipment route. The goal is not only to protect the mirror in transit, but also to make receiving and installation easier for the project team.',
+          'To streamline job-site receiving, cartons and fumigation-free plywood pallets are stenciled by FF&E item code, room type, building wing, and floor phase, with ISTA-3A corner/foam protection or wooden crating for LCL/FCL ocean transit in 25–35 days.',
         ],
       },
     ],
     faq: [
       {
-        question: 'Can hotel mirrors be made to architectural drawings?',
+        question: 'Can BOLEN build mock-up room samples from hotel FF&E drawings?',
         answer:
-          'Yes. BOLEN can review drawings, room schedules, dimensions, finish references, electrical notes and installation requirements before confirming the sample and quotation.',
+          'Yes. We review architectural elevations and room schedules within 24–48 hours and produce mock-up room samples in 7–12 days prior to 25–35 day bulk production (typical MOQ 50 pcs per room type).',
       },
       {
-        question: 'Can cartons be labeled by room type or project phase?',
+        question: 'Are hardwired wall-switch, anti-fog, and UL/CE hospitality specs supported?',
         answer:
-          'Yes. Model, room type, floor, batch and other project labels can be discussed as part of the packaging specification.',
+          'Yes. Mirrors can be configured for 110–120V (UL 962 / ETL) or 220–240V (CE EN 60598 / CB / SAA / RoHS) hardwired wall switches, IP44/IP54 ratings, and dedicated anti-fog pads.',
       },
       {
-        question: 'Do you supply replacement units after the main order?',
+        question: 'What spare parts and warranty come with hotel project orders?',
         answer:
-          'Replacement and spare-part planning can be agreed during the order review. Availability depends on the product construction, components and agreed production records.',
+          'Shipments include agreed spare electrical parts for hotel maintenance, plus a 3-year warranty on LED lighting, drivers, and touch sensors and a 2-year warranty on non-LED mirror silvering and frames.',
       },
     ],
-    productTerms: ['hotel', 'vanity', 'bathroom', 'full length', 'wall mirror'],
+    productTerms: ['hotel', 'hospitality', 'villa', 'salon', 'apartment renovation'],
+    productExcludeTerms: ['bear', 'cartoon', 'animal', 'panda', 'kids'],
     relatedSlugs: ['full-length-mirror-manufacturer', 'anti-fog-led-mirror-manufacturer', 'commercial-bathroom-mirrors'],
   },
   {
     slug: 'commercial-bathroom-mirrors',
-    title: 'Commercial Bathroom Mirror Manufacturer | BOLEN',
+    title: 'Commercial Bathroom Mirror Manufacturer | Multi-Unit & Public Specs | BOLEN',
     description:
-      'Commercial bathroom mirrors for apartments, offices, retail, hospitality and public projects, with custom sizing, durable materials and project packaging.',
-    eyebrow: 'Commercial and multi-unit mirror supply',
+      'Commercial bathroom mirrors for apartments, offices, retail and public washrooms: 5mm EN 1036 shatter-backed glass, IP44/IP54 LED options, UL 962 / CE compliance, MOQ 50–100 pcs.',
+    eyebrow: 'Multi-unit residential & commercial washroom supply',
     h1: 'Commercial Bathroom Mirrors for Multi-Unit and Public Projects',
     intro:
-      'BOLEN supports contractors, developers, distributors and project suppliers sourcing mirrors for apartments, offices, retail spaces, hospitality and public washrooms. We focus on repeatable specifications, durable construction, practical mounting and packaging that works for multi-unit delivery.',
+      'BOLEN supplies contractors, multi-family developers, and commercial distributors sourcing durable washroom, apartment vanity, and retail fitting mirrors. Manufactured in our 46,800 m² ISO 9001 plant using 5mm EN 1036 copper-free silver glass, CAT II shatter-resistant safety film, corrosion-proof 6063-T5 aluminum frames, and optional IP44/IP54 LED modules (CRI ≥ 90, 2700K–6500K) with 25–35 day phased delivery.',
     proofPoints: [
-      { value: 'Multi-unit', label: 'Repeatable project specifications' },
-      { value: 'Custom', label: 'Dimensions, frames and functions' },
-      { value: 'QC', label: 'Appearance, function and packaging checks' },
-      { value: 'B2B', label: 'Quotation by quantity and specification' },
+      { value: '5mm + CAT II Film', label: 'EN 1036 copper-free glass with shatter-safe backing' },
+      { value: 'IP44 / IP54 · RoHS', label: 'UL 962, CE EN 60598 & SAA commercial electrical compliance' },
+      { value: 'MOQ 50–100 pcs', label: 'Repeatable unit-type specs for multi-family & office builds' },
+      { value: '25–35 days', label: 'Batch-labeled pallets & ISTA-3A transit protection' },
     ],
     sections: [
       {
-        heading: 'Specify mirrors around the building application',
+        heading: 'Engineered for high-traffic washrooms and multi-family builds',
         paragraphs: [
-          'A commercial restroom mirror, apartment vanity mirror and retail fitting-room mirror do not share the same priorities. Project teams may need corrosion resistance, safety backing, consistent frame color, simplified controls, accessible mounting or easy replacement. We review the use case before recommending glass, frame and electrical options.',
+          'Public restrooms, office cores, student housing, and build-to-rent apartments require low-maintenance hardware, shatter containment, and moisture corrosion resistance. BOLEN equips commercial mirrors with 5mm EN 1036 copper-free glass, 130-micron CAT II PE safety film (holding shards intact upon accidental impact), anodized 6063-T5 aluminum or 304 stainless frames, and heavy-duty galvanized steel Z-bar or tamper-resistant brackets.',
+          'Where illuminated mirrors are specified, simplified hardwired drivers (100–240V / 120V / 230V, IP44/IP54, CRI ≥ 90, 3000K/4000K/6000K) eliminate unnecessary consumer menus so facility teams get 50,000+ hour LED reliability.',
         ],
         bullets: [
-          'Frameless and aluminum-framed bathroom mirrors',
-          'LED mirrors with simplified project-ready controls',
-          'Full-length and decorative mirrors for common areas or retail',
-          'Custom dimensions aligned with vanity, tile and lighting layouts',
+          '5mm EN 1036 copper-free mirror glass (4mm option for framed value-engineered apartment tiers)',
+          'CAT II shatter-safe backing film and corrosion-resistant anodized aluminum or frameless polished edges',
+          'Hardwired IP44/IP54 LED builds (UL 962 / CE EN 60598 / SAA / RoHS) or zero-power non-LED mirrors',
+          'Standardized sizing & drilling templates for rapid multi-floor contractor installation',
         ],
       },
       {
-        heading: 'Transparent quotation inputs',
+        heading: 'Specification-transparent value engineering & MOQ',
         paragraphs: [
-          'Commercial mirror pricing depends on size, glass type, edge treatment, frame, lighting, functions, packaging, quantity and destination. Rather than publishing a misleading single price, BOLEN prepares a specification-based quotation and identifies the items that materially affect cost. Value-engineering options can then be reviewed without quietly changing the required performance.',
+          'Commercial tenders win on predictable landed cost without compromising code compliance. Starting at MOQ 50–100 pcs per unit type, BOLEN itemizes cost drivers—glass thickness, frame profile, driver certification, and pallet vs individual ISTA-3A carton packing—so estimators can balance budget across penthouse, standard apartment, and common-area washrooms.',
         ],
       },
       {
-        heading: 'Consistency across phases and repeat orders',
+        heading: 'Phased container scheduling & unified factory warranty',
         paragraphs: [
-          'Approved samples, finish references and component requirements are used to guide production. For phased projects, model naming, carton labels and delivery batches can be coordinated to make receiving easier and reduce the risk of different room types being mixed on site.',
+          'Approved master samples (7–12 days) lock BOM specifications across multi-month construction phases, with mass production completed in 25–35 days per release. Commercial orders receive our unified 3-year warranty on LED lighting, drivers, and electrical controls and 2-year warranty on non-LED mirror silvering, backing, and structural frames.',
         ],
       },
     ],
     faq: [
       {
-        question: 'What affects commercial bathroom mirror pricing?',
+        question: 'Do your commercial mirrors include shatter-safe backing and corrosion protection?',
         answer:
-          'The main variables are dimensions, glass and frame construction, lighting and functions, certification scope, packaging, order quantity and delivery terms. A usable quote requires these inputs.',
+          'Yes. We supply 5mm EN 1036 copper-free corrosion-resistant glass (>720h salt-spray tested) with CAT II safety film backing and anodized 6063-T5 aluminum or stainless frames.',
       },
       {
-        question: 'Can BOLEN support apartment and multi-unit projects?',
+        question: 'What are the MOQ and lead times for apartment and commercial tenders?',
         answer:
-          'Yes. We can review repeated unit types, phased quantities, mounting, labeling, packaging and delivery requirements for apartment and other multi-unit programs.',
+          'Standard MOQ is 50–100 pcs per mirror specification, with 7–12 day submittal samples and 25–35 day mass-production lead times coordinated to phased site schedules.',
       },
       {
-        question: 'Are non-LED commercial mirrors available?',
+        question: 'Are both non-LED and UL/CE certified LED commercial mirrors available?',
         answer:
-          'Yes. The range includes frameless, framed, decorative and full-length non-LED mirrors as well as illuminated products.',
+          'Yes. Non-LED mirrors carry a 2-year structural/silvering warranty, while UL 962 / CE EN 60598 / SAA compliant IP44/IP54 LED mirrors carry a 3-year electrical warranty.',
       },
     ],
-    productTerms: ['commercial', 'tempered', 'hotel', 'bulk', 'wall mounted', 'bathroom mirror without led'],
+    productTerms: ['apartment', 'contractors', 'tempered', 'explosion-proof', 'safety', 'bathroom mirror without led', 'beveled'],
+    productExcludeTerms: ['bear', 'cartoon', 'animal', 'panda', 'kids'],
     relatedSlugs: ['full-length-mirror-manufacturer', 'hotel-bathroom-mirrors', 'led-mirror-wholesale-supplier'],
   },
   {
     slug: 'led-mirror-cabinet-manufacturer',
-    title: 'LED Mirror Cabinet Manufacturer | BOLEN',
+    title: 'LED Mirror Cabinet Manufacturer | IP44 Aluminum & Storage OEM | BOLEN',
     description:
-      'Develop LED mirror cabinets with custom sizes, storage, lighting, anti-fog, controls, branding and export packaging through BOLEN OEM/ODM manufacturing.',
-    eyebrow: 'Illuminated storage solutions',
+      'Wall-mounted & recessed LED mirror cabinet manufacturer: 5mm copper-free double-sided doors, CRI ≥ 90, 2700K–6500K dimming, anti-fog, IP44 UL 962 / CE EN 60598 compliance & ISTA-3A packaging.',
+    eyebrow: 'Illuminated bathroom medicine & storage cabinets',
     h1: 'LED Mirror Cabinet Manufacturer for OEM and Project Buyers',
     intro:
-      'BOLEN develops illuminated mirror cabinets for bathroom brands, distributors and project suppliers. Cabinet structure, door layout, mirror glass, storage, lighting, electrical components, mounting and packaging are reviewed as one system so the finished product is practical to use and manufacture.',
+      'BOLEN designs and manufactures wall-mounted and recessed LED mirror cabinets in our 46,800 m² Jiaxing plant. Combining rust-proof anodized aluminum or E1 moisture-resistant carcasses with copper-free mirror doors (EN 1036), 8mm tempered glass adjustable shelves, 110° soft-close 304 stainless hinges, CRI ≥ 90 2700K–6500K lighting, anti-fog pads, and IP44 electrical assemblies (UL 962 / CE EN 60598 / SAA / RoHS).',
     proofPoints: [
-      { value: 'Custom storage', label: 'Door, shelf and internal layout review' },
-      { value: 'LED options', label: 'Lighting, dimming and anti-fog functions' },
-      { value: 'Private label', label: 'Logo, manual and packaging support' },
-      { value: 'Project supply', label: 'Specification and repeat-order planning' },
+      { value: 'IP44 · CRI ≥ 90', label: '2700K–6500K front/ambient LED, demister & shaver/USB options' },
+      { value: 'EN 1036 + 110°', label: 'Copper-free mirror doors, tempered shelves & soft-close hinges' },
+      { value: 'MOQ 30–50 pcs', label: 'Flexible mirror cabinet MOQ with 10–14 day sampling' },
+      { value: '25–35 days', label: 'ISTA-3A reinforced honeycomb/EPE export packaging' },
     ],
     sections: [
       {
-        heading: 'Configure the cabinet around the end user',
+        heading: 'Structural cabinet engineering, hinges, and storage layout',
         paragraphs: [
-          'The right mirror cabinet depends on the installation space and sales channel. Buyers can discuss overall size, door count, opening direction, shelf arrangement, internal finish, lighting position, switch behavior and selected smart functions. Existing platforms may be adapted for faster development, while more distinctive programs can be reviewed as ODM projects.',
+          'Illuminated medicine cabinets carry significantly higher mechanical load and wiring complexity than flat mirrors. BOLEN builds single-, double-, and triple-door cabinets (typical widths 500–1200 mm, depths 120–150 mm) using anodized aluminum alloy or moisture-sealed E1 boards, double-sided copper-free EN 1036 mirror doors, 6–8 mm tempered glass shelves (10–15 kg load rating), and cycle-tested 110° soft-close stainless buffer hinges.',
+          'Lighting options include perimeter frosted front-lighting, top/bottom ambient wash, internal door-sensor cabinet illumination, 2700K–6500K stepless CCT, 10%–100% dimming, door-integrated PET anti-fog pads, digital clock/temperature readouts, and optional internal shaver sockets or dual USB-A/C charging ports.',
         ],
         bullets: [
-          'Single- or multi-door configurations',
-          'Front-lit, edge-lit or ambient lighting options',
-          'Anti-fog, dimming and color-temperature control',
-          'Clock, temperature and other model-specific functions',
-          'Custom logo, labels, manuals and protective packaging',
+          'Surface wall-mounted or recessed in-wall aluminum & moisture-resistant mirror cabinet bodies',
+          'Copper-free EN 1036 mirror doors (front + interior mirror options) with 110° soft-close hinges',
+          'CRI ≥ 90 LEDs (2700K–6500K), touch/IR door sensor, anti-fog pad, and optional shaver/USB outlet',
+          'IP44 moisture protection engineered to UL 962 / CE EN 60598 / UKCA / SAA / RoHS standards',
+          'Private-label laser logo, multi-language installation manuals, and drilling templates',
         ],
       },
       {
-        heading: 'Electrical and installation details confirmed early',
+        heading: 'Electrical safety, wire-hinge durability, and warranty',
         paragraphs: [
-          'Cabinet depth, cable entry, mounting points, driver placement and access for service should be confirmed before the sample is approved. Destination-market electrical and documentation requirements are reviewed by model so the quoted configuration matches the intended sales region.',
+          'Door-to-cabinet low-voltage wiring passes through concealed flexible conduits tested across 30,000+ open/close cycles, isolating 12V/24V DC door electronics from the sealed IP44 mains driver compartment. LED strips, drivers, sensors, outlets, and electrical components carry a 3-year factory warranty, while cabinet structure, hinges, and mirror silvering carry a 2-year warranty.',
         ],
       },
       {
-        heading: 'Packaging for a heavier, more complex product',
+        heading: 'Heavy-duty ISTA-3A cabinet packaging & MOQ 30–50 pcs',
         paragraphs: [
-          'Mirror cabinets combine glass, doors, shelves and electrical parts, so packaging must control both impact and internal movement. BOLEN reviews foam, carton, corner protection, accessories, labels and pallet method against the cabinet size and shipment plan.',
+          'Because mirror cabinets weigh 14–32 kg, BOLEN packages every unit with immobilized internal shelf blocks, 35 mm molded EPE foam, honeycomb board panels, corner guards, and 5-ply export cartons tested to ISTA-3A standards. Standard OEM cabinet MOQ is 30–50 pcs per size with 25–35 days production lead time.',
         ],
       },
     ],
     faq: [
       {
-        question: 'Can the cabinet size and internal layout be customized?',
+        question: 'What materials, hinges, and IP ratings do BOLEN LED mirror cabinets use?',
         answer:
-          'Yes. Overall dimensions, door arrangement, shelves, finish, lighting and functions can be reviewed. Feasibility and MOQ depend on the construction and tooling requirements.',
+          'We build rust-proof anodized aluminum and moisture-resistant E1 cabinets with EN 1036 copper-free mirror doors, tempered glass shelves, 110° soft-close stainless hinges, CRI ≥ 90 2700K–6500K LEDs, and IP44 protection.',
       },
       {
-        question: 'Are anti-fog and dimming functions available?',
+        question: 'What is the MOQ and lead time for custom LED mirror cabinets?',
         answer:
-          'They are available on selected configurations. The anti-fog area, lighting control and electrical component set should be confirmed for the specific model and market.',
+          'Standard MOQ for LED mirror cabinets is 30–50 pcs per size/model, with 10–14 day engineering samples and 25–35 day mass production.',
       },
       {
-        question: 'Can you provide private-label packaging?',
+        question: 'How are heavy mirror cabinets protected against shipping breakage?',
         answer:
-          'Yes. Logo, labels, manuals, accessory packs and carton artwork can be included in the OEM/ODM review.',
+          'Each cabinet uses internal shelf immobilizers, 35 mm high-density EPE foam, honeycomb impact boards, and 5-ply cartons engineered to ISTA-3A drop-test criteria, backed by a 3-year electrical / 2-year structural warranty.',
       },
     ],
-    productTerms: ['cabinet', 'storage', 'medicine'],
+    productTerms: ['mirror cabinet', 'medicine', 'mirror vanity cabinet', 'vanity mirror cabinet'],
+    productExcludeTerms: ['without led', 'sink cabinet', 'base cabinet'],
     relatedSlugs: ['smart-bluetooth-mirror-manufacturer', 'led-mirror-wholesale-supplier', 'oem-odm-mirror-manufacturing'],
   },
   {
     slug: 'oem-odm-mirror-manufacturing',
-    title: 'OEM ODM Mirror Manufacturer | BOLEN',
+    title: 'OEM & ODM Mirror Manufacturing | Private-Label Factory | BOLEN',
     description:
-      'OEM and ODM mirror manufacturing for brands and distributors, from specification and sampling to quality control, private-label packaging and export.',
-    eyebrow: 'Private-label mirror development',
+      'Private-label OEM & ODM mirror manufacturing in a 46,800 m² ISO 9001 facility: BOM lock, EN 1036 5mm glass, UL 962 / CE EN 60598 / SAA certification files, ISTA-3A retail boxes & 3-year LED warranty.',
+    eyebrow: 'Private-label governance, tooling & lifecycle supply',
     h1: 'OEM & ODM Mirror Manufacturing for Global Brands',
     intro:
-      'BOLEN works with brands, importers and distributors that need more than a catalog product. Our OEM/ODM process connects product design, engineering review, sampling, production, inspection and packaging so a mirror program can move from idea to repeatable supply.',
+      'BOLEN serves bathroom brands, national retailers, and private-label importers requiring disciplined OEM/ODM program governance. Operating a 46,800 m² ISO 9001 factory with 200+ specialists since 2005, we manage BOM locking, laser branding, custom touch-UI silkscreens, UL 962 / CE EN 60598 / SAA compliance documentation, ISTA-3A retail packaging, and 25–35 day replenishment cycles.',
     proofPoints: [
-      { value: 'Design review', label: 'Reference, drawing or market brief' },
-      { value: 'Sampling', label: 'Confirm construction before production' },
-      { value: 'Private label', label: 'Product and packaging customization' },
-      { value: 'Repeat supply', label: 'Controlled specifications and QC' },
+      { value: 'ISO 9001 · 2005', label: '46,800 m² plant, 6 lines & zero-substitution BOM lock' },
+      { value: 'UL / CE / SAA', label: 'UL 962, CE EN 60598, CB, UKCA & RoHS compliance dossiers' },
+      { value: 'MOQ 50–100 pcs', label: 'ODM platform adaptation or dedicated OEM tooling' },
+      { value: '3-Yr / 2-Yr', label: '3-yr LED/electrical & 2-yr structural warranty + spare parts' },
     ],
     sections: [
       {
-        heading: 'OEM when you know the specification',
+        heading: 'OEM specification lock vs. ODM platform acceleration',
         paragraphs: [
-          'For OEM projects, buyers provide a defined product, drawing, sample or bill of requirements. BOLEN reviews manufacturability, materials, tolerances, component availability, certification scope, packaging and order quantity before confirming the quotation. The goal is to reproduce the approved specification consistently rather than make silent substitutions.',
-        ],
-      },
-      {
-        heading: 'ODM when the concept still needs development',
-        paragraphs: [
-          'For ODM projects, the brief may begin with a target consumer, price position, visual direction or competitor reference. We help narrow the product architecture, identify existing platforms that can shorten development, and define the items that need new engineering or tooling. This creates a clearer path to sampling and avoids spending on features that do not support the intended market.',
+          'In OEM manufacturing, your engineering package defines exact dimensions, 5mm EN 1036 copper-free glass, CRI ≥ 90 LED density, 2700K–6500K CCT curve, IP44/IP54 driver brand, and hardware: BOLEN locks the approved Golden Sample and Bill of Materials (BOM) with zero unauthorized component substitutions across reorders.',
+          'In ODM programs, brands select from our 200+ proven optical and frame platforms—customizing outer dimensions, frame anodizing, touch-sensor icon graphics, Bluetooth/clock modules, and retail packaging—slashing tooling investment to zero and delivering pre-production samples in 7–12 days at MOQ 50–100 pcs.',
         ],
         bullets: [
-          'Product shape, dimensions and frame construction',
-          'Lighting effect, controls and selected smart functions',
-          'Glass, backing, mounting and safety considerations',
-          'Brand marks, manuals, accessories and carton presentation',
-          'Inspection points and shipment packaging',
+          'Golden-sample & BOM version control across 5mm EN 1036 glass, CRI ≥ 90 LEDs, and certified drivers',
+          'Laser-etched front/backlit brand logos, custom touch-switch UI icons, and serialized rating labels',
+          'Model-specific UL 962, CE EN 60598, CB, UKCA, SAA, EMC, and RoHS technical documentation review',
+          'Full-color retail litho-laminated boxes or brown ISTA-3A e-commerce mailers with UPC/EAN/FNSKU labels',
+          '1%–2% shipment spare-parts kit plus 3-year electrical / 2-year structural warranty coverage',
         ],
       },
       {
-        heading: 'Information that speeds up quotation',
+        heading: 'Private-label compliance dossiers and pre-shipment AQL inspection',
         paragraphs: [
-          'Share the target market, expected order quantity, required launch timing, dimensions, functions, certification needs, packaging channel and target price position. A drawing is helpful but not mandatory. Reference photos or product links can be used to begin a feasibility discussion.',
+          'Retailers and marketplace brands face strict audit requirements. Every OEM/ODM batch undergoes 100% hi-pot electrical safety testing, 2-hour illumination aging, and AQL 1.5/2.5 pre-shipment visual and packaging verification, with inspection photos and dimension reports archived by PO number.',
+        ],
+      },
+      {
+        heading: 'Predictable 25–35 day lead times near Shanghai & Ningbo ports',
+        paragraphs: [
+          'Located 60 km from Shanghai and Ningbo deep-water ports, BOLEN completes mass production in 25–35 days after Golden Sample sign-off, supporting FOB, CIF, or DDP container schedules and NDA-protected exclusivity on buyer-funded tooling.',
         ],
       },
     ],
     faq: [
       {
-        question: 'What is the difference between OEM and ODM mirrors?',
+        question: 'How do MOQ and lead times compare between ODM adaptation and custom OEM tooling?',
         answer:
-          'OEM follows a buyer-defined specification or sample. ODM includes more product-development support, using a market brief or concept to define the construction and features before sampling.',
+          'Adapting an ODM platform requires 0 tooling cost, MOQ 50–100 pcs per SKU, 7–12 day samples, and 25–35 day mass production. Custom extrusion dies or injection tooling typically start at MOQ 200+ pcs withNDA exclusivity.',
       },
       {
-        question: 'Can BOLEN work from a reference photo or product link?',
+        question: 'Can BOLEN support UL, CE, UKCA, and SAA private-label documentation?',
         answer:
-          'Yes. A reference can start the feasibility review, but dimensions, construction, functions, compliance and intellectual-property considerations still need to be confirmed before production.',
+          'Yes. We build with UL 962 / ETL, CE EN 60598, CB, UKCA, SAA, and RoHS certified component sets matched to your target region and confirm certificate/report scope per model during quotation.',
       },
       {
-        question: 'How is MOQ determined?',
+        question: 'What warranty and after-sales support back OEM/ODM brand programs?',
         answer:
-          'MOQ depends on the product platform, custom materials, electrical components, packaging and any new tooling. BOLEN confirms it against the actual specification rather than applying one number to every product.',
+          'All programs receive a 3-year warranty on LED strips, drivers, touch sensors, and electrical parts, a 2-year warranty on non-LED mirror silvering and frames, plus agreed shipment spare parts.',
       },
     ],
-    productTerms: ['oem', 'odm', 'custom', 'low moq', 'manufacturer', 'factory'],
+    productTerms: ['oem', 'odm', 'multi-country', 'ce en1036', 'time display', 'digital clock'],
     relatedSlugs: ['led-mirror-wholesale-supplier', 'custom-size-led-mirrors', 'custom-mirror-manufacturer'],
   },
   {
     slug: 'led-mirror-wholesale-supplier',
-    title: 'LED Mirror Wholesale Supplier in China | BOLEN',
+    title: 'LED Mirror Wholesale Supplier | Mixed-SKU Container Bulk | BOLEN',
     description:
-      'Source wholesale LED bathroom mirrors from BOLEN with specification-based pricing, OEM branding, flexible product programs and export packaging.',
-    eyebrow: 'Factory-direct bulk mirror sourcing',
+      'Factory-direct LED mirror wholesale supplier: mix 4–8 SKUs per 20GP/40HQ container, MOQ 50 pcs, 5mm EN 1036 glass, CRI ≥ 90, IP44 UL/CE/SAA compliance & ISTA-3A cartons in 25–35 days.',
+    eyebrow: 'Container consolidation & distributor assortment programs',
     h1: 'LED Mirror Wholesale Supplier for Distributors and Bulk Projects',
     intro:
-      'BOLEN supplies LED bathroom mirrors to importers, distributors, private-label brands and project buyers. Instead of offering one generic wholesale price, we help buyers define a repeatable product mix, confirm the electrical and packaging requirements for the destination market, and quote each model against its actual specification and order volume.',
+      'BOLEN supplies regional bathroom distributors, showroom chains, and e-commerce importers with factory-direct wholesale LED mirror assortments. Ship mixed-SKU 20GP (~350–550 pcs) or 40HQ (~850–1,300 pcs) containers from our 46,800 m² Jiaxing plant starting at MOQ 50 pcs per model—built with 5mm EN 1036 copper-free glass, CRI ≥ 90 2700K–6500K LEDs, IP44 protection, and ISTA-3A cartons in 25–35 days.',
     proofPoints: [
-      { value: 'B2B supply', label: 'Distributors, brands and project buyers' },
-      { value: 'Mixed range', label: 'Selected models and functions can be reviewed' },
-      { value: 'OEM ready', label: 'Logo, manuals, labels and cartons' },
-      { value: 'Export support', label: 'Packaging and shipment planning' },
+      { value: '20GP / 40HQ', label: '350–1,300 pcs mixed-SKU container consolidation (4–8 models)' },
+      { value: 'MOQ 50 pcs', label: 'Per stocked platform for fast distributor assortment launch' },
+      { value: 'ISTA-3A Pack', label: '5-ply mail-order or palletized cartons with UPC/EAN labels' },
+      { value: '25–35 days', label: 'Factory-direct FCL/LCL dispatch near Shanghai & Ningbo ports' },
     ],
     sections: [
       {
-        heading: 'Build a wholesale LED mirror range around your customers',
+        heading: 'Good-better-best distributor assortments in one container',
         paragraphs: [
-          'A useful wholesale range normally combines several price points and applications. Buyers may select front-lit, backlit or combined-light mirrors; framed or frameless construction; standard touch controls; anti-fog systems; and selected smart features. BOLEN reviews the proposed assortment to reduce unnecessary component variation while preserving clear differences between entry, core and premium models.',
-          'Product selection can also be aligned with the sales channel. E-commerce programs prioritize individual carton protection and clear installation content, while distributors and project suppliers may need consolidated labeling, pallet planning and easier repeat ordering.',
+          'Profitable wholesale catalogs balance inventory turn against SKU breadth. Instead of tying up capital in single-SKU containers, BOLEN helps distributors combine 4–8 complementary models—entry frameless backlit rounds/rectangles, mid-tier matte-black/brushed-gold 6063-T5 aluminum frames with 2700K–6500K dimming and anti-fog, and flagship Bluetooth or mirror cabinet SKUs—inside a single 20GP or 40HQ container.',
+          'Shared UL 962 / ETL (120V) or CE EN 60598 / UKCA / SAA / RoHS (220–240V) driver and touch-sensor families across your assortment simplify warehouse spare-part stocking while keeping 5mm EN 1036 copper-free glass and CRI ≥ 90 optical quality uniform across every tier.',
         ],
         bullets: [
-          'LED bathroom and vanity mirrors for wholesale catalogs',
-          'Framed, frameless, round, rectangular and irregular designs',
-          'Anti-fog, dimming, color-temperature and sensor options',
-          'Mirror cabinets and selected non-LED mirrors for a broader range',
+          'Mix rectangular, round, oval, arch, capsule, and irregular LED mirrors at MOQ 50 pcs per SKU',
+          'Standardized 5mm EN 1036 copper-free glass, CRI ≥ 90 LEDs, 2700K–6500K CCT & IP44/IP54 sealing',
+          '20GP (~350–550 pcs) and 40HQ (~850–1,300 pcs) cubic-meter (CBM) container load optimization',
+          'Drop-ship ready ISTA-3A 5-ply individual cartons or shrink-wrapped wholesale showroom pallets',
         ],
       },
       {
-        heading: 'Wholesale pricing and MOQ based on the real specification',
+        heading: 'Transparent FOB / EXW volume tiers & cost drivers',
         paragraphs: [
-          'LED mirror cost is affected by dimensions, glass, lighting layout, frame, controls, electrical components, certification scope, packaging and quantity. MOQ also varies: an existing construction with standard components is usually more flexible than a new frame profile, mold or control system. We identify these cost drivers in the quotation so buyers can compare equivalent products and evaluate value-engineering options transparently.',
+          'Wholesale quotations break down unit pricing by order tier (50 / 200 / 500+ pcs), carton specification, and destination compliance (CE/SAA vs UL/ETL) so importers calculate exact landed margin per CBM without hidden trading-company markups.',
         ],
       },
       {
-        heading: 'Private-label details prepared for repeat supply',
+        heading: 'Reorder consistency, barcode labeling & 3-year LED warranty',
         paragraphs: [
-          'Logo position, control icons, rating labels, instruction manuals, carton artwork, model coding and accessory packs can be reviewed before the sample is approved. The confirmed specification then supports production checks and future reorders. Send your target market, expected quantity, preferred models and required functions to begin a wholesale quotation.',
+          'Every wholesale SKU ships with pre-applied master/inner carton barcodes (UPC, EAN, SKU, gross/net weight), multilingual installation guides, 1%–2% spare electrical kits, and our unified 3-year warranty on LED/electrical components (2-year warranty on non-LED mirror silvering and frames).',
         ],
       },
     ],
     faq: [
       {
-        question: 'What is the MOQ for wholesale LED mirrors?',
+        question: 'How many LED mirrors fit in a 20GP or 40HQ container, and can we mix SKUs?',
         answer:
-          'MOQ depends on the mirror size, construction, components, packaging and customization level. Existing platforms generally allow more flexibility. BOLEN confirms the minimum after reviewing the intended models and specification.',
+          'Depending on mirror dimensions (e.g., 600×800 mm to 1200×800 mm), a 20GP holds roughly 350–550 pcs and a 40HQ holds 850–1,300 pcs. Buyers can typically mix 4–8 SKUs at MOQ 50 pcs per model.',
       },
       {
-        question: 'Can wholesale buyers order samples before bulk production?',
+        question: 'Are wholesale cartons drop-tested for parcel e-commerce fulfilment?',
         answer:
-          'Yes. Sampling can be arranged to confirm appearance, lighting, controls, mounting and packaging before the bulk order. Sample cost and timing depend on the selected construction.',
+          'Yes. Buyers can choose ISTA-3A drop-tested 5-ply mail-order cartons with 25–35 mm molded EPE/EPS foam for parcel couriers, or palletized showroom packaging to maximize container CBM.',
       },
       {
-        question: 'Can different LED mirror models be combined in one order?',
+        question: 'What lead times and warranty apply to wholesale orders?',
         answer:
-          'A mixed program can be reviewed against component availability, minimum quantities, carton sizes and shipment planning. Feasibility is confirmed during quotation rather than assumed for every combination.',
+          'Pre-production samples ship in 7–12 days and bulk containers ship in 25–35 days from Shanghai or Ningbo port, backed by a 3-year LED/electrical warranty and 2-year structural warranty.',
       },
     ],
-    productTerms: ['led', 'lighted', 'illuminated', 'backlit', 'smart mirror'],
-    productExcludeTerms: ['without led'],
+    productTerms: ['wholesale', 'bulk', 'factory direct', 'factory price', 'for eu market', 'ce ip44 rohs certified'],
+    productExcludeTerms: ['without led', 'mirror cabinet', 'bear', 'cartoon', 'animal'],
     relatedSlugs: ['led-bathroom-mirror-manufacturer', 'oem-odm-mirror-manufacturing', 'custom-size-led-mirrors'],
   },
   {
     slug: 'custom-size-led-mirrors',
-    title: 'Custom Size LED Mirrors & Made-to-Measure Supply | BOLEN',
+    title: 'Custom Size LED Mirrors | Made-to-Measure 400–2000mm OEM | BOLEN',
     description:
-      'Develop custom-size LED bathroom mirrors around vanity dimensions, wall layouts and project drawings with BOLEN sampling, QC and export packaging.',
-    eyebrow: 'Made-to-measure mirror development',
+      'Made-to-measure custom size LED mirrors (400mm to 2000mm+): ±1.0mm CNC 5mm EN 1036 glass, scaled lumen & driver sizing, CRI ≥ 90, IP44 UL/CE compliance & custom ISTA-3A packaging.',
+    eyebrow: 'Made-to-measure vanity & wall-span LED mirrors',
     h1: 'Custom Size LED Mirrors Cut to Vanity and Wall Dimensions',
     intro:
-      'BOLEN manufactures custom-size LED mirrors for buyers who need more than a fixed catalog dimension. We review the wall or vanity layout, lighting effect, glass and frame construction, cable position, mounting method, functions and packaging together so the finished mirror fits the intended space and remains practical to produce and install.',
+      'BOLEN manufactures made-to-measure LED mirrors from compact 400×600 mm cloakroom units up to 1800–2000 mm double-vanity wall spans in millimeter or inch increments (±1.0 mm CNC accuracy). Rather than stretching a small driver across a wide glass sheet, we recalculate 5mm EN 1036 glass stiffness, LED wattage, driver capacity (36W–96W, IP44/IP54), and anti-fog pad area for every custom dimension.',
     proofPoints: [
-      { value: 'Custom dimensions', label: 'Width, height and project proportions' },
-      { value: 'Drawing review', label: 'Wall, vanity, cable and mounting details' },
-      { value: 'Sample control', label: 'Confirm scale, light and construction' },
-      { value: 'Size-specific pack', label: 'Protection designed for the format' },
+      { value: '400–2000+ mm', label: 'Custom mm/inch sizing with ±1.0 mm CNC glass accuracy' },
+      { value: '36W–96W Scaled', label: 'Driver wattage, CRI ≥ 90 lumens & demister scaled to area' },
+      { value: 'MOQ 50 pcs', label: 'Tooling-free resizing on frameless & aluminum platforms' },
+      { value: '25–35 days', label: '7–12 day sample & size-engineered ISTA-3A crate/carton' },
     ],
     sections: [
       {
-        heading: 'Specify dimensions around the vanity and wall',
+        heading: 'Precision sizing around double vanities, faucets, and junction boxes',
         paragraphs: [
-          'A made-to-measure mirror should be coordinated with the vanity width, taps, wall lights, tile joints, ceiling height and electrical outlet. For large or unusually narrow formats, the lighting path, frame stiffness, glass handling and mounting points may need to change. BOLEN checks these relationships before confirming the production drawing.',
-          'Buyers can submit dimensions in millimeters or inches. A hand sketch, architectural elevation, CAD drawing or annotated reference image can start the review. Critical dimensions and tolerances are confirmed in one production unit to reduce interpretation errors.',
+          'Architectural vanities frequently require non-catalog widths (such as 36"×42", 72"×36", 1400×750 mm, or 1650×850 mm) with exact cutouts or rear wire-exit coordinates aligned to wall junction boxes. BOLEN confirms production drawings in millimeters and inches with ±1.0 mm glass cutting tolerance on 5mm copper-free EN 1036 silver mirror.',
+          'For wide formats exceeding 1200 mm, we upgrade rear structural aluminum sub-frames, dual-point heavy-duty Z-bar brackets, and balanced dual-feed 24V DC CRI ≥ 90 LED strips (2700K–6500K stepless dimming) to prevent voltage drop or center dimming.',
         ],
         bullets: [
-          'Custom width and height for single or double vanities',
-          'Horizontal, vertical, round, oval and selected irregular formats',
-          'Cable exit, switch position and hanging orientation',
-          'Front-lit, backlit and combined-light layouts',
+          'Custom width, height, corner radius (R5–R50 mm), pill/arch proportions & horizontal/vertical hanging',
+          '5mm EN 1036 copper-free glass with CAT II safety film and reinforced aluminum mounting rails',
+          'Proportional 24V DC LED routing (CRI ≥ 90, 2700K–6500K) and scaled PET anti-fog heating zones',
+          '110–120V (UL 962 / ETL) or 220–240V (CE EN 60598 / SAA / RoHS) IP44/IP54 sealed drivers',
         ],
       },
       {
-        heading: 'Lighting and functions scaled with the mirror',
+        heading: 'No-mold resizing for fast 7–12 day sampling',
         paragraphs: [
-          'Changing the dimensions can affect LED length, driver selection, brightness distribution and anti-fog coverage. The team reviews these items against the intended effect rather than simply stretching a standard model. Dimming, color-temperature control, anti-fog and selected smart functions can be evaluated for the final size and destination market.',
+          'Frameless backlit/front-lit mirrors and mitered/welded 6063-T5 aluminum frames can be built to any custom size without new mold fees, keeping MOQ at 50–100 pcs per dimension and prototype lead time at 7–12 days.',
         ],
       },
       {
-        heading: 'Packaging engineered for custom and oversized mirrors',
+        heading: 'Anti-flex packaging for oversized LED mirrors',
         paragraphs: [
-          'Large and non-standard mirrors require packaging that controls corner impact, surface pressure and movement inside the carton. We review foam layout, edge and corner protection, carton strength, accessory placement, labels and pallet orientation against the approved dimension and shipment route.',
+          'Mirrors wider than 1200 mm face torsional flex in transit. BOLEN engineers custom-cut 30–40 mm high-density EPS/EPE perimeter channels, honeycomb face stiffeners, and palletized A-frame or plywood crates (ISTA-3A drop-tested for parcel sizes), backed by our 3-year LED/electrical and 2-year structural warranty.',
         ],
       },
     ],
     faq: [
       {
-        question: 'What custom LED mirror sizes can BOLEN manufacture?',
+        question: 'What minimum and maximum custom LED mirror sizes can BOLEN produce?',
         answer:
-          'There is no single size range that applies to every construction. Feasibility depends on glass handling, frame strength, lighting layout, driver capacity, mounting and packaging. Send the required dimensions for a model-specific review.',
+          'Standard custom production spans 400×500 mm up to 2000×1000 mm (16" to 78"+) in ±1.0 mm tolerances on 5mm EN 1036 glass; larger architectural panels can be reviewed with crate/pallet shipping.',
       },
       {
-        question: 'Do you need a CAD drawing for a custom-size mirror?',
+        question: 'Does resizing an LED mirror require new tooling or affect brightness?',
         answer:
-          'No. A CAD drawing is helpful, but a dimensioned sketch, elevation or annotated reference image can begin the discussion. BOLEN will confirm the critical production dimensions before sampling.',
+          'Frameless and aluminum-framed platforms require zero mold cost (MOQ 50–100 pcs). We scale 24V LED strip length, driver wattage (e.g., 36W–96W), and anti-fog pad dimensions so illumination stays uniform.',
       },
       {
-        question: 'Does a custom size require a new mold?',
+        question: 'What are the sample and bulk lead times for made-to-measure mirrors?',
         answer:
-          'Not always. Many frameless and selected framed constructions can be resized without a dedicated mold. New tooling may be required for a special frame section, corner detail or component layout.',
+          'Shop drawings are confirmed within 24–48 hours, physical samples ship in 7–12 days, and mass production ships in 25–35 days with a 3-year electrical / 2-year structural warranty.',
       },
     ],
-    productTerms: ['custom size', 'custom', 'made to measure', 'oversized', 'led', 'lighted'],
-    productExcludeTerms: ['without led'],
+    productTerms: ['flexible sizes', 'custom rectangular', 'large rectangular', 'pill-shaped', 'borderless', 'capsule-shaped', 'large frameless'],
+    productExcludeTerms: ['without led', 'mirror cabinet', 'bear'],
     relatedSlugs: ['custom-mirror-manufacturer', 'irregular-shaped-mirror-manufacturer', 'led-bathroom-mirror-manufacturer'],
   },
   {
     slug: 'irregular-shaped-mirror-manufacturer',
-    title: 'Irregular shaped mirror manufacturer with 3-year warranty',
+    title: 'Irregular Shaped Mirror Manufacturer | Custom Organic OEM | BOLEN',
     description:
-      'Create organic, asymmetric, oval and custom-shaped mirrors with engineering review, LED options, sampling and protective export packaging from BOLEN.',
-    eyebrow: 'Organic and geometric mirror programs',
+      'Custom irregular, pebble, wavy, arch and asymmetric mirror manufacturer: CNC waterjet/contoured 5mm EN 1036 glass, optional CRI ≥ 90 halo LED, custom EPE molds & 25–35 day delivery.',
+    eyebrow: 'CNC organic, pebble & asymmetric mirror programs',
     h1: 'Irregular Shaped Mirror Manufacturer for Custom Collections',
     intro:
-      'BOLEN develops irregular and custom-shaped mirrors for bathroom brands, furniture programs, hotels and design-led distributors. Organic curves, asymmetric outlines and geometric forms require coordination between the glass edge, frame or backing, lighting path, mounting orientation and packaging. We review those details before sampling so the design can be produced consistently.',
+      'BOLEN manufactures organic pebble, cloud, wavy, capsule, half-moon, and asymmetric designer mirrors for bathroom, furniture, and hospitality brands inside our 46,800 m² Jiaxing factory. Using CNC contour cutting and automated curve-edging on 5mm EN 1036 copper-free silver glass, we produce both non-LED decorative shapes and IP44 CRI ≥ 90 backlit/front-lit irregular LED mirrors at MOQ 50–100 pcs.',
     proofPoints: [
-      { value: 'Shape review', label: 'Organic, asymmetric and geometric outlines' },
-      { value: 'LED optional', label: 'Front, back or ambient lighting routes' },
-      { value: 'Drawing control', label: 'Critical curves, points and orientation' },
-      { value: 'Protective pack', label: 'Support for non-standard edges' },
+      { value: 'CNC Contour', label: '±1.0 mm curve cutting & diamond edge polishing on 5mm glass' },
+      { value: 'LED or Non-LED', label: 'Frameless halo, bent 6063-T5 aluminum or wood frames' },
+      { value: 'MOQ 50–100 pcs', label: '7–12 day sample from DXF/AI vector or dimensioned sketch' },
+      { value: '3-Yr / 2-Yr', label: '3-yr LED/electrical warranty; 2-yr non-LED mirror & frame warranty' },
     ],
     sections: [
       {
-        heading: 'Choose a distinctive shape that remains manufacturable',
+        heading: 'CNC curve radii, frame bending, and multi-orientation balance',
         paragraphs: [
-          'Irregular mirrors can include pebble, cloud, capsule, arch, oval, asymmetric and other buyer-defined forms. The final outline affects cutting and polishing, frame bending or backing design, LED diffusion and wall balance. Sharp internal corners and very tight curves may need adjustment to maintain edge quality and structural reliability.',
-          'A vector drawing is ideal for an original shape, but a reference image with the required width, height and orientation can begin the feasibility review. We clarify whether proportions may be adjusted across different sizes or whether every model must preserve one exact outline.',
+          'Freeform silhouettes succeed or fail on edge smoothness and center-of-gravity mounting. BOLEN programs CNC glass cutting tables directly from DXF/DWG/AI vector curves on 5mm EN 1036 copper-free glass, verifying minimum internal/external radii so automated diamond polishing leaves clean, chip-free arris edges.',
+          'Frames can be roll-bent in slim 6063-T5 anodized aluminum (matte black, brushed brass, white), CNC-routed in MDF/solid wood, or built frameless with concealed multi-direction hangers tested for 4-way (vertical, horizontal, or inverted organic) wall balance.',
         ],
         bullets: [
-          'Frameless polished-edge organic mirrors',
-          'Black, gold and selected custom-color framed shapes',
-          'Backlit or front-lit irregular LED mirrors',
-          'Vertical, horizontal and reversible mounting review',
+          'Pebble, pond, wavy, cloud, half-round, arch, capsule, and buyer-exclusive vector silhouettes',
+          '5mm EN 1036 copper-free glass with CAT II shatter-protection film for retail and hospitality safety',
+          'Optional flexible 24V COB/2835 LED halo or contoured sandblasted front light (CRI ≥ 90, 2700K–6500K, IP44)',
+          '4-way multi-angle keyhole/Z-bar brackets verified against each irregular shape’s center of gravity',
         ],
       },
       {
-        heading: 'Light distribution around curves and asymmetry',
+        heading: 'Uniform halo diffusion and UL / CE electrical integration',
         paragraphs: [
-          'On an illuminated irregular mirror, LED position and distance from the edge influence brightness and visual continuity. BOLEN reviews the lighting route, diffuser or backing, driver, cable exit and control position for the chosen shape. Anti-fog, dimming and color-temperature functions can be added where the construction and usable surface permit.',
+          'On illuminated irregular mirrors, flexible high-density LED strips follow a constant offset from the curved perimeter so halo backlighting remains even around tight arcs without dark corners. Illuminated models include IP44/IP54 drivers (UL 962 / CE EN 60598 / SAA / RoHS), touch/dimming controls, and custom-positioned anti-fog pads.',
         ],
       },
       {
-        heading: 'Sampling, tolerances and packaging for repeat orders',
+        heading: 'Contour-cut ISTA-3A foam protection & transparent warranty',
         paragraphs: [
-          'The sample confirms the physical outline, edge finish, mounting balance and lighting effect. Approved drawings and orientation references are then used for production inspection. Packaging is developed to support projecting curves and vulnerable points rather than forcing an irregular mirror into a standard rectangular protection plan.',
+          'Standard rectangular corner blocks leave asymmetric lobes exposed to shock. BOLEN die-cuts custom 25–35 mm EPE foam cavities matching the exact mirror contour inside 5-ply ISTA-3A export cartons (25–35 days mass production). Illuminated irregular mirrors carry a 3-year warranty on LED/electrical components, while non-LED irregular mirrors and frames carry a 2-year warranty.',
         ],
       },
     ],
     faq: [
       {
-        question: 'Can BOLEN manufacture an irregular mirror from our drawing?',
+        question: 'What file formats and tolerances are used for custom irregular mirrors?',
         answer:
-          'Yes. Vector or CAD artwork is preferred for a precise original outline, but a dimensioned reference image can start the review. The final production drawing is confirmed before sampling.',
+          'DXF, DWG, AI, or PDF vector outlines are ideal (dimensioned sketches also work), machined to ±1.0 mm CNC contour accuracy on 5mm EN 1036 copper-free mirror glass.',
       },
       {
-        question: 'Can irregular shaped mirrors include LED lighting?',
+        question: 'What warranty applies to LED vs non-LED irregular shaped mirrors?',
         answer:
-          'Yes, many shapes can use front, back or ambient lighting. Feasibility depends on the curve, backing or frame construction, LED route, driver and mounting space.',
+          'BOLEN applies a unified policy: 3-year warranty on LED lighting, drivers, touch sensors, and electrical components; 2-year warranty on non-LED mirror silvering, backing, and frames.',
       },
       {
-        question: 'Do custom shapes have a different MOQ?',
+        question: 'What are the MOQ and lead times for custom organic shapes?',
         answer:
-          'They can. MOQ depends on whether the design uses standard glass processing and components or requires dedicated tooling, frame development or packaging. It is confirmed after drawing review.',
+          'Standard MOQ is 50–100 pcs per shape/size, with 7–12 day samples and 25–35 day mass production packed in contour-cut EPE foam cartons.',
       },
     ],
-    productTerms: ['irregular', 'organic', 'asymmetric', 'shape', 'oval', 'arch'],
+    productTerms: ['irregular', 'organic', 'pebble', 'half-round', 'half moon', 'geometric', 'diamond', 'arch'],
+    productExcludeTerms: ['bear', 'cartoon', 'animal', 'mirror cabinet'],
     relatedSlugs: ['custom-size-led-mirrors', 'custom-mirror-manufacturer', 'full-length-mirror-manufacturer'],
   },
   {
     slug: 'smart-bluetooth-mirror-manufacturer',
-    title: 'Smart Bluetooth Mirror Manufacturer | BOLEN',
+    title: 'Smart Bluetooth Mirror Manufacturer | Audio, Clock & LED OEM | BOLEN',
     description:
-      'Develop smart Bluetooth bathroom mirrors with speakers, lighting, anti-fog, clock, sensors and OEM branding through BOLEN specification review and sampling.',
-    eyebrow: 'Connected mirror function programs',
+      'OEM smart Bluetooth bathroom mirror manufacturer: Bluetooth 5.0/5.3 dual sealed speakers, CRI ≥ 90 2700K–6500K dimming, clock/temp display, anti-fog, IP44 UL 962 / CE / RED / FCC compliance.',
+    eyebrow: 'Connected audio, display & multi-sensor LED mirrors',
     h1: 'Smart Bluetooth Mirror Manufacturer for OEM and Wholesale',
     intro:
-      'BOLEN develops smart Bluetooth bathroom mirrors for brands, distributors and hospitality suppliers. Bluetooth audio is only one part of the product: lighting, control logic, anti-fog, displays, sensors, electrical components, user instructions and destination-market requirements must operate as one tested configuration.',
+      'BOLEN engineers smart Bluetooth bathroom mirrors combining Bluetooth 5.0/5.3 dual sealed acoustic transducers (2×3W), CRI ≥ 90 2700K–6500K dimmable LED lighting, digital time/temperature displays, IR/touch controls, and PET anti-fog heating on 5mm EN 1036 copper-free glass—tested as a unified IP44 assembly for CE RED / EN 60598, UL 962 / FCC, UKCA, SAA, and RoHS markets.',
     proofPoints: [
-      { value: 'Function review', label: 'Audio, lighting, display and sensors' },
-      { value: 'OEM control', label: 'Icons, logo, manuals and packaging' },
-      { value: 'Sample testing', label: 'Confirm behavior before production' },
-      { value: 'Market fit', label: 'Components reviewed by destination' },
+      { value: 'BT 5.0/5.3 · 2×3W', label: 'Moisture-sealed stereo rear exciters/speakers & custom pairing ID' },
+      { value: 'CRI ≥ 90 · IP44', label: '2700K–6500K dimming, anti-fog, LED clock & temperature readout' },
+      { value: 'CE RED / FCC / UL', label: 'RF, EMC & electrical safety verified per model configuration' },
+      { value: 'MOQ 50–100 pcs', label: '7–12 day functional sample, 25–35 day build & 3-yr electrical warranty' },
     ],
     sections: [
       {
-        heading: 'Select smart mirror functions around the target user',
+        heading: 'Integrated Bluetooth audio, touch UI, and display engineering',
         paragraphs: [
-          'A smart mirror should solve a defined user need rather than collect functions for a specification sheet. Bluetooth speakers may be combined with dimmable white lighting, adjustable color temperature, anti-fog heating, clock and temperature displays, motion sensing, touch controls or a magnifying area. Availability is confirmed by model because not every construction supports every combination.',
-          'The control sequence also matters. Buyers can review switch icons, memory behavior, standby display, sensor range, audio placement and the relationship between lighting and anti-fog controls. These details are confirmed in the sample and reflected in the instruction manual.',
+          'Adding wireless audio and digital displays inside a humid bathroom mirror demands acoustic isolation, EMI shielding, and intuitive touch ergonomics. BOLEN pairs Bluetooth 5.0/5.3 modules (customizable OEM device pairing name, 10 m indoor range) with dual 2×3W vibration-damped sealed speakers, anti-glare laser-etched clock/temperature windows, and responsive capacitive touch or IR wave sensors.',
+          'Each smart platform uses 5mm EN 1036 copper-free silver glass, 2700K–6500K stepless CCT + 10%–100% dimming (CRI ≥ 90), power-off memory, and dedicated 150–250 W/m² anti-fog heating pads with optional 3x/5x optical magnifier inserts.',
         ],
         bullets: [
-          'Bluetooth speaker and selected hands-free audio options',
-          'Dimming and adjustable color-temperature lighting',
-          'Anti-fog, clock and temperature display',
-          'Touch, motion-sensor and selected magnifier configurations',
+          'Bluetooth 5.0/5.3 audio module with custom OEM pairing name & dual 2×3W sealed bathroom speakers',
+          'Laser-etched digital 12/24h clock, ambient temperature readout & night-light/motion-sensor options',
+          'CRI ≥ 90 2700K–6500K stepless dimming + independent one-touch anti-fog pad with auto-off timer',
+          '5mm EN 1036 copper-free mirror with IP44 moisture sealing across driver, audio, and touch boxes',
         ],
       },
       {
-        heading: 'Electrical configuration and documentation by market',
+        heading: 'RF, EMC, and bathroom electrical compliance by destination',
         paragraphs: [
-          'Driver, Bluetooth module, switches, heating pad, cables and plugs are reviewed as a complete component set. Required voltage, frequency, ingress protection and certification documents should be identified before quotation. BOLEN confirms model-specific coverage instead of presenting one certificate as evidence for every possible function combination.',
+          'Connected mirrors require both luminaire safety and radio-frequency compliance. Depending on target market, BOLEN configures 110–120V (UL 962 / ETL + FCC) or 220–240V (CE LVD EN 60598, EMC, RED, UKCA, SAA, RoHS) component sets and runs 100% pairing, audio sweep, touch-response, hi-pot, and 2-hour burn-in checks before packing.',
         ],
       },
       {
-        heading: 'OEM sampling before wholesale production',
+        heading: 'OEM UI customization, 25–35 day production & 3-year warranty',
         paragraphs: [
-          'Provide the mirror size and shape, required functions, control preference, destination market, target quantity and branding needs. We will review a suitable product platform and prepare a sample route. Function tests, visual checks, manuals and packaging are confirmed before bulk production and repeat-order records are established.',
+          'Customize touch-icon silkscreens, standby backlight brightness, multi-language user manuals, and ISTA-3A retail packaging starting at MOQ 50–100 pcs (7–12 day samples, 25–35 day mass production). All smart modules, LEDs, drivers, and touch sensors are covered by our 3-year factory warranty.',
         ],
       },
     ],
     faq: [
       {
-        question: 'Which functions can be included in a smart Bluetooth mirror?',
+        question: 'Can we customize the Bluetooth pairing name and touch-screen icon layout?',
         answer:
-          'Selected models can combine Bluetooth audio, dimming, color-temperature control, anti-fog, clock, temperature display, touch or motion control and magnification. The final combination depends on the construction and target market.',
+          'Yes. OEM orders can customize the Bluetooth device broadcast ID, laser-etched touch icons, brand logo, clock format (12h/24h, °C/°F), and user manuals.',
       },
       {
-        question: 'Can the smart mirror controls and icons be customized?',
+        question: 'Which RF and electrical certifications apply to smart Bluetooth mirrors?',
         answer:
-          'Control behavior, icon artwork, logo, display position and manual can be reviewed for OEM/ODM programs. New control logic or modules may affect development time and MOQ.',
+          'Depending on destination market and model, builds align with UL 962 / ETL & FCC (North America) or CE EN 60598 / RED / EMC, UKCA, SAA, and RoHS (Europe/UK/AU) with IP44 ingress protection.',
       },
       {
-        question: 'Are smart mirrors tested before shipment?',
+        question: 'What MOQ, lead time, and warranty cover smart mirrors?',
         answer:
-          'Production checks can cover lighting, control response, Bluetooth connection, display, anti-fog and other configured functions, along with appearance and packaging inspection.',
+          'Standard MOQ is 50–100 pcs per model, with 7–12 day samples, 25–35 day mass production, and a 3-year warranty on Bluetooth, display, LED, driver, and touch electronics.',
       },
     ],
-    productTerms: ['bluetooth', 'smart', 'speaker', 'clock', 'temperature', 'sensor'],
-    productExcludeTerms: ['without led'],
+    productTerms: ['bluetooth', 'speaker', 'time and temperature', 'time&temperature', 'digital clock', 'touch screen', 'motion sensor'],
+    productExcludeTerms: ['without led', 'bear', 'cartoon'],
     relatedSlugs: ['led-bathroom-mirror-manufacturer', 'anti-fog-led-mirror-manufacturer', 'oem-odm-mirror-manufacturing'],
   },
   {
     slug: 'anti-fog-led-mirror-manufacturer',
-    title: 'Anti-Fog LED Bathroom Mirror Manufacturer | BOLEN',
+    title: 'Anti-Fog LED Bathroom Mirror Manufacturer | Heated Demister OEM | BOLEN',
     description:
-      'Source anti-fog LED bathroom mirrors with reviewed heating coverage, lighting controls, electrical configuration, testing and OEM packaging from BOLEN.',
-    eyebrow: 'Clear reflection in humid bathrooms',
+      'Anti-fog LED mirror manufacturer specifying UL/CE PET heating pads (150–250 W/m², 3–5 min clear zone), 5mm EN 1036 glass, CRI ≥ 90 lighting, IP44/IP54 protection & 3-year electrical warranty.',
+    eyebrow: 'Engineered PET demister & IP44/IP54 LED mirrors',
     h1: 'Anti-Fog LED Mirror Manufacturer with Demister Coverage by Model',
     intro:
-      'BOLEN manufactures anti-fog LED bathroom mirrors for distributors, brands, hotels and multi-unit projects. A reliable demister solution depends on heating-pad size and position, mirror dimensions, control behavior, electrical components and bathroom conditions. We confirm these variables by model rather than treating “anti-fog” as a generic badge.',
+      'BOLEN engineers anti-fog LED bathroom mirrors using double-insulated UL/CE recognized PET carbon/foil heating pads (150–250 W/m²) bonded to 5mm EN 1036 copper-free silver glass. Raising central mirror surface temperature by +12°C to +18°C within 3–5 minutes without thermal shock, each model pairs verified demister coverage with CRI ≥ 90 2700K–6500K lighting and IP44/IP54 protection.',
     proofPoints: [
-      { value: 'Coverage review', label: 'Heating area matched to the mirror' },
-      { value: 'Control options', label: 'Combined or independent switching' },
-      { value: 'Function checks', label: 'Lighting and demister verification' },
-      { value: 'OEM support', label: 'Icons, manual, labels and packaging' },
+      { value: '150–250 W/m²', label: 'PET demister pad (+12°C to +18°C in 3–5 min, auto-off option)' },
+      { value: '5mm EN 1036', label: 'Copper-free glass (>720h corrosion test) & CRI ≥ 90 LEDs' },
+      { value: 'IP44 / IP54', label: 'UL 962, CE EN 60598, UKCA, SAA & RoHS electrical safety' },
+      { value: 'MOQ 50–100 pcs', label: '25–35 day production, ISTA-3A cartons & 3-yr electrical warranty' },
     ],
     sections: [
       {
-        heading: 'How the mirror demister system is specified',
+        heading: 'Thermal watt-density, clear-zone sizing, and energy control',
         paragraphs: [
-          'An anti-fog mirror uses a heating pad behind the glass to warm a defined area and reduce condensation after a shower. The clear zone is normally related to the pad coverage rather than the entire mirror surface. Buyers should confirm the preferred usable area, warm-up expectations, mirror size and whether the demister shares a switch with the light or operates independently.',
-          'BOLEN reviews pad placement around sandblasted lighting areas, frames, sensors, displays and mounting components. The goal is to provide a useful clear reflection zone without interfering with other electrical or structural elements.',
+          'Generic "anti-fog" claims fail when an undersized heating film leaves half the vanity steamed up or overheats silvering adhesive. BOLEN sizes each self-adhesive PET heating pad (150–250 W/m², typical pad footprints 200×300 mm to 400×600 mm+ matched to mirror width) to maintain a safe +12°C to +18°C delta above ambient bathroom air—clearing condensation in 3–5 minutes.',
+          'Pads are positioned clear of sandblasted front-lit frosted channels, driver housings, and mounting brackets, with independent capacitive touch switching (plus 60-minute auto-shutoff energy-saving relay for hospitality/EU eco-design) or synchronized light+demister switching.',
         ],
         bullets: [
-          'Heating-pad dimensions and position by mirror model',
-          'Touch control or selected independent-switch options',
-          'Integration with dimming and color-temperature functions',
-          'Instruction and rating labels for the approved configuration',
+          'Model-mapped PET heating pad dimensions (30%–55% central viewing zone coverage) confirmed on shop drawings',
+          'Independent anti-fog touch button with 60-minute auto-off timer or master wall-switch linkage',
+          '5mm EN 1036 copper-free glass + high-bond thermal acrylic adhesive tested against delamination',
+          'CRI ≥ 90 2700K–6500K LED illumination with IP44/IP54 moisture-sealed electrical architecture',
         ],
       },
       {
-        heading: 'Anti-fog LED mirrors for hotels and wholesale ranges',
+        heading: '100% thermal imaging, hi-pot safety & regional certifications',
         paragraphs: [
-          'Hotel and apartment buyers may prioritize simple, repeatable controls and replacement compatibility, while retail brands may offer anti-fog within a wider smart-function package. BOLEN can review the appropriate combination of lighting, frame, controls, mounting and packaging for each channel while keeping the demister specification clear.',
+          'Because heating pads operate on AC mains or regulated low voltage behind wet-zone glass, BOLEN specifies UL/TUV/CE recognized double-insulated heating films and performs 100% dielectric hi-pot testing plus thermal warm-up verification during our 2-hour production aging check—supporting UL 962 / ETL (120V) and CE EN 60598 / CB / SAA / RoHS (220–240V) compliance.',
         ],
       },
       {
-        heading: 'Testing and compliance confirmed by configuration',
+        heading: 'Sampling in 7–12 days, container shipping & 3-year warranty',
         paragraphs: [
-          'The approved component set is used for production checks covering lighting, switch response and demister operation. Voltage, ingress-protection and certification requirements vary by market and model and should be identified before quotation. Documentation coverage is confirmed against the selected construction and components.',
+          'Request demister pad layout drawings, sample verification (7–12 days), and FOB/CIF quotations at MOQ 50–100 pcs per size with 25–35 day mass production and ISTA-3A export cartons. Anti-fog heating pads, LEDs, drivers, and touch controls are covered by our 3-year factory warranty.',
         ],
       },
     ],
     faq: [
       {
-        question: 'How does an anti-fog bathroom mirror work?',
+        question: 'How fast does the anti-fog pad heat up and how much of the mirror stays clear?',
         answer:
-          'A heating pad behind the mirror warms a defined area of the glass, helping reduce condensation. The actual clear area and warm-up behavior depend on pad coverage, mirror size and room conditions.',
+          'Our 150–250 W/m² PET heating pads warm the central viewing zone (+12°C to +18°C) within 3–5 minutes; exact pad dimensions (typically 200×300 mm to 400×600 mm+) are confirmed on each model’s production drawing.',
       },
       {
-        question: 'Does the anti-fog pad clear the whole mirror?',
+        question: 'Can the anti-fog pad have its own switch and automatic shutoff timer?',
         answer:
-          'Not necessarily. Most systems are designed around a defined usable reflection zone. BOLEN confirms the pad size and position for the selected model so buyers understand the expected coverage.',
+          'Yes. Most OEM and hotel configurations use an independent anti-fog touch switch with a 60-minute auto-off timer to save energy, or can link directly to a bathroom wall switch.',
       },
       {
-        question: 'Can anti-fog and lighting controls operate separately?',
+        question: 'Are anti-fog pads safety-tested and covered by the 3-year warranty?',
         answer:
-          'Separate or combined control may be available depending on the model and switch system. The required behavior should be confirmed during specification and sampling.',
+          'Yes. Every unit undergoes 100% hi-pot dielectric safety and thermal burn-in testing (UL 962 / CE EN 60598 / SAA options) and carries our 3-year warranty on heating pads, LEDs, drivers, and sensors.',
       },
     ],
-    productTerms: ['anti-fog', 'antifog', 'defogger', 'demister', 'fogless', 'heated'],
+    productTerms: ['one-touch defogging', 'heating-film', 'built-in demister', 'defogger', 'one-key light & defog', 'one-touch anti-fog'],
+    productExcludeTerms: ['without led', 'bear', 'cartoon', 'mirror cabinet'],
     relatedSlugs: ['smart-bluetooth-mirror-manufacturer', 'led-bathroom-mirror-manufacturer', 'hotel-bathroom-mirrors'],
   },
   {
     slug: 'full-length-mirror-manufacturer',
-    title: 'Full Length Mirror Manufacturer for Hotels and Retail | BOLEN',
+    title: 'Full Length Mirror Manufacturer | Dressing, Floor & Hotel OEM | BOLEN',
     description:
-      'Source custom full-length and dressing mirrors for retail, hotels and projects with frame, mounting, safety backing and export packaging options from BOLEN.',
-    eyebrow: 'Dressing and floor mirror supply',
+      'Full-length & floor mirror manufacturer (1500×400mm to 1800×800mm+): 4mm/5mm EN 1036 glass with CAT II shatter-safe film, 6063-T5 aluminum or wood frames, optional LED & ISTA-3A packaging.',
+    eyebrow: 'Wall-mounted, leaning & freestanding floor mirrors',
     h1: 'Full Length Mirror Manufacturer for Hotels, Retail and Apartments',
     intro:
-      'BOLEN manufactures full-length mirrors for furniture brands, distributors, hotels, apartments, retail interiors and dressing areas. Wall-mounted, leaning and selected freestanding designs can be reviewed with custom dimensions, frames, finishes, safety backing, lighting and packaging suited to the sales channel.',
+      'BOLEN manufactures full-length dressing, leaning, and freestanding floor mirrors (typical formats 1500×400 mm, 1600×500 mm, 1650×600 mm, 1800×800 mm, and custom project sizes) inside our 46,800 m² Jiaxing plant. Built with distortion-free 4mm/5mm EN 1036 float silver glass, mandatory CAT II shatter-protection film, reinforced 6063-T5 aluminum or wood frames, optional CRI ≥ 90 LED lighting, and anti-flex ISTA-3A packaging.',
     proofPoints: [
-      { value: 'Custom formats', label: 'Wall, leaning and selected floor designs' },
-      { value: 'Frame options', label: 'Materials, profiles, colors and finishes' },
-      { value: 'Safety review', label: 'Backing, mounting and intended use' },
-      { value: 'Large-format pack', label: 'Corner, surface and pallet protection' },
+      { value: '1500–1800+ mm', label: 'Distortion-free 4mm/5mm EN 1036 glass + CAT II shatter film' },
+      { value: '3 Mount Styles', label: 'Fold-out easel stand, wall-hung Z-bar & leaning anti-tip hardware' },
+      { value: 'MOQ 50 pcs', label: 'Arched, rectangular, capsule & LED full-length formats' },
+      { value: 'ISTA-3A Pack', label: 'Honeycomb + 35mm EPE anti-flex cartons in 25–35 days' },
     ],
     sections: [
       {
-        heading: 'Configure the full-length mirror for its application',
+        heading: 'Structural rigidity, shatter safety, and 3-in-1 mounting hardware',
         paragraphs: [
-          'A guest-room dressing mirror, retail fitting-room mirror and residential leaning mirror have different priorities. Buyers should define mounting position, viewing height, floor contact, frame depth, traffic level and cleaning requirements. BOLEN reviews the glass, backing, frame and hardware around the intended use before confirming the sample.',
-          'Available directions can include slim aluminum frames, selected steel or wood-look finishes, frameless polished edges, rounded or arched tops and illuminated versions. Final options depend on the format, construction and destination market.',
+          'Tall mirrors (1500–2000 mm) amplify any glass wave distortion or weak corner joint. BOLEN selects optical-grade 4mm or 5mm EN 1036 copper-free silver glass backed with 130-micron CAT II explosion-proof safety film (preventing loose glass shards in guest rooms, fitting rooms, and homes), set inside rigid 1.2–1.5 mm 6063-T5 anodized aluminum, powder-coated steel, or kiln-dried solid/engineered wood frames.',
+          'Buyers can configure 2-in-1 wall/leaning brackets with anti-tip safety straps or 3-in-1 freestanding U-shaped fold-out easel stands with non-slip floor glides and limit chains.',
         ],
         bullets: [
-          'Wall-mounted full-length and dressing mirrors',
-          'Leaning and selected freestanding constructions',
-          'Black, gold and project-specific frame finishes',
-          'Optional LED lighting for selected designs',
+          'Arched, rectangular, rounded-corner, capsule, and irregular full-length silhouettes (1500–2000 mm)',
+          '4mm/5mm EN 1036 copper-free silver glass with CAT II shatter-resistant safety backing film',
+          'Matte black, brushed gold, silver, champagne, white 6063-T5 aluminum & natural wood frames',
+          'Optional perimeter front/backlit LEDs (CRI ≥ 90, 2700K–6500K, IP44, UL 962 / CE EN 60598 / SAA)',
         ],
       },
       {
-        heading: 'Mounting, safety backing and large-format handling',
+        heading: 'Anti-flex ISTA-3A mail-order and palletized project packaging',
         paragraphs: [
-          'Long mirrors place different loads on frames, joints and hanging hardware than compact vanity mirrors. Orientation, fixing points, anti-tip requirements and safety backing should be reviewed for the application. Project buyers can also discuss installation templates, model labels and replacement planning.',
+          'Long-span mirrors suffer high courier breakage when packed in standard foam. BOLEN reinforces full-length cartons with full-surface honeycomb board stiffeners, 35 mm high-density EPS/EPE corner/edge blocks, and 5-ply double-wall corrugated cartons engineered to pass ISTA-3A drop and vibration tests—or vertical A-frame pallets for hotel/retail container loads.',
         ],
       },
       {
-        heading: 'Wholesale packaging for long and vulnerable edges',
+        heading: 'MOQ 50 pcs, 25–35 day delivery & clear warranty terms',
         paragraphs: [
-          'Full-length mirrors require packaging that protects long edges and corners while limiting flex and surface pressure. BOLEN reviews foam, corner blocks, carton strength, accessory placement and pallet orientation for retail, e-commerce or project shipment. The packaging specification is confirmed together with the product, not after production.',
+          'Standard MOQ for full-length mirrors is 50 pcs per size/finish, with 7–12 day samples and 25–35 day mass production from Jiaxing (60 km to Shanghai port). Illuminated LED full-length models carry a 3-year electrical warranty, while non-LED full-length mirror glass, safety backing, stands, and frames carry a 2-year warranty.',
         ],
       },
     ],
     faq: [
       {
-        question: 'Can full-length mirrors be made to custom dimensions?',
+        question: 'What glass thickness and shatter protection do BOLEN full-length mirrors use?',
         answer:
-          'Yes. Width, height, shape, frame and mounting can be reviewed. Feasibility depends on glass handling, structural support, hardware and packaging for the requested size.',
+          'We use distortion-free 4mm or 5mm EN 1036 silver glass backed with CAT II explosion-proof safety film so glass fragments remain adhered if impacted.',
       },
       {
-        question: 'Can full-length mirrors include LED lighting?',
+        question: 'How do you prevent breakage on e-commerce and container full-length mirror orders?',
         answer:
-          'Selected wall-mounted and framed constructions can include front, edge or back lighting. The lighting route, driver, cable position and controls are confirmed by model.',
+          'E-commerce SKUs use honeycomb anti-flex panels, 35 mm molded EPE/EPS corner/edge protection, and 5-ply cartons tested to ISTA-3A standards; bulk project orders ship on vertical reinforced pallets.',
       },
       {
-        question: 'How are full-length mirrors packed for wholesale shipping?',
+        question: 'What MOQ, lead time, and warranty apply to full-length mirrors?',
         answer:
-          'Packaging can combine surface protection, foam, reinforced corners, cartons and pallet planning. The final method depends on mirror dimensions, frame, order quantity and transport route.',
+          'MOQ starts at 50 pcs per size/finish with 7–12 day samples and 25–35 day bulk production. LED electronics carry a 3-year warranty; non-LED mirror glass, backing, stands, and frames carry a 2-year warranty.',
       },
     ],
-    productTerms: ['full length', 'full-length', 'dressing', 'floor standing', 'floor mirror', 'leaning'],
+    productTerms: ['full length', 'full-length', 'dressing', 'freestanding', 'with stand', 'floor standing', 'floor mirror', 'leaning'],
+    productExcludeTerms: ['mirror cabinet', 'bear'],
     relatedSlugs: ['hotel-bathroom-mirrors', 'commercial-bathroom-mirrors', 'irregular-shaped-mirror-manufacturer'],
   },
 ];
@@ -828,6 +841,22 @@ export const HOME_SOLUTION_SLUGS = [
   'full-length-mirror-manufacturer',
 ] as const;
 
+const NOVELTY_SHAPE_RE = /\b(bear|bear-shaped|cartoon|animal|panda|cat-ear|rabbit|bunny|kids|child)\b/i;
+const MIRROR_CABINET_PHRASE_RE =
+  /\b(mirror\s+cabinet|mirror\s+vanity\s+cabinet|vanity\s+mirror\s+cabinet|medicine\s+[\w\s-]*mirror)\b/i;
+const BASE_VANITY_PHRASE_RE =
+  /\b(sink\s+cabinet|base\s+cabinet|vanity\s+cabinet|bathroom\s+vanity|floating\s+bathroom\s+vanity|storage\s+unit)\b/i;
+
+function isBaseSinkVanityProduct(product: { title?: string; category?: string }): boolean {
+  const cat = (product.category || '').trim().toLowerCase();
+  const title = (product.title || '').trim().toLowerCase();
+  if (cat === 'bathroom vanity') return true;
+  if (MIRROR_CABINET_PHRASE_RE.test(title)) return false;
+  if (BASE_VANITY_PHRASE_RE.test(title)) return true;
+  if (!/\bmirror\b/i.test(title) && /\b(cabinet|vanity)\b/i.test(title)) return true;
+  return false;
+}
+
 export function recommendSolutionsForProduct(
   product: { title?: string; category?: string; description?: string },
   limit = 3
@@ -855,13 +884,56 @@ export function scoreSeoLandingProduct(
   page: SeoLandingPage,
   product: { title?: string; category?: string }
 ): number {
-  // Product long-details often reuse broad factory copy, so using them here
-  // can make a non-LED mirror appear relevant to an LED-specific landing page.
-  // Existing titles and categories are stable, already indexed signals.
-  const haystack = `${product.title || ''} ${product.category || ''}`.toLowerCase();
+  const title = (product.title || '').toLowerCase();
+  const category = (product.category || '').toLowerCase();
+  const haystack = `${title} ${category}`;
+
+  // Never show base sink vanities (e.g. Bathroom Vanity or sink/base cabinets
+  // without mirrors) on any mirror or mirror-cabinet solution page.
+  if (isBaseSinkVanityProduct(product)) return 0;
+
+  // For led-mirror-cabinet-manufacturer, strictly require genuine wall-mounted
+  // Mirror Cabinet items (mirror in title + mirror cabinet category/phrase).
+  if (page.slug === 'led-mirror-cabinet-manufacturer') {
+    if (!/\bmirror\b/.test(title)) return 0;
+    if (category !== 'mirror cabinet' && !MIRROR_CABINET_PHRASE_RE.test(title)) return 0;
+  }
+
+  // Exclude novelty/kids shapes (Bear, cartoon, animal) from hospitality,
+  // commercial, wholesale, and general B2B engineering showcases.
+  if (
+    NOVELTY_SHAPE_RE.test(haystack) &&
+    (page.slug === 'hotel-bathroom-mirrors' ||
+      page.slug === 'commercial-bathroom-mirrors' ||
+      page.slug === 'led-mirror-wholesale-supplier' ||
+      page.slug === 'led-bathroom-mirror-manufacturer' ||
+      page.slug === 'oem-odm-mirror-manufacturing' ||
+      page.slug === 'custom-mirror-manufacturer')
+  ) {
+    return 0;
+  }
+
   if (page.productExcludeTerms?.some((term) => haystack.includes(term.toLowerCase()))) return 0;
-  return page.productTerms.reduce(
-    (score, term, index) => score + (haystack.includes(term.toLowerCase()) ? page.productTerms.length - index : 0),
+
+  let score = page.productTerms.reduce(
+    (acc, term, index) => acc + (haystack.includes(term.toLowerCase()) ? (page.productTerms.length - index) * 2 : 0),
     0
   );
+
+  // Fallback category bonus for LED Bathroom Mirror vs Wholesale LED Mirror so
+  // both pages always find >= 6 LED vanity mirrors while prioritizing completely
+  // distinct representative subsets.
+  if (page.slug === 'led-bathroom-mirror-manufacturer' && /\bled\b/.test(haystack)) {
+    score += 1;
+    if (/\b(copper-free|5mm|frosted|stepless)\b/.test(title)) score += 8;
+    if (/\b(wholesale|bulk|factory direct|factory price)\b/.test(title)) score = Math.max(1, score - 6);
+  } else if (page.slug === 'led-mirror-wholesale-supplier' && /\bled\b/.test(haystack)) {
+    score += 1;
+    if (/\b(wholesale|bulk|factory direct|factory price|for eu market)\b/.test(title)) score += 10;
+    if (/\b(copper-free|5mm)\b/.test(title) && !/\b(wholesale|bulk|factory direct)\b/.test(title)) {
+      score = Math.max(1, score - 4);
+    }
+  }
+
+  return score;
 }

@@ -25,13 +25,21 @@ export const it = {
       videos: "Video",
       adminDashboard: "Pannello di Controllo",
       logout: "Esci",
-      employeeLogin: "Accesso Dipendenti"
+      employeeLogin: "Accesso Dipendenti",
+      changeLanguage: "Cambia lingua",
+      openMenu: "Apri menu principale",
+      languageSelection: "Selezione della lingua",
+      mainNavigation: "Navigazione principale"
     },
     footer: {
       description: "Produttore ed esportatore di specchi premium. Forniamo specchi da toeletta moderni e di alta qualità ad aziende in tutto il mondo.",
       contact: "Contatti",
       quickLinks: "Link rapidi",
-      rights: "Tutti i diritti riservati."
+      rights: "Tutti i diritti riservati.",
+      address: "No. 1, Building 2, No. 1, Chuangye Road, Wangdian Town, Jiaxing, Zhejiang, Cina",
+      terms: "Termini e Condizioni",
+      privacy: "Informativa sulla Privacy",
+      languagesLabel: "Lingue"
     },
     accessibility: {
       skipToContent: "Vai al contenuto"
@@ -81,6 +89,7 @@ export const it = {
       privacyNote: "Conserviamo per un massimo di 90 giorni una copia automaticamente oscurata di questa chat IA. Non inserire nella chat dati di contatto, identità, pagamento o account. L’e-mail inviata tramite il modulo separato viene conservata con il tuo consenso ed è visibile solo agli amministratori autorizzati e ai dipendenti approvati.",
       privacyNoteCompact: "La chat oscurata viene conservata fino a 90 giorni. Non inserire dati sensibili.",
       privacyContact: "Richiesta privacy",
+      privacyPolicyLink: "Informativa privacy",
       openLabel: "Apri l’assistente IA BOLEN",
       buttonText: "Chiedi all’IA"
     },
@@ -225,7 +234,7 @@ export const it = {
       heroKicker: "Produttore di specchi LED · Partner OEM/ODM",
       heroTitle1: "Specchi di alta gamma,",
       heroTitle2: "realizzati su misura per il tuo brand.",
-      heroImageAlt: "Fabbrica di specchi BOLEN: produttore di specchi LED e da bagno e fornitore OEM/ODM con oltre 20 anni di esperienza",
+      heroImageAlt: "Fabbrica BOLEN: produttore e fornitore OEM/ODM di specchi LED e da bagno",
       heroDesc: "<1>BOLEN</1> aiuta brand di tutto il mondo a portare sul mercato collezioni di specchi dal carattere distintivo. Dalla progettazione e personalizzazione alla produzione con rigorosi controlli di qualità e alla consegna in tutto il mondo, rendiamo la produzione di alta gamma semplice, affidabile e scalabile.",
       heroPrimaryCta: "Richiedi prezzi e MOQ",
       heroSecondaryCta: "Scopri i prodotti",
@@ -253,7 +262,22 @@ export const it = {
         desc2: "Operiamo due sedi aziendali e due impianti di produzione all'avanguardia. La nostra forza lavoro dedicata gestisce molteplici linee di produzione di specchi a LED e fitting, oltre a laboratori specializzati su misura, il tutto nel rigoroso rispetto degli standard di gestione della qualità ISO 9001.",
         backedBy: "Supportato da oltre 200 professionisti dedicati",
         quote: "\"La Qualità Prima di Tutto, i Clienti Prima di Tutto\"",
-        corePrinciple: "Il Nostro Principio Fondamentale"
+        corePrinciple: "Il Nostro Principio Fondamentale",
+        map: {
+          hub: "Jiaxing · Polo vicino a Shanghai",
+          hubSub: "A 60 km dal porto di Shanghai · ISO 9001",
+          corridors: "8 corridoi globali di esportazione",
+          regions: {
+            northAmerica: "Nord America",
+            canada: "Canada",
+            southAmerica: "Sud America",
+            europe: "Europa",
+            ukNordics: "Regno Unito e Nordici",
+            middleEast: "Medio Oriente",
+            southeastAsia: "Sud-Est Asiatico",
+            australia: "Australia"
+          }
+        }
       },
       collections: {
         subtitle: "Collezioni",
@@ -279,7 +303,17 @@ export const it = {
       },
       certificates: {
         subtitle: "Le Nostre Qualifiche",
-        title: "Certificazioni Globali"
+        title: "Certificazioni Globali",
+        desc: "Test di sicurezza, conformità e grado di protezione verificati per modello per i mercati di Europa, Nord America, Regno Unito e Australia.",
+        scopeNote: "I marchi e i report di prova disponibili sono confermati per modello e mercato in fase di preventivo.",
+        items: {
+          saa: "Australia e NZ",
+          ce: "Conformità Europea",
+          ip44: "Umidità e Polvere",
+          ukca: "Regno Unito",
+          ul: "Nord America",
+          ccc: "Sicurezza Obbligatoria"
+        }
       },
       factoryShowcase: {
         subtitle: "Dentro la Fabbrica",
@@ -308,10 +342,11 @@ export const it = {
         subtitle: "Il Vantaggio BOLEN",
         title: "Vantaggio Produttivo",
         desc: "Ventuno anni di produzione verticalmente integrata, uno stabilimento di 46.800 m² e una posizione logisticamente privilegiata vicino ai porti di Shanghai e Ningbo.",
+        facilityTag: "Stabilimento di Jiaxing · Dal 2005",
         features: {
-          f1: { title: "Capacità Produttiva Comprovata", desc: "Fondata 21 anni fa, la nostra struttura di 46.800 m² impiega oltre 200 lavoratori qualificati, garantendo una catena di approvvigionamento stabile e tempi di consegna affidabili." },
-          f2: { title: "Posizione Strategica", desc: "Situati vicino ai porti di Shanghai e Ningbo, godiamo di una posizione privilegiata che assicura una logistica comoda ed efficiente." },
-          f3: { title: "Fabbrica Diretta ed Economicamente Vantaggiosa", desc: "Come fabbrica diretta, eliminiamo i costi degli intermediari per offrire prezzi altamente competitivi senza compromettere la qualità, garantendo il miglior valore per il tuo business." }
+          f1: { metric: "46.800 m² · 200+ Specialisti", title: "Capacità Produttiva Comprovata", desc: "Fondata 21 anni fa, la nostra struttura di 46.800 m² impiega oltre 200 lavoratori qualificati, garantendo una catena di approvvigionamento stabile e tempi di consegna affidabili." },
+          f2: { metric: "Porti di Shanghai e Ningbo", title: "Posizione Strategica", desc: "Situati vicino ai porti di Shanghai e Ningbo, godiamo di una posizione privilegiata che assicura una logistica comoda ed efficiente." },
+          f3: { metric: "OEM / ODM · Diretto Fabbrica", title: "Fabbrica Diretta ed Economicamente Vantaggiosa", desc: "Come fabbrica diretta, eliminiamo i costi degli intermediari per offrire prezzi altamente competitivi senza compromettere la qualità, garantendo il miglior valore per il tuo business." }
         }
       },
       manufacturingProcess: {
@@ -328,6 +363,7 @@ export const it = {
         }
       },
       whyUs: {
+        subtitle: "Standard di Partnership",
         title1: "Perché Collaborare con",
         title2: "Bolen?",
         features: [
@@ -335,6 +371,12 @@ export const it = {
           { title: "Fabbrica Diretta ed Economicamente Vantaggiosa" },
           { title: "Controllo Qualità Rigoroso e Garanzia" },
           { title: "Personalizzazione Completa" }
+        ],
+        proofs: [
+          "CE · CB · RoHS · IP44 · UKCA · UL · SAA",
+          "Prezzo diretto di fabbrica · MOQ su specifica",
+          "Ispezione 100% pre-spedizione · Garanzia 3 anni",
+          "Vetro · Illuminazione · Cornice · Imballaggio brandizzato"
         ],
         paragraphs: [
           "Abbiamo stabilito partnership solide in Europa (NL, RO, UK, ES, NO, DK), Medio Oriente, Nord America, Australia e Sud America. I nostri prodotti sono pienamente conformi agli standard internazionali, con certificazioni CE, CB, RoHS, IP44, SAA e altre.",
@@ -344,8 +386,10 @@ export const it = {
         ]
       },
       cta: {
+        kicker: "Avvia il Tuo Prossimo Programma di Specchi",
         title: "Pronto a Elevare il Tuo Spazio?",
         desc: "Contattaci oggi per discutere le tue esigenze personalizzate o sfoglia il nostro ampio catalogo di specchi premium.",
+        responseNote: "Analisi specifiche e preventivo di fabbrica entro 24 ore",
         viewCatalog: "Vedi Catalogo",
         contactSales: "Contatta le Vendite"
       }
@@ -476,6 +520,8 @@ export const it = {
       noMoreInTopic: "Non ci sono ancora altri approfondimenti in questa vista.",
       nextStepTitle: "Trasforma le informazioni utili in una specifica pronta per la fabbrica",
       nextStepDescription: "Confronta i percorsi produttivi e invia dimensioni, quantità, mercato e funzioni richieste per un preventivo mirato.",
+      authorRoleTeam: "Team di Ingegneria Ottica ed Elettrica BOLEN · Stabilimento ISO 9001 (Dal 2005)",
+      authorRoleSpecialist: "Specialista Export B2B e Capitolati Tecnici · Jiaxing Chengtai Mirror Co., Ltd.",
       categories: {
         "Buying Guide": "Guida all'acquisto",
         "Bolen Story": "Storia di BOLEN",

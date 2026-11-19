@@ -25,13 +25,21 @@ export const de = {
       videos: "Videos",
       adminDashboard: "Admin-Dashboard",
       logout: "Abmelden",
-      employeeLogin: "Mitarbeiter-Login"
+      employeeLogin: "Mitarbeiter-Login",
+      changeLanguage: "Sprache ändern",
+      openMenu: "Hauptmenü öffnen",
+      languageSelection: "Sprachauswahl",
+      mainNavigation: "Hauptnavigation"
     },
     footer: {
       description: "Premium-Spiegelhersteller und Exporteur. Wir liefern hochwertige, moderne Schminkspiegel an Unternehmen weltweit.",
       contact: "Kontakt",
       quickLinks: "Schnelllinks",
-      rights: "Alle Rechte vorbehalten."
+      rights: "Alle Rechte vorbehalten.",
+      address: "No. 1, Building 2, No. 1, Chuangye Road, Wangdian Town, Jiaxing, Zhejiang, China",
+      terms: "Allgemeine Geschäftsbedingungen",
+      privacy: "Datenschutzerklärung",
+      languagesLabel: "Sprachen"
     },
     accessibility: {
       skipToContent: "Zum Inhalt springen"
@@ -81,6 +89,7 @@ export const de = {
       privacyNote: "Wir speichern eine automatisch bereinigte Kopie dieses KI-Chats für höchstens 90 Tage. Geben Sie im Chat keine Kontakt-, Ausweis-, Zahlungs- oder Kontodaten ein. Eine über das separate Formular übermittelte E-Mail wird mit Ihrer Einwilligung gespeichert und ist nur für autorisierte Administratoren und freigeschaltete Mitarbeitende sichtbar.",
       privacyNoteCompact: "Der bereinigte Chat wird bis zu 90 Tage gespeichert. Keine sensiblen Daten eingeben.",
       privacyContact: "Datenschutzanfrage",
+      privacyPolicyLink: "Datenschutzerklärung",
       openLabel: "BOLEN KI-Assistent öffnen",
       buttonText: "KI fragen"
     },
@@ -225,7 +234,7 @@ export const de = {
       heroKicker: "LED-Spiegelhersteller · OEM/ODM-Partner",
       heroTitle1: "Premium-Spiegel,",
       heroTitle2: "passgenau für Ihre Marke.",
-      heroImageAlt: "BOLEN Spiegelfabrik – Hersteller von LED- und Badspiegeln und OEM/ODM-Lieferant mit über 20 Jahren Erfahrung",
+      heroImageAlt: "BOLEN Spiegelfabrik – Hersteller und OEM/ODM-Lieferant für LED- und Badspiegel",
       heroDesc: "<1>BOLEN</1> unterstützt Marken weltweit dabei, unverwechselbare Spiegelkollektionen auf den Markt zu bringen. Von Design und Individualisierung über qualitätsgesicherte Fertigung bis hin zur weltweiten Lieferung machen wir Premiumfertigung einfach, zuverlässig und skalierbar.",
       heroPrimaryCta: "Preise & MOQ anfragen",
       heroSecondaryCta: "Produkte entdecken",
@@ -253,7 +262,22 @@ export const de = {
         desc2: "Wir betreiben zwei Unternehmenszentralen und zwei hochmoderne Produktionsstätten. Unsere engagierte Belegschaft verwaltet mehrere LED- und Spiegelproduktionslinien sowie spezialisierte Werkstätten für Sonderanfertigungen, alles in strikter Übereinstimmung mit den Qualitätsmanagementstandards ISO 9001.",
         backedBy: "Unterstützt von über 200 engagierten Fachleuten",
         quote: "\"Qualität zuerst, Kunden zuerst\"",
-        corePrinciple: "Unser Grundprinzip"
+        corePrinciple: "Unser Grundprinzip",
+        map: {
+          hub: "Jiaxing · Standort nahe Shanghai",
+          hubSub: "60 km zum Hafen Shanghai · ISO 9001",
+          corridors: "8 globale Exportkorridore",
+          regions: {
+            northAmerica: "Nordamerika",
+            canada: "Kanada",
+            southAmerica: "Südamerika",
+            europe: "Europa",
+            ukNordics: "UK & Nordeuropa",
+            middleEast: "Naher Osten",
+            southeastAsia: "Südostasien",
+            australia: "Australien"
+          }
+        }
       },
       collections: {
         subtitle: "Kollektionen",
@@ -279,7 +303,17 @@ export const de = {
       },
       certificates: {
         subtitle: "Unsere Qualifikationen",
-        title: "Globale Zertifizierungen"
+        title: "Globale Zertifizierungen",
+        desc: "Modellspezifische Sicherheits-, Konformitäts- und Schutzartprüfungen für europäische, nordamerikanische, britische und australische Märkte.",
+        scopeNote: "Verfügbare Prüfzeichen und Nachweise werden im Angebot je Modell und Zielmarkt bestätigt.",
+        items: {
+          saa: "Australien & NZ",
+          ce: "EU-Konformität",
+          ip44: "Feuchte- & Staubschutz",
+          ukca: "Vereinigtes Königreich",
+          ul: "Nordamerika",
+          ccc: "Pflichtzertifizierung"
+        }
       },
       factoryShowcase: {
         subtitle: "Einblick in die Fabrik",
@@ -308,10 +342,11 @@ export const de = {
         subtitle: "Der BOLEN-Vorteil",
         title: "Fertigungs-Vorteil",
         desc: "21 Jahre vertikal integrierte Produktion, eine Anlage mit 46.800 m² und ein logistisch optimaler Standort in der Nähe der Häfen von Shanghai und Ningbo.",
+        facilityTag: "Werk Jiaxing · Gegr. 2005",
         features: {
-          f1: { title: "Bewährte Fertigungsleistung", desc: "Seit 21 Jahren etabliert, unsere 46.800 m² große Anlage beschäftigt über 200 erfahrene Mitarbeiter und garantiert eine stabile Lieferkette sowie zuverlässige Lieferzeiten." },
-          f2: { title: "Strategischer Standort", desc: "Nahe den Häfen von Shanghai und Ningbo gelegen, genießen wir eine erstklassige Lage, die eine bequeme und effiziente Logistik gewährleistet." },
-          f3: { title: "Werksdirekt & Kosteneffizient", desc: "Als Direkthersteller eliminieren wir Zwischenhändlerkosten und bieten hochkompetitive Preise ohne Qualitätsabstriche – für den besten Wert für Ihr Geschäft." }
+          f1: { metric: "46.800 m² · 200+ Fachkräfte", title: "Bewährte Fertigungsleistung", desc: "Seit 21 Jahren etabliert, unsere 46.800 m² große Anlage beschäftigt über 200 erfahrene Mitarbeiter und garantiert eine stabile Lieferkette sowie zuverlässige Lieferzeiten." },
+          f2: { metric: "Häfen Shanghai & Ningbo", title: "Strategischer Standort", desc: "Nahe den Häfen von Shanghai und Ningbo gelegen, genießen wir eine erstklassige Lage, die eine bequeme und effiziente Logistik gewährleistet." },
+          f3: { metric: "OEM / ODM · Direkt ab Werk", title: "Werksdirekt & Kosteneffizient", desc: "Als Direkthersteller eliminieren wir Zwischenhändlerkosten und bieten hochkompetitive Preise ohne Qualitätsabstriche – für den besten Wert für Ihr Geschäft." }
         }
       },
       manufacturingProcess: {
@@ -328,6 +363,7 @@ export const de = {
         }
       },
       whyUs: {
+        subtitle: "Partnerschaftsstandards",
         title1: "Warum eine Partnerschaft mit",
         title2: "Bolen?",
         features: [
@@ -335,6 +371,12 @@ export const de = {
           { title: "Werksdirekt & kosteneffizient" },
           { title: "Strenge Qualitätskontrolle & Garantie" },
           { title: "Umfassende Anpassung" }
+        ],
+        proofs: [
+          "CE · CB · RoHS · IP44 · UKCA · UL · SAA",
+          "Direktpreise ab Werk · Spezifikationsbasierte MOQ",
+          "100% Versandkontrolle · 3 Jahre Garantie",
+          "Glas · Licht · Rahmen · Eigenmarkenverpackung"
         ],
         paragraphs: [
           "Wir haben enge Partnerschaften in Europa (NL, RO, UK, ES, NO, DK), im Nahen Osten, in Nordamerika, Australien und Südamerika aufgebaut. Unsere Produkte entsprechen vollständig den internationalen Standards und verfügen über CE-, CB-, RoHS-, IP44-, SAA- und weitere Zertifizierungen.",
@@ -344,8 +386,10 @@ export const de = {
         ]
       },
       cta: {
+        kicker: "Starten Sie Ihr nächstes Spiegelprogramm",
         title: "Bereit, Ihren Raum aufzuwerten?",
         desc: "Kontaktieren Sie uns noch heute, um Ihre individuellen Anforderungen zu besprechen, oder durchsuchen Sie unseren umfangreichen Katalog an Premium-Spiegeln.",
+        responseNote: "Spezifikationsprüfung & Werksangebot innerhalb von 24 Stunden",
         viewCatalog: "Katalog ansehen",
         contactSales: "Vertrieb kontaktieren"
       }
@@ -476,6 +520,8 @@ export const de = {
       noMoreInTopic: "In dieser Ansicht gibt es noch keine weiteren Einblicke.",
       nextStepTitle: "Machen Sie aus hilfreichen Einblicken eine werksreife Spezifikation",
       nextStepDescription: "Vergleichen Sie Fertigungswege und senden Sie Maße, Menge, Markt und gewünschte Funktionen für ein gezieltes Angebot.",
+      authorRoleTeam: "BOLEN Optik- & Elektrotechnik-Team · ISO-9001-Werk (Gegr. 2005)",
+      authorRoleSpecialist: "B2B-Export- & Spezifikationsspezialist · Jiaxing Chengtai Mirror Co., Ltd.",
       categories: {
         "Buying Guide": "Kaufratgeber",
         "Bolen Story": "BOLEN Geschichte",

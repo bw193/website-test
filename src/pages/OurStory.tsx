@@ -27,6 +27,8 @@ import {
 import SEO from '../components/SEO';
 import Reveal from '../components/Reveal';
 import VideoPlayer from '../components/VideoPlayer';
+import { localizeFactoryGalleryList } from '../components/FactoryShowcase';
+import { capImageAlt } from '../components/ProductCard';
 import { hasSupabaseConfig } from '../supabaseConfig';
 import { useLocalizedPath } from '../hooks/useLocalizedPath';
 import { imageSrcSet, optimizeImage } from '../utils/optimizeImage';
@@ -96,12 +98,12 @@ const FALLBACK_VIDEO: VideoListItem = {
 };
 
 const CERTIFICATES = [
-  { url: `${STORAGE}/comp%20image/au.png`, label: 'SAA' },
-  { url: `${STORAGE}/comp%20image/CE(1)(1).jpg`, label: 'CE' },
-  { url: `${STORAGE}/comp%20image/IP44.jpg`, label: 'IP44' },
-  { url: `${STORAGE}/comp%20image/UKCA.jpg`, label: 'UKCA' },
-  { url: `${STORAGE}/comp%20image/UL2.jpg`, label: 'UL' },
-  { url: `${STORAGE}/comp%20image/ctce.png`, label: 'CCC' },
+  { key: 'saa', url: `${STORAGE}/comp%20image/au.png`, label: 'SAA' },
+  { key: 'ce', url: `${STORAGE}/comp%20image/CE(1)(1).jpg`, label: 'CE' },
+  { key: 'ip44', url: `${STORAGE}/comp%20image/IP44.jpg`, label: 'IP44' },
+  { key: 'ukca', url: `${STORAGE}/comp%20image/UKCA.jpg`, label: 'UKCA' },
+  { key: 'ul', url: `${STORAGE}/comp%20image/UL2.jpg`, label: 'UL' },
+  { key: 'ccc', url: `${STORAGE}/comp%20image/ctce.png`, label: 'CCC' },
 ] as const;
 
 type ProcessKey = 'brief' | 'specification' | 'manufacturing' | 'inspection' | 'packaging' | 'logistics';
@@ -174,13 +176,38 @@ function safeGallery(raw: string | null | undefined): FactoryGalleryItem[] | nul
   }
 }
 
+function readStoryPrerenderSeed(): { productCount: number; videoCount: number; gallery?: FactoryGalleryItem[] } {
+  let raw: Record<string, any> | null = null;
+  if (typeof window !== 'undefined' && (window as any).__BOLEN_PRERENDER_DATA__) {
+    const winObj = (window as any).__BOLEN_PRERENDER_DATA__;
+    if (winObj && typeof winObj === 'object') raw = winObj as Record<string, any>;
+  }
+  if (!raw && typeof document !== 'undefined') {
+    const el = document.getElementById('__BOLEN_PRERENDER_DATA__');
+    if (el?.textContent) {
+      try {
+        raw = JSON.parse(el.textContent) as Record<string, any>;
+      } catch {
+        raw = null;
+      }
+    }
+  }
+  return {
+    productCount: typeof raw?.productCount === 'number' && raw.productCount > 0 ? raw.productCount : 117,
+    videoCount: typeof raw?.videoCount === 'number' && raw.videoCount > 0 ? raw.videoCount : 36,
+    gallery: Array.isArray(raw?.factoryGallery) && raw.factoryGallery.length > 0 ? raw.factoryGallery : undefined,
+  };
+}
+
 export default function OurStory() {
   const { t } = useTranslation();
   const { lang, lp } = useLocalizedPath();
-  const [gallery, setGallery] = useState<FactoryGalleryItem[]>(FALLBACK_GALLERY);
+  const storySeed = useMemo(() => readStoryPrerenderSeed(), []);
+  const [rawGallery, setRawGallery] = useState<FactoryGalleryItem[]>(storySeed.gallery ?? FALLBACK_GALLERY);
+  const gallery = useMemo(() => localizeFactoryGalleryList(rawGallery, lang), [rawGallery, lang]);
   const [featuredVideo, setFeaturedVideo] = useState<VideoListItem>(FALLBACK_VIDEO);
-  const [productCount, setProductCount] = useState(78);
-  const [videoCount, setVideoCount] = useState(13);
+  const [productCount, setProductCount] = useState(storySeed.productCount);
+  const [videoCount, setVideoCount] = useState(storySeed.videoCount);
   const [activeProcess, setActiveProcess] = useState<ProcessKey>('inspection');
   const [activeGalleryIndex, setActiveGalleryIndex] = useState(0);
   const [activeChapter, setActiveChapter] = useState('company');
@@ -215,8 +242,6 @@ export default function OurStory() {
     };
   });
 
-  const selectedProcess = processes.find((step) => step.key === activeProcess) ?? processes[3];
-  const processImage = gallery[selectedProcess.imageIndex % gallery.length] ?? gallery[0];
   const activeGallery = gallery[activeGalleryIndex] ?? gallery[0];
 
   useEffect(() => {
@@ -239,7 +264,7 @@ export default function OurStory() {
         if (!settingsResult.error && settingsResult.data) {
           const galleryValue = settingsResult.data.find((row) => row.key === 'factory_gallery')?.value;
           const liveGallery = safeGallery(galleryValue);
-          if (liveGallery) setGallery(liveGallery);
+          if (liveGallery) setRawGallery(liveGallery);
 
           const videoSetting = settingsResult.data.find((row) => row.key === 'home_featured_video')?.value;
           const slug = parseFeaturedVideoSlug(videoSetting);
@@ -344,18 +369,21 @@ export default function OurStory() {
           </div>
 
           <m.div
-            initial={{ opacity: 0, y: 24 }}
+            initial={false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
             className="relative z-10 mx-4 -mt-16 rounded-[1.25rem] border border-white/80 bg-[#FAF9F6]/95 p-6 shadow-[0_24px_70px_rgba(28,25,23,0.16)] backdrop-blur-sm sm:mx-8 sm:p-9 lg:absolute lg:left-10 lg:top-1/2 lg:mx-0 lg:mt-0 lg:w-[520px] lg:-translate-y-1/2 lg:p-12"
           >
-            <p className="mb-5 text-xs font-semibold uppercase tracking-[0.2em] text-amber-700">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-amber-700">
               {tx('ourStoryPage.hero.kicker', 'Jiaxing Chengtai Mirror Co., Ltd.')}
             </p>
-            <h1 id="story-hero-title" className="font-serif text-[2.65rem] leading-[0.98] tracking-tight text-stone-950 sm:text-5xl lg:text-[3.6rem]">
+            <h1 id="story-hero-title" className="font-serif text-3xl leading-tight tracking-tight text-stone-950 sm:text-4xl">
+              {tx('ourStoryPage.title', 'Our Story')}
+            </h1>
+            <p className="mt-2 font-serif text-[2rem] leading-[1.04] tracking-tight text-stone-900 sm:text-4xl">
               {tx('ourStoryPage.hero.titleLine1', 'Built here.')}{' '}
               <span className="block italic text-stone-500">{tx('ourStoryPage.hero.titleLine2', 'Trusted beyond.')}</span>
-            </h1>
+            </p>
             <p className="mt-6 max-w-md text-[0.98rem] leading-7 text-stone-600">
               {tx(
                 'ourStoryPage.hero.description',
@@ -504,10 +532,13 @@ export default function OurStory() {
                 })}
               </div>
 
-              <div className="mt-4 flex flex-col justify-between gap-3 rounded-2xl border border-stone-200 bg-stone-100/70 px-5 py-4 text-xs leading-5 text-stone-500 sm:flex-row sm:items-center">
-                <span className="font-semibold uppercase tracking-[0.14em] text-stone-700">
-                  {tx('ourStoryPage.company.snapshotLabel', 'Live company snapshot')}
-                </span>
+              <div className="mt-4 flex flex-col justify-between gap-3 rounded-2xl border border-stone-200 bg-stone-100/70 px-5 py-4 text-xs leading-5 text-stone-600 sm:flex-row sm:items-center">
+                <address className="not-italic font-medium text-stone-800">
+                  {t(
+                    'footer.address',
+                    'No. 1, Building 2, No. 1, Chuangye Road, Wangdian Town, Jiaxing, Zhejiang, China'
+                  )}
+                </address>
                 <span>{tx('ourStoryPage.company.snapshotNote', 'Catalog and media counts refresh from the website database.')}</span>
               </div>
             </section>
@@ -569,61 +600,65 @@ export default function OurStory() {
                 })}
               </div>
 
-              <m.div
-                key={selectedProcess.key}
-                id={`process-panel-${selectedProcess.key}`}
-                role="tabpanel"
-                aria-labelledby={`process-tab-${selectedProcess.key}`}
-                aria-label={tx('ourStoryPage.accessibility.processPanel', 'Selected manufacturing stage')}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.22 }}
-                className="mt-7 grid min-h-[520px] overflow-hidden rounded-[1.25rem] border border-stone-200 bg-white shadow-sm md:grid-cols-[0.42fr_0.58fr]"
-              >
-                <div className="flex flex-col justify-center p-7 sm:p-9 lg:p-10">
-                  <span className="mb-8 flex h-12 w-12 items-center justify-center rounded-full bg-amber-50 text-amber-700">
-                    {React.createElement(selectedProcess.icon, { className: 'h-5 w-5', 'aria-hidden': true })}
-                  </span>
-                  <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-amber-700">
-                    {selectedProcess.label}
-                  </p>
-                  <h3 className="font-serif text-3xl leading-[1.08] tracking-tight text-stone-950 sm:text-4xl">
-                    {selectedProcess.title}
-                  </h3>
-                  <p className="mt-5 text-[0.95rem] leading-7 text-stone-600">{selectedProcess.description}</p>
-                  <ul className="mt-8 space-y-4">
-                    {selectedProcess.checks.map((check) => (
-                      <li key={check} className="flex items-center gap-3 text-sm font-medium text-stone-700">
-                        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-stone-100 text-amber-700">
-                          <Check className="h-3.5 w-3.5" aria-hidden="true" />
-                        </span>
-                        {check}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <div className="relative min-h-[300px] bg-stone-200 md:min-h-full">
-                  <img
-                    src={optimizeImage(processImage.url, { width: 1100, height: 800, resize: 'cover' })}
-                    srcSet={imageSrcSet(processImage.url, [640, 900, 1200], {
-                      heightForWidth: (width) => Math.round(width * 0.73),
-                      resize: 'cover',
-                    })}
-                    sizes="(min-width: 768px) 58vw, 100vw"
-                    alt={processImage.alt}
-                    className="absolute inset-0 h-full w-full object-cover"
-                    width="1100"
-                    height="800"
-                    loading="lazy"
-                    decoding="async"
-                    referrerPolicy="no-referrer"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-stone-950/35 via-transparent to-transparent" />
-                  <p className="absolute bottom-5 left-5 rounded-full bg-stone-950/75 px-4 py-2 text-xs font-medium text-white backdrop-blur-sm">
-                    {processImage.caption || processImage.alt}
-                  </p>
-                </div>
-              </m.div>
+              {processes.map((step) => {
+                const isSelected = step.key === activeProcess;
+                const stepImage = gallery[step.imageIndex % gallery.length] ?? gallery[0];
+                return (
+                  <div
+                    key={step.key}
+                    id={`process-panel-${step.key}`}
+                    role="tabpanel"
+                    aria-labelledby={`process-tab-${step.key}`}
+                    className={`${
+                      isSelected ? 'grid' : 'hidden'
+                    } mt-7 min-h-[520px] overflow-hidden rounded-[1.25rem] border border-stone-200 bg-white shadow-sm md:grid-cols-[0.42fr_0.58fr]`}
+                  >
+                    <div className="flex flex-col justify-center p-7 sm:p-9 lg:p-10">
+                      <span className="mb-8 flex h-12 w-12 items-center justify-center rounded-full bg-amber-50 text-amber-700">
+                        {React.createElement(step.icon, { className: 'h-5 w-5', 'aria-hidden': true })}
+                      </span>
+                      <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-amber-700">
+                        {step.label}
+                      </p>
+                      <h3 className="font-serif text-3xl leading-[1.08] tracking-tight text-stone-950 sm:text-4xl">
+                        {step.title}
+                      </h3>
+                      <p className="mt-5 text-[0.95rem] leading-7 text-stone-600">{step.description}</p>
+                      <ul className="mt-8 space-y-4">
+                        {step.checks.map((check) => (
+                          <li key={check} className="flex items-center gap-3 text-sm font-medium text-stone-700">
+                            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-stone-100 text-amber-700">
+                              <Check className="h-3.5 w-3.5" aria-hidden="true" />
+                            </span>
+                            {check}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div className="relative min-h-[300px] bg-stone-200 md:min-h-full">
+                      <img
+                        src={optimizeImage(stepImage.url, { width: 1100, height: 800, resize: 'cover' })}
+                        srcSet={imageSrcSet(stepImage.url, [640, 900, 1200], {
+                          heightForWidth: (width) => Math.round(width * 0.73),
+                          resize: 'cover',
+                        })}
+                        sizes="(min-width: 768px) 58vw, 100vw"
+                        alt={capImageAlt(stepImage.alt, 100)}
+                        className="absolute inset-0 h-full w-full object-cover"
+                        width="1100"
+                        height="800"
+                        loading="lazy"
+                        decoding="async"
+                        referrerPolicy="no-referrer"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-stone-950/35 via-transparent to-transparent" />
+                      <p className="absolute bottom-5 left-5 rounded-full bg-stone-950/75 px-4 py-2 text-xs font-medium text-white backdrop-blur-sm">
+                        {stepImage.caption || stepImage.alt}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
             </section>
 
             <section id="factory" data-story-section className="scroll-mt-24" aria-labelledby="factory-title">
@@ -645,7 +680,7 @@ export default function OurStory() {
                 <div className="grid gap-4 lg:grid-cols-[1.22fr_0.78fr]">
                   <m.figure
                     key={activeGallery.url}
-                    initial={{ opacity: 0 }}
+                    initial={false}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.2 }}
                     className="relative aspect-[16/9] overflow-hidden rounded-[1.25rem] bg-stone-200"
@@ -813,7 +848,7 @@ export default function OurStory() {
                         <Reveal key={certificate.label} delay={index * 55} as="figure" className="flex min-h-28 flex-col items-center justify-center rounded-xl border border-stone-200 bg-stone-50 p-4 text-center">
                           <img
                             src={optimizeImage(certificate.url, { width: 220, height: 110, resize: 'contain' })}
-                            alt={`${certificate.label} document graphic`}
+                            alt={capImageAlt(`${certificate.label} — ${t(`home.certificates.items.${certificate.key}`, certificate.label)}`, 100)}
                             className="h-12 w-full object-contain mix-blend-multiply"
                             width="220"
                             height="110"
@@ -867,6 +902,12 @@ export default function OurStory() {
                       <a href={`tel:${STORY_COMPANY.phone.replace(/\s/g, '')}`} className="underline decoration-stone-600 underline-offset-4 hover:text-white">
                         {tx('ourStoryPage.partnership.phoneLabel', 'Phone')}: {STORY_COMPANY.phone}
                       </a>
+                      <span className="text-stone-300">
+                        {t(
+                          'footer.address',
+                          'No. 1, Building 2, No. 1, Chuangye Road, Wangdian Town, Jiaxing, Zhejiang, China'
+                        )}
+                      </span>
                     </div>
                   </div>
                   <div className="flex flex-col gap-3 sm:flex-row lg:flex-col xl:flex-row">

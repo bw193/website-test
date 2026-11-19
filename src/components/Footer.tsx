@@ -75,7 +75,15 @@ export default function Footer() {
                 <Phone className="h-4 w-4" />
                 <a href="tel:+8618058603602" className="hover:text-white transition-colors">+86 18058603602</a>
               </li>
-              <li className="flex items-center gap-2"><MapPin className="h-4 w-4" /> Jiaxing, Zhejiang, China</li>
+              <li className="flex items-start gap-2">
+                <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
+                <span>
+                  {t(
+                    'footer.address',
+                    'No. 1, Building 2, No. 1, Chuangye Road, Wangdian Town, Jiaxing, Zhejiang, China'
+                  )}
+                </span>
+              </li>
             </ul>
           </div>
           <div>
@@ -101,7 +109,7 @@ export default function Footer() {
               {footerSolutions.map((page) => (
                 <li key={page.slug}>
                   <Link to={lp(`/solutions/${page.slug}`)} className="hover:text-white transition-colors">
-                    {page.shortTitle || page.h1}
+                    {page.footerAnchor || page.shortTitle || page.h1}
                   </Link>
                 </li>
               ))}
@@ -120,7 +128,7 @@ export default function Footer() {
               and gave an internal staff entry point the same prominence as the
               RFQ call to action. */}
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-            <nav aria-label="Languages" className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <nav aria-label={t('footer.languagesLabel', 'Languages')} className="flex flex-wrap items-center gap-x-3 gap-y-1">
               {FOOTER_LANGUAGES.map((item) => (
                 <Link
                   key={item.code}
@@ -137,6 +145,9 @@ export default function Footer() {
               ))}
             </nav>
             <span className="text-stone-700" aria-hidden="true">|</span>
+            <Link to={lp('/privacy-policy')} className="text-stone-500 hover:text-white transition-colors">
+              {t('footer.privacy', 'Privacy Policy')}
+            </Link>
             <Link to={lp('/terms-and-conditions')} className="text-stone-500 hover:text-white transition-colors">
               {t('footer.terms', 'Terms and Conditions')}
             </Link>

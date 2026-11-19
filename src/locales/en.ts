@@ -35,13 +35,19 @@ export const en = {
       logout: "Logout",
       employeeLogin: "Employee Login",
       changeLanguage: "Change language",
-      openMenu: "Open main menu"
+      openMenu: "Open main menu",
+      languageSelection: "Language selection",
+      mainNavigation: "Main navigation"
     },
     footer: {
       description: "Premium mirror manufacturer and exporter. Supplying high-quality, modern vanity mirrors to businesses worldwide.",
       contact: "Contact",
       quickLinks: "Quick Links",
-      rights: "All rights reserved."
+      rights: "All rights reserved.",
+      address: "No. 1, Building 2, No. 1, Chuangye Road, Wangdian Town, Jiaxing, Zhejiang, China",
+      terms: "Terms and Conditions",
+      privacy: "Privacy Policy",
+      languagesLabel: "Languages"
     },
     accessibility: {
       skipToContent: "Skip to content"
@@ -91,6 +97,7 @@ export const en = {
       privacyNote: "We store an automatically redacted copy of this AI chat for up to 90 days. Do not type contact, ID, payment, or account details into chat. An email submitted through the separate continuation form is stored with your consent and is visible only to authorized administrators and approved employees.",
       privacyNoteCompact: "Redacted chat is stored for up to 90 days. Do not enter sensitive information.",
       privacyContact: "Privacy request",
+      privacyPolicyLink: "Privacy Policy",
       openLabel: "Open BOLEN AI assistant",
       buttonText: "Ask BOLEN"
     },
@@ -237,7 +244,7 @@ export const en = {
       heroTitle2: "Built Around Your Brand.",
       // One alt for every hero slide: editors change the banners without
       // per-image alt text, so it describes what they all show.
-      heroImageAlt: "BOLEN mirror factory – LED mirror and bathroom mirror manufacturer and OEM/ODM supplier with 20+ years of experience",
+      heroImageAlt: "BOLEN LED mirror and bathroom mirror manufacturer – OEM/ODM factory supplier",
       heroDesc: "<1>BOLEN</1> helps global brands bring distinctive mirror collections to market. From design and customization to quality-controlled production and worldwide delivery, we make premium manufacturing simple, reliable, and scalable.",
       heroPrimaryCta: "Get Pricing & MOQ",
       heroSecondaryCta: "Explore Products",
@@ -265,7 +272,22 @@ export const en = {
         desc2: "We operate two enterprise headquarters and two state-of-the-art production plants. Our dedicated workforce manages multiple LED and fitting mirror production lines, alongside specialized customized workshops, all in strict compliance with ISO 9001 quality management standards.",
         backedBy: "Backed by 200+ dedicated professionals",
         quote: "\"Quality First, Customers First\"",
-        corePrinciple: "Our Core Principle"
+        corePrinciple: "Our Core Principle",
+        map: {
+          hub: "Jiaxing · Shanghai Hub",
+          hubSub: "60 km to Shanghai Port · ISO 9001",
+          corridors: "8 Global Export Corridors",
+          regions: {
+            northAmerica: "North America",
+            canada: "Canada",
+            southAmerica: "South America",
+            europe: "Europe",
+            ukNordics: "UK & Nordics",
+            middleEast: "Middle East",
+            southeastAsia: "SE Asia",
+            australia: "Australia"
+          }
+        }
       },
       collections: {
         subtitle: "Collections",
@@ -291,7 +313,17 @@ export const en = {
       },
       certificates: {
         subtitle: "Our Qualifications",
-        title: "Global Certifications"
+        title: "Global Certifications",
+        desc: "Model-specific safety, conformity, and ingress ratings verified for European, North American, UK, and Australian markets.",
+        scopeNote: "Available marks and test reports are confirmed per model and destination market during quotation.",
+        items: {
+          saa: "Australia & NZ",
+          ce: "European Conformity",
+          ip44: "Moisture & Dust",
+          ukca: "United Kingdom",
+          ul: "North America",
+          ccc: "Compulsory Safety"
+        }
       },
       factoryShowcase: {
         subtitle: "Inside the Factory",
@@ -320,10 +352,11 @@ export const en = {
         subtitle: "The BOLEN Edge",
         title: "Manufacturing Advantage",
         desc: "Twenty-one years of vertically integrated production, a 46,800 sqm facility, and a logistics-first location near Shanghai and Ningbo ports.",
+        facilityTag: "Jiaxing Production Base · Est. 2005",
         features: {
-          f1: { title: "Proven Manufacturing Power", desc: "Established 21 years ago, our 46,800 sqm facility is staffed by over 200 skilled workers, guaranteeing a stable supply chain and reliable lead times." },
-          f2: { title: "Strategic Location", desc: "Located near Shanghai and Ningbo ports, we enjoy a prime location that ensures convenient and efficient logistics." },
-          f3: { title: "Factory Direct & Cost-Effective", desc: "As a direct factory, we eliminate middleman costs to offer highly competitive prices without compromising on quality, ensuring the best value for your business." }
+          f1: { metric: "46,800 m² · 200+ Specialists", title: "Proven Manufacturing Power", desc: "Established 21 years ago, our 46,800 sqm facility is staffed by over 200 skilled workers, guaranteeing a stable supply chain and reliable lead times." },
+          f2: { metric: "Shanghai & Ningbo Ports", title: "Strategic Location", desc: "Located near Shanghai and Ningbo ports, we enjoy a prime location that ensures convenient and efficient logistics." },
+          f3: { metric: "OEM / ODM · Factory Direct", title: "Factory Direct & Cost-Effective", desc: "As a direct factory, we eliminate middleman costs to offer highly competitive prices without compromising on quality, ensuring the best value for your business." }
         }
       },
       manufacturingProcess: {
@@ -340,6 +373,7 @@ export const en = {
         }
       },
       whyUs: {
+        subtitle: "Partnership Standards",
         title1: "Why Partner With",
         title2: "Bolen?",
         features: [
@@ -348,16 +382,24 @@ export const en = {
           { title: "Rigorous Quality Control & Warranty" },
           { title: "Comprehensive Customization" }
         ],
+        proofs: [
+          "CE · CB · RoHS · IP44 · UKCA · UL · SAA",
+          "Direct Factory Pricing · Specification-led MOQ",
+          "100% Pre-shipment Inspection · 3-Year Warranty",
+          "Glass · Lighting · Frame · Private-Label Packaging"
+        ],
         paragraphs: [
-          "We have established deep partnerships across Europe (NL, RO, UK, ES, NO, DK), the Middle East, North America, Australia, and South America. Our products are fully compliant with international standards, holding CE, CB, RoHS, IP44, and SAA certifications and so on.",
+          "We have established deep partnerships across Europe (NL, RO, UK, ES, NO, DK), the Middle East, North America, Australia, and South America. Our products are fully compliant with international standards, holding CE, CB, RoHS, IP44, UKCA, UL, and SAA certifications.",
           "As a direct manufacturer, we offer highly competitive pricing. We are committed to delivering premium quality that perfectly aligns with your budget requirements.",
           "Our quality assurance system matches our after-sales commitment. Every product undergoes 100% pre-shipment inspection, backed by a comprehensive 3-year extended warranty on electronic components.",
           "From mirror glass to packaging, we provide end-to-end OEM/ODM customization services tailored to help you expand your market reach and build your brand."
         ]
       },
       cta: {
+        kicker: "Start Your Next Mirror Program",
         title: "Ready to Elevate Your Space?",
         desc: "Contact us today to discuss your custom requirements or browse our extensive catalog of premium mirrors.",
+        responseNote: "24-hour specification review & factory quotation",
         viewCatalog: "View Catalog",
         contactSales: "Contact Sales"
       }
@@ -491,6 +533,8 @@ export const en = {
       noMoreInTopic: "No additional insights in this view yet.",
       nextStepTitle: "Turn useful insight into a factory-ready specification",
       nextStepDescription: "Compare manufacturing routes, then send dimensions, quantity, market, and required functions for a focused quote.",
+      authorRoleTeam: "BOLEN Optical & Electrical Engineering Team · ISO 9001 Factory (Est. 2005)",
+      authorRoleSpecialist: "B2B Export & Mirror Specification Specialist · Jiaxing Chengtai Mirror Co., Ltd.",
       categories: {
         "Buying Guide": "Buying Guide",
         "Bolen Story": "BOLEN Story",

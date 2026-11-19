@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import Markdown from '../components/Markdown';
 import SEO from '../components/SEO';
 import BlogCard from '../components/BlogCard';
-import ProductCard from '../components/ProductCard';
+import ProductCard, { capImageAlt } from '../components/ProductCard';
 import { useLocalizedPath } from '../hooks/useLocalizedPath';
 import { readInitialBlogPost } from '../utils/prerenderData';
 import {
@@ -33,27 +33,128 @@ interface ProductLite {
   category?: string;
   price_range?: string;
   msrp?: string;
+  href?: string;
+}
+
+function readRawPrerenderObject(): Record<string, any> | null {
+  if (typeof window !== 'undefined' && (window as any).__BOLEN_PRERENDER_DATA__) {
+    const winObj = (window as any).__BOLEN_PRERENDER_DATA__;
+    if (winObj && typeof winObj === 'object') return winObj as Record<string, any>;
+  }
+  if (typeof document !== 'undefined') {
+    const el = document.getElementById('__BOLEN_PRERENDER_DATA__');
+    if (el?.textContent) {
+      try {
+        return JSON.parse(el.textContent) as Record<string, any>;
+      } catch {
+        return null;
+      }
+    }
+  }
+  return null;
+}
+
+function normalizeSeededArticles(items: unknown): BlogListItem[] {
+  if (!Array.isArray(items)) return [];
+  return items
+    .map((raw: any, index): BlogListItem | null => {
+      if (!raw || typeof raw !== 'object' || typeof raw.title !== 'string') return null;
+      const slugFromHref =
+        typeof raw.href === 'string'
+          ? raw.href.replace(/\/+$/, '').split('/').pop() || ''
+          : '';
+      const slug = typeof raw.slug === 'string' && raw.slug ? raw.slug : slugFromHref;
+      if (!slug) return null;
+      return {
+        id: typeof raw.id === 'string' && raw.id ? raw.id : `seed-article-${slug}-${index}`,
+        slug,
+        title: raw.title,
+        excerpt: typeof raw.excerpt === 'string' ? raw.excerpt : '',
+        category: typeof raw.category === 'string' ? raw.category : null,
+        cover_image:
+          typeof raw.cover_image === 'string'
+            ? raw.cover_image
+            : typeof raw.img === 'string'
+              ? raw.img
+              : null,
+        author: typeof raw.author === 'string' ? raw.author : 'BOLEN',
+        reading_minutes: typeof raw.reading_minutes === 'number' ? raw.reading_minutes : 4,
+        published_at: typeof raw.published_at === 'string' ? raw.published_at : null,
+      };
+    })
+    .filter((item): item is BlogListItem => Boolean(item));
+}
+
+function normalizeSeededProducts(items: unknown): ProductLite[] {
+  if (!Array.isArray(items)) return [];
+  return items
+    .map((raw: any): ProductLite | null => {
+      if (!raw || typeof raw !== 'object' || typeof raw.title !== 'string') return null;
+      const images = Array.isArray(raw.images)
+        ? raw.images.filter((u: unknown): u is string => typeof u === 'string')
+        : typeof raw.img === 'string' && raw.img
+          ? [raw.img]
+          : [];
+      return {
+        id: typeof raw.id === 'string' ? raw.id : '',
+        title: raw.title,
+        description: typeof raw.description === 'string' ? raw.description : '',
+        images,
+        category: typeof raw.category === 'string' ? raw.category : undefined,
+        price_range: typeof raw.price_range === 'string' ? raw.price_range : undefined,
+        msrp: typeof raw.msrp === 'string' ? raw.msrp : undefined,
+        href: typeof raw.href === 'string' ? raw.href : undefined,
+      };
+    })
+    .filter((item): item is ProductLite => Boolean(item && (item.id || item.href)));
+}
+
+function readBlogPrerenderSeed(slug: string, lang: string): {
+  post: LocalizedBlogPost | null;
+  relatedArticles: BlogListItem[];
+  relatedProducts: ProductLite[];
+} {
+  const post = readInitialBlogPost(slug, lang);
+  const raw = readRawPrerenderObject();
+  if (
+    raw &&
+    raw.lang === lang &&
+    (raw.route === 'blogPost' || raw.blogPost?.slug === slug) &&
+    (!raw.blogPost?.slug || raw.blogPost.slug === slug)
+  ) {
+    return {
+      post: post ?? (raw.blogPost?.slug === slug ? (raw.blogPost as LocalizedBlogPost) : null),
+      relatedArticles: normalizeSeededArticles(raw.relatedArticles ?? raw.related),
+      relatedProducts: normalizeSeededProducts(raw.relatedProducts ?? raw.products),
+    };
+  }
+  return { post, relatedArticles: [], relatedProducts: [] };
+}
+
+function demoteMarkdownH1(markdown: string): string {
+  if (!markdown) return '';
+  return markdown.replace(/^#\s+/gm, '## ');
 }
 
 export default function BlogPost() {
   const { slug = '' } = useParams<{ slug: string }>();
   const { lp, lang } = useLocalizedPath();
   const { t } = useTranslation();
-  const initial = readInitialBlogPost(slug, lang);
-  const [post, setPost] = useState<LocalizedBlogPost | null>(initial);
-  const [loading, setLoading] = useState(initial === null);
-  const [related, setRelated] = useState<BlogListItem[]>([]);
-  const [relatedProducts, setRelatedProducts] = useState<ProductLite[]>([]);
+  const seed = readBlogPrerenderSeed(slug, lang);
+  const [post, setPost] = useState<LocalizedBlogPost | null>(seed.post);
+  const [loading, setLoading] = useState(seed.post === null);
+  const [related, setRelated] = useState<BlogListItem[]>(seed.relatedArticles);
+  const [relatedProducts, setRelatedProducts] = useState<ProductLite[]>(seed.relatedProducts);
   const [failedCover, setFailedCover] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
-    const initialPost = readInitialBlogPost(slug, lang);
-    setPost(initialPost);
-    setRelated([]);
-    setRelatedProducts([]);
+    const nextSeed = readBlogPrerenderSeed(slug, lang);
+    setPost(nextSeed.post);
+    setRelated(nextSeed.relatedArticles);
+    setRelatedProducts(nextSeed.relatedProducts);
     setFailedCover(null);
-    setLoading(initialPost === null);
+    setLoading(nextSeed.post === null);
 
     const refreshPost = async () => {
       try {
@@ -74,10 +175,10 @@ export default function BlogPost() {
         ]);
         const data = postResult.data;
         const list = listResult.data;
-        if (active) {
-          setPost(data ? localizePost(data as RawBlogPost, lang) : initialPost);
+        if (active && data) {
+          setPost(localizePost(data as RawBlogPost, lang));
         }
-        if (active && list) {
+        if (active && list && list.length > 0) {
           const items = (list as RawBlogPost[])
             .filter(
               (candidate) =>
@@ -85,22 +186,23 @@ export default function BlogPost() {
                 Boolean(candidate.title?.[lang]?.trim() && candidate.body?.[lang]?.trim())
             )
             .map((candidate) => toListItem(candidate, lang));
-          setRelated(items.slice(0, 3));
+          if (items.length > 0) setRelated(items.slice(0, 3));
         }
 
         const productIds =
-          (data as RawBlogPost | null)?.product_ids || initialPost?.product_ids || [];
+          (data as RawBlogPost | null)?.product_ids || nextSeed.post?.product_ids || [];
         if (active && productIds.length) {
           const { data: products } = await supabase
             .from('products')
             .select('id, title, description, images, category, price_range, msrp')
             .eq('is_active', true)
             .in('id', productIds);
-          if (active && products) {
+          if (active && products && products.length > 0) {
             const byId = new Map((products as ProductLite[]).map((product) => [product.id, product]));
-            setRelatedProducts(
-              productIds.map((id) => byId.get(id)).filter((product): product is ProductLite => Boolean(product))
-            );
+            const resolved = productIds
+              .map((id) => byId.get(id))
+              .filter((product): product is ProductLite => Boolean(product));
+            if (resolved.length > 0) setRelatedProducts(resolved);
           }
         }
       } catch (error) {
@@ -110,7 +212,7 @@ export default function BlogPost() {
       }
     };
 
-    if (initialPost) {
+    if (nextSeed.post) {
       const cancel = runWhenIdle(refreshPost, 2500);
       return () => {
         active = false;
@@ -170,6 +272,16 @@ export default function BlogPost() {
   const showCover = Boolean(cover && cover !== failedCover);
   const seoTitle = post.seo_title || `${post.title} | BOLEN Mirror Insights`;
   const seoDescription = post.seo_description || post.excerpt;
+  const isCompanyAuthor = !post.author || /^bolen(\s+mirror)?$/i.test(post.author.trim());
+  const authorCredential = isCompanyAuthor
+    ? t(
+        'blog.authorRoleTeam',
+        'BOLEN Optical & Electrical Engineering Team · ISO 9001 Factory (Est. 2005)'
+      )
+    : t(
+        'blog.authorRoleSpecialist',
+        'B2B Export & Mirror Specification Specialist · Jiaxing Chengtai Mirror Co., Ltd.'
+      );
 
   return (
     <article className="bg-[#FAF9F6] text-stone-800 selection:bg-amber-200/60 selection:text-stone-900">
@@ -211,15 +323,18 @@ export default function BlogPost() {
           {post.excerpt && (
             <p className="mt-5 text-lg leading-8 text-stone-700">{post.excerpt}</p>
           )}
-          <div className="mt-7 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-medium uppercase tracking-wider text-stone-500">
-            <span>{post.author}</span>
-            {post.published_at && <span aria-hidden className="text-stone-300">·</span>}
-            {post.published_at && <span>{formatBlogDate(post.published_at, lang)}</span>}
-            <span aria-hidden className="text-stone-300">·</span>
-            <span className="inline-flex items-center gap-1.5">
-              <Clock className="h-3.5 w-3.5" />
-              {t('blog.readingTime', { minutes: post.reading_minutes })}
-            </span>
+          <div className="mt-7 border-t border-stone-100 pt-5">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-medium uppercase tracking-wider text-stone-600">
+              <span className="font-semibold text-stone-900">{post.author || 'BOLEN'}</span>
+              {post.published_at && <span aria-hidden className="text-stone-300">·</span>}
+              {post.published_at && <span>{formatBlogDate(post.published_at, lang)}</span>}
+              <span aria-hidden className="text-stone-300">·</span>
+              <span className="inline-flex items-center gap-1.5">
+                <Clock className="h-3.5 w-3.5" />
+                {t('blog.readingTime', { minutes: post.reading_minutes })}
+              </span>
+            </div>
+            <p className="mt-1.5 text-xs leading-5 text-stone-500">{authorCredential}</p>
           </div>
         </div>
       </header>
@@ -228,7 +343,7 @@ export default function BlogPost() {
         <figure className="mx-auto max-w-6xl px-4 pt-10 sm:px-6 sm:pt-12 lg:px-8">
           <img
             src={optimizeImage(cover, { width: 1600, quality: 85 })}
-            alt={post.title}
+            alt={capImageAlt(post.title, 100)}
             width="1600"
             height="900"
             decoding="async"
@@ -252,7 +367,7 @@ export default function BlogPost() {
             prose-img:shadow-sm
             prose-li:text-stone-700 prose-li:marker:text-amber-600"
         >
-          {post.body}
+          {demoteMarkdownH1(post.body)}
         </Markdown>
 
         <aside className="mt-16 bg-stone-900 p-8 text-white md:p-12" aria-label={t('blog.ctaTitle')}>
@@ -290,7 +405,7 @@ export default function BlogPost() {
                 <li key={solution.slug} className="border-t border-stone-200 pt-4">
                   <Link to={lp(`/solutions/${solution.slug}`)} className="group block">
                     <span className="flex items-baseline justify-between gap-3 font-medium text-stone-900 group-hover:text-amber-800">
-                      {solution.shortTitle || solution.h1}
+                      {solution.relatedAnchor || solution.shortTitle || solution.h1}
                       <ArrowRight className="h-4 w-4 shrink-0 text-stone-400 group-hover:text-amber-800" />
                     </span>
                     <span className="mt-2 block text-sm leading-6 text-stone-600">{solution.blurb}</span>
@@ -309,18 +424,39 @@ export default function BlogPost() {
               {t('blog.relatedProducts', 'Featured in this insight')}
             </h2>
             <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {relatedProducts.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  id={product.id}
-                  title={product.title}
-                  description={product.description}
-                  image={product.images?.[0] || ''}
-                  category={product.category}
-                  priceRange={product.price_range}
-                  msrp={product.msrp}
-                />
-              ))}
+              {relatedProducts.map((product, idx) =>
+                product.id ? (
+                  <ProductCard
+                    key={product.id}
+                    id={product.id}
+                    title={product.title}
+                    description={product.description}
+                    image={product.images?.[0] || ''}
+                    category={product.category}
+                    priceRange={product.price_range}
+                    msrp={product.msrp}
+                  />
+                ) : (
+                  <article key={product.href || idx} className="group flex flex-col">
+                    <Link to={product.href || lp('/products')} className="block aspect-square overflow-hidden rounded-2xl bg-stone-100">
+                      {product.images?.[0] && (
+                        <img
+                          src={optimizeImage(product.images[0], { width: 400 })}
+                          alt={capImageAlt(product.title, 100)}
+                          width="400"
+                          height="400"
+                          loading="lazy"
+                          decoding="async"
+                          className="h-full w-full object-contain object-center"
+                        />
+                      )}
+                    </Link>
+                    <h3 className="mt-4 font-serif text-lg leading-snug text-stone-900 group-hover:text-amber-800">
+                      <Link to={product.href || lp('/products')}>{product.title}</Link>
+                    </h3>
+                  </article>
+                )
+              )}
             </div>
           </div>
         </section>

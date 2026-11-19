@@ -27,13 +27,19 @@ export const zh = {
       logout: "退出登录",
       employeeLogin: "员工登录",
       changeLanguage: "切换语言",
-      openMenu: "打开主菜单"
+      openMenu: "打开主菜单",
+      languageSelection: "选择语言",
+      mainNavigation: "主导航"
     },
     footer: {
       description: "高端镜子制造商与出口商，为全球企业供应高品质现代化妆镜。",
       contact: "联系方式",
       quickLinks: "快速链接",
-      rights: "版权所有。"
+      rights: "版权所有。",
+      address: "中国浙江省嘉兴市王店镇创业路1号2幢1号",
+      terms: "条款与条件",
+      privacy: "隐私政策",
+      languagesLabel: "语言"
     },
     accessibility: {
       skipToContent: "跳到主要内容"
@@ -83,6 +89,7 @@ export const zh = {
       privacyNote: "我们会保存一份自动脱敏的 AI 对话，最长 90 天。请勿在聊天正文中填写联系方式、证件、付款或账户信息；通过独立继续表单提交的邮箱会在您同意后单独保存，仅限获授权管理员和已审核员工查看。",
       privacyNoteCompact: "脱敏对话最长保存 90 天，请勿填写敏感信息。",
       privacyContact: "隐私请求",
+      privacyPolicyLink: "隐私政策",
       openLabel: "打开 BOLEN AI 助手",
       buttonText: "咨询 AI"
     },
@@ -255,7 +262,22 @@ export const zh = {
         desc2: "我们运营两个企业总部和两个现代化生产工厂。我们敬业的员工管理着多条LED和试衣镜生产线，以及专门的定制车间，所有操作均严格遵守ISO 9001质量管理标准。",
         backedBy: "由200多名专业人员提供支持",
         quote: "“质量第一，客户至上”",
-        corePrinciple: "我们的核心原则"
+        corePrinciple: "我们的核心原则",
+        map: {
+          hub: "嘉兴总部 · 毗邻上海",
+          hubSub: "距上海港 60 公里 · ISO 9001",
+          corridors: "8 条全球出口航线",
+          regions: {
+            northAmerica: "北美",
+            canada: "加拿大",
+            southAmerica: "南美",
+            europe: "欧洲",
+            ukNordics: "英国与北欧",
+            middleEast: "中东",
+            southeastAsia: "东南亚",
+            australia: "澳大利亚"
+          }
+        }
       },
       collections: {
         subtitle: "系列产品",
@@ -281,7 +303,17 @@ export const zh = {
       },
       certificates: {
         subtitle: "我们的资质",
-        title: "全球认证"
+        title: "全球认证",
+        desc: "按具体型号验证符合欧洲、北美、英国及澳大利亚市场的安全、合规与防护等级认证。",
+        scopeNote: "适用认证标识与测试报告将在报价阶段按所选型号与目的市场逐一确认。",
+        items: {
+          saa: "澳大利亚与新西兰",
+          ce: "欧盟安全合规",
+          ip44: "防水防尘等级",
+          ukca: "英国市场准入",
+          ul: "北美安全标准",
+          ccc: "中国强制认证"
+        }
       },
       factoryShowcase: {
         subtitle: "走进工厂",
@@ -310,10 +342,11 @@ export const zh = {
         subtitle: "BOLEN 的优势",
         title: "制造优势",
         desc: "21 年的垂直一体化生产、46,800 平方米厂房，毗邻上海与宁波港口的物流优选位置。",
+        facilityTag: "嘉兴生产基地 · 始于 2005",
         features: {
-          f1: { title: "成熟的制造实力", desc: "公司成立已 21 年，拥有 46,800 平方米厂房和 200 余名熟练工人，保障稳定的供应链与可靠的交期。" },
-          f2: { title: "得天独厚的地理位置", desc: "毗邻上海与宁波港口，地理位置优越，物流便捷高效。" },
-          f3: { title: "工厂直销，超高性价比", desc: "作为源头工厂，我们去除中间环节，提供极具竞争力的价格，同时不妥协品质，为您的业务带来最佳价值。" }
+          f1: { metric: "46,800 m² · 200+ 专业人员", title: "成熟的制造实力", desc: "公司成立已 21 年，拥有 46,800 平方米厂房和 200 余名熟练工人，保障稳定的供应链与可靠的交期。" },
+          f2: { metric: "毗邻上海港与宁波港", title: "得天独厚的地理位置", desc: "毗邻上海与宁波港口，地理位置优越，物流便捷高效。" },
+          f3: { metric: "OEM / ODM · 源头直供", title: "工厂直销，超高性价比", desc: "作为源头工厂，我们去除中间环节，提供极具竞争力的价格，同时不妥协品质，为您的业务带来最佳价值。" }
         }
       },
       manufacturingProcess: {
@@ -330,6 +363,7 @@ export const zh = {
         }
       },
       whyUs: {
+        subtitle: "合作保障",
         title1: "为什么选择",
         title2: "BOLEN？",
         features: [
@@ -338,16 +372,24 @@ export const zh = {
           { title: "严格的质量管控与质保" },
           { title: "全方位定制能力" }
         ],
+        proofs: [
+          "CE · CB · RoHS · IP44 · UKCA · UL · SAA",
+          "源头工厂定价 · 按规格核算起订量",
+          "100% 出货前全检 · 3 年电子质保",
+          "镜片 · 灯光 · 边框 · 自有品牌包装"
+        ],
         paragraphs: [
-          "我们已在欧洲（荷兰、罗马尼亚、英国、西班牙、挪威、丹麦）、中东、北美、澳大利亚与南美建立了深度合作。产品完全符合国际标准，持有 CE、CB、RoHS、IP44、SAA 等多项认证。",
+          "我们已在欧洲（荷兰、罗马尼亚、英国、西班牙、挪威、丹麦）、中东、北美、澳大利亚与南美建立了深度合作。产品完全符合国际标准，持有 CE、CB、RoHS、IP44、UKCA、UL、SAA 等多项认证。",
           "作为源头制造商，我们提供极具竞争力的价格，并致力于在您的预算范围内交付优质产品。",
           "我们的品质保证体系与售后承诺相匹配。每件产品出货前均经过 100% 检验，电子元件提供 3 年延长质保。",
           "从镜面玻璃到包装，我们提供端到端的 OEM/ODM 定制服务，量身打造，助您拓展市场并塑造品牌。"
         ]
       },
       cta: {
+        kicker: "开启您的下一个镜类项目",
         title: "准备好提升您的空间了吗？",
         desc: "立即联系我们讨论您的定制需求，或浏览我们丰富的优质镜子目录。",
+        responseNote: "24 小时内回复规格评估与工厂报价",
         viewCatalog: "查看目录",
         contactSales: "联系销售"
       }
@@ -478,6 +520,8 @@ export const zh = {
       noMoreInTopic: "当前视图暂无其他洞察。",
       nextStepTitle: "把实用洞察转化为可报价的工厂规格",
       nextStepDescription: "对比制造方案，并发送尺寸、数量、目标市场和所需功能，以获取更准确的报价。",
+      authorRoleTeam: "BOLEN 光学与电气工程研发团队 · ISO 9001 制造基地（创立于 2005 年）",
+      authorRoleSpecialist: "B2B 出口与镜类规格专员 · 嘉兴诚泰镜业有限公司",
       categories: {
         "Buying Guide": "选购指南",
         "Bolen Story": "BOLEN 故事",

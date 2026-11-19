@@ -45,6 +45,7 @@ const AdminVideoForm = lazy(() => import('./pages/AdminVideoForm'));
 const SeoSolutions = lazy(() => import('./pages/SeoSolutions'));
 const SeoLandingPage = lazy(() => import('./pages/SeoLandingPage'));
 const TermsAndConditions = lazy(() => import('./pages/TermsAndConditions'));
+const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const AiReceptionist = lazy(() => import('./components/AiReceptionist'));
 
 // Loading fallback
@@ -111,6 +112,7 @@ function AppShell() {
               <Route path="solutions/:slug" element={<SeoLandingPage />} />
               <Route path="rfq" element={withMotion(<RFQ />)} />
               <Route path="terms-and-conditions" element={<TermsAndConditions />} />
+              <Route path="privacy-policy" element={<PrivacyPolicy />} />
             </Route>
 
             {/* Client-side safety net; production serves permanent redirects. */}

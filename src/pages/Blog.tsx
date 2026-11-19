@@ -140,8 +140,15 @@ export default function Blog() {
         })}
       />
 
-      {/* The page opens on the featured insight; the heading stays for screen readers and search. */}
-      <h1 className="sr-only">{pageHeading}</h1>
+      <header className="mx-auto max-w-6xl border-b border-stone-200 px-4 pb-8 pt-12 sm:px-6 sm:pt-16 lg:px-8">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-800">
+          {t('navbar.blog', 'Insights')}
+        </p>
+        <h1 className="mt-2 font-serif text-3xl tracking-tight text-stone-950 sm:text-4xl">
+          {pageHeading}
+        </h1>
+        <p className="mt-2 max-w-2xl text-sm leading-6 text-stone-600">{pageDescription}</p>
+      </header>
 
       {loading && posts.length === 0 ? (
         <section className="mx-auto max-w-6xl px-4 pb-12 pt-16 sm:px-6 sm:pt-20 lg:px-8">
