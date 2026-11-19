@@ -2067,7 +2067,14 @@ marked.use({
 
 function renderMarkdown(md: string): string {
   if (!md) return '';
-  return marked.parse(md, { async: false }) as string;
+  const normalized = md.replace(/\*\*([^*\n]+?)\*\*/g, (full, inner, offset, str) => {
+    const prev = offset > 0 ? str[offset - 1] : '';
+    const next = offset + full.length < str.length ? str[offset + full.length] : '';
+    const lead = /[\p{L}\p{N}]/u.test(prev) && /^[^\s\p{L}\p{N}]/u.test(inner) ? ' ' : '';
+    const trail = /[^\s\p{L}\p{N}]$/u.test(inner) && /[\p{L}\p{N}]/u.test(next) ? ' ' : '';
+    return `${lead}${full}${trail}`;
+  });
+  return marked.parse(normalized, { async: false }) as string;
 }
 
 function blogIndexContent(lang: Lang, items: BlogListItem[]): string {
