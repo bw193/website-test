@@ -4,7 +4,7 @@
 //
 // These overlays replace display fields only. Localized URL slugs are compiled
 // separately into productRoutes.json so links do not wait for a translation
-// fetch. Chinese display copy retains its existing English fallback.
+// fetch. All 5 non-English locales (zh, es, fr, de, it) load static overlays.
 
 import { useEffect, useState } from 'react';
 
@@ -15,7 +15,7 @@ export interface ProductFields {
   specifications?: Array<{ key: string; value: string }> | Record<string, string>;
 }
 
-const TRANSLATED_LANGS = new Set(['es', 'fr', 'de', 'it']);
+const TRANSLATED_LANGS = new Set(['zh', 'es', 'fr', 'de', 'it']);
 
 type LangMap = Record<string, ProductFields>;
 const cache: Record<string, LangMap> = {};

@@ -1,10 +1,9 @@
 /**
  * Generates per-language product copy for the storefront.
  *
- * Reads every product from Supabase (the English source of truth) and uses the
+ * Reads active products from Supabase (the English source of truth) and uses the
  * Gemini API to translate the human-readable fields — title, description,
- * details, and specification keys/values — into es / fr / de / it. English is
- * the source and Chinese is intentionally skipped (zh shows English copy).
+ * details, and specification keys/values — into zh / es / fr / de / it.
  *
  * Output: public/i18n/products.<lang>.json, a map of product id -> fields, e.g.
  *   { "<uuid>": { "title": "...", "description": "...", "details": "...",
@@ -32,9 +31,10 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = resolve(__dirname, '..');
 const OUT_DIR = resolve(PROJECT_ROOT, 'public', 'i18n');
 
-const TARGET_LANGS = ['es', 'fr', 'de', 'it'] as const;
+const TARGET_LANGS = ['zh', 'es', 'fr', 'de', 'it'] as const;
 type TargetLang = (typeof TARGET_LANGS)[number];
 const LANG_NAMES: Record<TargetLang, string> = {
+  zh: 'Simplified Chinese',
   es: 'Spanish',
   fr: 'French',
   de: 'German',
@@ -61,6 +61,9 @@ interface Fields {
   specifications?: Spec[];
 }
 
+const PROMPT_LEAK_RE =
+  /benefit-first language|spec signals trust|nutzenorientierte sprache|lenguaje orientado|langage ax[ée] sur|linguaggio orientato/i;
+
 function normalizeSpecs(raw: ProductRow['specifications']): Spec[] {
   if (!raw) return [];
   if (Array.isArray(raw)) {
@@ -69,10 +72,13 @@ function normalizeSpecs(raw: ProductRow['specifications']): Spec[] {
   return Object.entries(raw).map(([key, value]) => ({ key, value: String(value ?? '') }));
 }
 
-// A description that is really just a model code (e.g. "CTF0067LK") has nothing
-// to translate; skip it so the overlay falls back to the English value.
+// A description that is really just a model code (e.g. "CTF0067LK") or an
+// accidental authoring rubric has nothing to translate.
 function isTranslatableText(text: string | undefined): boolean {
-  return !!text && /\s/.test(text.trim()) && text.trim().length >= 15;
+  if (!text) return false;
+  const trimmed = text.trim();
+  if (PROMPT_LEAK_RE.test(trimmed)) return false;
+  return /\s/.test(trimmed) && trimmed.length >= 15;
 }
 
 // The English source we feed the model — also what we hash for the skip cache.
@@ -87,6 +93,45 @@ function sourceFields(p: ProductRow): Fields {
 
 function hashFields(f: Fields): string {
   return createHash('sha1').update(JSON.stringify(f)).digest('hex');
+}
+
+function sanitizeText(lang: TargetLang, value: string): string {
+  let out = value.replace(/\*\* +([^*\n]+?)\*\*/g, '**$1**').replace(/\*\*([^*\n]+?) +\*\*/g, '**$1**');
+  if (lang === 'fr') {
+    out = out
+      .replace(/\bde plain-pied\b/gi, 'en pied')
+      .replace(/\bmiroirs? de vanity\b/gi, (m) => (/miroirs/i.test(m) ? 'miroirs de salle de bains' : 'miroir de salle de bains'));
+  } else if (lang === 'es') {
+    out = out
+      .replace(/\bespejos? de vanidad\b/gi, (m) => (/espejos/i.test(m) ? 'espejos de tocador' : 'espejo de tocador'))
+      .replace(/\bantinieblas?\b/gi, 'antivaho')
+      .replace(/\b(?:con |en )?forma de piscina\b/gi, 'tipo cápsula');
+  } else if (lang === 'de') {
+    out = out
+      .replace(/\bEntnebler(?:s|n)?\b/g, 'Antibeschlagfunktion')
+      .replace(/\b[Bb]eckenförmig(er|e|es|en|em)?\b/g, (_, suf = '') => `kapselförmig${suf}`);
+  } else if (lang === 'it') {
+    out = out.replace(/\ba forma di piscina\b/gi, 'a capsula');
+  } else if (lang === 'zh') {
+    out = out.replace(/泳池形/g, '跑道椭圆形');
+  }
+  return out;
+}
+
+function sanitizeFields(lang: TargetLang, f: Fields): Fields {
+  const out: Fields = {};
+  if (f.title) out.title = sanitizeText(lang, f.title);
+  if (f.description && !PROMPT_LEAK_RE.test(f.description)) {
+    out.description = sanitizeText(lang, f.description);
+  }
+  if (f.details) out.details = sanitizeText(lang, f.details);
+  if (Array.isArray(f.specifications)) {
+    out.specifications = f.specifications.map((s) => ({
+      key: sanitizeText(lang, String(s.key ?? '')),
+      value: sanitizeText(lang, String(s.value ?? '')),
+    }));
+  }
+  return out;
 }
 
 async function readJson<T>(path: string, fallback: T): Promise<T> {
@@ -105,15 +150,22 @@ async function translateProduct(
   ai: GoogleGenAI,
   source: Fields
 ): Promise<Record<TargetLang, Fields>> {
-  const prompt = `You are a professional product-copy translator for a B2B LED mirror manufacturer (brand: BOLEN / Jiaxing Chengtai Mirror Co., Ltd.).
+  const prompt = `You are a professional B2B product-copy translator for an LED bathroom & architectural mirror manufacturer (brand: BOLEN / Jiaxing Chengtai Mirror Co., Ltd.).
 
 Translate the JSON below from English into these languages: ${TARGET_LANGS.map((l) => `${l} (${LANG_NAMES[l]})`).join(', ')}.
 
 Rules:
-- Translate "title", "description", "details", and every specification "key" and "value".
-- Keep UNCHANGED: brand names (BOLEN, Chengtai), model/SKU codes, measurements and numbers (e.g. "60*100CM", "5MM", "IP44"), and certification names (CE, RoHS, IP66, ISO 9001).
-- Preserve any Markdown in "details".
-- In "details", keep every photo line ![description](url) where it is, with its url unchanged; translate only the description (it is the photo's caption), keeping any backslash escapes.
+- Translate "title", "description", "details", and every specification "key" and "value" completely and naturally. Never leave English prose or English specification words untranslated (especially in zh / Simplified Chinese, translate words like "or Custom" -> "或定制", "and so on" -> "等", "PE Bag+Foam+Carton" -> "PE袋+泡沫+纸箱").
+- Never output authoring instructions, prompt rubrics, or meta commentary — output only translated product copy.
+- Mandatory B2B mirror glossary:
+  * French (fr): "full-length mirror" = "miroir en pied" (NEVER "de plain-pied"); "vanity mirror" = "miroir de salle de bains" / "miroir de meuble-lavabo" (NEVER "vanity").
+  * Spanish (es): "vanity mirror" = "espejo de tocador" (NEVER "vanidad"); "anti-fog" = "antivaho" (NEVER "antiniebla"); "capsule / pill / pool shape" = "tipo cápsula" (NEVER "piscina").
+  * German (de): "defogger / demister / anti-fog" = "Antibeschlagfunktion" or "Spiegelheizung" (NEVER "Entnebler"); "capsule / pill / pool shape" = "kapselförmig" (NEVER "beckenförmig").
+  * Italian (it): "capsule / pill / pool shape" = "a capsula" (NEVER "piscina").
+  * Simplified Chinese (zh): "capsule / pill / pool shape" = "胶囊形" or "跑道椭圆形" (NEVER "泳池形").
+- Keep UNCHANGED: brand names (BOLEN, Chengtai), model/SKU codes, measurements and numbers (e.g. "60*100CM", "5mm", "3000K–6500K"), and certification names (CE, RoHS, IP44, IP54, IP66, UKCA, UL, SAA, CB, EN 1036, ISO 9001).
+- Preserve valid CommonMark Markdown in "details" (never leave spaces inside **bold** markers).
+- In "details", keep every photo line ![description](url) where it is, with its url unchanged; translate only the description concisely (<= 90 chars), keeping any backslash escapes.
 - Keep the same JSON structure. "specifications" must stay an array of {"key","value"} in the same order.
 - Return ONLY a JSON object shaped exactly like:
   { ${TARGET_LANGS.map((l) => `"${l}": { ...translated fields... }`).join(', ')} }
@@ -131,7 +183,9 @@ ${JSON.stringify(source)}`;
   const text = stripCodeFence(response.text ?? '');
   const parsed = JSON.parse(text) as Record<string, Fields>;
   const out = {} as Record<TargetLang, Fields>;
-  for (const lang of TARGET_LANGS) out[lang] = parsed[lang] || {};
+  for (const lang of TARGET_LANGS) {
+    out[lang] = sanitizeFields(lang, parsed[lang] || {});
+  }
   return out;
 }
 
@@ -152,13 +206,14 @@ async function main(): Promise<void> {
   const { data, error } = await supabase
     .from('products')
     .select('id, title, description, details, specifications')
+    .eq('is_active', true)
     .order('created_at', { ascending: false });
   if (error) {
     console.error('[translate-products] Failed to fetch products:', error.message);
     process.exit(1);
   }
   const products = (data || []) as ProductRow[];
-  console.log(`[translate-products] ${products.length} products from Supabase.`);
+  console.log(`[translate-products] ${products.length} active products from Supabase.`);
 
   await mkdir(OUT_DIR, { recursive: true });
 
@@ -183,9 +238,13 @@ async function main(): Promise<void> {
     nextHashes[product.id] = hash;
 
     const unchanged = prevHashes[product.id] === hash;
-    const haveAll = TARGET_LANGS.every((l) => existing[l][product.id]);
+    const haveAll = TARGET_LANGS.every(
+      (l) => existing[l][product.id] && (!source.details || existing[l][product.id]?.details)
+    );
     if (unchanged && haveAll) {
-      for (const lang of TARGET_LANGS) result[lang][product.id] = existing[lang][product.id];
+      for (const lang of TARGET_LANGS) {
+        result[lang][product.id] = sanitizeFields(lang, existing[lang][product.id]);
+      }
       reused++;
       continue;
     }
@@ -197,11 +256,12 @@ async function main(): Promise<void> {
       console.log(`[translate-products] ✓ ${product.title.slice(0, 60)}`);
     } catch (err) {
       console.warn(`[translate-products] ✗ ${product.id} (${product.title.slice(0, 40)}): ${(err as Error).message}`);
-      // Keep any previous translation so a single failure doesn't drop copy.
       for (const lang of TARGET_LANGS) {
-        if (existing[lang][product.id]) result[lang][product.id] = existing[lang][product.id];
+        if (existing[lang][product.id]) {
+          result[lang][product.id] = sanitizeFields(lang, existing[lang][product.id]);
+        }
       }
-      delete nextHashes[product.id]; // retry next run
+      delete nextHashes[product.id];
     }
   }
 
