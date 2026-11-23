@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { getCatalogCategoryPageCopy, getCatalogCategorySeoTitle } from '../src/utils/catalogCategory';
-import { resolveProductSeo, type ProductSeoFields } from '../src/utils/productSeo';
+import { parseProductPriceBounds, resolveProductSeo, type ProductSeoFields } from '../src/utils/productSeo';
 import { polishEnglishProductTitle } from '../src/utils/productCopy';
 import { productDetailPath, productAlternatePaths } from '../src/utils/productRoutes';
 import { en } from '../src/locales/en';
@@ -40,7 +40,7 @@ function readOne(html: string, pattern: RegExp, route: string, label: string): s
 
 async function main(): Promise<void> {
   const routeSets: Set<string>[] = [];
-  const counts = { catalogs: 0, categories: 0, products: 0 };
+  const counts = { catalogs: 0, categories: 0, products: 0, pricedProducts: 0, unpricedProducts: 0 };
 
   for (const lang of LANGUAGES) {
     const productRoot = path.join(DIST, lang, 'products');
@@ -85,33 +85,35 @@ async function main(): Promise<void> {
         });
       const categorySlug = route.match(/\/products\/category\/([^/]+)\/$/)?.[1];
       const isCatalog = route === `/${lang}/products/`;
-      const pageType = isCatalog || categorySlug ? 'CollectionPage' : 'Product';
-      const pageSchemas = schemas.filter((schema) => schema['@type'] === pageType);
-      assert.equal(pageSchemas.length, 1, `${route}: expected one ${pageType} schema`);
-      assert.equal(normalized(String(pageSchemas[0].name)), h1, `${route}: schema name differs from H1`);
-      assert.equal(normalized(String(pageSchemas[0].description)), description, `${route}: schema description differs from Meta Description`);
 
-      if (categorySlug) {
-        routeSet.add(route.slice(lang.length + 1));
-        const expectedTitle = getCatalogCategorySeoTitle(lang, categorySlug, '');
-        if (expectedTitle) {
-          const expectedCopy = getCatalogCategoryPageCopy(lang, categorySlug, { h1: '', description: '' });
-          assert.ok(expectedCopy.h1 && expectedCopy.description, `${route}: custom title has no dedicated page copy`);
-          assert.equal(title, expectedTitle, `${route}: category Title override missing`);
-          assert.deepEqual({ h1, description }, expectedCopy, `${route}: category copy override missing`);
+      if (categorySlug || isCatalog) {
+        const pageSchemas = schemas.filter((schema) => schema['@type'] === 'CollectionPage');
+        assert.equal(pageSchemas.length, 1, `${route}: expected one CollectionPage schema`);
+        assert.equal(normalized(String(pageSchemas[0].name)), h1, `${route}: schema name differs from H1`);
+        assert.equal(normalized(String(pageSchemas[0].description)), description, `${route}: schema description differs from Meta Description`);
+
+        if (categorySlug) {
+          routeSet.add(route.slice(lang.length + 1));
+          const expectedTitle = getCatalogCategorySeoTitle(lang, categorySlug, '');
+          if (expectedTitle) {
+            const expectedCopy = getCatalogCategoryPageCopy(lang, categorySlug, { h1: '', description: '' });
+            assert.ok(expectedCopy.h1 && expectedCopy.description, `${route}: custom title has no dedicated page copy`);
+            assert.equal(title, expectedTitle, `${route}: category Title override missing`);
+            assert.deepEqual({ h1, description }, expectedCopy, `${route}: category copy override missing`);
+          }
+          const itemLists = schemas.filter((schema) => schema['@type'] === 'ItemList');
+          assert.equal(itemLists.length, 1, `${route}: expected one ItemList`);
+          assert.equal(itemLists[0].name, h1, `${route}: ItemList name differs from H1`);
+          counts.categories += 1;
+        } else {
+          routeSet.add('/products/');
+          counts.catalogs += 1;
         }
-        const itemLists = schemas.filter((schema) => schema['@type'] === 'ItemList');
-        assert.equal(itemLists.length, 1, `${route}: expected one ItemList`);
-        assert.equal(itemLists[0].name, h1, `${route}: ItemList name differs from H1`);
-        counts.categories += 1;
-      } else if (isCatalog) {
-        routeSet.add('/products/');
-        counts.catalogs += 1;
       } else {
         const islandMatch = html.match(/<script\b[^>]*id="__BOLEN_PRERENDER_DATA__"[^>]*>([\s\S]*?)<\/script>/);
         assert.ok(islandMatch, `${route}: product data island missing`);
         const payload = JSON.parse(islandMatch[1]) as {
-          product: ProductSeoFields & { id: string; category?: string; price_range?: string };
+          product: ProductSeoFields & { id: string; category?: string; price_range?: string; msrp?: string };
           productTranslations?: Record<string, Partial<ProductSeoFields>>;
         };
         routeSet.add(`product:${payload.product.id}`);
@@ -120,22 +122,55 @@ async function main(): Promise<void> {
           const href = readOne(html, new RegExp(`<link\\b[^>]*hreflang="${alternateLang}"[^>]*href="([^"]*)"[^>]*>`, 'g'), route, `${alternateLang} alternate`);
           assert.equal(href, `${ORIGIN}/${alternateLang}${alternatePath}/`, `${route}: incorrect translated alternate URL`);
         }
-        const priceNums = payload.product.price_range?.match(/\d+(?:\.\d+)?/g)?.map(Number) ?? [];
-        const hasPriceRange = priceNums.some((n) => n > 0);
-        if (pageSchemas[0].offers !== undefined) {
-          assert.equal(hasPriceRange, true, `${route}: Product without price_range must omit offers`);
-          const offer = pageSchemas[0].offers as Record<string, unknown>;
-          assert.equal(offer['@type'], 'Offer', `${route}: Product offer must use @type "Offer"`);
-          assert.equal(offer.url, canonical, `${route}: Product offer uses an old URL`);
-          assert.equal('availability' in offer, false, `${route}: Product offer must not hardcode availability`);
-          assert.equal(offer.priceCurrency, 'USD', `${route}: Product offer missing priceCurrency`);
+
+        const breadcrumbSchemas = schemas.filter((schema) => schema['@type'] === 'BreadcrumbList');
+        assert.equal(breadcrumbSchemas.length, 1, `${route}: expected one BreadcrumbList schema`);
+
+        const productSchemas = schemas.filter((schema) => schema['@type'] === 'Product');
+        const { lowPrice, highPrice } = parseProductPriceBounds(payload.product.price_range, payload.product.msrp);
+
+        if (lowPrice > 0) {
+          assert.equal(productSchemas.length, 1, `${route}: expected one Product schema for priced product`);
+          assert.equal(normalized(String(productSchemas[0].name)), h1, `${route}: schema name differs from H1`);
+          assert.equal(normalized(String(productSchemas[0].description)), description, `${route}: schema description differs from Meta Description`);
           assert.ok(
-            'price' in offer || 'priceSpecification' in offer,
-            `${route}: Product offer must include price or priceSpecification`
+            productSchemas[0].offers && typeof productSchemas[0].offers === 'object' && !Array.isArray(productSchemas[0].offers),
+            `${route}: priced Product is missing offers`
           );
+          const offer = productSchemas[0].offers as Record<string, unknown>;
+          assert.equal(offer['@type'], 'Offer', `${route}: Product offer must use @type "Offer"`);
+          assert.equal(typeof offer.price, 'number', `${route}: Product offer.price must be a number`);
+          assert.ok((offer.price as number) > 0, `${route}: Product offer.price must be > 0`);
+          assert.equal(offer.price, lowPrice, `${route}: Product offer.price must match parsed lowPrice`);
+          assert.equal(offer.priceCurrency, 'USD', `${route}: Product offer missing priceCurrency`);
+          assert.equal(offer.url, canonical, `${route}: Product offer uses an old URL`);
+          assert.equal(offer.itemCondition, 'https://schema.org/NewCondition', `${route}: Product offer must declare NewCondition`);
+          assert.equal('availability' in offer, false, `${route}: Product offer must not hardcode availability`);
+          if (highPrice > lowPrice) {
+            assert.deepEqual(
+              offer.priceSpecification,
+              {
+                '@type': 'UnitPriceSpecification',
+                price: lowPrice,
+                minPrice: lowPrice,
+                maxPrice: highPrice,
+                priceCurrency: 'USD',
+              },
+              `${route}: range-priced Product offer has invalid priceSpecification`
+            );
+          } else {
+            assert.equal('priceSpecification' in offer, false, `${route}: single-priced Product offer should omit priceSpecification`);
+          }
+          counts.pricedProducts += 1;
         } else {
-          assert.equal(hasPriceRange, false, `${route}: Product with price_range is missing offers`);
+          assert.equal(
+            productSchemas.length,
+            0,
+            `${route}: Product without numeric price must not emit Product schema`
+          );
+          counts.unpricedProducts += 1;
         }
+
         const translated = payload.productTranslations?.[payload.product.id];
         const product: ProductSeoFields = {
           ...payload.product,
@@ -162,7 +197,9 @@ async function main(): Promise<void> {
   for (let index = 1; index < routeSets.length; index += 1) {
     assert.deepEqual(routeSets[index], routeSets[0], `${LANGUAGES[index]}: translated routes do not contain the same products/categories as English`);
   }
-  console.log(`[verify-product-seo] Passed: ${counts.catalogs} catalogs, ${counts.categories} category pages, ${counts.products} product pages across ${LANGUAGES.length} languages.`);
+  console.log(
+    `[verify-product-seo] Passed: ${counts.catalogs} catalogs, ${counts.categories} category pages, ${counts.products} product pages (${counts.pricedProducts} priced with Product+Offer.price, ${counts.unpricedProducts} unpriced breadcrumb-only) across ${LANGUAGES.length} languages.`
+  );
   console.log('[verify-product-seo] Title, Meta Description, visible H1/description, canonical, social tags and page schema are consistent.');
 }
 

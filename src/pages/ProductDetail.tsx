@@ -8,10 +8,9 @@ import Markdown from '../components/Markdown';
 import SEO from '../components/SEO';
 import ProductGallery from '../components/ProductGallery';
 import './ProductDetail.css';
-import { resolveProductSeo, normalizeSpecs, type ProductSeoMetadata } from '../utils/productSeo';
+import { buildProductJsonLd, resolveProductSeo, normalizeSpecs, type ProductSeoMetadata } from '../utils/productSeo';
 import VideoCard from '../components/VideoCard';
 import { optimizeImage } from '../utils/optimizeImage';
-import { toMediaUrl } from '../utils/media';
 import { PRODUCT_IMAGE_PLACEHOLDER, handleImageError } from '../utils/imagePlaceholder';
 import { useLocalizedPath } from '../hooks/useLocalizedPath';
 import { readInitialProduct } from '../utils/prerenderData';
@@ -365,14 +364,6 @@ export default function ProductDetail() {
   // adopts the existing JSON-LD tag instead of appending a duplicate.
   const productFullUrl = product ? `https://bolenmirror.com/${lang}${productPath}/` : '';
 
-  const parsePriceRange = (range?: string): { low: number; high: number } => {
-    const nums = range?.match(/\d+(?:\.\d+)?/g)?.map(Number) ?? [];
-    if (nums.length === 0) return { low: 0, high: 0 };
-    if (nums.length === 1) return { low: nums[0], high: nums[0] };
-    return { low: Math.min(...nums), high: Math.max(...nums) };
-  };
-  const { low: lowPrice, high: highPrice } = parsePriceRange(product?.price_range);
-
   // Shared with scripts/prerender-static.ts via src/utils/productSeo.ts so the
   // values Helmet writes on mount match what was baked into the static HTML.
   const { title: seoTitle, description: richDescription, h1: pageHeading } = resolveProductSeo(display, lang, {
@@ -388,57 +379,33 @@ export default function ProductDetail() {
     ? display.title.slice(0, 84).replace(/\s+\S*$/, '').replace(/[,;:\-–|/]+$/, '').trim()
     : display.title;
 
-  const productSchema = product ? [
-    {
-      "@context": "https://schema.org/",
-      "@type": "Product",
-      "name": pageHeading,
-      "image": (product.images || []).map((image: string) => toMediaUrl(image)),
-      "description": richDescription,
-      "sku": product.id,
-      "brand": {
-        "@type": "Brand",
-        "name": "BOLEN"
-      },
-      ...(normalizeSpecs(display.specifications).length
-        ? {
-            "additionalProperty": normalizeSpecs(display.specifications).map((s) => ({
-              "@type": "PropertyValue",
-              "name": s.key,
-              "value": s.value
-            }))
-          }
-        : {}),
-      ...(lowPrice > 0
-        ? {
-            "offers": {
-              "@type": "Offer",
-              "url": productFullUrl,
-              "priceCurrency": "USD",
-              ...(lowPrice === highPrice
-                ? { "price": lowPrice }
-                : {
-                    "priceSpecification": {
-                      "@type": "UnitPriceSpecification",
-                      "priceCurrency": "USD",
-                      "minPrice": lowPrice,
-                      "maxPrice": highPrice
-                    }
-                  })
-            }
-          }
-        : {})
-    },
-    buildProductBreadcrumbSchema({
-      lang,
-      homeLabel: t('navbar.home'),
-      catalogLabel: t('navbar.catalog'),
-      categoryName: product.category,
-      categoryLabel,
-      productTitle: display.title,
-      productUrl: productFullUrl,
-    })
-  ] : undefined;
+  const productJsonLd = product
+    ? buildProductJsonLd({
+        id: product.id,
+        name: pageHeading,
+        description: richDescription,
+        url: productFullUrl,
+        images: product.images,
+        specifications: display.specifications,
+        priceRange: product.price_range,
+        msrp: product.msrp,
+      })
+    : null;
+
+  const productSchema = product
+    ? [
+        ...(productJsonLd ? [productJsonLd] : []),
+        buildProductBreadcrumbSchema({
+          lang,
+          homeLabel: t('navbar.home'),
+          catalogLabel: t('navbar.catalog'),
+          categoryName: product.category,
+          categoryLabel,
+          productTitle: display.title,
+          productUrl: productFullUrl,
+        }),
+      ]
+    : undefined;
 
   return (
     <div lang={lang} className="product-detail min-h-screen">

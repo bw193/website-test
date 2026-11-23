@@ -51,6 +51,7 @@ import { normalizeProductDetails } from '../src/utils/productDetails';
 import { renderMarkdownToHtml } from '../src/components/Markdown';
 import {
   buildProductBuyerSummary,
+  buildProductJsonLd,
   normalizeSpecs,
   resolveProductSeo,
   type ProductSeoMetadata,
@@ -1754,18 +1755,9 @@ function seoLandingSchema(lang: Lang, page: SeoLandingPage): any[] {
   ];
 }
 
-// Mirrors src/pages/ProductDetail.tsx's parsePriceRange. Keep both in lockstep
-// so the prerendered JSON-LD matches Helmet's render and avoids duplicates.
-function parsePriceRange(range?: string): { low: number; high: number } {
-  const nums = range?.match(/\d+(?:\.\d+)?/g)?.map(Number) ?? [];
-  if (nums.length === 0) return { low: 0, high: 0 };
-  if (nums.length === 1) return { low: nums[0], high: nums[0] };
-  return { low: Math.min(...nums), high: Math.max(...nums) };
-}
-
 // Thin localized wrappers over the shared helpers in src/utils/productSeo.ts,
 // which src/pages/ProductDetail.tsx also uses — so the prerendered <title>/
-// <meta description> and the values Helmet writes on mount cannot drift.
+// <meta description>/JSON-LD and the values Helmet writes on mount cannot drift.
 function productPageSeo(product: Product, lang: Lang): ResolvedProductSeo {
   const display = { ...product, title: lang === 'en' ? polishEnglishProductTitle(product.title) : product.title };
   return resolveProductSeo(display, lang, {
@@ -1776,60 +1768,28 @@ function productPageSeo(product: Product, lang: Lang): ResolvedProductSeo {
 
 function productDetailSchema(lang: Lang, product: Product, display: Product, seo: ResolvedProductSeo): any[] {
   const productFullUrl = `https://bolenmirror.com/${lang}${productDetailPath(product, lang)}/`;
-  const { low: lowPrice, high: highPrice } = parsePriceRange(product.price_range);
   const resolvedCategory = canonicalCategoryName(product.category);
   const categoryLabel = resolvedCategory ? categoryDisplayName(lang, resolvedCategory) : undefined;
-  return [
-    {
-      '@context': 'https://schema.org/',
-      '@type': 'Product',
-      name: seo.h1,
-      image: (product.images || []).map((image) => toMediaUrl(image)),
-      description: seo.description,
-      sku: product.id,
-      brand: {
-        '@type': 'Brand',
-        name: 'BOLEN',
-      },
-      ...(normalizeSpecs(display.specifications).length
-        ? {
-            additionalProperty: normalizeSpecs(display.specifications).map((s) => ({
-              '@type': 'PropertyValue',
-              name: s.key,
-              value: s.value,
-            })),
-          }
-        : {}),
-      ...(lowPrice > 0
-        ? {
-            offers: {
-              '@type': 'Offer',
-              url: productFullUrl,
-              priceCurrency: 'USD',
-              ...(lowPrice === highPrice
-                ? { price: lowPrice }
-                : {
-                    priceSpecification: {
-                      '@type': 'UnitPriceSpecification',
-                      priceCurrency: 'USD',
-                      minPrice: lowPrice,
-                      maxPrice: highPrice,
-                    },
-                  }),
-            },
-          }
-        : {}),
-    },
-    buildProductBreadcrumbSchema({
-      lang,
-      homeLabel: LOCALE_NAV[lang].home,
-      catalogLabel: LOCALE_NAV[lang].catalog,
-      categoryName: product.category,
-      categoryLabel,
-      productTitle: display.title,
-      productUrl: productFullUrl,
-    }),
-  ];
+  const productJsonLd = buildProductJsonLd({
+    id: product.id,
+    name: seo.h1,
+    description: seo.description,
+    url: productFullUrl,
+    images: product.images,
+    specifications: display.specifications,
+    priceRange: product.price_range,
+    msrp: product.msrp,
+  });
+  const breadcrumbSchema = buildProductBreadcrumbSchema({
+    lang,
+    homeLabel: LOCALE_NAV[lang].home,
+    catalogLabel: LOCALE_NAV[lang].catalog,
+    categoryName: product.category,
+    categoryLabel,
+    productTitle: display.title,
+    productUrl: productFullUrl,
+  });
+  return productJsonLd ? [productJsonLd, breadcrumbSchema] : [breadcrumbSchema];
 }
 
 function storySchema(lang: Lang): any[] {

@@ -10,6 +10,8 @@
  * them from i18next, the prerenderer from its own COPY table.
  */
 
+import { toMediaUrl } from './media';
+
 export interface ProductSeoFields {
   title: string;
   description?: string;
@@ -211,4 +213,109 @@ export function buildProductSeoTitle(title: string, suffix: string): string {
   const budget = 60 - suffix.length - 1;
   const trimmed = clean.length > budget ? truncateAtWord(clean, budget) : clean;
   return `${trimmed} ${suffix}`;
+}
+
+export interface ProductPriceBounds {
+  lowPrice: number;
+  highPrice: number;
+}
+
+function extractPositiveNumbers(raw?: string | null): number[] {
+  if (typeof raw !== 'string' || !raw.trim()) return [];
+  // Remove thousands separators inside numbers (e.g. "$1,200-$1,550.50") without
+  // merging comma-separated values like "$20,$40".
+  const normalized = raw.replace(/(\d),(?=\d{3}(?!\d))/g, '$1');
+  return (normalized.match(/\d+(?:\.\d+)?/g) ?? [])
+    .map(Number)
+    .filter((n) => Number.isFinite(n) && n > 0);
+}
+
+/**
+ * Extracts positive numeric low/high price bounds from `price_range`, falling
+ * back to `msrp` when `price_range` contains no positive number. Returns
+ * `{ lowPrice: 0, highPrice: 0 }` for truly price-less quote-only products.
+ */
+export function parseProductPriceBounds(
+  priceRange?: string | null,
+  msrp?: string | null
+): ProductPriceBounds {
+  const fromRange = extractPositiveNumbers(priceRange);
+  const nums = fromRange.length > 0 ? fromRange : extractPositiveNumbers(msrp);
+  if (nums.length === 0) return { lowPrice: 0, highPrice: 0 };
+  if (nums.length === 1) return { lowPrice: nums[0], highPrice: nums[0] };
+  return { lowPrice: Math.min(...nums), highPrice: Math.max(...nums) };
+}
+
+export interface ProductJsonLdInput {
+  id: string;
+  name: string;
+  description: string;
+  url: string;
+  images?: readonly string[] | null;
+  specifications?: unknown;
+  priceRange?: string | null;
+  msrp?: string | null;
+}
+
+/**
+ * Builds the schema.org `Product` JSON-LD object shared by both
+ * `src/pages/ProductDetail.tsx` and `scripts/prerender-static.ts`.
+ *
+ * - Priced products (`lowPrice > 0`): emits a Google Product Snippets-valid
+ *   single-seller `Offer` with top-level `price` + `priceCurrency` (and
+ *   `UnitPriceSpecification` with `price`, `minPrice`, `maxPrice` when
+ *   `highPrice > lowPrice`), omitting `availability` to avoid unverified
+ *   in-stock claims on made-to-order B2B items.
+ * - Price-less products (`lowPrice === 0`): returns `null` so pages emit only
+ *   `BreadcrumbList` instead of an invalid `Product` missing
+ *   `offers`/`review`/`aggregateRating`.
+ */
+export function buildProductJsonLd(input: ProductJsonLdInput): Record<string, unknown> | null {
+  const { lowPrice, highPrice } = parseProductPriceBounds(input.priceRange, input.msrp);
+  if (lowPrice <= 0) return null;
+
+  const specs = normalizeSpecs(input.specifications);
+  const images = (input.images ?? [])
+    .filter((image): image is string => typeof image === 'string' && image.trim().length > 0)
+    .map((image) => toMediaUrl(image));
+
+  return {
+    '@context': 'https://schema.org/',
+    '@type': 'Product',
+    name: input.name,
+    image: images,
+    description: input.description,
+    sku: input.id,
+    brand: {
+      '@type': 'Brand',
+      name: 'BOLEN',
+    },
+    ...(specs.length > 0
+      ? {
+          additionalProperty: specs.map((s) => ({
+            '@type': 'PropertyValue',
+            name: s.key,
+            value: s.value,
+          })),
+        }
+      : {}),
+    offers: {
+      '@type': 'Offer',
+      url: input.url,
+      priceCurrency: 'USD',
+      price: lowPrice,
+      itemCondition: 'https://schema.org/NewCondition',
+      ...(highPrice > lowPrice
+        ? {
+            priceSpecification: {
+              '@type': 'UnitPriceSpecification',
+              price: lowPrice,
+              minPrice: lowPrice,
+              maxPrice: highPrice,
+              priceCurrency: 'USD',
+            },
+          }
+        : {}),
+    },
+  };
 }

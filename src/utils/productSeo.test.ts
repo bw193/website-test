@@ -3,9 +3,11 @@ import { test } from 'node:test';
 import {
   PRODUCT_SEO_LANGUAGES,
   buildProductDescription,
+  buildProductJsonLd,
   buildProductSeoTitle,
   getProductSeoLengthRecommendation,
   normalizeProductSeo,
+  parseProductPriceBounds,
   resolveProductSeo,
   type ProductSeoFields,
 } from './productSeo';
@@ -119,4 +121,135 @@ test('recommendations never truncate or reject longer custom SEO copy', () => {
     }
     assert.deepEqual(resolveProductSeo({ ...product, seo: { [lang]: override } }, lang, defaults), override);
   }
+});
+
+test('parseProductPriceBounds handles single prices, ranges, thousands separators, msrp fallback and price-less items', () => {
+  assert.deepEqual(parseProductPriceBounds('$45', '$400'), { lowPrice: 45, highPrice: 45 });
+  assert.deepEqual(parseProductPriceBounds('$35-$35'), { lowPrice: 35, highPrice: 35 });
+  assert.deepEqual(parseProductPriceBounds('$35-$45', '$400'), { lowPrice: 35, highPrice: 45 });
+  assert.deepEqual(parseProductPriceBounds('32-65', '499'), { lowPrice: 32, highPrice: 65 });
+  assert.deepEqual(parseProductPriceBounds('$80 - $40'), { lowPrice: 40, highPrice: 80 });
+  assert.deepEqual(parseProductPriceBounds('$1,200 - $1,550.50'), { lowPrice: 1200, highPrice: 1550.5 });
+  assert.deepEqual(parseProductPriceBounds('$0-$50'), { lowPrice: 50, highPrice: 50 });
+
+  // Fallback to msrp when price_range has no positive numeric price
+  assert.deepEqual(parseProductPriceBounds('', '$400'), { lowPrice: 400, highPrice: 400 });
+  assert.deepEqual(parseProductPriceBounds('Contact sales', '$280-$320'), { lowPrice: 280, highPrice: 320 });
+  assert.deepEqual(parseProductPriceBounds('$0', '199.95'), { lowPrice: 199.95, highPrice: 199.95 });
+
+  // Truly price-less items return zeros
+  assert.deepEqual(parseProductPriceBounds('', ''), { lowPrice: 0, highPrice: 0 });
+  assert.deepEqual(parseProductPriceBounds(undefined, undefined), { lowPrice: 0, highPrice: 0 });
+  assert.deepEqual(parseProductPriceBounds('Quote on request', '$0'), { lowPrice: 0, highPrice: 0 });
+});
+
+test('buildProductJsonLd emits a valid single-price Offer without range priceSpecification or availability', () => {
+  const schema = buildProductJsonLd({
+    id: 'single-price-id',
+    name: 'Round LED Bathroom Mirror',
+    description: 'Copper-free silver LED bathroom mirror.',
+    url: 'https://bolenmirror.com/en/products/led-lighted-mirror/round-led-bathroom-mirror/',
+    images: [
+      'https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/product-images/mirror-1.jpg',
+      '',
+    ],
+    specifications: [
+      { key: 'Installation', value: 'Wall-mounted' },
+      { key: 'installation', value: 'Wall-Mounted' },
+      { key: 'IP Rating', value: 'IP44' },
+    ],
+    priceRange: '$45',
+    msrp: '$200',
+  });
+
+  assert.deepEqual(schema, {
+    '@context': 'https://schema.org/',
+    '@type': 'Product',
+    name: 'Round LED Bathroom Mirror',
+    image: ['https://bolenmirror.com/media/product-images/mirror-1.jpg'],
+    description: 'Copper-free silver LED bathroom mirror.',
+    sku: 'single-price-id',
+    brand: {
+      '@type': 'Brand',
+      name: 'BOLEN',
+    },
+    additionalProperty: [
+      { '@type': 'PropertyValue', name: 'Installation', value: 'Wall-mounted' },
+      { '@type': 'PropertyValue', name: 'IP Rating', value: 'IP44' },
+    ],
+    offers: {
+      '@type': 'Offer',
+      url: 'https://bolenmirror.com/en/products/led-lighted-mirror/round-led-bathroom-mirror/',
+      priceCurrency: 'USD',
+      price: 45,
+      itemCondition: 'https://schema.org/NewCondition',
+    },
+  });
+  assert.equal('priceSpecification' in (schema!.offers as Record<string, unknown>), false);
+  assert.equal('availability' in (schema!.offers as Record<string, unknown>), false);
+});
+
+test('buildProductJsonLd emits Offer.price AND UnitPriceSpecification.price/minPrice/maxPrice for price ranges', () => {
+  const schema = buildProductJsonLd({
+    id: 'd3ee9bf9-45e7-463e-9b54-bf953195c296',
+    name: 'Backlit Hotel LED Mirror',
+    description: 'Custom hotel backlit mirror with stepless dimming.',
+    url: 'https://bolenmirror.com/en/products/led-lighted-mirror/backlit-hotel-led-mirror/',
+    images: ['https://bolenmirror.com/media/product-images/hotel-1.jpg'],
+    priceRange: '$35-$45',
+    msrp: '$400',
+  });
+
+  assert.ok(schema);
+  assert.equal('additionalProperty' in schema, false);
+  assert.deepEqual(schema.offers, {
+    '@type': 'Offer',
+    url: 'https://bolenmirror.com/en/products/led-lighted-mirror/backlit-hotel-led-mirror/',
+    priceCurrency: 'USD',
+    price: 35,
+    itemCondition: 'https://schema.org/NewCondition',
+    priceSpecification: {
+      '@type': 'UnitPriceSpecification',
+      price: 35,
+      minPrice: 35,
+      maxPrice: 45,
+      priceCurrency: 'USD',
+    },
+  });
+  assert.equal('availability' in (schema.offers as Record<string, unknown>), false);
+});
+
+test('buildProductJsonLd falls back to msrp when price_range is empty', () => {
+  const schema = buildProductJsonLd({
+    id: 'msrp-fallback-id',
+    name: 'Frameless Vanity Mirror',
+    description: 'Frameless LED vanity mirror.',
+    url: 'https://bolenmirror.com/en/products/led-lighted-mirror/frameless-vanity-mirror/',
+    images: [],
+    priceRange: '',
+    msrp: '$299',
+  });
+
+  assert.ok(schema);
+  assert.deepEqual(schema.offers, {
+    '@type': 'Offer',
+    url: 'https://bolenmirror.com/en/products/led-lighted-mirror/frameless-vanity-mirror/',
+    priceCurrency: 'USD',
+    price: 299,
+    itemCondition: 'https://schema.org/NewCondition',
+  });
+});
+
+test('buildProductJsonLd returns null for truly price-less products so invalid Product blocks are omitted', () => {
+  const schema = buildProductJsonLd({
+    id: 'dd492c7a-e9bd-4fc4-90b1-4fb34a62d11d',
+    name: 'Black Aluminium Framed Arch LED Vanity Mirror',
+    description: 'Arch vanity mirror with copper-free silver glass.',
+    url: 'https://bolenmirror.com/en/products/led-lighted-mirror/arch-vanity-mirror/',
+    images: ['https://bolenmirror.com/media/product-images/arch-1.jpg'],
+    priceRange: '',
+    msrp: '',
+  });
+
+  assert.equal(schema, null);
 });
