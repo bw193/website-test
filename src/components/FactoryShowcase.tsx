@@ -167,6 +167,21 @@ export function localizeFactoryGalleryItem(
   };
 }
 
+export type FactoryPhotoKind = keyof typeof GALLERY_COPY_BY_KEY;
+
+/**
+ * Index of the first gallery photo showing one of `kinds`, tried in order, or
+ * -1. Lets another section pick a photo by what it shows (the assembly line,
+ * container loading) rather than by its position in the editor's gallery.
+ */
+export function findFactoryPhoto(items: FactoryGalleryItem[], kinds: FactoryPhotoKind[]): number {
+  for (const kind of kinds) {
+    const idx = items.findIndex((item) => detectGalleryKey(item) === kind);
+    if (idx !== -1) return idx;
+  }
+  return -1;
+}
+
 export function localizeFactoryGalleryList(
   items: FactoryGalleryItem[],
   lang: SupportedLanguage

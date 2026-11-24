@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ComposableMap, Geographies, Geography, type ProjectionFunction } from 'react-simple-maps';
 import { geoEqualEarth } from 'd3-geo';
+import { useSeenOnce } from '../hooks/useSeenOnce';
 
 const GEO_URL = 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json';
 
@@ -14,6 +15,11 @@ const GEO_URL = 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json'
  * Labels are HTML laid over the SVG so they keep their size at every width.
  * Below `sm` they would crowd the land, so the map drops them and the caption
  * lists the regions instead.
+ *
+ * Motion (index.css, "Home lower sections"): when the map is reached the
+ * corridors draw out from the hub, nearest market first, each marker and label
+ * landing as its corridor arrives; then a light runs out along every corridor
+ * in turn while the hub sends out a ring.
  */
 const W = 1000;
 const H = 405;
@@ -68,10 +74,21 @@ function corridor([x, y]: [number, number]): string {
   return `M${hx.toFixed(1)} ${hy.toFixed(1)}Q${cx.toFixed(1)} ${cy.toFixed(1)} ${x.toFixed(1)} ${y.toFixed(1)}`;
 }
 
+// Corridors open nearest market first, so the routes visibly reach farther out.
+const DRAW_RANK = new Map(
+  REGIONS.map((region) => {
+    const [x, y] = project(region.at);
+    return [region.key, Math.hypot(x - HUB[0], y - HUB[1])] as const;
+  })
+    .sort((a, b) => a[1] - b[1])
+    .map(([key], rank) => [key, rank] as const)
+);
+
 const pct = ([x, y]: [number, number]): React.CSSProperties => ({
   left: `${(x / W) * 100}%`,
   top: `${(y / H) * 100}%`,
 });
+const order = (key: RegionKey) => ({ '--i': String(DRAW_RANK.get(key) ?? 0) }) as React.CSSProperties;
 
 function Mark({ children }: { children: React.ReactNode }) {
   return (
@@ -83,11 +100,12 @@ function Mark({ children }: { children: React.ReactNode }) {
 
 export default function GlobalMap() {
   const { t } = useTranslation();
+  const [figureRef, seen] = useSeenOnce<HTMLElement>('25%');
   const regionName = (key: RegionKey) => t(`home.about.map.regions.${key}`);
   const summary = `${t('home.about.map.corridors')}: ${REGIONS.map((region) => regionName(region.key)).join(', ')}`;
 
   return (
-    <figure className="w-full">
+    <figure ref={figureRef} data-seen={seen || undefined} className="global-map w-full">
       <div role="img" aria-label={summary} className="relative">
         <ComposableMap
           // v3 uses a function prop as the projection itself; @types describes
@@ -119,14 +137,32 @@ export default function GlobalMap() {
 
           <g fill="none" stroke="#C4905E" strokeWidth={1.4} strokeLinecap="round">
             {REGIONS.map((region) => (
-              <path key={region.key} d={corridor(project(region.at))} />
+              <path key={region.key} className="map-corridor" style={order(region.key)} pathLength={1} d={corridor(project(region.at))} />
+            ))}
+          </g>
+          <g fill="none" stroke="#F59E0B" strokeWidth={2.4} strokeLinecap="round">
+            {REGIONS.map((region) => (
+              <path key={region.key} className="map-flow" style={order(region.key)} pathLength={1} d={corridor(project(region.at))} />
             ))}
           </g>
           {REGIONS.map((region) => {
             const [x, y] = project(region.at);
-            return <circle key={region.key} cx={x} cy={y} r={5} fill="#C4905E" stroke="#F5F3EF" strokeWidth={2} />;
+            return (
+              <circle
+                key={region.key}
+                className="map-marker"
+                style={order(region.key)}
+                cx={x}
+                cy={y}
+                r={5}
+                fill="#C4905E"
+                stroke="#F5F3EF"
+                strokeWidth={2}
+              />
+            );
           })}
           <circle cx={HUB[0]} cy={HUB[1]} r={13} fill="none" stroke="#C4905E" strokeOpacity={0.5} strokeWidth={1.2} />
+          <circle className="map-hub-ping" cx={HUB[0]} cy={HUB[1]} r={13} fill="none" stroke="#F59E0B" strokeWidth={1.5} />
           <circle cx={HUB[0]} cy={HUB[1]} r={6.5} fill="#B45309" stroke="#F5F3EF" strokeWidth={2} />
         </ComposableMap>
 
@@ -134,8 +170,8 @@ export default function GlobalMap() {
           {REGIONS.map((region) => (
             <span
               key={region.key}
-              style={pct(project(region.at))}
-              className={`absolute flex -translate-x-1/2 items-center whitespace-nowrap text-[12.5px] font-medium [text-shadow:0_0_3px_#F5F3EF,0_0_3px_#F5F3EF] ${
+              style={{ ...pct(project(region.at)), ...order(region.key) }}
+              className={`map-label absolute flex -translate-x-1/2 items-center whitespace-nowrap text-[12.5px] font-medium [text-shadow:0_0_3px_#F5F3EF,0_0_3px_#F5F3EF] ${
                 region.place === 'above' ? '-translate-y-[calc(100%+9px)]' : 'translate-y-[9px]'
               }`}
             >
@@ -148,7 +184,7 @@ export default function GlobalMap() {
               (Australia), and this is the one wedge none of them cross. */}
           <span
             style={pct(HUB)}
-            className="absolute translate-x-[12px] translate-y-[10px] whitespace-nowrap [text-shadow:0_0_3px_#F5F3EF,0_0_3px_#F5F3EF]"
+            className="map-label absolute translate-x-[12px] translate-y-[10px] whitespace-nowrap [text-shadow:0_0_3px_#F5F3EF,0_0_3px_#F5F3EF]"
           >
             <span className="block text-[13px] font-semibold text-stone-900">{t('home.about.map.hub')}</span>
             <span className="block text-[11.5px] text-stone-500">{t('home.about.map.hubSub')}</span>

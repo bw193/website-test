@@ -8,9 +8,10 @@ import ProductCardSkeleton from '../components/ProductCardSkeleton';
 import SEO from '../components/SEO';
 import Reveal from '../components/Reveal';
 import FeaturedVideo from '../components/FeaturedVideo';
-import FactoryShowcase, { localizeFactoryGalleryList } from '../components/FactoryShowcase';
+import FactoryShowcase, { findFactoryPhoto, localizeFactoryGalleryList } from '../components/FactoryShowcase';
 import { optimizeImage } from '../utils/optimizeImage';
 import { useLocalizedPath } from '../hooks/useLocalizedPath';
+import { useSeenOnce } from '../hooks/useSeenOnce';
 import { readInitialHomeData, type FactoryGalleryItem } from '../utils/prerenderData';
 import { parseFeaturedVideoSlug, toVideoListItem, VIDEO_LIST_COLUMNS } from '../utils/video';
 import { buildHomeSchema } from '../utils/homeSchema';
@@ -215,34 +216,8 @@ function StatValue({ value, className }: { value: string; className?: string }) 
   return <p className={className}>{value}</p>;
 }
 
-/**
- * The closing CTA is drawn as an LED mirror whose light band switches on once,
- * the first time the mirror is well into view (index.css, "Closing CTA").
- * Without IntersectionObserver the band is simply on.
- */
-function useLitWhenSeen<T extends Element>() {
-  const ref = useRef<T>(null);
-  const [lit, setLit] = useState(false);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el || typeof IntersectionObserver === 'undefined') {
-      setLit(true);
-      return;
-    }
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry?.isIntersecting) {
-          setLit(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.45 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-  return [ref, lit] as const;
-}
+/** An item's place in a staggered entrance (index.css, "Home lower sections"). */
+const order = (i: number) => ({ '--i': String(i) }) as React.CSSProperties;
 
 export default function Home() {
   const { t } = useTranslation();
@@ -469,8 +444,26 @@ export default function Home() {
   const whyUsTitles = t('home.whyUs.features', { returnObjects: true }) as Array<{ title?: string }>;
   const whyUsParagraphs = t('home.whyUs.paragraphs', { returnObjects: true }) as string[];
   const whyUsProofs = t('home.whyUs.proofs', { returnObjects: true }) as string[];
-  const advantagePhoto = localizedFactoryGallery[1] || localizedFactoryGallery[0];
-  const [ctaMirrorRef, ctaLit] = useLitWhenSeen<HTMLDivElement>();
+  // Manufacturing Advantage shows each advantage with the factory photo that
+  // proves it, found by what the photo shows so the editor can reorder the
+  // gallery freely.
+  const advantageFacts = ([
+    { key: 'f1', kinds: ['assembly', 'workshop', 'machinery', 'exterior'] },
+    { key: 'f2', kinds: ['loading', 'warehouse', 'inventory'] },
+  ] as const).map((fact, i) => {
+    const found = findFactoryPhoto(factoryGallery, [...fact.kinds]);
+    return {
+      key: fact.key,
+      photo: localizedFactoryGallery[found] ?? localizedFactoryGallery[i] ?? localizedFactoryGallery[0],
+    };
+  });
+  // Each lower section plays its entrance once, when a visitor reaches it.
+  const [routesRef, routesSeen] = useSeenOnce<HTMLElement>();
+  const [advantageRef, advantageSeen] = useSeenOnce<HTMLElement>();
+  const [whyUsRef, whyUsSeen] = useSeenOnce<HTMLElement>();
+  const [certsRef, certsSeen] = useSeenOnce<HTMLElement>();
+  // The mirror waits until it is well into view before switching on.
+  const [ctaMirrorRef, ctaLit] = useSeenOnce<HTMLDivElement>('35%');
 
   // Arm auto-rotation only after the first interaction. Rotating on a timer
   // from page load mounted a new full-width hero every 5s, and each paint
@@ -903,8 +896,14 @@ export default function Home() {
           to a row from md. Only the title is the link, so its anchor text stays
           the page's homeAnchor; the link's ::after stretches over the row to
           make all of it clickable. Hovering or focusing a row lights the
-          bronze bar at its start. */}
-      <section aria-labelledby="sourcing-solutions-title" className="border-t border-stone-200/80 bg-[#FAF9F6] py-14 sm:py-16">
+          bronze bar at its start; when the list is first reached, the six bars
+          switch on one after another, like LED strips under test. */}
+      <section
+        ref={routesRef}
+        data-seen={routesSeen || undefined}
+        aria-labelledby="sourcing-solutions-title"
+        className="border-t border-stone-200/80 bg-[#FAF9F6] py-14 sm:py-16"
+      >
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between lg:gap-12">
             <div className="max-w-3xl">
@@ -926,18 +925,19 @@ export default function Home() {
           </div>
 
           <ul className="mt-9 grid md:grid-cols-2 md:gap-x-12 lg:mt-10">
-            {homeSolutions.map((page) => (
+            {homeSolutions.map((page, i) => (
               <li
                 key={page.slug}
+                style={order(i)}
                 className="group relative border-b border-stone-300/70 transition-colors duration-300 first:border-t hover:bg-[#F3EFE8] has-[:focus-visible]:bg-[#F3EFE8] has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-amber-500 md:[&:nth-child(2)]:border-t"
               >
                 <span
                   aria-hidden="true"
-                  className="absolute inset-y-3 left-0 w-0.5 origin-center scale-y-0 rounded-full bg-bronze-400 transition-transform duration-300 group-hover:scale-y-100 group-has-[:focus-visible]:scale-y-100"
+                  className="route-bar absolute inset-y-3 left-0 w-0.5 origin-center scale-y-0 rounded-full bg-bronze-400 transition-transform duration-300 group-hover:scale-y-100 group-has-[:focus-visible]:scale-y-100"
                 />
                 <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-6 py-4 pl-5 pr-3 sm:pl-6">
                   <div>
-                    <h3 className="font-serif text-xl leading-snug text-stone-900 transition-colors duration-300 group-hover:text-amber-900 sm:text-[1.375rem]">
+                    <h3 className="route-title font-serif text-xl leading-snug text-stone-900 transition-colors duration-300 group-hover:text-amber-900 sm:text-[1.375rem]">
                       <Link to={lp(`/solutions/${page.slug}`)} className="after:absolute after:inset-0 focus-visible:outline-none">
                         {page.homeAnchor || page.shortTitle || page.h1}
                       </Link>
@@ -955,77 +955,116 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Manufacturing Advantage — from lg the plant photo fills the left 45%
-          of the viewport, out to its edge, and the copy keeps to the
-          container's remaining 55%.
+      {/* Manufacturing Advantage — made here, shipped from here. Each
+          advantage stands under the factory photo that shows it (the assembly
+          line for the plant's scale, container loading for the ports), and from
+          md a bronze rail runs from one to the other in the Manufacturing
+          Process track's language: it draws in when the section is reached,
+          then a light travels it from the line to the port.
           It covers the plant itself (scale, location); factory-direct pricing
           is a partnership term and lives in "Why Partner" below. */}
-      <section aria-labelledby="home-advantage-title" className="relative border-t border-stone-200/80 bg-[#F5F3EF]">
-        <figure className="relative h-72 overflow-hidden bg-stone-300 sm:h-[26rem] lg:absolute lg:inset-y-0 lg:left-0 lg:h-auto lg:w-[45%]">
-          <img
-            src={optimizeImage(advantagePhoto?.url || FACTORY_FALLBACK_PHOTO, { width: 1280 })}
-            alt={capImageAlt(advantagePhoto?.alt || t('home.advantage.title'), 100)}
-            onError={(e) => {
-              const fallback = optimizeImage(FACTORY_FALLBACK_PHOTO, { width: 1280 });
-              if (e.currentTarget.src !== fallback) e.currentTarget.src = fallback;
-            }}
-            className="absolute inset-0 h-full w-full object-cover"
-            width="1280"
-            height="800"
-            loading="lazy"
-            decoding="async"
-            referrerPolicy="no-referrer"
-          />
-          <figcaption className="absolute inset-x-0 bottom-0 flex items-center gap-2 bg-gradient-to-t from-stone-950/75 via-stone-950/35 to-transparent px-5 pb-4 pt-14 text-[13px] font-medium text-white sm:px-8">
-            <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-amber-400" />
-            {t('home.advantage.facilityTag', 'Jiaxing Production Base · Est. 2005')}
-          </figcaption>
-        </figure>
-
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:grid lg:grid-cols-[45fr_55fr] lg:px-8">
-          <div className="max-w-2xl py-14 sm:py-16 lg:col-start-2 lg:max-w-none lg:pl-14">
-            <SectionKicker>{t('home.advantage.subtitle')}</SectionKicker>
-            <h2 id="home-advantage-title" className="font-serif text-4xl leading-[1.1] text-stone-900 text-balance sm:text-5xl">
-              {t('home.advantage.title')}
-            </h2>
-            <p className="mt-5 text-base leading-7 text-stone-600 sm:text-lg">
-              {t('home.advantage.desc')}
-            </p>
-
-            <dl className="mt-8 border-t border-stone-300/70">
-              {(['f1', 'f2'] as const).map((key) => (
-                <div key={key} className="border-b border-stone-300/70 py-5">
-                  <dt>
-                    <span className="block text-[13px] font-semibold tabular-nums text-amber-800">
-                      {t(`home.advantage.features.${key}.metric`)}
-                    </span>
-                    <span className="mt-1 block font-serif text-[1.375rem] leading-snug text-stone-900">
-                      {t(`home.advantage.features.${key}.title`)}
-                    </span>
-                  </dt>
-                  <dd className="mt-2 text-[15px] leading-7 text-stone-600">
-                    {t(`home.advantage.features.${key}.desc`)}
-                  </dd>
-                </div>
-              ))}
-            </dl>
-
-            <Link
-              to={lp('/our-story')}
-              className="group mt-7 inline-flex items-center gap-2 border-b border-stone-900/70 pb-1 text-sm font-semibold text-stone-900 transition-colors hover:border-amber-700 hover:text-amber-800 focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-4 focus-visible:ring-offset-[#F5F3EF]"
-            >
-              {t('home.factoryShowcase.visit')}
-              <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true" />
-            </Link>
+      <section
+        ref={advantageRef}
+        data-seen={advantageSeen || undefined}
+        aria-labelledby="home-advantage-title"
+        className="border-t border-stone-200/80 bg-[#F5F3EF] py-14 sm:py-16"
+      >
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-end lg:gap-16">
+            <div>
+              <SectionKicker>{t('home.advantage.subtitle')}</SectionKicker>
+              <h2 id="home-advantage-title" className="font-serif text-4xl leading-[1.1] text-stone-900 text-balance sm:text-5xl">
+                {t('home.advantage.title')}
+              </h2>
+            </div>
+            <div className="max-w-2xl lg:max-w-none lg:pb-1">
+              <p className="text-base leading-7 text-stone-600 sm:text-[17px]">
+                {t('home.advantage.desc')}
+              </p>
+              <div className="mt-4 flex flex-wrap items-center justify-between gap-x-8 gap-y-3">
+                <span className="inline-flex items-center gap-2 text-[13px] font-medium text-stone-700">
+                  <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+                  {t('home.advantage.facilityTag', 'Jiaxing Production Base · Est. 2005')}
+                </span>
+                <Link
+                  to={lp('/our-story')}
+                  className="group inline-flex items-center gap-2 border-b border-stone-900/70 pb-1 text-sm font-semibold text-stone-900 transition-colors hover:border-amber-700 hover:text-amber-800 focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-4 focus-visible:ring-offset-[#F5F3EF]"
+                >
+                  {t('home.factoryShowcase.visit')}
+                  <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true" />
+                </Link>
+              </div>
+            </div>
           </div>
+
+          <ol className="mt-10 grid gap-y-12 md:grid-cols-2 md:gap-x-8 lg:mt-12">
+            {advantageFacts.map(({ key, photo }, i) => {
+              const url = photo?.url || FACTORY_FALLBACK_PHOTO;
+              return (
+                <li key={key} style={order(i)}>
+                  <figure className="relative aspect-[16/10] overflow-hidden rounded-2xl bg-stone-300 lg:aspect-[2/1]">
+                    <img
+                      src={optimizeImage(url, { width: 960 })}
+                      srcSet={[640, 960, 1280].map((w) => `${optimizeImage(url, { width: w })} ${w}w`).join(', ')}
+                      sizes="(min-width: 1280px) 600px, (min-width: 768px) 50vw, 100vw"
+                      alt={capImageAlt(photo?.alt || t(`home.advantage.features.${key}.title`), 100)}
+                      onError={(e) => {
+                        const fallback = optimizeImage(FACTORY_FALLBACK_PHOTO, { width: 960 });
+                        if (e.currentTarget.src !== fallback) {
+                          e.currentTarget.srcset = '';
+                          e.currentTarget.src = fallback;
+                        }
+                      }}
+                      className="adv-photo absolute inset-0 h-full w-full object-cover"
+                      width="960"
+                      height="600"
+                      loading="lazy"
+                      decoding="async"
+                      referrerPolicy="no-referrer"
+                    />
+                    <span aria-hidden="true" className="adv-glint pointer-events-none absolute inset-0" />
+                    {photo?.caption && (
+                      <figcaption className="absolute bottom-3 left-3 rounded-full bg-stone-950/55 px-3 py-1 text-[12px] font-medium text-white backdrop-blur-sm">
+                        {photo.caption}
+                      </figcaption>
+                    )}
+                  </figure>
+                  <div aria-hidden="true" className="relative mt-6 hidden h-3 md:block">
+                    <span className="adv-marker absolute left-0 top-0 z-10 h-3 w-3 rounded-full border-2 border-bronze-400 bg-[#F5F3EF]" />
+                    {i === 0 && (
+                      <span className="adv-rail absolute left-3 top-[5px] h-0.5 w-[calc(100%+2rem-0.75rem)] overflow-hidden rounded-full bg-bronze-200">
+                        <span className="adv-rail-flow absolute inset-0" />
+                      </span>
+                    )}
+                  </div>
+                  <p className="mt-5 text-[13px] font-semibold tabular-nums text-amber-800 md:mt-4">
+                    {t(`home.advantage.features.${key}.metric`)}
+                  </p>
+                  <h3 className="mt-1 font-serif text-[1.375rem] leading-snug text-stone-900">
+                    {t(`home.advantage.features.${key}.title`)}
+                  </h3>
+                  <p className="mt-2 max-w-xl text-[15px] leading-7 text-stone-600">
+                    {t(`home.advantage.features.${key}.desc`)}
+                  </p>
+                </li>
+              );
+            })}
+          </ol>
         </div>
       </section>
 
       {/* Why Partner With Bolen — four commitments side by side from xl (two
           by two below it, where four columns would be too narrow to read).
           From xl each column is a subgrid of the list's three rows, so the
-          titles, the copy and the proof lines line up across all four. */}
-      <section aria-labelledby="home-whyus-title" className="border-t border-stone-200/80 bg-white py-14 sm:py-16">
+          titles, the copy and the proof lines line up across all four. When
+          the section is reached, the dividers grow down, each proof's rule
+          draws across and its check lands, column by column. */}
+      <section
+        ref={whyUsRef}
+        data-seen={whyUsSeen || undefined}
+        aria-labelledby="home-whyus-title"
+        className="border-t border-stone-200/80 bg-white py-14 sm:py-16"
+      >
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
             <SectionKicker centered>{t('home.whyUs.subtitle', 'Partnership Standards')}</SectionKicker>
@@ -1038,17 +1077,18 @@ export default function Home() {
             {[0, 1, 2, 3].map((idx) => (
               <li
                 key={idx}
-                className="flex flex-col xl:row-span-3 xl:grid xl:grid-rows-subgrid xl:border-l xl:border-stone-200 xl:px-8 xl:first:border-l-0 xl:first:pl-0 xl:last:pr-0"
+                style={order(idx)}
+                className="why-col relative flex flex-col xl:row-span-3 xl:grid xl:grid-rows-subgrid xl:px-8 xl:first:pl-0 xl:last:pr-0"
               >
-                <h3 className="font-serif text-[1.375rem] leading-snug text-stone-900">
+                <h3 className="why-title font-serif text-[1.375rem] leading-snug text-stone-900">
                   {whyUsTitles[idx]?.title}
                 </h3>
                 <p className="mt-3 text-[15px] leading-7 text-stone-600">
                   {whyUsParagraphs[idx]}
                 </p>
                 {whyUsProofs[idx] && (
-                  <p className="mt-5 flex items-start gap-2 border-t border-stone-200 pt-4 text-[13px] font-medium leading-5 text-stone-800 xl:mt-6">
-                    <CheckCircle2 className="mt-px h-4 w-4 shrink-0 text-amber-700" aria-hidden="true" />
+                  <p className="why-proof relative mt-5 flex items-start gap-2 pt-4 text-[13px] font-medium leading-5 text-stone-800 xl:mt-6">
+                    <CheckCircle2 className="why-check mt-px h-4 w-4 shrink-0 text-amber-700" aria-hidden="true" />
                     <span>{whyUsProofs[idx]}</span>
                   </p>
                 )}
@@ -1098,8 +1138,15 @@ export default function Home() {
       </section>
 
       {/* Global Certifications — the certificates themselves, shown as paper
-          sheets, markets first. Static: a marquee hid half of them at a time. */}
-      <section aria-labelledby="home-certificates-title" className="border-t border-stone-200/80 bg-[#FAF9F6] pb-6 pt-14 sm:pt-16">
+          sheets, markets first. Static: a marquee hid half of them at a time.
+          When the row is reached the sheets are dealt in, and a sheen crosses
+          each as it lands. */}
+      <section
+        ref={certsRef}
+        data-seen={certsSeen || undefined}
+        aria-labelledby="home-certificates-title"
+        className="border-t border-stone-200/80 bg-[#FAF9F6] pb-6 pt-14 sm:pt-16"
+      >
         <div className="mx-auto grid max-w-7xl gap-8 px-4 sm:px-6 lg:grid-cols-[minmax(0,4fr)_minmax(0,8fr)] lg:items-center lg:gap-14 lg:px-8">
           <div className="max-w-2xl">
             <SectionKicker>{t('home.certificates.subtitle')}</SectionKicker>
@@ -1115,10 +1162,10 @@ export default function Home() {
           </div>
 
           <ul className="grid grid-cols-3 gap-x-4 gap-y-6 sm:grid-cols-6 sm:gap-x-5">
-            {CERTS.map((cert) => (
-              <li key={cert.key}>
+            {CERTS.map((cert, i) => (
+              <li key={cert.key} style={order(i)}>
                 <figure>
-                  <div className="aspect-[3/4] rounded-[3px] bg-white p-1.5 shadow-[0_1px_2px_rgba(28,25,23,0.08),0_14px_24px_-16px_rgba(28,25,23,0.45)] ring-1 ring-stone-900/5 transition-transform duration-300 hover:-translate-y-1">
+                  <div className="cert-sheet relative aspect-[3/4] overflow-hidden rounded-[3px] bg-white p-1.5 shadow-[0_1px_2px_rgba(28,25,23,0.08),0_14px_24px_-16px_rgba(28,25,23,0.45)] ring-1 ring-stone-900/5 transition-transform duration-300 hover:-translate-y-1">
                     {/* Alt names the mark, not its market: alt text is SEO copy,
                         which stays clear of China/Jiaxing, and the zh market
                         label for CCC names China. The caption shows the market. */}
@@ -1133,6 +1180,7 @@ export default function Home() {
                       loading="lazy"
                       decoding="async"
                     />
+                    <span aria-hidden="true" className="cert-glint pointer-events-none absolute inset-0" />
                   </div>
                   <figcaption className="mt-3">
                     <span className="block font-serif text-[15px] font-semibold text-stone-900">{cert.code}</span>
@@ -1147,13 +1195,15 @@ export default function Home() {
 
       {/* Closing CTA — drawn as a BOLEN LED mirror: smoked glass with a frosted
           light band inset from its edge, which switches on the first time the
-          mirror scrolls into view (useLitWhenSeen, index.css "Closing CTA"). */}
+          mirror scrolls into view (useSeenOnce, index.css "Closing CTA"),
+          after which a reflection glides across the glass now and then. */}
       <section aria-labelledby="home-cta-title" className="bg-[#FAF9F6] px-4 pb-16 pt-10 sm:px-6 sm:pb-24 sm:pt-14 lg:px-8">
         <div
           ref={ctaMirrorRef}
           className={`cta-mirror relative isolate mx-auto max-w-5xl px-7 pb-16 pt-28 text-center sm:px-16 sm:py-20 ${ctaLit ? 'is-lit' : ''}`}
         >
           <span aria-hidden="true" className="cta-mirror-band" />
+          <span aria-hidden="true" className="cta-mirror-sweep" />
           <h2 id="home-cta-title" className="relative font-serif text-4xl leading-[1.1] text-white text-balance sm:text-5xl">
             {t('home.cta.title')}
           </h2>
