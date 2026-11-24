@@ -306,6 +306,10 @@ export const it = {
         title: "Certificazioni Globali",
         desc: "Test di sicurezza, conformità e grado di protezione verificati per modello per i mercati di Europa, Nord America, Regno Unito e Australia.",
         scopeNote: "I marchi e i report di prova disponibili sono confermati per modello e mercato in fase di preventivo.",
+        // Certificate viewer (CertificateShelf.tsx).
+        viewerPrev: "Certificato precedente",
+        viewerNext: "Certificato successivo",
+        viewerClose: "Chiudi",
         items: {
           saa: "Australia e NZ",
           ce: "Conformità Europea",
@@ -390,6 +394,8 @@ export const it = {
         title: "Pronto a Elevare il Tuo Spazio?",
         desc: "Contattaci oggi per discutere le tue esigenze personalizzate o sfoglia il nostro ampio catalogo di specchi premium.",
         responseNote: "Analisi specifiche e preventivo di fabbrica entro 24 ore",
+        // Touch sensor on the closing CTA mirror (Home.tsx); {{kelvin}} is e.g. "3000K".
+        lightToggle: "Cambia il colore della luce, ora {{kelvin}}",
         viewCatalog: "Vedi Catalogo",
         contactSales: "Contatta le Vendite"
       }

@@ -316,6 +316,10 @@ export const en = {
         title: "Global Certifications",
         desc: "Model-specific safety, conformity, and ingress ratings verified for European, North American, UK, and Australian markets.",
         scopeNote: "Available marks and test reports are confirmed per model and destination market during quotation.",
+        // Certificate viewer (CertificateShelf.tsx).
+        viewerPrev: "Previous certificate",
+        viewerNext: "Next certificate",
+        viewerClose: "Close",
         items: {
           saa: "Australia & NZ",
           ce: "European Conformity",
@@ -400,6 +404,8 @@ export const en = {
         title: "Ready to Elevate Your Space?",
         desc: "Contact us today to discuss your custom requirements or browse our extensive catalog of premium mirrors.",
         responseNote: "24-hour specification review & factory quotation",
+        // Touch sensor on the closing CTA mirror (Home.tsx); {{kelvin}} is e.g. "3000K".
+        lightToggle: "Change the light colour, now {{kelvin}}",
         viewCatalog: "View Catalog",
         contactSales: "Contact Sales"
       }

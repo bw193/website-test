@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState, lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, ArrowUpRight, Globe, ShieldCheck, Factory, Lightbulb, Users, ChevronRight, ChevronLeft, Palette, Loader2, Send, CheckCircle2, Mail, Phone } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Globe, ShieldCheck, Factory, Lightbulb, Users, ChevronRight, ChevronLeft, Palette, Loader2, Send, CheckCircle2 } from 'lucide-react';
 import { useTranslation, Trans } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import ProductCard, { capImageAlt } from '../components/ProductCard';
@@ -8,10 +8,13 @@ import ProductCardSkeleton from '../components/ProductCardSkeleton';
 import SEO from '../components/SEO';
 import Reveal from '../components/Reveal';
 import FeaturedVideo from '../components/FeaturedVideo';
+import CertificateShelf from '../components/CertificateShelf';
+import MirrorCta from '../components/MirrorCta';
 import FactoryShowcase, { findFactoryPhoto, localizeFactoryGalleryList } from '../components/FactoryShowcase';
 import { optimizeImage } from '../utils/optimizeImage';
 import { useLocalizedPath } from '../hooks/useLocalizedPath';
 import { useSeenOnce } from '../hooks/useSeenOnce';
+import { usePointerVars } from '../hooks/usePointerVars';
 import { readInitialHomeData, type FactoryGalleryItem } from '../utils/prerenderData';
 import { parseFeaturedVideoSlug, toVideoListItem, VIDEO_LIST_COLUMNS } from '../utils/video';
 import { buildHomeSchema } from '../utils/homeSchema';
@@ -51,21 +54,6 @@ interface HomeInquiryForm {
   customerEmail: string;
   message: string;
 }
-
-// Market marks first (in the order the export map tags them), then the
-// ratings that apply everywhere.
-const CERTS: {
-  key: 'saa' | 'ce' | 'ip44' | 'ukca' | 'ul' | 'ccc';
-  code: string;
-  url: string;
-}[] = [
-  { key: 'ce', code: 'CE', url: "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/CE(1)(1).jpg" },
-  { key: 'ukca', code: 'UKCA', url: "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/UKCA.jpg" },
-  { key: 'ul', code: 'UL', url: "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/UL2.jpg" },
-  { key: 'saa', code: 'SAA', url: "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/au.png" },
-  { key: 'ip44', code: 'IP44', url: "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/IP44.jpg" },
-  { key: 'ccc', code: 'CCC', url: "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/comp%20image/ctce.png" },
-];
 
 /**
  * Manufacturing Process, drawn as a -==- track: one line leaves 01, splits
@@ -138,9 +126,9 @@ function SectionKicker({ children, centered = false }: { children: React.ReactNo
         centered ? 'justify-center' : ''
       }`}
     >
-      <span aria-hidden="true" className="h-px w-8 bg-amber-500/70" />
+      <span aria-hidden="true" className="kicker-line h-px w-8 bg-amber-500/70" />
       {children}
-      {centered && <span aria-hidden="true" className="h-px w-8 bg-amber-500/70" />}
+      {centered && <span aria-hidden="true" className="kicker-line h-px w-8 bg-amber-500/70" />}
     </span>
   );
 }
@@ -461,9 +449,11 @@ export default function Home() {
   const [routesRef, routesSeen] = useSeenOnce<HTMLElement>();
   const [advantageRef, advantageSeen] = useSeenOnce<HTMLElement>();
   const [whyUsRef, whyUsSeen] = useSeenOnce<HTMLElement>();
+  const [aboutRef, aboutSeen] = useSeenOnce<HTMLElement>();
   const [certsRef, certsSeen] = useSeenOnce<HTMLElement>();
-  // The mirror waits until it is well into view before switching on.
-  const [ctaMirrorRef, ctaLit] = useSeenOnce<HTMLDivElement>('35%');
+  // A warm light follows the pointer across the sourcing routes.
+  const routesListRef = useRef<HTMLUListElement>(null);
+  usePointerVars(routesListRef);
 
   // Arm auto-rotation only after the first interaction. Rotating on a timer
   // from page load mounted a new full-width hero every 5s, and each paint
@@ -924,12 +914,12 @@ export default function Home() {
             </Link>
           </div>
 
-          <ul className="mt-9 grid md:grid-cols-2 md:gap-x-12 lg:mt-10">
+          <ul ref={routesListRef} className="route-list relative mt-9 grid md:grid-cols-2 md:gap-x-12 lg:mt-10">
             {homeSolutions.map((page, i) => (
               <li
                 key={page.slug}
                 style={order(i)}
-                className="group relative border-b border-stone-300/70 transition-colors duration-300 first:border-t hover:bg-[#F3EFE8] has-[:focus-visible]:bg-[#F3EFE8] has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-amber-500 md:[&:nth-child(2)]:border-t"
+                className="group relative border-b border-stone-300/70 transition-colors duration-300 first:border-t hover:bg-[#F3EFE8]/70 has-[:focus-visible]:bg-[#F3EFE8] has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-amber-500 md:[&:nth-child(2)]:border-t"
               >
                 <span
                   aria-hidden="true"
@@ -997,31 +987,34 @@ export default function Home() {
             </div>
           </div>
 
-          <ol className="mt-10 grid gap-y-12 md:grid-cols-2 md:gap-x-8 lg:mt-12">
+          <ol className="adv-list mt-10 grid gap-y-12 md:grid-cols-2 md:gap-x-8 lg:mt-12">
             {advantageFacts.map(({ key, photo }, i) => {
               const url = photo?.url || FACTORY_FALLBACK_PHOTO;
               return (
-                <li key={key} style={order(i)}>
+                <li key={key} style={order(i)} className="adv-step">
                   <figure className="relative aspect-[16/10] overflow-hidden rounded-2xl bg-stone-300 lg:aspect-[2/1]">
-                    <img
-                      src={optimizeImage(url, { width: 960 })}
-                      srcSet={[640, 960, 1280].map((w) => `${optimizeImage(url, { width: w })} ${w}w`).join(', ')}
-                      sizes="(min-width: 1280px) 600px, (min-width: 768px) 50vw, 100vw"
-                      alt={capImageAlt(photo?.alt || t(`home.advantage.features.${key}.title`), 100)}
-                      onError={(e) => {
-                        const fallback = optimizeImage(FACTORY_FALLBACK_PHOTO, { width: 960 });
-                        if (e.currentTarget.src !== fallback) {
-                          e.currentTarget.srcset = '';
-                          e.currentTarget.src = fallback;
-                        }
-                      }}
-                      className="adv-photo absolute inset-0 h-full w-full object-cover"
-                      width="960"
-                      height="600"
-                      loading="lazy"
-                      decoding="async"
-                      referrerPolicy="no-referrer"
-                    />
+                    {/* Taller than the frame so it can drift with the scroll. */}
+                    <div className="adv-drift absolute inset-x-0 -inset-y-[8%]">
+                      <img
+                        src={optimizeImage(url, { width: 960 })}
+                        srcSet={[640, 960, 1280].map((w) => `${optimizeImage(url, { width: w })} ${w}w`).join(', ')}
+                        sizes="(min-width: 1280px) 600px, (min-width: 768px) 50vw, 100vw"
+                        alt={capImageAlt(photo?.alt || t(`home.advantage.features.${key}.title`), 100)}
+                        onError={(e) => {
+                          const fallback = optimizeImage(FACTORY_FALLBACK_PHOTO, { width: 960 });
+                          if (e.currentTarget.src !== fallback) {
+                            e.currentTarget.srcset = '';
+                            e.currentTarget.src = fallback;
+                          }
+                        }}
+                        className="adv-photo absolute inset-0 h-full w-full object-cover"
+                        width="960"
+                        height="600"
+                        loading="lazy"
+                        decoding="async"
+                        referrerPolicy="no-referrer"
+                      />
+                    </div>
                     <span aria-hidden="true" className="adv-glint pointer-events-none absolute inset-0" />
                     {photo?.caption && (
                       <figcaption className="absolute bottom-3 left-3 rounded-full bg-stone-950/55 px-3 py-1 text-[12px] font-medium text-white backdrop-blur-sm">
@@ -1100,7 +1093,13 @@ export default function Home() {
 
       {/* Global Reach (About) — heading and the markets paragraph across the
           top, then the export map beside the company facts. */}
-      <section id="about" aria-labelledby="home-about-title" className="scroll-mt-20 border-t border-stone-200/80 bg-[#F5F3EF] py-14 sm:py-16">
+      <section
+        ref={aboutRef}
+        data-seen={aboutSeen || undefined}
+        id="about"
+        aria-labelledby="home-about-title"
+        className="scroll-mt-20 border-t border-stone-200/80 bg-[#F5F3EF] py-14 sm:py-16"
+      >
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid gap-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-end lg:gap-16">
             <div>
@@ -1161,77 +1160,12 @@ export default function Home() {
             </p>
           </div>
 
-          <ul className="grid grid-cols-3 gap-x-4 gap-y-6 sm:grid-cols-6 sm:gap-x-5">
-            {CERTS.map((cert, i) => (
-              <li key={cert.key} style={order(i)}>
-                <figure>
-                  <div className="cert-sheet relative aspect-[3/4] overflow-hidden rounded-[3px] bg-white p-1.5 shadow-[0_1px_2px_rgba(28,25,23,0.08),0_14px_24px_-16px_rgba(28,25,23,0.45)] ring-1 ring-stone-900/5 transition-transform duration-300 hover:-translate-y-1">
-                    {/* Alt names the mark, not its market: alt text is SEO copy,
-                        which stays clear of China/Jiaxing, and the zh market
-                        label for CCC names China. The caption shows the market. */}
-                    <img
-                      src={optimizeImage(cert.url, { width: 240 })}
-                      srcSet={`${optimizeImage(cert.url, { width: 240 })} 1x, ${optimizeImage(cert.url, { width: 480 })} 2x`}
-                      alt={capImageAlt(`${t('home.certificates.title')}: ${cert.code}`, 100)}
-                      className="h-full w-full object-contain"
-                      width="240"
-                      height="320"
-                      referrerPolicy="no-referrer"
-                      loading="lazy"
-                      decoding="async"
-                    />
-                    <span aria-hidden="true" className="cert-glint pointer-events-none absolute inset-0" />
-                  </div>
-                  <figcaption className="mt-3">
-                    <span className="block font-serif text-[15px] font-semibold text-stone-900">{cert.code}</span>
-                    <span className="block text-[12px] leading-4 text-stone-500">{t(`home.certificates.items.${cert.key}`)}</span>
-                  </figcaption>
-                </figure>
-              </li>
-            ))}
-          </ul>
+          <CertificateShelf />
         </div>
       </section>
 
-      {/* Closing CTA — drawn as a BOLEN LED mirror: smoked glass with a frosted
-          light band inset from its edge, which switches on the first time the
-          mirror scrolls into view (useSeenOnce, index.css "Closing CTA"),
-          after which a reflection glides across the glass now and then. */}
-      <section aria-labelledby="home-cta-title" className="bg-[#FAF9F6] px-4 pb-16 pt-10 sm:px-6 sm:pb-24 sm:pt-14 lg:px-8">
-        <div
-          ref={ctaMirrorRef}
-          className={`cta-mirror relative isolate mx-auto max-w-5xl px-7 pb-16 pt-28 text-center sm:px-16 sm:py-20 ${ctaLit ? 'is-lit' : ''}`}
-        >
-          <span aria-hidden="true" className="cta-mirror-band" />
-          <span aria-hidden="true" className="cta-mirror-sweep" />
-          <h2 id="home-cta-title" className="relative font-serif text-4xl leading-[1.1] text-white text-balance sm:text-5xl">
-            {t('home.cta.title')}
-          </h2>
-          <p className="relative mx-auto mt-4 max-w-xl text-base leading-7 text-stone-300 sm:text-lg">
-            {t('home.cta.desc')}
-          </p>
-          <div className="relative mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link to={lp('/rfq')} className="btn-primary min-h-12 w-full px-8 text-base sm:w-auto">
-              {t('home.cta.contactSales')}
-              <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
-            </Link>
-            <Link to={lp('/products')} className="btn-secondary-on-dark min-h-12 w-full px-8 text-base sm:w-auto">
-              {t('home.cta.viewCatalog')}
-            </Link>
-          </div>
-          <div className="relative mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-stone-400">
-            <span className="text-stone-200">{t('home.cta.responseNote', '24-hour specification review & factory quotation')}</span>
-            <a href="mailto:sales@bolenmirror.com" className="inline-flex items-center gap-1.5 transition-colors hover:text-white">
-              <Mail className="h-3.5 w-3.5" aria-hidden="true" />
-              sales@bolenmirror.com
-            </a>
-            <a href="tel:+8618058603602" className="inline-flex items-center gap-1.5 transition-colors hover:text-white">
-              <Phone className="h-3.5 w-3.5" aria-hidden="true" />
-              +86 18058603602
-            </a>
-          </div>
-        </div>
-      </section>
+      {/* Closing CTA — a BOLEN LED mirror with a working touch sensor (MirrorCta). */}
+      <MirrorCta />
     </div>
   );
 }

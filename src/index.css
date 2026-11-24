@@ -162,9 +162,11 @@
 
 /* Closing CTA (home) — drawn as one of our LED mirrors: smoked glass with a
    faint diagonal reflection, and a frosted light band inset from the edge.
-   The band is dark until the mirror first scrolls into view; then Home.tsx adds
-   .is-lit and the band switches on in warm white, spilling a little light into
-   the glass and onto the wall behind it. */
+   The band is dark until the mirror first scrolls into view; then MirrorCta
+   adds .is-lit and the band switches on, spilling a little light into the
+   glass and onto the wall behind it. The touch sensor steps data-temp through
+   3000K, 4000K and 6000K like the real mirror's, and the light fades between
+   them. --lamp is the band, --glow its halo, --wall the backlight. */
 .cta-mirror {
   /* Phones: an arched mirror, a semicircle (half the mirror's width, inside
      the px-4 gutters) over rounded lower corners. A dark rounded rectangle
@@ -172,6 +174,9 @@
   --top-radius: calc(50vw - 1rem);
   --bottom-radius: 1.75rem;
   --band-inset: 10px;
+  --lamp: 255 243 224;
+  --glow: 255 206 145;
+  --wall: 245 172 84;
   border-radius: var(--top-radius) var(--top-radius) var(--bottom-radius) var(--bottom-radius);
   background:
     /* Two reflections sweeping across the glass. */
@@ -202,18 +207,52 @@
 @media (min-width: 640px) {
   .cta-mirror-band { border-width: 7px; }
 }
+.cta-mirror[data-temp="4000"] { --lamp: 255 249 241; --glow: 255 236 212; --wall: 236 214 182; }
+.cta-mirror[data-temp="6000"] { --lamp: 241 247 255; --glow: 200 224 255; --wall: 160 196 245; }
 .cta-mirror.is-lit {
   box-shadow:
     inset 0 0 0 1px rgb(255 255 255 / 0.1),
     0 34px 60px -34px rgb(28 25 23 / 0.55),
     /* Backlight on the wall around the mirror. */
-    0 0 80px 2px rgb(245 172 84 / 0.28);
+    0 0 80px 2px rgb(var(--wall) / 0.28);
 }
 .cta-mirror.is-lit .cta-mirror-band {
-  border-color: rgb(255 243 224 / 0.8);
+  border-color: rgb(var(--lamp) / 0.8);
   box-shadow:
-    0 0 18px 2px rgb(255 206 145 / 0.42),
-    inset 0 0 18px 2px rgb(255 206 145 / 0.36);
+    0 0 18px 2px rgb(var(--glow) / 0.42),
+    inset 0 0 18px 2px rgb(var(--glow) / 0.36);
+}
+/* A soft highlight that follows the pointer over the glass (usePointerVars). */
+.cta-mirror-glare {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(26rem circle at calc(var(--px, 0.5) * 100%) calc(var(--py, 0.5) * 100%), rgb(var(--glow) / 0.1), transparent 62%);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.cta-mirror[data-pointer] .cta-mirror-glare { opacity: 1; }
+/* The touch sensor: a frosted pad that takes the band's light once it is on. */
+.cta-sensor-pad {
+  border: 1px solid rgb(255 255 255 / 0.22);
+  background: rgb(255 255 255 / 0.06);
+  transition: background-color 0.3s ease, box-shadow 0.6s ease, color 0.6s ease;
+}
+.cta-mirror.is-lit .cta-sensor-pad {
+  color: rgb(var(--lamp));
+  box-shadow: 0 0 14px 1px rgb(var(--glow) / 0.35), inset 0 0 8px rgb(var(--glow) / 0.25);
+}
+.cta-sensor:hover .cta-sensor-pad { background: rgb(255 255 255 / 0.14); }
+.cta-sensor:active .cta-sensor-pad { transform: scale(0.94); }
+.cta-sensor-pad::after {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  border: 1.5px solid rgb(var(--glow) / 0.7);
+  border-radius: 9999px;
+  opacity: 0;
+  pointer-events: none;
 }
 /* A reflection that glides across the glass now and then, once it is lit. */
 .cta-mirror-sweep {
@@ -393,6 +432,148 @@
   0% { transform: translateX(-120%) skewX(-12deg); }
   22%, 100% { transform: translateX(340%) skewX(-12deg); }
 }
+
+/* Home lower sections: interaction --------------------------------------------
+   Lights that follow the pointer (usePointerVars sets --px/--py, 0–1, and
+   data-pointer, for a mouse or pen only), hover and focus states, the export
+   map's selected market, and the certificate viewer. */
+
+/* Section headings: the kicker's rule draws out from its words and the heading
+   rises into place when the section is reached; the mirror's heading rises as
+   the light comes on. */
+.kicker-line { transform-origin: right; }
+.kicker-line:last-child:not(:first-child) { transform-origin: left; }
+@media (prefers-reduced-motion: no-preference) {
+  [data-seen] .kicker-line { animation: drawAcross 700ms cubic-bezier(0.65, 0, 0.35, 1) 80ms backwards; }
+  [data-seen] h2 { animation: liftIn 800ms cubic-bezier(0.22, 1, 0.36, 1) 40ms backwards; }
+  .cta-mirror.is-lit h2 { animation: liftIn 900ms cubic-bezier(0.22, 1, 0.36, 1) 120ms backwards; }
+  /* The touch sensor invites a touch: its ring pings twice once the light is on. */
+  .cta-mirror.is-lit .cta-sensor-pad::after { animation: processPing 1.6s cubic-bezier(0, 0, 0.2, 1) 1.8s 2; }
+}
+
+/* Sourcing routes: a warm light follows the pointer across the list. */
+.route-list::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(20rem circle at calc(var(--px, 0.5) * 100%) calc(var(--py, 0.5) * 100%), rgb(245 158 11 / 0.1), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.45s ease;
+}
+.route-list[data-pointer]::before { opacity: 1; }
+
+/* Manufacturing Advantage: the photos drift with the scroll; pointing at one
+   brings it closer and lights its end of the rail. */
+.adv-photo { transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1); }
+@media (hover: hover) {
+  .adv-step:hover .adv-photo { transform: scale(1.045); }
+}
+.adv-marker { transition: background-color 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease; }
+.adv-step:hover .adv-marker {
+  background-color: var(--color-amber-500);
+  border-color: var(--color-amber-500);
+  box-shadow: 0 0 10px rgb(245 158 11 / 0.6);
+}
+.adv-rail { transition: background-color 0.4s ease, box-shadow 0.4s ease; }
+.adv-list:has(.adv-step:hover) .adv-rail {
+  background-color: var(--color-amber-300);
+  box-shadow: 0 0 8px rgb(245 158 11 / 0.45);
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .adv-drift {
+      animation: advDrift linear both;
+      animation-timeline: view();
+      animation-range: cover;
+    }
+  }
+}
+@keyframes advDrift {
+  from { transform: translateY(-5%); }
+  to { transform: translateY(5%); }
+}
+
+/* Why Partner: the column under the pointer lights its proof. */
+.why-title { transition: color 0.35s ease; }
+.why-proof::before { transition: background-color 0.35s ease; }
+.why-check { transition: color 0.35s ease, filter 0.35s ease; }
+.why-col:hover .why-title { color: var(--color-amber-900); }
+.why-col:hover .why-proof::before { background-color: var(--color-amber-500); }
+.why-col:hover .why-check {
+  color: var(--color-amber-500);
+  filter: drop-shadow(0 0 4px rgb(245 158 11 / 0.55));
+}
+
+/* Export map: the selected market's corridor lights up and the rest dim, and
+   a shipment light runs out to it from the hub (GlobalMap). */
+.map-marker { transform-box: fill-box; transform-origin: center; }
+.global-map .map-corridor,
+.global-map .map-flow,
+.global-map .map-marker {
+  transition: opacity 0.35s ease, stroke 0.35s ease, stroke-width 0.35s ease, fill 0.35s ease, transform 0.35s ease;
+}
+.global-map .map-label,
+.global-map .map-chip { transition: opacity 0.35s ease, color 0.35s ease, background-color 0.35s ease, border-color 0.35s ease; }
+.map-corridor.is-dim,
+.map-marker.is-dim { opacity: 0.25; }
+.map-flow.is-dim { opacity: 0; }
+.map-label.is-dim { opacity: 0.4; }
+.map-corridor.is-active { stroke: var(--color-amber-600); stroke-width: 2.4; }
+.map-marker.is-active { fill: var(--color-amber-600); transform: scale(1.6); }
+.map-label:hover,
+.map-label.is-active { color: var(--color-amber-900); }
+.map-chip.is-active {
+  border-color: var(--color-amber-500);
+  background-color: var(--color-amber-50);
+  color: var(--color-amber-900);
+}
+.map-label.is-active .map-mark,
+.map-chip.is-active .map-mark {
+  border-color: var(--color-amber-600);
+  background-color: var(--color-amber-50);
+}
+.map-hit { cursor: pointer; }
+.map-ship {
+  fill: none;
+  stroke: var(--color-amber-500);
+  stroke-width: 3.2;
+  stroke-linecap: round;
+  stroke-dasharray: 0.12 1;
+  stroke-dashoffset: 0.12;
+  filter: drop-shadow(0 0 4px rgb(245 158 11 / 0.75));
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .map-ship { animation: mapShip 1.3s cubic-bezier(0.45, 0, 0.25, 1) forwards; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .map-ship { display: none; }
+}
+@keyframes mapShip { to { stroke-dashoffset: -1; } }
+
+/* Certifications: a sheet tilts toward the pointer with a warm light on it,
+   and opens large in the viewer. */
+.cert-sheet { transition: transform 0.35s ease, translate 0.3s ease, box-shadow 0.35s ease; }
+.cert-sheet[data-pointer] {
+  transform: perspective(600px) rotateX(calc((0.5 - var(--py, 0.5)) * 14deg)) rotateY(calc((var(--px, 0.5) - 0.5) * 18deg));
+  translate: 0 -4px;
+  box-shadow: 0 2px 4px rgb(28 25 23 / 0.08), 0 22px 34px -18px rgb(28 25 23 / 0.5);
+}
+.cert-sheet:focus-visible { translate: 0 -4px; }
+.cert-shine {
+  background: radial-gradient(12rem circle at calc(var(--px, 0.5) * 100%) calc(var(--py, 0.5) * 100%), rgb(255 236 200 / 0.4), transparent 55%);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.cert-sheet[data-pointer] .cert-shine { opacity: 1; }
+@media (prefers-reduced-motion: no-preference) {
+  .cert-viewer[open] { animation: viewerIn 320ms cubic-bezier(0.22, 1, 0.36, 1); }
+  .cert-viewer[open]::backdrop { animation: fadeIn 300ms ease; }
+  .cert-viewer-sheet { animation: viewerSheetIn 420ms cubic-bezier(0.22, 1, 0.36, 1); }
+}
+@keyframes viewerIn { from { opacity: 0; transform: translateY(14px) scale(0.97); } }
+@keyframes viewerSheetIn { from { opacity: 0; transform: scale(0.96) rotate(-1.2deg); } }
 
 /* Factory gallery: finite entrance and photo transitions, with no animation
    runtime added to the home bundle. Separate surfaces keep hover zoom from

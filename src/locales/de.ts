@@ -306,6 +306,10 @@ export const de = {
         title: "Globale Zertifizierungen",
         desc: "Modellspezifische Sicherheits-, Konformitäts- und Schutzartprüfungen für europäische, nordamerikanische, britische und australische Märkte.",
         scopeNote: "Verfügbare Prüfzeichen und Nachweise werden im Angebot je Modell und Zielmarkt bestätigt.",
+        // Certificate viewer (CertificateShelf.tsx).
+        viewerPrev: "Vorheriges Zertifikat",
+        viewerNext: "Nächstes Zertifikat",
+        viewerClose: "Schließen",
         items: {
           saa: "Australien & NZ",
           ce: "EU-Konformität",
@@ -390,6 +394,8 @@ export const de = {
         title: "Bereit, Ihren Raum aufzuwerten?",
         desc: "Kontaktieren Sie uns noch heute, um Ihre individuellen Anforderungen zu besprechen, oder durchsuchen Sie unseren umfangreichen Katalog an Premium-Spiegeln.",
         responseNote: "Spezifikationsprüfung & Werksangebot innerhalb von 24 Stunden",
+        // Touch sensor on the closing CTA mirror (Home.tsx); {{kelvin}} is e.g. "3000K".
+        lightToggle: "Lichtfarbe wechseln, aktuell {{kelvin}}",
         viewCatalog: "Katalog ansehen",
         contactSales: "Vertrieb kontaktieren"
       }

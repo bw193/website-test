@@ -306,6 +306,10 @@ export const fr = {
         title: "Certifications Mondiales",
         desc: "Essais de sécurité, de conformité et d'étanchéité vérifiés par modèle pour les marchés d'Europe, d'Amérique du Nord, du Royaume-Uni et d'Australie.",
         scopeNote: "Les marquages et rapports d'essais disponibles sont confirmés par modèle et marché lors du devis.",
+        // Certificate viewer (CertificateShelf.tsx).
+        viewerPrev: "Certificat précédent",
+        viewerNext: "Certificat suivant",
+        viewerClose: "Fermer",
         items: {
           saa: "Australie & NZ",
           ce: "Conformité Européenne",
@@ -390,6 +394,8 @@ export const fr = {
         title: "Prêt à Sublimer Votre Espace ?",
         desc: "Contactez-nous dès aujourd'hui pour discuter de vos besoins personnalisés ou parcourez notre vaste catalogue de miroirs haut de gamme.",
         responseNote: "Étude du cahier des charges et devis usine sous 24 heures",
+        // Touch sensor on the closing CTA mirror (Home.tsx); {{kelvin}} is e.g. "3000K".
+        lightToggle: "Changer la teinte de la lumière, actuellement {{kelvin}}",
         viewCatalog: "Voir le Catalogue",
         contactSales: "Contacter les Ventes"
       }

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ComposableMap, Geographies, Geography, type ProjectionFunction } from 'react-simple-maps';
 import { geoEqualEarth } from 'd3-geo';
@@ -20,6 +20,10 @@ const GEO_URL = 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json'
  * corridors draw out from the hub, nearest market first, each marker and label
  * landing as its corridor arrives; then a light runs out along every corridor
  * in turn while the hub sends out a ring.
+ *
+ * Interaction: pointing at, focusing or tapping a market (its label, its
+ * marker, or on phones its chip under the map) lights its corridor, dims the
+ * rest and runs a shipment light out to it from the hub.
  */
 const W = 1000;
 const H = 405;
@@ -92,7 +96,7 @@ const order = (key: RegionKey) => ({ '--i': String(DRAW_RANK.get(key) ?? 0) }) a
 
 function Mark({ children }: { children: React.ReactNode }) {
   return (
-    <span className="ml-1.5 rounded-[3px] border border-bronze-400/70 bg-[#F5F3EF] px-1 py-px text-[10px] font-semibold leading-none tracking-wide text-amber-800">
+    <span className="map-mark ml-1.5 rounded-[3px] border border-bronze-400/70 bg-[#F5F3EF] px-1 py-px text-[10px] font-semibold leading-none tracking-wide text-amber-800">
       {children}
     </span>
   );
@@ -101,83 +105,152 @@ function Mark({ children }: { children: React.ReactNode }) {
 export default function GlobalMap() {
   const { t } = useTranslation();
   const [figureRef, seen] = useSeenOnce<HTMLElement>('25%');
+  // The market a visitor is pointing at, focusing or has tapped: its corridor
+  // lights up, the others dim, and a shipment light runs out to it from the
+  // hub (re-run each time, hence the counter in its key).
+  const [active, setActive] = useState<RegionKey | null>(null);
+  const [shipment, setShipment] = useState(0);
+  const lastPointer = useRef('mouse');
   const regionName = (key: RegionKey) => t(`home.about.map.regions.${key}`);
   const summary = `${t('home.about.map.corridors')}: ${REGIONS.map((region) => regionName(region.key)).join(', ')}`;
+  const activeRegion = REGIONS.find((region) => region.key === active);
+
+  const select = (key: RegionKey | null) => {
+    setActive(key);
+    if (key) setShipment((n) => n + 1);
+  };
+  const state = (key: RegionKey) => (active === null ? '' : active === key ? ' is-active' : ' is-dim');
+
+  // Mouse: hovering a market selects it and clicking re-runs the light.
+  // Keyboard: focusing one selects it. Touch: a tap selects, a second tap on
+  // the same market clears.
+  const hover = (key: RegionKey) => ({
+    onPointerDown: (event: React.PointerEvent) => {
+      lastPointer.current = event.pointerType;
+    },
+    onPointerEnter: (event: React.PointerEvent) => {
+      if (event.pointerType === 'mouse') select(key);
+    },
+    onPointerLeave: (event: React.PointerEvent) => {
+      if (event.pointerType === 'mouse') select(null);
+    },
+    onClick: (event: React.MouseEvent) => {
+      const keyboard = event.detail === 0;
+      if (!keyboard && lastPointer.current === 'mouse') setShipment((n) => n + 1);
+      else if (!keyboard && active === key) setActive(null);
+      else select(key);
+    },
+  });
+  const control = (key: RegionKey) => ({
+    ...hover(key),
+    type: 'button' as const,
+    onFocus: (event: React.FocusEvent<HTMLElement>) => {
+      if (event.currentTarget.matches(':focus-visible')) select(key);
+    },
+    onBlur: () => select(null),
+  });
 
   return (
-    <figure ref={figureRef} data-seen={seen || undefined} className="global-map w-full">
-      <div role="img" aria-label={summary} className="relative">
-        <ComposableMap
-          // v3 uses a function prop as the projection itself; @types describes
-          // it as a factory, hence the cast.
-          projection={projection as unknown as ProjectionFunction}
-          width={W}
-          height={H}
-          className="block h-auto w-full"
-          aria-hidden="true"
-        >
-          <Geographies geography={GEO_URL}>
-            {({ geographies }) =>
-              geographies.map((geo) => (
-                <Geography
-                  key={geo.rsmKey}
-                  geography={geo}
-                  fill="#E5DDD2"
-                  stroke="#F5F3EF"
-                  strokeWidth={0.6}
-                  style={{
-                    default: { outline: 'none' },
-                    hover: { outline: 'none', fill: '#E5DDD2' },
-                    pressed: { outline: 'none' },
-                  }}
+    <figure ref={figureRef} data-seen={seen || undefined} data-active={active ?? undefined} className="global-map w-full">
+      <div className="relative">
+        <div role="img" aria-label={summary}>
+          <ComposableMap
+            // v3 uses a function prop as the projection itself; @types describes
+            // it as a factory, hence the cast.
+            projection={projection as unknown as ProjectionFunction}
+            width={W}
+            height={H}
+            className="block h-auto w-full"
+            aria-hidden="true"
+          >
+            <Geographies geography={GEO_URL}>
+              {({ geographies }) =>
+                geographies.map((geo) => (
+                  <Geography
+                    key={geo.rsmKey}
+                    geography={geo}
+                    fill="#E5DDD2"
+                    stroke="#F5F3EF"
+                    strokeWidth={0.6}
+                    style={{
+                      default: { outline: 'none' },
+                      hover: { outline: 'none', fill: '#E5DDD2' },
+                      pressed: { outline: 'none' },
+                    }}
+                  />
+                ))
+              }
+            </Geographies>
+
+            <g fill="none" stroke="#C4905E" strokeWidth={1.4} strokeLinecap="round">
+              {REGIONS.map((region) => (
+                <path
+                  key={region.key}
+                  className={`map-corridor${state(region.key)}`}
+                  style={order(region.key)}
+                  pathLength={1}
+                  d={corridor(project(region.at))}
                 />
-              ))
-            }
-          </Geographies>
-
-          <g fill="none" stroke="#C4905E" strokeWidth={1.4} strokeLinecap="round">
-            {REGIONS.map((region) => (
-              <path key={region.key} className="map-corridor" style={order(region.key)} pathLength={1} d={corridor(project(region.at))} />
-            ))}
-          </g>
-          <g fill="none" stroke="#F59E0B" strokeWidth={2.4} strokeLinecap="round">
-            {REGIONS.map((region) => (
-              <path key={region.key} className="map-flow" style={order(region.key)} pathLength={1} d={corridor(project(region.at))} />
-            ))}
-          </g>
-          {REGIONS.map((region) => {
-            const [x, y] = project(region.at);
-            return (
-              <circle
-                key={region.key}
-                className="map-marker"
-                style={order(region.key)}
-                cx={x}
-                cy={y}
-                r={5}
-                fill="#C4905E"
-                stroke="#F5F3EF"
-                strokeWidth={2}
+              ))}
+            </g>
+            <g fill="none" stroke="#F59E0B" strokeWidth={2.4} strokeLinecap="round">
+              {REGIONS.map((region) => (
+                <path
+                  key={region.key}
+                  className={`map-flow${state(region.key)}`}
+                  style={order(region.key)}
+                  pathLength={1}
+                  d={corridor(project(region.at))}
+                />
+              ))}
+            </g>
+            {activeRegion && (
+              <path
+                key={`${activeRegion.key}-${shipment}`}
+                className="map-ship"
+                pathLength={1}
+                d={corridor(project(activeRegion.at))}
               />
-            );
-          })}
-          <circle cx={HUB[0]} cy={HUB[1]} r={13} fill="none" stroke="#C4905E" strokeOpacity={0.5} strokeWidth={1.2} />
-          <circle className="map-hub-ping" cx={HUB[0]} cy={HUB[1]} r={13} fill="none" stroke="#F59E0B" strokeWidth={1.5} />
-          <circle cx={HUB[0]} cy={HUB[1]} r={6.5} fill="#B45309" stroke="#F5F3EF" strokeWidth={2} />
-        </ComposableMap>
+            )}
+            {REGIONS.map((region) => {
+              const [x, y] = project(region.at);
+              return (
+                <g key={region.key}>
+                  <circle
+                    className={`map-marker${state(region.key)}`}
+                    style={order(region.key)}
+                    cx={x}
+                    cy={y}
+                    r={5}
+                    fill="#C4905E"
+                    stroke="#F5F3EF"
+                    strokeWidth={2}
+                  />
+                  {/* A bigger, invisible target, so the small marker is easy to hover. */}
+                  <circle className="map-hit" cx={x} cy={y} r={18} fill="transparent" {...hover(region.key)} />
+                </g>
+              );
+            })}
+            <circle cx={HUB[0]} cy={HUB[1]} r={13} fill="none" stroke="#C4905E" strokeOpacity={0.5} strokeWidth={1.2} />
+            <circle className="map-hub-ping" cx={HUB[0]} cy={HUB[1]} r={13} fill="none" stroke="#F59E0B" strokeWidth={1.5} />
+            <circle cx={HUB[0]} cy={HUB[1]} r={6.5} fill="#B45309" stroke="#F5F3EF" strokeWidth={2} />
+          </ComposableMap>
+        </div>
 
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0 hidden text-stone-700 sm:block">
+        {/* The market labels are buttons: point at, focus or tap one to light its corridor. */}
+        <div className="pointer-events-none absolute inset-0 hidden text-stone-700 sm:block">
           {REGIONS.map((region) => (
-            <span
+            <button
               key={region.key}
+              {...control(region.key)}
               style={{ ...pct(project(region.at)), ...order(region.key) }}
-              className={`map-label absolute flex -translate-x-1/2 items-center whitespace-nowrap text-[12.5px] font-medium [text-shadow:0_0_3px_#F5F3EF,0_0_3px_#F5F3EF] ${
-                region.place === 'above' ? '-translate-y-[calc(100%+9px)]' : 'translate-y-[9px]'
-              }`}
+              className={`map-label pointer-events-auto absolute flex -translate-x-1/2 cursor-pointer items-center whitespace-nowrap rounded-full px-1.5 py-0.5 text-[12.5px] font-medium [text-shadow:0_0_3px_#F5F3EF,0_0_3px_#F5F3EF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 ${
+                region.place === 'above' ? '-translate-y-[calc(100%+6px)]' : 'translate-y-[6px]'
+              }${state(region.key)}`}
             >
               {regionName(region.key)}
               {region.mark && <Mark>{region.mark}</Mark>}
-            </span>
+            </button>
           ))}
           {/* Below and right of the hub: the corridors leave it upwards to the
               right (the Americas), to the left (Europe) and straight down
@@ -197,12 +270,17 @@ export default function GlobalMap() {
           <span aria-hidden="true" className="h-[1.5px] w-6 rounded-full bg-bronze-400" />
           {t('home.about.map.corridors')}
         </span>
-        <span className="mt-2.5 flex flex-wrap gap-x-4 gap-y-2 sm:hidden">
+        {/* Phones: the markets as chips, which light their corridors the same way. */}
+        <span className="mt-2.5 flex flex-wrap gap-x-2 gap-y-2 sm:hidden">
           {REGIONS.map((region) => (
-            <span key={region.key} className="inline-flex items-center">
+            <button
+              key={region.key}
+              {...control(region.key)}
+              className={`map-chip inline-flex items-center rounded-full border border-stone-300/80 bg-[#FAF9F6] px-2.5 py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500${state(region.key)}`}
+            >
               {regionName(region.key)}
               {region.mark && <Mark>{region.mark}</Mark>}
-            </span>
+            </button>
           ))}
         </span>
       </figcaption>

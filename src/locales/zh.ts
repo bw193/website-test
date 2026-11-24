@@ -306,6 +306,10 @@ export const zh = {
         title: "全球认证",
         desc: "按具体型号验证符合欧洲、北美、英国及澳大利亚市场的安全、合规与防护等级认证。",
         scopeNote: "适用认证标识与测试报告将在报价阶段按所选型号与目的市场逐一确认。",
+        // Certificate viewer (CertificateShelf.tsx).
+        viewerPrev: "上一张证书",
+        viewerNext: "下一张证书",
+        viewerClose: "关闭",
         items: {
           saa: "澳大利亚与新西兰",
           ce: "欧盟安全合规",
@@ -390,6 +394,8 @@ export const zh = {
         title: "准备好提升您的空间了吗？",
         desc: "立即联系我们讨论您的定制需求，或浏览我们丰富的优质镜子目录。",
         responseNote: "24 小时内回复规格评估与工厂报价",
+        // Touch sensor on the closing CTA mirror (Home.tsx); {{kelvin}} is e.g. "3000K".
+        lightToggle: "切换镜灯色温，当前 {{kelvin}}",
         viewCatalog: "查看目录",
         contactSales: "联系销售"
       }
