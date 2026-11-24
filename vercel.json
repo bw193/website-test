@@ -1,0 +1,24 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    {
+      "source": "/media/:path*",
+      "has": [{ "type": "query", "key": "width" }],
+      "destination": "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/render/image/public/:path*"
+    },
+    {
+      "source": "/media/:path*",
+      "has": [{ "type": "query", "key": "height" }],
+      "destination": "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/render/image/public/:path*"
+    },
+    {
+      "source": "/media/:path*",
+      "has": [{ "type": "query", "key": "resize" }],
+      "destination": "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/render/image/public/:path*"
+    },
+    {
+      "source": "/media/:path*",
+      "destination": "https://mxmmffwntosvwaviippd.supabase.co/storage/v1/object/public/:path*"
+    }
+  ]
+}
