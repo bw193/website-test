@@ -1,142 +1,175 @@
-import { m } from 'motion/react';
 import React from 'react';
-import {
-  ComposableMap,
-  Geographies,
-  Geography,
-  Marker,
-  Line
-} from 'react-simple-maps';
-const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
+import { useTranslation } from 'react-i18next';
+import { ComposableMap, Geographies, Geography, type ProjectionFunction } from 'react-simple-maps';
+import { geoEqualEarth } from 'd3-geo';
 
-const center: [number, number] = [120.75, 30.75]; // Jiaxing, China
+const GEO_URL = 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json';
 
-const destinations = [
-  { name: "America", coordinates: [-100, 40] as [number, number], color: "#e11d48", bg: "#ffe4e6" }, // Rose-600
-  { name: "Canada", coordinates: [-106, 56] as [number, number], color: "#ea580c", bg: "#ffedd5" }, // Orange-600
-  { name: "South America", coordinates: [-55, -10] as [number, number], color: "#ea580c", bg: "#ffedd5" },
-  { name: "Europe", coordinates: [10, 51] as [number, number], color: "#ea580c", bg: "#ffedd5" },
-  { name: "Middle East", coordinates: [45, 25] as [number, number], color: "#ea580c", bg: "#ffedd5" },
-  { name: "Thailand", coordinates: [100, 15] as [number, number], color: "#ea580c", bg: "#ffedd5" },
-  { name: "Australia", coordinates: [133, -25] as [number, number], color: "#ea580c", bg: "#ffedd5" },
-  { name: "Russia", coordinates: [100, 60] as [number, number], color: "#ea580c", bg: "#ffedd5" },
+/**
+ * BOLEN's export map. An Equal Earth world turned to 150°E puts the hub near
+ * Shanghai just left of centre, Europe and the Middle East to its left and the
+ * Americas across the Pacific to its right, so every corridor is a short arc
+ * that never crosses the map's edge. The frame runs from 75°N to 50°S.
+ *
+ * Labels are HTML laid over the SVG so they keep their size at every width.
+ * Below `sm` they would crowd the land, so the map drops them and the caption
+ * lists the regions instead.
+ */
+const W = 1000;
+const H = 405;
+const projection = geoEqualEarth().rotate([-150, 0]).scale(184.7).translate([W / 2, 231.6]);
+const project = (coordinates: [number, number]) => projection(coordinates) as [number, number];
+
+// Jiaxing, between the Shanghai and Ningbo ports.
+const HUB = project([120.75, 30.75]);
+
+type RegionKey =
+  | 'northAmerica'
+  | 'canada'
+  | 'southAmerica'
+  | 'europe'
+  | 'ukNordics'
+  | 'middleEast'
+  | 'southeastAsia'
+  | 'australia';
+
+/**
+ * The eight corridors in home.about.map.regions. `mark` is the certification
+ * the certificates section names for that market (CE Europe, UKCA United
+ * Kingdom, UL North America, SAA Australia & NZ); `place` keeps neighbouring
+ * labels apart.
+ */
+const REGIONS: { key: RegionKey; at: [number, number]; place: 'above' | 'below'; mark?: string }[] = [
+  { key: 'canada', at: [-106, 57], place: 'above' },
+  { key: 'northAmerica', at: [-97, 38], place: 'below', mark: 'UL' },
+  { key: 'southAmerica', at: [-58, -12], place: 'below' },
+  { key: 'ukNordics', at: [4, 59], place: 'above', mark: 'UKCA' },
+  { key: 'europe', at: [15, 46], place: 'below', mark: 'CE' },
+  { key: 'middleEast', at: [46, 25], place: 'below' },
+  { key: 'southeastAsia', at: [103, 12], place: 'below' },
+  { key: 'australia', at: [134, -25], place: 'below', mark: 'SAA' },
 ];
 
-export default function GlobalMap() {
+/** A corridor from the hub, bowed away from the equator like a sea lane on a globe. */
+function corridor([x, y]: [number, number]): string {
+  const [hx, hy] = HUB;
+  const dx = x - hx;
+  const dy = y - hy;
+  const length = Math.hypot(dx, dy);
+  let nx = -dy / length;
+  let ny = dx / length;
+  if (ny > 0) {
+    nx = -nx;
+    ny = -ny;
+  }
+  const bow = length * 0.2;
+  const cx = (hx + x) / 2 + nx * bow;
+  const cy = (hy + y) / 2 + ny * bow;
+  return `M${hx.toFixed(1)} ${hy.toFixed(1)}Q${cx.toFixed(1)} ${cy.toFixed(1)} ${x.toFixed(1)} ${y.toFixed(1)}`;
+}
+
+const pct = ([x, y]: [number, number]): React.CSSProperties => ({
+  left: `${(x / W) * 100}%`,
+  top: `${(y / H) * 100}%`,
+});
+
+function Mark({ children }: { children: React.ReactNode }) {
   return (
-    <div className="w-full h-full bg-stone-50 rounded-3xl overflow-hidden relative shadow-xl border border-stone-200">
-      <ComposableMap
-        projection="geoMercator"
-        projectionConfig={{
-          scale: 140,
-          center: [10, 30]
-        }}
-        width={1000}
-        height={450}
-        style={{ width: "100%", height: "100%" }}
-      >
-        <Geographies geography={geoUrl}>
-          {({ geographies }) =>
-            geographies.map((geo) => (
-              <Geography
-                key={geo.rsmKey}
-                geography={geo}
-                fill="#e7e5e4"
-                stroke="#ffffff"
-                strokeWidth={0.5}
-                style={{
-                  default: { outline: "none" },
-                  hover: { outline: "none", fill: "#d6d3d1" },
-                  pressed: { outline: "none" },
-                }}
-              />
-            ))
-          }
-        </Geographies>
+    <span className="ml-1.5 rounded-[3px] border border-bronze-400/70 bg-[#F5F3EF] px-1 py-px text-[10px] font-semibold leading-none tracking-wide text-amber-800">
+      {children}
+    </span>
+  );
+}
 
-        {/* Lines */}
-        {destinations.map((dest, i) => (
-          <Line
-            key={`line-${i}`}
-            from={center}
-            to={dest.coordinates}
-            stroke={dest.color}
-            strokeWidth={1.5}
-            strokeLinecap="round"
-            className="opacity-60"
-            style={{
-              strokeDasharray: "4 4",
-              animation: "dash 10s linear infinite"
-            }}
-          />
-        ))}
+export default function GlobalMap() {
+  const { t } = useTranslation();
+  const regionName = (key: RegionKey) => t(`home.about.map.regions.${key}`);
+  const summary = `${t('home.about.map.corridors')}: ${REGIONS.map((region) => regionName(region.key)).join(', ')}`;
 
-        {/* Markers */}
-        <Marker coordinates={center}>
-          <circle r={4} fill="#2563eb" />
-          <circle r={12} fill="#3b82f6" className="opacity-30 animate-ping" />
-          <rect x={10} y={-10} width={40} height={20} fill="#dbeafe" rx={4} />
-          <text textAnchor="middle" x={30} y={4} style={{ fontFamily: "system-ui", fill: "#1e3a8a", fontSize: "10px", fontWeight: "600" }}>
-            China
-          </text>
-        </Marker>
+  return (
+    <figure className="w-full">
+      <div role="img" aria-label={summary} className="relative">
+        <ComposableMap
+          // v3 uses a function prop as the projection itself; @types describes
+          // it as a factory, hence the cast.
+          projection={projection as unknown as ProjectionFunction}
+          width={W}
+          height={H}
+          className="block h-auto w-full"
+          aria-hidden="true"
+        >
+          <Geographies geography={GEO_URL}>
+            {({ geographies }) =>
+              geographies.map((geo) => (
+                <Geography
+                  key={geo.rsmKey}
+                  geography={geo}
+                  fill="#E5DDD2"
+                  stroke="#F5F3EF"
+                  strokeWidth={0.6}
+                  style={{
+                    default: { outline: 'none' },
+                    hover: { outline: 'none', fill: '#E5DDD2' },
+                    pressed: { outline: 'none' },
+                  }}
+                />
+              ))
+            }
+          </Geographies>
 
-        {destinations.map((dest, i) => (
-          <Marker key={`marker-${i}`} coordinates={dest.coordinates}>
-            <m.circle
-              r={4}
-              fill="transparent"
-              stroke={dest.color}
-              strokeWidth={2}
-              initial={{ scale: 0 }}
-              whileInView={{ scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 1 + i * 0.1 }}
-            />
-            <m.circle
-              r={10}
-              fill={dest.color}
-              className="opacity-20"
-              initial={{ scale: 0 }}
-              whileInView={{ scale: [1, 1.5, 1] }}
-              viewport={{ once: true }}
-              transition={{ delay: 1 + i * 0.1, duration: 2, repeat: Infinity }}
-            />
-            <m.rect
-              x={dest.coordinates[0] < center[0] ? -60 : 10}
-              y={-10}
-              width={50}
-              height={20}
-              fill={dest.bg}
-              rx={4}
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 1.2 + i * 0.1 }}
-            />
-            <m.text
-              textAnchor="middle"
-              x={dest.coordinates[0] < center[0] ? -35 : 35}
-              y={4}
-              style={{ fontFamily: "system-ui", fill: "#78350f", fontSize: "10px", fontWeight: "600" }}
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 1.3 + i * 0.1 }}
+          <g fill="none" stroke="#C4905E" strokeWidth={1.4} strokeLinecap="round">
+            {REGIONS.map((region) => (
+              <path key={region.key} d={corridor(project(region.at))} />
+            ))}
+          </g>
+          {REGIONS.map((region) => {
+            const [x, y] = project(region.at);
+            return <circle key={region.key} cx={x} cy={y} r={5} fill="#C4905E" stroke="#F5F3EF" strokeWidth={2} />;
+          })}
+          <circle cx={HUB[0]} cy={HUB[1]} r={13} fill="none" stroke="#C4905E" strokeOpacity={0.5} strokeWidth={1.2} />
+          <circle cx={HUB[0]} cy={HUB[1]} r={6.5} fill="#B45309" stroke="#F5F3EF" strokeWidth={2} />
+        </ComposableMap>
+
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 hidden text-stone-700 sm:block">
+          {REGIONS.map((region) => (
+            <span
+              key={region.key}
+              style={pct(project(region.at))}
+              className={`absolute flex -translate-x-1/2 items-center whitespace-nowrap text-[12.5px] font-medium [text-shadow:0_0_3px_#F5F3EF,0_0_3px_#F5F3EF] ${
+                region.place === 'above' ? '-translate-y-[calc(100%+9px)]' : 'translate-y-[9px]'
+              }`}
             >
-              {dest.name}
-            </m.text>
-          </Marker>
-        ))}
-      </ComposableMap>
-      
-      <style>{`
-        @keyframes dash {
-          to {
-            stroke-dashoffset: -100;
-          }
-        }
-      `}</style>
-    </div>
+              {regionName(region.key)}
+              {region.mark && <Mark>{region.mark}</Mark>}
+            </span>
+          ))}
+          {/* Below and right of the hub: the corridors leave it upwards to the
+              right (the Americas), to the left (Europe) and straight down
+              (Australia), and this is the one wedge none of them cross. */}
+          <span
+            style={pct(HUB)}
+            className="absolute translate-x-[12px] translate-y-[10px] whitespace-nowrap [text-shadow:0_0_3px_#F5F3EF,0_0_3px_#F5F3EF]"
+          >
+            <span className="block text-[13px] font-semibold text-stone-900">{t('home.about.map.hub')}</span>
+            <span className="block text-[11.5px] text-stone-500">{t('home.about.map.hubSub')}</span>
+          </span>
+        </div>
+      </div>
+
+      <figcaption className="mt-3 text-[13px] text-stone-600">
+        <span className="inline-flex items-center gap-2 font-medium text-stone-800">
+          <span aria-hidden="true" className="h-[1.5px] w-6 rounded-full bg-bronze-400" />
+          {t('home.about.map.corridors')}
+        </span>
+        <span className="mt-2.5 flex flex-wrap gap-x-4 gap-y-2 sm:hidden">
+          {REGIONS.map((region) => (
+            <span key={region.key} className="inline-flex items-center">
+              {regionName(region.key)}
+              {region.mark && <Mark>{region.mark}</Mark>}
+            </span>
+          ))}
+        </span>
+      </figcaption>
+    </figure>
   );
 }
